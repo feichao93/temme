@@ -35,18 +35,18 @@ CssSelector
 
 CssPartSep 'css-selector-part-seperator'
   = s+
-  / & '>'
+  / & '>' s*
 
-Part 'cssSelectorPart'
-  = direct:'>'? tag:Tag id:Id? classList:Class* 
+Part 'css-selector-part'
+  = direct:('>' s* { return '>' })? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:'>'? tag:Tag? id:Id classList:Class*
+  / direct:('>' s* { return '>' })? tag:Tag? id:Id classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:'>'? tag:Tag? id:Id? classList:Class+
+  / direct:('>' s* { return '>' })? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }

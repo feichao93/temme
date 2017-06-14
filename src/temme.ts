@@ -5,7 +5,7 @@ import * as cheerio from 'cheerio'
 
 const defaultCaptureKey = '@@default-capture@@'
 
-const grammar = fs.readFileSync(path.resolve(__dirname, 'temme.pegjs'), 'utf8')
+const grammar = fs.readFileSync(path.resolve(__dirname, '../src/temme.pegjs'), 'utf8')
 
 export const temmeParser = pegjs.generate(grammar)
 
