@@ -1,0 +1,19 @@
+{
+  "name": "temme",
+  "version": "0.1.0",
+  "description": "Better CSS selector for node crawlers.",
+  "main": "null",
+  "repository": "https://github.com/shinima/temme.git",
+  "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
+  "license": "MIT",
+  "dependencies": {
+    "@types/cheerio": "^0.22.1",
+    "cheerio": "^1.0.0-rc.1"
+  },
+  "devDependencies": {
+    "@types/node": "^7.0.31",
+    "@types/pegjs": "^0.10.0",
+    "pegjs": "^0.10.0",
+    "typescript": "^2.3.4"
+  }
+}
