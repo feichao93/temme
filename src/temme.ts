@@ -33,6 +33,8 @@ interface NonSelfSelector {
 
 interface SelfSelector {
   self: true
+  id: string
+  classList: string[]
   attrList: CssAttr[]
   content: ContentPart[]
 }
@@ -105,8 +107,8 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
         const cssSelector = makeNormalCssSelector([{
           direct: false,
           tag: '',
-          id: '',
-          classList: null,
+          id: selector.id,
+          classList: selector.classList,
           attrList: selector.attrList,
           content: selector.content,
         }])

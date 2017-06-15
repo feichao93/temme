@@ -8,8 +8,8 @@ Start = s* selector:Selector s* { return selector }
 Selector = SelfSelector / NonSelfSelector
 
 SelfSelector
-  = '&' attrList:AttrSelector? content:Content? {
-    return { self: true, attrList, content }
+  = '&' id:Id? classList:Class* attrList:AttrSelector? content:Content? {
+    return { self: true, id, classList, attrList, content }
   }
 
 NonSelfSelector
@@ -30,7 +30,7 @@ Children
   }
 
 CssSelector
-  = head:Part tail:(CssPartSep part:Part { return part })* {
+  = head:CssSelectorPart tail:(CssPartSep part:CssSelectorPart { return part })* {
     return [head].concat(tail)
   }
 
@@ -38,7 +38,7 @@ CssPartSep 'css-selector-part-seperator'
   = s+
   / & '>' s*
 
-Part 'css-selector-part'
+CssSelectorPart 'css-selector-part'
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
   = direct:('>' s* { return '>' })? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
