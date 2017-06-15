@@ -13,8 +13,8 @@ SelfSelector
   }
 
 NonSelfSelector
-  = css:CssSelector name:CssSelectorName? s* children:Children? {
-    return { self: false, css, name, children }
+  = css:CssSelector s* name:CssSelectorName? filterList:Filter* s* children:Children? {
+    return { self: false, css, name, filterList, children }
   }
 
 CssSelectorName
@@ -27,6 +27,11 @@ Children
   s* ','? // optimal extra comma
   s* ')' {
     return [head].concat(tail)
+  }
+
+Filter
+  = ':' chars:NormalChar+ {
+    return chars.join('')
   }
 
 CssSelector
@@ -79,9 +84,13 @@ ContentPart
 Arg = String / ValueCapture
 
 ValueCapture
-  = '$' chars:NormalChar+ { return { capture: chars.join('') } }
-  / '$' { return { capture: defaultCaptureKey } }
-  / '_' { return { capture: ingoreCaptureKey } }
+  = '$' chars:NormalChar+ filterList:Filter* {
+    return { capture: chars.join(''), filterList }
+  }
+  / '$' filterList:Filter* {
+    return { capture: defaultCaptureKey, filterList }
+  }
+  / '_' { return { capture: ingoreCaptureKey, filterList: [] } }
 
 AttrSelector 'attribute-selector'
   = '[' s*

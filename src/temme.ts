@@ -12,7 +12,7 @@ const errors = {
 const defaultCaptureKey = '@@default-capture@@'
 const ignoreCaptureKey = '@@ignore-capture@@'
 
-const ignoreCapture = { capture: ignoreCaptureKey }
+const ignoreCapture: Capture<string> = { capture: ignoreCaptureKey, filterList: [] }
 
 const grammar = fs.readFileSync(path.resolve(__dirname, '../src/temme.pegjs'), 'utf8')
 
@@ -22,6 +22,10 @@ interface Dict<V> {
   [key: string]: V
 }
 
+interface Filter {
+  (v: any): any
+}
+
 type TemmeSelector = SelfSelector | NonSelfSelector
 
 interface NonSelfSelector {
@@ -29,6 +33,7 @@ interface NonSelfSelector {
   name: string
   css: CssPart[]
   children: TemmeSelector[]
+  filterList: string[]
 }
 
 interface SelfSelector {
@@ -64,6 +69,7 @@ type FuncName = 'text' | 'html' | 'node' | 'contains'
 
 type Capture<T> = {
   capture: T
+  filterList: string[]
 }
 
 function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioStatic {
@@ -95,13 +101,18 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
       if (selector.self === false) {
         const cssSelector = makeNormalCssSelector(selector.css)
         const subCheerio = cntCheerio.find(cssSelector)
-        const capturer = makeValueCapturer(selector.css)
-        Object.assign(result, capturer(subCheerio))
+        if (subCheerio.length > 0) {
+          const capturer = makeValueCapturer(selector.css)
+          Object.assign(result, capturer(subCheerio))
 
-        if (selector.name && selector.children) {
-          result[selector.name] = subCheerio.toArray()
-            .map(sub => helper($(sub), selector.children))
-            .filter(r => Object.keys(r).length > 0)
+          if (selector.name && selector.children) {
+            const beforeValue = subCheerio.toArray()
+              .map(sub => helper($(sub), selector.children))
+              .filter(r => Object.keys(r).length > 0)
+            result[selector.name] = applyFilters(beforeValue, selector.filterList)
+          }
+        } else if (selector.name) {
+          result[selector.name] = applyFilters([], selector.filterList)
         }
       } else { // self === true
         const cssSelector = makeNormalCssSelector([{
@@ -119,7 +130,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
       }
     })
     delete result[ignoreCaptureKey]
-    if (result[defaultCaptureKey]) {
+    if (result.hasOwnProperty(defaultCaptureKey)) {
       return result[defaultCaptureKey]
     } else {
       return result
@@ -144,7 +155,7 @@ function captureAttrs(node: Cheerio, attrList: CssAttr[]) {
     if (typeof attr.value === 'object') {
       const value = node.attr(attr.name)
       if (value !== undefined) {
-        result[attr.value.capture] = value
+        result[attr.value.capture] = applyFilters(value, attr.value.filterList)
       }
     }
     // todo 这里是否需要同时验证匹配? 例如 foo=bar
@@ -180,7 +191,7 @@ function captureContent(node: Cheerio, content: ContentPart[]) {
       console.assert(part.args.length === 1)
       const arg = part.args[0]
       if (typeof arg === 'object') {
-        result[arg.capture] = cheerio(node)
+        result[arg.capture] = applyFilters(cheerio(node), arg.filterList)
       } else {
         throw new Error('Cotnent func `text` must be in `text($foo)` form')
       }
@@ -229,8 +240,8 @@ function makeSelfCapturer(selfSelector: SelfSelector) {
 export function captureString(s: string, args: ContentPartArg[]) {
   const trimed = s.trim()
   const result: Dict<string> = {}
-  // 标记正在捕获的字段名称, 空字符表示没有在捕获中
-  let capturing = ''
+  // 标记正在进行的capture, null表示没有在捕获中
+  let capturing: Capture<string> = null
   let charIndex = 0
   for (const arg of args) {
     if (typeof arg === 'string') {
@@ -239,24 +250,24 @@ export function captureString(s: string, args: ContentPartArg[]) {
         if (c === -1) {
           return null
         } else {
-          result[capturing] = trimed.substring(charIndex, c).trim()
-          capturing = ''
+          result[capturing.capture] = trimed.substring(charIndex, c)
+          result[capturing.capture] = applyFilters(trimed.substring(charIndex, c), capturing.filterList)
+          capturing = null
           charIndex = c + arg.length
         }
       } else {
         if (trimed.substring(charIndex).startsWith(arg)) {
           charIndex += arg.length
-          continue
         } else {
           return null // fail
         }
       }
     } else { // arg is value capture
-      capturing = arg.capture
+      capturing = arg
     }
   }
   if (capturing) {
-    result[capturing] = trimed.substring(charIndex).trim()
+    result[capturing.capture] = applyFilters(trimed.substring(charIndex).trim(), capturing.filterList)
     charIndex = s.length
   }
   if (charIndex !== s.length) {
@@ -319,4 +330,27 @@ function makeNormalCssSelector(cssPartArray: CssPart[]) {
     }
   })
   return result.join('')
+}
+
+const filterMap: { [key: string]: Filter } = {}
+
+function applyFilters(initValue: any, filterList: string[]) {
+  return filterList.reduce((value, filterName) => {
+    if (typeof filterMap[filterName] === 'function') {
+      return filterMap[filterName](value)
+    } else {
+      throw new Error(`${filterName} is not a valid filter.`)
+    }
+  }, initValue)
+}
+
+filterMap['pack'] = (v: any) => Object.assign({}, ...v)
+filterMap['splitComma'] = (s: string) => s.split(',')
+filterMap['splitBlanks'] = (s: string) => s.split(/ +/)
+filterMap['Number'] = Number
+filterMap['String'] = String
+filterMap['Boolean'] = Boolean
+
+export function defineFilter(name: string, filter: Filter) {
+  filterMap[name] = filter
 }
