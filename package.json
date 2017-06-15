@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Better CSS selector for node crawlers.",
   "main": "build/temme.js",
   "repository": "https://github.com/shinima/temme.git",
