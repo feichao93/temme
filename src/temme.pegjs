@@ -13,19 +13,36 @@ SelfSelector
   }
 
 NonSelfSelector
-  = css:CssSelector s* name:CssSelectorName? filterList:Filter* s* children:Children? {
-    return { self: false, css, name, filterList, children }
+  = css:CssSelector s* nc:NameAndChildren? {
+    return {
+      self: false,
+      css,
+      name: nc && nc.name,
+      filterList: nc && nc.filterList,
+      children: nc && nc.children,
+    }
+  }
+
+NameAndChildren
+  = name:CssSelectorName filterList:Filter* s* children:ParenthesizedChildren {
+    return { name, filterList, children }
+  }
+  / name:CssSelectorName filterList:Filter* s+ singleChild:Selector {
+    return { name, filterList, children: singleChild ? [singleChild] : null }
+  }
+  / name:CssSelectorName filterList:Filter* {
+    error('After @-sign there must be valid children selectors. You need to parenthesize the children selectors, or you need a blank after @-sign')
   }
 
 CssSelectorName
   = '@' chars:NormalChar+ { return chars.join('') }
   / '@' { return defaultCaptureKey }
 
-Children
+ParenthesizedChildren
   = '('
-  s* head:Selector s* tail:(',' s* s:Selector { return s })*
-  s* ','? // optimal extra comma
-  s* ')' {
+    s* head:Selector s* tail:(',' s* s:Selector { return s })*
+    s* ','? // optimal extra comma
+    s* ')' {
     return [head].concat(tail)
   }
 
@@ -60,15 +77,15 @@ CssSelectorPart 'css-selector-part'
 
 Content
   = '{'
-  s* single:ValueCapture
-  s* ','? // optimal extra comma
-  s* '}' { 
+    s* single:ValueCapture
+    s* ','? // optimal extra comma
+    s* '}' { 
     return [{ funcName: 'text', args: [single] }]
   }
   / '{' 
-  s* head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
-  s* ','? // optimal extra comma
-  s* '}' { 
+    s* head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
+    s* ','? // optimal extra comma
+    s* '}' { 
     return [head].concat(tail)
   }
 

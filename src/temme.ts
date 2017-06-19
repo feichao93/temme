@@ -72,8 +72,44 @@ type Capture<T> = {
   filterList: string[]
 }
 
+function isEmptyObject(x: any) {
+  return typeof x === 'object' && Object.keys(x).length === 0
+}
+
 function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioStatic {
   return typeof (<CheerioStatic>arg).root === 'function'
+}
+
+function checkLeadingCssParts(cssParts: CssPart[]) {
+  const hasLeadingCapture = cssParts.some(part => {
+    const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string')
+    if (hasAttrCapture) {
+      return true
+    }
+    const hasContentCapture = part.content && part.content.length > 0
+    if (hasContentCapture) {
+      return true
+    }
+    return false
+  })
+  if (hasLeadingCapture) {
+    console.warn('Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?')
+  }
+}
+
+// notice 递归的检查 selector是否合法, 目前暂时不会抛出异常, 只会提示对应的出错消息
+function check(selector: TemmeSelector) {
+  if (selector.self === true) {
+  } else {
+    const cssPartsLength = selector.css.length
+    const leadingParts = selector.css.slice(0, cssPartsLength - 1)
+    checkLeadingCssParts(leadingParts)
+    if (selector.children) {
+      for (const child of selector.children) {
+        check(child)
+      }
+    }
+  }
 }
 
 export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector) {
@@ -92,7 +128,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
   } else {
     rootSelector = selector
   }
-
+  check(rootSelector)
   return helper($.root(), [rootSelector])
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]) {
@@ -108,7 +144,6 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
           if (selector.name && selector.children) {
             const beforeValue = subCheerio.toArray()
               .map(sub => helper($(sub), selector.children))
-              .filter(r => Object.keys(r).length > 0)
             result[selector.name] = applyFilters(beforeValue, selector.filterList)
           }
         } else if (selector.name) {
@@ -130,10 +165,15 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
       }
     })
     delete result[ignoreCaptureKey]
+
+    let returnVal = result
     if (result.hasOwnProperty(defaultCaptureKey)) {
-      return result[defaultCaptureKey]
+      returnVal = result[defaultCaptureKey]
+    }
+    if (isEmptyObject(returnVal)) {
+      return null
     } else {
-      return result
+      return returnVal
     }
   }
 }
@@ -281,7 +321,7 @@ export function captureString(s: string, args: ContentPartArg[]) {
 function makeValueCapturer(cssPartArray: CssPart[]) {
   return (node: Cheerio) => {
     const result: CaptureResult = {}
-    // todo 目前只能在最后一个part中进行value-capture
+    // notice 目前只能在最后一个part中进行value-capture
     const lastCssPart = cssPartArray[cssPartArray.length - 1]
     if (lastCssPart.attrList) {
       Object.assign(result, captureAttrs(node, lastCssPart.attrList))
@@ -344,12 +384,37 @@ function applyFilters(initValue: any, filterList: string[]) {
   }, initValue)
 }
 
-filterMap['pack'] = (v: any) => Object.assign({}, ...v)
-filterMap['splitComma'] = (s: string) => s.split(',')
-filterMap['splitBlanks'] = (s: string) => s.split(/ +/)
-filterMap['Number'] = Number
-filterMap['String'] = String
-filterMap['Boolean'] = Boolean
+const defaultFilters = {
+  pack(v: any[]) {
+    return Object.assign({}, ...v)
+  },
+  splitComma(s: string) {
+    return s.split(',')
+  },
+  splitBlanks(s: string) {
+    return s.split(/ +/)
+  },
+  Number,
+  String,
+  Boolean,
+  Date(arg: any) {
+    return new Date(arg)
+  },
+  firstLine(s: string) {
+    return s.split(/(\r\n)|\r|\n/)[0]
+  },
+  trim(s: string) {
+    return s.trim()
+  },
+  asWords(s: string) {
+    return s.replace(/\s+/, ' ')
+  },
+  json(arg: any) {
+    return JSON.stringify(arg)
+  },
+}
+
+Object.assign(filterMap, defaultFilters)
 
 export function defineFilter(name: string, filter: Filter) {
   filterMap[name] = filter
