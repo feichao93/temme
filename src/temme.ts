@@ -20,16 +20,16 @@ interface Dict<V> {
   [key: string]: V
 }
 
-interface Filter {
+export interface Filter {
   (v: any): any
 }
 interface FilterMap {
   [key: string]: Filter
 }
 
-type TemmeSelector = SelfSelector | NonSelfSelector
+export type TemmeSelector = SelfSelector | NonSelfSelector
 
-interface NonSelfSelector {
+export interface NonSelfSelector {
   self: false
   name: string
   css: CssPart[]
@@ -37,7 +37,7 @@ interface NonSelfSelector {
   filterList: string[]
 }
 
-interface SelfSelector {
+export interface SelfSelector {
   self: true
   id: string
   classList: string[]
@@ -45,14 +45,14 @@ interface SelfSelector {
   content: ContentPart[]
 }
 
-interface CssAttr {
+export interface CssAttr {
   name: string
   value: string | Capture<string>
 }
 
 export type CaptureResult = any
 
-interface CssPart {
+export interface CssPart {
   direct: boolean
   tag: string
   id: string
@@ -61,14 +61,14 @@ interface CssPart {
   content: ContentPart[]
 }
 
-type ContentPart = {
+export type ContentPart = {
   funcName: FuncName
   args: ContentPartArg[]
 }
-type ContentPartArg = string | Capture<string>
-type FuncName = 'text' | 'html' | 'node' | 'contains'
+export type ContentPartArg = string | Capture<string>
+export type FuncName = 'text' | 'html' | 'node' | 'contains'
 
-type Capture<T> = {
+export type Capture<T> = {
   capture: T
   filterList: string[]
 }
