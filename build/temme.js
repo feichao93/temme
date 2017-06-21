@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = require("path");
-const fs = require("fs");
 const pegjs = require("pegjs");
 const cheerio = require("cheerio");
+const grammar_1 = require("./grammar");
+const makeGrammarErrorMessage_1 = require("./makeGrammarErrorMessage");
 const errors = {
     funcNameNotSupported(f) {
         return `${f} is not a valid content func-name.`;
@@ -11,13 +11,46 @@ const errors = {
 };
 const defaultCaptureKey = '@@default-capture@@';
 const ignoreCaptureKey = '@@ignore-capture@@';
-const ignoreCapture = { capture: ignoreCaptureKey };
-const grammar = fs.readFileSync(path.resolve(__dirname, '../src/temme.pegjs'), 'utf8');
-exports.temmeParser = pegjs.generate(grammar);
+const ignoreCapture = { capture: ignoreCaptureKey, filterList: [] };
+exports.temmeParser = pegjs.generate(grammar_1.default);
+function isEmptyObject(x) {
+    return typeof x === 'object' && Object.keys(x).length === 0;
+}
 function isCheerioStatic(arg) {
     return typeof arg.root === 'function';
 }
-function temme(html, selector) {
+function checkLeadingCssParts(cssParts) {
+    const hasLeadingCapture = cssParts.some(part => {
+        const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string');
+        if (hasAttrCapture) {
+            return true;
+        }
+        const hasContentCapture = part.content && part.content.length > 0;
+        if (hasContentCapture) {
+            return true;
+        }
+        return false;
+    });
+    if (hasLeadingCapture) {
+        console.warn('Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?');
+    }
+}
+// notice 递归的检查 selector是否合法, 目前暂时不会抛出异常, 只会提示对应的出错消息
+function check(selector) {
+    if (selector.self === true) {
+    }
+    else {
+        const cssPartsLength = selector.css.length;
+        const leadingParts = selector.css.slice(0, cssPartsLength - 1);
+        checkLeadingCssParts(leadingParts);
+        if (selector.children) {
+            for (const child of selector.children) {
+                check(child);
+            }
+        }
+    }
+}
+function temme(html, selector, extraFilters = {}) {
     let $;
     if (typeof html === 'string') {
         $ = cheerio.load(html, { decodeEntities: false });
@@ -30,11 +63,19 @@ function temme(html, selector) {
     }
     let rootSelector;
     if (typeof selector === 'string') {
-        rootSelector = exports.temmeParser.parse(selector);
+        try {
+            rootSelector = exports.temmeParser.parse(selector);
+        }
+        catch (error) {
+            const message = makeGrammarErrorMessage_1.default(selector, error);
+            throw new Error(message);
+        }
     }
     else {
         rootSelector = selector;
     }
+    const filterMap = Object.assign({}, defaultFilterMap, extraFilters);
+    check(rootSelector);
     return helper($.root(), [rootSelector]);
     function helper(cntCheerio, selectorArray) {
         const result = {};
@@ -42,12 +83,17 @@ function temme(html, selector) {
             if (selector.self === false) {
                 const cssSelector = makeNormalCssSelector(selector.css);
                 const subCheerio = cntCheerio.find(cssSelector);
-                const capturer = makeValueCapturer(selector.css);
-                Object.assign(result, capturer(subCheerio));
-                if (selector.name && selector.children) {
-                    result[selector.name] = subCheerio.toArray()
-                        .map(sub => helper($(sub), selector.children))
-                        .filter(r => Object.keys(r).length > 0);
+                if (subCheerio.length > 0) {
+                    const capturer = makeValueCapturer(selector.css);
+                    Object.assign(result, capturer(subCheerio));
+                    if (selector.name && selector.children) {
+                        const beforeValue = subCheerio.toArray()
+                            .map(sub => helper($(sub), selector.children));
+                        result[selector.name] = applyFilters(beforeValue, selector.filterList);
+                    }
+                }
+                else if (selector.name) {
+                    result[selector.name] = applyFilters([], selector.filterList);
                 }
             }
             else {
@@ -66,12 +112,176 @@ function temme(html, selector) {
             }
         });
         delete result[ignoreCaptureKey];
-        if (result[defaultCaptureKey]) {
-            return result[defaultCaptureKey];
+        let returnVal = result;
+        if (result.hasOwnProperty(defaultCaptureKey)) {
+            returnVal = result[defaultCaptureKey];
+        }
+        if (isEmptyObject(returnVal)) {
+            return null;
         }
         else {
-            return result;
+            return returnVal;
         }
+    }
+    function applyFilters(initValue, filterList) {
+        return filterList.reduce((value, filterName) => {
+            if (typeof filterMap[filterName] === 'function') {
+                return filterMap[filterName](value);
+            }
+            else {
+                throw new Error(`${filterName} is not a valid filter.`);
+            }
+        }, initValue);
+    }
+    function captureAttrs(node, attrList) {
+        const result = {};
+        for (const attr of attrList) {
+            if (typeof attr.value === 'object') {
+                const value = node.attr(attr.name);
+                if (value !== undefined) {
+                    result[attr.value.capture] = applyFilters(value, attr.value.filterList);
+                }
+            }
+            // todo 这里是否需要同时验证匹配? 例如 foo=bar
+        }
+        return result;
+    }
+    function captureContent(node, content) {
+        const result = {};
+        for (const part of content) {
+            // 目前只支持这几个func
+            console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName), errors.funcNameNotSupported(part.funcName));
+            // 至少有一个是value-capture
+            // console.assert(part.args.some(isCapture),
+            //   errors.needValueCapture(part.funcName))
+            // 不能出现连续两个值捕获
+            console.assert(!hasConsecutiveValueCapture(part.args));
+            if (part.funcName === 'text') {
+                const textCaptureResult = captureString(node.text(), part.args);
+                if (textCaptureResult == null) {
+                    return null;
+                }
+                Object.assign(result, textCaptureResult);
+            }
+            else if (part.funcName === 'html') {
+                const htmlCaptureResult = captureString(node.html(), part.args);
+                if (htmlCaptureResult == null) {
+                    return null;
+                }
+                Object.assign(result, htmlCaptureResult);
+            }
+            else if (part.funcName === 'node') {
+                console.assert(part.args.length === 1);
+                const arg = part.args[0];
+                if (typeof arg === 'object') {
+                    result[arg.capture] = applyFilters(cheerio(node), arg.filterList);
+                }
+                else {
+                    throw new Error('Cotnent func `text` must be in `text($foo)` form');
+                }
+            }
+            else if (part.funcName === 'contains') {
+                console.assert(part.args.length === 1);
+                const arg = part.args[0];
+                if (typeof arg === 'string') {
+                    // contains('<some-text>') -> text(_, '<some-text>', _)
+                    const textCaptureResult = captureString(node.text(), [ignoreCapture, arg, ignoreCapture]);
+                    if (textCaptureResult == null) {
+                        return null;
+                    }
+                    Object.assign(result, textCaptureResult);
+                }
+                else {
+                    throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form');
+                }
+            }
+            else {
+                throw new Error(`${part.funcName} is not a valid content-func.`);
+            }
+        }
+        return result;
+    }
+    function makeSelfCapturer(selfSelector) {
+        return (node) => {
+            const result = {};
+            if (selfSelector.attrList) {
+                Object.assign(result, captureAttrs(node, selfSelector.attrList));
+            }
+            if (selfSelector.content) {
+                const contentCaptureResult = captureContent(node, selfSelector.content);
+                if (contentCaptureResult == null) {
+                    return null;
+                }
+                Object.assign(result, contentCaptureResult);
+            }
+            return result;
+        };
+    }
+    // 对string进行多段匹配/捕获. 匹配之前会先调用String#trim来修剪参数s
+    // matchString('I like apple', ['I', { capture: 'foo' }])的结果为
+    //  { foo: ' like apple' }
+    // 如果匹配失败, 则返回null
+    // todo 需要用回溯的方法来正确处理多种匹配选择的情况
+    function captureString(s, args) {
+        const trimed = s.trim();
+        const result = {};
+        // 标记正在进行的capture, null表示没有在捕获中
+        let capturing = null;
+        let charIndex = 0;
+        for (const arg of args) {
+            if (typeof arg === 'string') {
+                if (capturing) {
+                    const c = trimed.indexOf(arg, charIndex);
+                    if (c === -1) {
+                        return null;
+                    }
+                    else {
+                        result[capturing.capture] = applyFilters(trimed.substring(charIndex, c), capturing.filterList);
+                        capturing = null;
+                        charIndex = c + arg.length;
+                    }
+                }
+                else {
+                    if (trimed.substring(charIndex).startsWith(arg)) {
+                        charIndex += arg.length;
+                    }
+                    else {
+                        return null; // fail
+                    }
+                }
+            }
+            else {
+                capturing = arg;
+            }
+        }
+        if (capturing) {
+            result[capturing.capture] = applyFilters(trimed.substring(charIndex).trim(), capturing.filterList);
+            charIndex = s.length;
+        }
+        if (charIndex !== s.length) {
+            // 字符串结尾处还有字符尚未匹配
+            return null;
+        }
+        return result;
+    }
+    // todo makeValueCapturer命名是不是有问题???
+    function makeValueCapturer(cssPartArray) {
+        return (node) => {
+            const result = {};
+            // notice 目前只能在最后一个part中进行value-capture
+            const lastCssPart = cssPartArray[cssPartArray.length - 1];
+            if (lastCssPart.attrList) {
+                Object.assign(result, captureAttrs(node, lastCssPart.attrList));
+            }
+            if (lastCssPart.content) {
+                const contentCaptureResult = captureContent(node, lastCssPart.content);
+                if (contentCaptureResult == null) {
+                    return null;
+                }
+                Object.assign(result, contentCaptureResult);
+            }
+            return result;
+        };
     }
 }
 exports.default = temme;
@@ -84,158 +294,6 @@ function hasConsecutiveValueCapture(args) {
         }
     }
     return false;
-}
-function captureAttrs(node, attrList) {
-    const result = {};
-    for (const attr of attrList) {
-        if (typeof attr.value === 'object') {
-            const value = node.attr(attr.name);
-            if (value !== undefined) {
-                result[attr.value.capture] = value;
-            }
-        }
-        // todo 这里是否需要同时验证匹配? 例如 foo=bar
-    }
-    return result;
-}
-function captureContent(node, content) {
-    const result = {};
-    for (const part of content) {
-        // 目前只支持这几个func
-        console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName), errors.funcNameNotSupported(part.funcName));
-        // 至少有一个是value-capture
-        // console.assert(part.args.some(isCapture),
-        //   errors.needValueCapture(part.funcName))
-        // 不能出现连续两个值捕获
-        console.assert(!hasConsecutiveValueCapture(part.args));
-        if (part.funcName === 'text') {
-            const textCaptureResult = captureString(node.text(), part.args);
-            if (textCaptureResult == null) {
-                return null;
-            }
-            Object.assign(result, textCaptureResult);
-        }
-        else if (part.funcName === 'html') {
-            const htmlCaptureResult = captureString(node.html(), part.args);
-            if (htmlCaptureResult == null) {
-                return null;
-            }
-            Object.assign(result, htmlCaptureResult);
-        }
-        else if (part.funcName === 'node') {
-            console.assert(part.args.length === 1);
-            const arg = part.args[0];
-            if (typeof arg === 'object') {
-                result[arg.capture] = cheerio(node);
-            }
-            else {
-                throw new Error('Cotnent func `text` must be in `text($foo)` form');
-            }
-        }
-        else if (part.funcName === 'contains') {
-            console.assert(part.args.length === 1);
-            const arg = part.args[0];
-            if (typeof arg === 'string') {
-                // contains('<some-text>') -> text(_, '<some-text>', _)
-                const textCaptureResult = captureString(node.text(), [ignoreCapture, arg, ignoreCapture]);
-                if (textCaptureResult == null) {
-                    return null;
-                }
-                Object.assign(result, textCaptureResult);
-            }
-            else {
-                throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form');
-            }
-        }
-        else {
-            throw new Error(`${part.funcName} is not a valid content-func.`);
-        }
-    }
-    return result;
-}
-function makeSelfCapturer(selfSelector) {
-    return (node) => {
-        const result = {};
-        if (selfSelector.attrList) {
-            Object.assign(result, captureAttrs(node, selfSelector.attrList));
-        }
-        if (selfSelector.content) {
-            const contentCaptureResult = captureContent(node, selfSelector.content);
-            if (contentCaptureResult == null) {
-                return null;
-            }
-            Object.assign(result, contentCaptureResult);
-        }
-        return result;
-    };
-}
-// 对string进行多段匹配/捕获. 匹配之前会先调用String#trim来修剪参数s
-// matchString('I like apple', ['I', { capture: 'foo' }])的结果为
-//  { foo: ' like apple' }
-// 如果匹配失败, 则返回null
-// todo 需要用回溯的方法来正确处理多种匹配选择的情况
-function captureString(s, args) {
-    const trimed = s.trim();
-    const result = {};
-    // 标记正在捕获的字段名称, 空字符表示没有在捕获中
-    let capturing = '';
-    let charIndex = 0;
-    for (const arg of args) {
-        if (typeof arg === 'string') {
-            if (capturing) {
-                const c = trimed.indexOf(arg, charIndex);
-                if (c === -1) {
-                    return null;
-                }
-                else {
-                    result[capturing] = trimed.substring(charIndex, c).trim();
-                    capturing = '';
-                    charIndex = c + arg.length;
-                }
-            }
-            else {
-                if (trimed.substring(charIndex).startsWith(arg)) {
-                    charIndex += arg.length;
-                    continue;
-                }
-                else {
-                    return null; // fail
-                }
-            }
-        }
-        else {
-            capturing = arg.capture;
-        }
-    }
-    if (capturing) {
-        result[capturing] = trimed.substring(charIndex).trim();
-        charIndex = s.length;
-    }
-    if (charIndex !== s.length) {
-        // 字符串结尾处还有字符尚未匹配
-        return null;
-    }
-    return result;
-}
-exports.captureString = captureString;
-// todo makeValueCapturer命名是不是有问题???
-function makeValueCapturer(cssPartArray) {
-    return (node) => {
-        const result = {};
-        // todo 目前只能在最后一个part中进行value-capture
-        const lastCssPart = cssPartArray[cssPartArray.length - 1];
-        if (lastCssPart.attrList) {
-            Object.assign(result, captureAttrs(node, lastCssPart.attrList));
-        }
-        if (lastCssPart.content) {
-            const contentCaptureResult = captureContent(node, lastCssPart.content);
-            if (contentCaptureResult == null) {
-                return null;
-            }
-            Object.assign(result, contentCaptureResult);
-        }
-        return result;
-    };
 }
 function makeNormalCssSelector(cssPartArray) {
     const seperator = ' ';
@@ -272,3 +330,45 @@ function makeNormalCssSelector(cssPartArray) {
     });
     return result.join('');
 }
+const defaultFilterMap = {
+    pack(v) {
+        return Object.assign({}, ...v);
+    },
+    splitComma(s) {
+        return s.split(',');
+    },
+    splitBlanks(s) {
+        return s.split(/ +/);
+    },
+    Number,
+    String,
+    Boolean,
+    Date(arg) {
+        return new Date(arg);
+    },
+    first(arg) {
+        return arg[0];
+    },
+    firstLine(s) {
+        return s.split(/(\r\n)|\r|\n/)[0];
+    },
+    trim(s) {
+        return s.trim();
+    },
+    asWords(s) {
+        return s.replace(/\s+/g, ' ');
+    },
+    json(arg) {
+        return JSON.stringify(arg);
+    },
+    flatten(arg) {
+        return arg.reduce((r, a) => r.concat(a));
+    },
+    filter(arg) {
+        return arg.filter(Boolean);
+    },
+};
+function defineFilter(name, filter) {
+    defaultFilterMap[name] = filter;
+}
+exports.defineFilter = defineFilter;

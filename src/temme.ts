@@ -1,7 +1,7 @@
-import * as path from 'path'
-import * as fs from 'fs'
 import * as pegjs from 'pegjs'
 import * as cheerio from 'cheerio'
+import grammar from './grammar'
+import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 
 const errors = {
   funcNameNotSupported(f: string) {
@@ -12,14 +12,19 @@ const errors = {
 const defaultCaptureKey = '@@default-capture@@'
 const ignoreCaptureKey = '@@ignore-capture@@'
 
-const ignoreCapture = { capture: ignoreCaptureKey }
-
-const grammar = fs.readFileSync(path.resolve(__dirname, '../src/temme.pegjs'), 'utf8')
+const ignoreCapture: Capture<string> = { capture: ignoreCaptureKey, filterList: [] }
 
 export const temmeParser = pegjs.generate(grammar)
 
 interface Dict<V> {
   [key: string]: V
+}
+
+interface Filter {
+  (v: any): any
+}
+interface FilterMap {
+  [key: string]: Filter
 }
 
 type TemmeSelector = SelfSelector | NonSelfSelector
@@ -29,6 +34,7 @@ interface NonSelfSelector {
   name: string
   css: CssPart[]
   children: TemmeSelector[]
+  filterList: string[]
 }
 
 interface SelfSelector {
@@ -64,13 +70,52 @@ type FuncName = 'text' | 'html' | 'node' | 'contains'
 
 type Capture<T> = {
   capture: T
+  filterList: string[]
+}
+
+function isEmptyObject(x: any) {
+  return typeof x === 'object' && Object.keys(x).length === 0
 }
 
 function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioStatic {
   return typeof (<CheerioStatic>arg).root === 'function'
 }
 
-export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector) {
+function checkLeadingCssParts(cssParts: CssPart[]) {
+  const hasLeadingCapture = cssParts.some(part => {
+    const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string')
+    if (hasAttrCapture) {
+      return true
+    }
+    const hasContentCapture = part.content && part.content.length > 0
+    if (hasContentCapture) {
+      return true
+    }
+    return false
+  })
+  if (hasLeadingCapture) {
+    console.warn('Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?')
+  }
+}
+
+// notice 递归的检查 selector是否合法, 目前暂时不会抛出异常, 只会提示对应的出错消息
+function check(selector: TemmeSelector) {
+  if (selector.self === true) {
+  } else {
+    const cssPartsLength = selector.css.length
+    const leadingParts = selector.css.slice(0, cssPartsLength - 1)
+    checkLeadingCssParts(leadingParts)
+    if (selector.children) {
+      for (const child of selector.children) {
+        check(child)
+      }
+    }
+  }
+}
+
+export default function temme(html: string | CheerioStatic | CheerioElement,
+                              selector: string | TemmeSelector,
+                              extraFilters: { [key: string]: Filter } = {}) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -82,11 +127,18 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
 
   let rootSelector: TemmeSelector
   if (typeof selector === 'string') {
-    rootSelector = temmeParser.parse(selector) as TemmeSelector
+    try {
+      rootSelector = temmeParser.parse(selector) as TemmeSelector
+    } catch (error) {
+      const message = makeGrammarErrorMessage(selector, error)
+      throw new Error(message)
+    }
   } else {
     rootSelector = selector
   }
 
+  const filterMap: FilterMap = Object.assign({}, defaultFilterMap, extraFilters)
+  check(rootSelector)
   return helper($.root(), [rootSelector])
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]) {
@@ -95,13 +147,17 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
       if (selector.self === false) {
         const cssSelector = makeNormalCssSelector(selector.css)
         const subCheerio = cntCheerio.find(cssSelector)
-        const capturer = makeValueCapturer(selector.css)
-        Object.assign(result, capturer(subCheerio))
+        if (subCheerio.length > 0) {
+          const capturer = makeValueCapturer(selector.css)
+          Object.assign(result, capturer(subCheerio))
 
-        if (selector.name && selector.children) {
-          result[selector.name] = subCheerio.toArray()
-            .map(sub => helper($(sub), selector.children))
-            .filter(r => Object.keys(r).length > 0)
+          if (selector.name && selector.children) {
+            const beforeValue = subCheerio.toArray()
+              .map(sub => helper($(sub), selector.children))
+            result[selector.name] = applyFilters(beforeValue, selector.filterList)
+          }
+        } else if (selector.name) {
+          result[selector.name] = applyFilters([], selector.filterList)
         }
       } else { // self === true
         const cssSelector = makeNormalCssSelector([{
@@ -119,9 +175,171 @@ export default function temme(html: string | CheerioStatic | CheerioElement, sel
       }
     })
     delete result[ignoreCaptureKey]
-    if (result[defaultCaptureKey]) {
-      return result[defaultCaptureKey]
+
+    let returnVal = result
+    if (result.hasOwnProperty(defaultCaptureKey)) {
+      returnVal = result[defaultCaptureKey]
+    }
+    if (isEmptyObject(returnVal)) {
+      return null
     } else {
+      return returnVal
+    }
+  }
+
+  function applyFilters(initValue: any, filterList: string[]) {
+    return filterList.reduce((value, filterName) => {
+      if (typeof filterMap[filterName] === 'function') {
+        return filterMap[filterName](value)
+      } else {
+        throw new Error(`${filterName} is not a valid filter.`)
+      }
+    }, initValue)
+  }
+
+  function captureAttrs(node: Cheerio, attrList: CssAttr[]) {
+    const result: CaptureResult = {}
+    for (const attr of attrList) {
+      if (typeof attr.value === 'object') {
+        const value = node.attr(attr.name)
+        if (value !== undefined) {
+          result[attr.value.capture] = applyFilters(value, attr.value.filterList)
+        }
+      }
+      // todo 这里是否需要同时验证匹配? 例如 foo=bar
+    }
+    return result
+  }
+
+  function captureContent(node: Cheerio, content: ContentPart[]) {
+    const result: CaptureResult = {}
+    for (const part of content) {
+      // 目前只支持这几个func
+      console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName),
+        errors.funcNameNotSupported(part.funcName))
+      // 至少有一个是value-capture
+      // console.assert(part.args.some(isCapture),
+      //   errors.needValueCapture(part.funcName))
+      // 不能出现连续两个值捕获
+      console.assert(!hasConsecutiveValueCapture(part.args))
+
+      if (part.funcName === 'text') {
+        const textCaptureResult = captureString(node.text(), part.args)
+        if (textCaptureResult == null) {
+          return null
+        }
+        Object.assign(result, textCaptureResult)
+      } else if (part.funcName === 'html') {
+        const htmlCaptureResult = captureString(node.html(), part.args)
+        if (htmlCaptureResult == null) {
+          return null
+        }
+        Object.assign(result, htmlCaptureResult)
+      } else if (part.funcName === 'node') {
+        console.assert(part.args.length === 1)
+        const arg = part.args[0]
+        if (typeof arg === 'object') {
+          result[arg.capture] = applyFilters(cheerio(node), arg.filterList)
+        } else {
+          throw new Error('Cotnent func `text` must be in `text($foo)` form')
+        }
+      } else if (part.funcName === 'contains') {
+        console.assert(part.args.length === 1)
+        const arg = part.args[0]
+        if (typeof arg === 'string') {
+          // contains('<some-text>') -> text(_, '<some-text>', _)
+          const textCaptureResult = captureString(node.text(), [ignoreCapture, arg, ignoreCapture])
+          if (textCaptureResult == null) {
+            return null
+          }
+          Object.assign(result, textCaptureResult)
+        } else {
+          throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form')
+        }
+      } else {
+        throw new Error(`${part.funcName} is not a valid content-func.`)
+      }
+    }
+    return result
+  }
+
+  function makeSelfCapturer(selfSelector: SelfSelector) {
+    return (node: Cheerio) => {
+      const result: CaptureResult = {}
+      if (selfSelector.attrList) {
+        Object.assign(result, captureAttrs(node, selfSelector.attrList))
+      }
+      if (selfSelector.content) {
+        const contentCaptureResult = captureContent(node, selfSelector.content)
+        if (contentCaptureResult == null) {
+          return null
+        }
+        Object.assign(result, contentCaptureResult)
+      }
+      return result
+    }
+  }
+
+  // 对string进行多段匹配/捕获. 匹配之前会先调用String#trim来修剪参数s
+  // matchString('I like apple', ['I', { capture: 'foo' }])的结果为
+  //  { foo: ' like apple' }
+  // 如果匹配失败, 则返回null
+  // todo 需要用回溯的方法来正确处理多种匹配选择的情况
+  function captureString(s: string, args: ContentPartArg[]) {
+    const trimed = s.trim()
+    const result: Dict<string> = {}
+    // 标记正在进行的capture, null表示没有在捕获中
+    let capturing: Capture<string> = null
+    let charIndex = 0
+    for (const arg of args) {
+      if (typeof arg === 'string') {
+        if (capturing) {
+          const c = trimed.indexOf(arg, charIndex)
+          if (c === -1) {
+            return null
+          } else {
+            result[capturing.capture] = applyFilters(trimed.substring(charIndex, c), capturing.filterList)
+            capturing = null
+            charIndex = c + arg.length
+          }
+        } else {
+          if (trimed.substring(charIndex).startsWith(arg)) {
+            charIndex += arg.length
+          } else {
+            return null // fail
+          }
+        }
+      } else { // arg is value capture
+        capturing = arg
+      }
+    }
+    if (capturing) {
+      result[capturing.capture] = applyFilters(trimed.substring(charIndex).trim(), capturing.filterList)
+      charIndex = s.length
+    }
+    if (charIndex !== s.length) {
+      // 字符串结尾处还有字符尚未匹配
+      return null
+    }
+    return result
+  }
+
+  // todo makeValueCapturer命名是不是有问题???
+  function makeValueCapturer(cssPartArray: CssPart[]) {
+    return (node: Cheerio) => {
+      const result: CaptureResult = {}
+      // notice 目前只能在最后一个part中进行value-capture
+      const lastCssPart = cssPartArray[cssPartArray.length - 1]
+      if (lastCssPart.attrList) {
+        Object.assign(result, captureAttrs(node, lastCssPart.attrList))
+      }
+      if (lastCssPart.content) {
+        const contentCaptureResult = captureContent(node, lastCssPart.content)
+        if (contentCaptureResult == null) {
+          return null
+        }
+        Object.assign(result, contentCaptureResult)
+      }
       return result
     }
   }
@@ -138,153 +356,6 @@ function hasConsecutiveValueCapture(args: ContentPartArg[]) {
   return false
 }
 
-function captureAttrs(node: Cheerio, attrList: CssAttr[]) {
-  const result: CaptureResult = {}
-  for (const attr of attrList) {
-    if (typeof attr.value === 'object') {
-      const value = node.attr(attr.name)
-      if (value !== undefined) {
-        result[attr.value.capture] = value
-      }
-    }
-    // todo 这里是否需要同时验证匹配? 例如 foo=bar
-  }
-  return result
-}
-
-function captureContent(node: Cheerio, content: ContentPart[]) {
-  const result: CaptureResult = {}
-  for (const part of content) {
-    // 目前只支持这几个func
-    console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName),
-      errors.funcNameNotSupported(part.funcName))
-    // 至少有一个是value-capture
-    // console.assert(part.args.some(isCapture),
-    //   errors.needValueCapture(part.funcName))
-    // 不能出现连续两个值捕获
-    console.assert(!hasConsecutiveValueCapture(part.args))
-
-    if (part.funcName === 'text') {
-      const textCaptureResult = captureString(node.text(), part.args)
-      if (textCaptureResult == null) {
-        return null
-      }
-      Object.assign(result, textCaptureResult)
-    } else if (part.funcName === 'html') {
-      const htmlCaptureResult = captureString(node.html(), part.args)
-      if (htmlCaptureResult == null) {
-        return null
-      }
-      Object.assign(result, htmlCaptureResult)
-    } else if (part.funcName === 'node') {
-      console.assert(part.args.length === 1)
-      const arg = part.args[0]
-      if (typeof arg === 'object') {
-        result[arg.capture] = cheerio(node)
-      } else {
-        throw new Error('Cotnent func `text` must be in `text($foo)` form')
-      }
-    } else if (part.funcName === 'contains') {
-      console.assert(part.args.length === 1)
-      const arg = part.args[0]
-      if (typeof arg === 'string') {
-        // contains('<some-text>') -> text(_, '<some-text>', _)
-        const textCaptureResult = captureString(node.text(), [ignoreCapture, arg, ignoreCapture])
-        if (textCaptureResult == null) {
-          return null
-        }
-        Object.assign(result, textCaptureResult)
-      } else {
-        throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form')
-      }
-    } else {
-      throw new Error(`${part.funcName} is not a valid content-func.`)
-    }
-  }
-  return result
-}
-
-function makeSelfCapturer(selfSelector: SelfSelector) {
-  return (node: Cheerio) => {
-    const result: CaptureResult = {}
-    if (selfSelector.attrList) {
-      Object.assign(result, captureAttrs(node, selfSelector.attrList))
-    }
-    if (selfSelector.content) {
-      const contentCaptureResult = captureContent(node, selfSelector.content)
-      if (contentCaptureResult == null) {
-        return null
-      }
-      Object.assign(result, contentCaptureResult)
-    }
-    return result
-  }
-}
-
-// 对string进行多段匹配/捕获. 匹配之前会先调用String#trim来修剪参数s
-// matchString('I like apple', ['I', { capture: 'foo' }])的结果为
-//  { foo: ' like apple' }
-// 如果匹配失败, 则返回null
-// todo 需要用回溯的方法来正确处理多种匹配选择的情况
-export function captureString(s: string, args: ContentPartArg[]) {
-  const trimed = s.trim()
-  const result: Dict<string> = {}
-  // 标记正在捕获的字段名称, 空字符表示没有在捕获中
-  let capturing = ''
-  let charIndex = 0
-  for (const arg of args) {
-    if (typeof arg === 'string') {
-      if (capturing) {
-        const c = trimed.indexOf(arg, charIndex)
-        if (c === -1) {
-          return null
-        } else {
-          result[capturing] = trimed.substring(charIndex, c).trim()
-          capturing = ''
-          charIndex = c + arg.length
-        }
-      } else {
-        if (trimed.substring(charIndex).startsWith(arg)) {
-          charIndex += arg.length
-          continue
-        } else {
-          return null // fail
-        }
-      }
-    } else { // arg is value capture
-      capturing = arg.capture
-    }
-  }
-  if (capturing) {
-    result[capturing] = trimed.substring(charIndex).trim()
-    charIndex = s.length
-  }
-  if (charIndex !== s.length) {
-    // 字符串结尾处还有字符尚未匹配
-    return null
-  }
-  return result
-}
-
-// todo makeValueCapturer命名是不是有问题???
-function makeValueCapturer(cssPartArray: CssPart[]) {
-  return (node: Cheerio) => {
-    const result: CaptureResult = {}
-    // todo 目前只能在最后一个part中进行value-capture
-    const lastCssPart = cssPartArray[cssPartArray.length - 1]
-    if (lastCssPart.attrList) {
-      Object.assign(result, captureAttrs(node, lastCssPart.attrList))
-    }
-    if (lastCssPart.content) {
-      const contentCaptureResult = captureContent(node, lastCssPart.content)
-      if (contentCaptureResult == null) {
-        return null
-      }
-      Object.assign(result, contentCaptureResult)
-    }
-    return result
-  }
-}
 
 function makeNormalCssSelector(cssPartArray: CssPart[]) {
   const seperator = ' '
@@ -319,4 +390,47 @@ function makeNormalCssSelector(cssPartArray: CssPart[]) {
     }
   })
   return result.join('')
+}
+
+const defaultFilterMap: FilterMap = {
+  pack(v: any[]) {
+    return Object.assign({}, ...v)
+  },
+  splitComma(s: string) {
+    return s.split(',')
+  },
+  splitBlanks(s: string) {
+    return s.split(/ +/)
+  },
+  Number,
+  String,
+  Boolean,
+  Date(arg: any) {
+    return new Date(arg)
+  },
+  first(arg: any[]) {
+    return arg[0]
+  },
+  firstLine(s: string) {
+    return s.split(/(\r\n)|\r|\n/)[0]
+  },
+  trim(s: string) {
+    return s.trim()
+  },
+  asWords(s: string) {
+    return s.replace(/\s+/g, ' ')
+  },
+  json(arg: any) {
+    return JSON.stringify(arg)
+  },
+  flatten(arg: any[][]) {
+    return arg.reduce((r, a) => r.concat(a))
+  },
+  filter(arg: any[]) {
+    return arg.filter(Boolean)
+  },
+}
+
+export function defineFilter(name: string, filter: Filter) {
+  defaultFilterMap[name] = filter
 }
