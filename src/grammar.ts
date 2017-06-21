@@ -1,4 +1,4 @@
-{
+export default `{
   const defaultCaptureKey = '@@default-capture@@'
   const ingoreCaptureKey = '@@ignore-capture@@'
 }
@@ -161,4 +161,5 @@ h 'hex-digit'
   = [0-9a-f]i
 
 s 'whitespace'
-  = [ \t\r\n\f]
+  = [ \\t\\r\\n\\f]
+`
