@@ -148,7 +148,7 @@ This selectors means: check the text content of element contains string 'hello'.
 
 For example:
 
-`text(\$name, ':', \$value)`
+`text($name, ':', $value)`
 
 The above selector will match `<p>foo: hello world!</p>`. And the result is:
 

@@ -23,6 +23,7 @@ interface Dict<V> {
 export interface Filter {
   (v: any): any
 }
+
 interface FilterMap {
   [key: string]: Filter
 }
@@ -113,6 +114,15 @@ function check(selector: TemmeSelector) {
   }
 }
 
+export function mergeResult<T, S>(target: T, source: S): T & S {
+  for (const key in source) {
+    if (source[key] != null) {
+      (<any>target)[key] = source[key]
+    }
+  }
+  return target as any
+}
+
 export default function temme(html: string | CheerioStatic | CheerioElement,
                               selector: string | TemmeSelector,
                               extraFilters: { [key: string]: Filter } = {}) {
@@ -149,7 +159,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
           const capturer = makeValueCapturer(selector.css)
-          Object.assign(result, capturer(subCheerio))
+          mergeResult(result, capturer(subCheerio))
 
           if (selector.name && selector.children) {
             const beforeValue = subCheerio.toArray()
@@ -170,7 +180,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         }])
         if (cssSelector === '' || cntCheerio.is(cssSelector)) {
           const capturer = makeSelfCapturer(selector)
-          Object.assign(result, capturer(cntCheerio))
+          mergeResult(result, capturer(cntCheerio))
         }
       }
     })
@@ -180,7 +190,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     if (result.hasOwnProperty(defaultCaptureKey)) {
       returnVal = result[defaultCaptureKey]
     }
-    if (isEmptyObject(returnVal)) {
+    if (returnVal == null || isEmptyObject(returnVal)) {
       return null
     } else {
       return returnVal
@@ -228,13 +238,13 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         if (textCaptureResult == null) {
           return null
         }
-        Object.assign(result, textCaptureResult)
+        mergeResult(result, textCaptureResult)
       } else if (part.funcName === 'html') {
         const htmlCaptureResult = captureString(node.html(), part.args)
         if (htmlCaptureResult == null) {
           return null
         }
-        Object.assign(result, htmlCaptureResult)
+        mergeResult(result, htmlCaptureResult)
       } else if (part.funcName === 'node') {
         console.assert(part.args.length === 1)
         const arg = part.args[0]
@@ -252,7 +262,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
           if (textCaptureResult == null) {
             return null
           }
-          Object.assign(result, textCaptureResult)
+          mergeResult(result, textCaptureResult)
         } else {
           throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form')
         }
@@ -267,14 +277,14 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     return (node: Cheerio) => {
       const result: CaptureResult = {}
       if (selfSelector.attrList) {
-        Object.assign(result, captureAttrs(node, selfSelector.attrList))
+        mergeResult(result, captureAttrs(node, selfSelector.attrList))
       }
       if (selfSelector.content) {
         const contentCaptureResult = captureContent(node, selfSelector.content)
         if (contentCaptureResult == null) {
           return null
         }
-        Object.assign(result, contentCaptureResult)
+        mergeResult(result, contentCaptureResult)
       }
       return result
     }
@@ -331,14 +341,14 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
       // notice 目前只能在最后一个part中进行value-capture
       const lastCssPart = cssPartArray[cssPartArray.length - 1]
       if (lastCssPart.attrList) {
-        Object.assign(result, captureAttrs(node, lastCssPart.attrList))
+        mergeResult(result, captureAttrs(node, lastCssPart.attrList))
       }
       if (lastCssPart.content) {
         const contentCaptureResult = captureContent(node, lastCssPart.content)
         if (contentCaptureResult == null) {
           return null
         }
-        Object.assign(result, contentCaptureResult)
+        mergeResult(result, contentCaptureResult)
       }
       return result
     }

@@ -7,14 +7,34 @@
   "repository": "https://github.com/shinima/temme.git",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(tsx?|jsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json",
+      "jsx"
+    ]
+  },
   "dependencies": {
     "@types/cheerio": "^0.22.1",
     "cheerio": "^1.0.0-rc.1"
   },
   "devDependencies": {
+    "@types/jest": "^20.0.2",
     "@types/node": "^7.0.31",
     "@types/pegjs": "^0.10.0",
+    "jest": "^20.0.4",
+    "node-fetch": "^1.7.1",
     "pegjs": "^0.10.0",
-    "typescript": "^2.3.4"
+    "ts-jest": "^20.0.7",
+    "typescript": "^2.4.1"
   }
 }
