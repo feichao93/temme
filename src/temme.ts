@@ -3,9 +3,12 @@ import * as cheerio from 'cheerio'
 import grammar from './grammar'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 
-const errors = {
-  funcNameNotSupported(f: string) {
-    return `${f} is not a valid content func-name.`
+export const errors = {
+  // funcNameNotSupported(f: string) {
+  //   return `${f} is not a valid content func-name.`
+  // },
+  hasLeadingCapture() {
+    return 'Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?'
   },
 }
 
@@ -82,8 +85,8 @@ function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioSta
   return typeof (<CheerioStatic>arg).root === 'function'
 }
 
-function checkLeadingCssParts(cssParts: CssPart[]) {
-  const hasLeadingCapture = cssParts.some(part => {
+function containsAnyCaptureInAttrListOrContent(cssParts: CssPart[]) {
+  return cssParts.some(part => {
     const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string')
     if (hasAttrCapture) {
       return true
@@ -94,18 +97,18 @@ function checkLeadingCssParts(cssParts: CssPart[]) {
     }
     return false
   })
-  if (hasLeadingCapture) {
-    console.warn('Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?')
-  }
 }
 
-// notice 递归的检查 selector是否合法, 目前暂时不会抛出异常, 只会提示对应的出错消息
+// notice 递归的检查 selector是否合法
 function check(selector: TemmeSelector) {
   if (selector.self === true) {
   } else {
     const cssPartsLength = selector.css.length
     const leadingParts = selector.css.slice(0, cssPartsLength - 1)
-    checkLeadingCssParts(leadingParts)
+    const hasLeadingCapture = containsAnyCaptureInAttrListOrContent(leadingParts)
+    if (hasLeadingCapture) {
+      throw new Error(errors.hasLeadingCapture())
+    }
     if (selector.children) {
       for (const child of selector.children) {
         check(child)
@@ -225,8 +228,8 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     const result: CaptureResult = {}
     for (const part of content) {
       // 目前只支持这几个func
-      console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName),
-        errors.funcNameNotSupported(part.funcName))
+      // console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName),
+      // errors.funcNameNotSupported(part.funcName))
       // 至少有一个是value-capture
       // console.assert(part.args.some(isCapture),
       //   errors.needValueCapture(part.funcName))
@@ -251,7 +254,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         if (typeof arg === 'object') {
           result[arg.capture] = applyFilters(cheerio(node), arg.filterList)
         } else {
-          throw new Error('Cotnent func `text` must be in `text($foo)` form')
+          throw new Error('Content func `node` must be in `node($foo)` form')
         }
       } else if (part.funcName === 'contains') {
         console.assert(part.args.length === 1)
@@ -264,7 +267,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
           }
           mergeResult(result, textCaptureResult)
         } else {
-          throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form')
+          throw new Error('Content func `contains` must be in `text(<some-text>)` form')
         }
       } else {
         throw new Error(`${part.funcName} is not a valid content-func.`)

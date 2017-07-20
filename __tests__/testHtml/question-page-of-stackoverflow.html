@@ -1,0 +1,2616 @@
+
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/QAPage">
+
+<head>
+
+  <title>python - Short Description of the Scoping Rules? - Stack Overflow</title>
+  <link rel="shortcut icon" href="https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico?v=4f32ecc8f43d">
+  <link rel="apple-touch-icon image_src" href="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a">
+  <link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow" href="/opensearch.xml">
+  <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:domain" content="stackoverflow.com"/>
+
+  <meta property="og:image" itemprop="image primaryImageOfPage" content="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon@2.png?v=73d79a89bded" />
+  <meta name="twitter:title" property="og:title" itemprop="title name" content="Short Description of the Scoping Rules?" />
+  <meta name="twitter:description" property="og:description" itemprop="description" content="What exactly are the Python scoping rules?
+
+If I have some code:
+
+code1
+class Foo:
+   code2
+   def spam.....
+      code3
+      for code4..:
+       code5
+       x()
+Where is x found?  Some possible " />
+  <meta property="og:url" content="https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules"/>
+  <link rel="canonical" href="https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules" />
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="https://cdn.sstatic.net/Js/stub.en.js?v=61b0c15ca2dc"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.sstatic.net/Sites/stackoverflow/all.css?v=e5c0763b44a0">
+
+  <link rel="alternate" type="application/atom+xml" title="Feed for question &#39;Short Description of the Scoping Rules?&#39;" href="/feeds/question/291978">
+  <meta name="twitter:app:country" content="US" />
+  <meta name="twitter:app:name:iphone" content="Stack Exchange iOS" />
+  <meta name="twitter:app:id:iphone" content="871299723" />
+  <meta name="twitter:app:url:iphone" content="se-zaphod://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules" />
+  <meta name="twitter:app:name:ipad" content="Stack Exchange iOS" />
+  <meta name="twitter:app:id:ipad" content="871299723" />
+  <meta name="twitter:app:url:ipad" content="se-zaphod://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules" />
+  <meta name="twitter:app:name:googleplay" content="Stack Exchange Android">
+  <meta name="twitter:app:url:googleplay" content="http://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <meta name="twitter:app:id:googleplay" content="com.stackexchange.marvin">
+  <script>
+
+    StackExchange.ready(function () {
+
+      StackExchange.using("snippets", function () {
+        StackExchange.snippets.initSnippetRenderer();
+      });
+
+
+      StackExchange.using("postValidation", function () {
+        StackExchange.postValidation.initOnBlurAndSubmit($('#post-form'), 2, 'answer');
+      });
+
+
+      StackExchange.question.init({showAnswerHelp:true,totalCommentCount:2,shownCommentCount:2,highlightColor:'#F4A83D',backgroundColor:'#FFF',questionId:291978});
+
+      styleCode();
+
+      StackExchange.realtime.subscribeToQuestion('1', '291978');
+      StackExchange.using("gps", function () { StackExchange.gps.trackOutboundClicks('#content', '.post-text', true); });
+
+    });
+  </script>
+
+
+  <script>
+    StackExchange.init({"locale":"en","stackAuthUrl":"https://stackauth.com","networkMetaHostname":"meta.stackexchange.com","serverTime":1500553703,"routeName":"Questions/Show","site":{"name":"Stack Overflow","description":"Q&A for professional and enthusiast programmers","isNoticesTabEnabled":true,"recaptchaPublicKey":"6LdchgIAAAAAAJwGpIzRQSOFaO0pU6s44Xt8aTwc","recaptchaAudioLang":"en","enableNewTagCreationWarning":true,"insertSpaceAfterNameTabCompletion":false,"id":1,"enableInsertDocLinkDialog":true,"childUrl":"https://meta.stackoverflow.com","enableSocialMediaInSharePopup":true,"protocol":"https"},"user":{"fkey":"0430108249900165ccbb03c301d2ce88","rep":0,"isAnonymous":true,"isAnonymousNetworkWide":true,"canSeeNewHeaderDesign":true,"ab":{"inline_signup_hero":{"v":"b","g":2}}},"events":{"postType":{"question":1},"postEditionSection":{"title":1,"body":2,"tags":3}},"story":{"minCompleteBodyLength":75,"likedTagsMaxLength":300,"dislikedTagsMaxLength":300}}, {"site":{"allowImageUploads":true,"enableUserHovercards":true,"styleCode":true,"enableNewLinkInsertDialog":true,"enableImgurHttps":true,"forceHttpsImages":true},"comments":{},"userProfile":{"openGraphAPIKey":"58740831ad23540e00c58987"},"tags":{},"accounts":{"currentPasswordRequiredForChangingStackIdPassword":true},"flags":{"allowRetractingFlags":true},"snippets":{"snippetsEnabled":true,"renderDomain":"stacksnippets.net"},"markdown":{"asteriskIntraWordEmphasis":true},"monitoring":{"clientTimingsAbsoluteTimeout":30000,"clientTimingsDebounceTimeout":1000}});
+    StackExchange.using.setCacheBreakers({"js/prettify-full.en.js":"3f637ed5ea6d","js/moderator.en.js":"3c90ddcfdaff","js/full-anon.en.js":"cbccb6f06741","js/full.en.js":"44732411c8d0","js/wmd.en.js":"28649b9071c3","js/third-party/jquery.autocomplete.min.js":"d3b8fa7fdf74","js/third-party/jquery.autocomplete.min.en.js":"","js/mobile.en.js":"d7da0bad5bdf","js/help.en.js":"a56fdf9b9ff2","js/tageditor.en.js":"6ce32b0cf708","js/tageditornew.en.js":"c25e480fb8bd","js/inline-tag-editing.en.js":"a4fa53d308ae","js/revisions.en.js":"8f22ba768cac","js/review.en.js":"d7ad7b860ee5","js/tagsuggestions.en.js":"b278f9a0b23b","js/post-validation.en.js":"27d19b5b7631","js/explore-qlist.en.js":"d33e3ab2f2e0","js/events.en.js":"480bfc0b4767","js/keyboard-shortcuts.en.js":"6668f308be33","js/external-editor.en.js":"ae2d26085224","js/adops.en.js":"9a6a7812a212","js/external-editor.en.js":"ae2d26085224","js/snippet-javascript.en.js":"138b7a0da97b","js/snippet-javascript-codemirror.en.js":"b0c12b09e841"});
+    StackExchange.using("gps", function() {
+      StackExchange.gps.init(true);
+    });
+  </script>
+
+  <script>
+    StackExchange.ready(function () {
+      $('#nav-tour').click(function () {
+        StackExchange.using("gps", function() {
+          StackExchange.gps.track("aboutpage.click", { aboutclick_location: "headermain" }, true);
+        });
+      });
+    });
+  </script>
+  <noscript id="noscript-css"><style type="text/css">body,.so-header{margin-top:1.9em}</style></noscript>
+</head>
+<body class="question-page new-topbar">
+<script>(function () { var old = $.fn.contents; $.fn.contents = function () { try { return old.apply(this, arguments); } catch (e) { return $([]); } } })()</script>
+<iframe id="adzerk-user-match" width="0" height="0" frameborder="0" scrolling="no" onload="window.AUMIframeDone=true"
+        src="https://ssum-sec.casalemedia.com/usermatch?s=183712&amp;cb=https%3A%2F%2Fengine.adzerk.net%2Fudb%2F22%2Fsync%2Fi.gif%3FpartnerId%3D1%26userId%3D"
+        style="display: none;" marginheight="0" marginwidth="0"></iframe>
+
+<div id="notify-container"></div>
+<div id="custom-header"></div>
+
+
+<header class="so-header js-so-header _fixed">
+  <div class="-container">
+    <div class="-main">
+      <a href="https://stackoverflow.com" class="-logo js-gps-track "
+         data-gps-track="top_nav.click({is_current:false, location:2, destination:8})">
+
+        <span class="-img">Stack Overflow</span>
+      </a>
+
+      <nav class="navigation" role="navigation" aria-label="site navigation">
+        <ol class="-list">
+          <li class="-item _current">
+            <a id="nav-questions" href="/questions" class="-link js-gps-track"
+               data-gps-track="top_nav.click({is_current:true, location:2, destination:1})">Questions</a>
+          </li>
+
+          <li class="-item">
+            <a id="nav-jobs" href="/jobs?med=site-ui&amp;ref=jobs-tab" class="-link js-gps-track"
+               data-gps-track="top_nav.click({is_current:false, location:2, destination:6})">Developer Jobs</a>
+          </li>
+          <li class="-item">
+            <a id="nav-docs" href="/documentation" class="-link js-gps-track"
+               data-gps-track="top_nav.click({is_current:false, location:2, destination:7})">Documentation <small class='beta-badge'>beta</small></a>
+          </li>
+          <li class="-item">
+            <a id="nav-tags" href="/tags" class="-link js-gps-track"
+               data-gps-track="top_nav.click({is_current:false, location:2, destination:2})">Tags</a>
+          </li>
+
+          <li class="-item">
+            <a id="nav-users" href="/users" class="-link js-gps-track"
+               data-gps-track="top_nav.click({is_current:false, location:2, destination:3})">Users</a>
+          </li>
+
+        </ol>
+      </nav>
+
+      <form id="search" action="/search" method="get" class="searchbar" autocomplete="off" role="search">
+        <svg role="icon" class="svg-icon iconSearch" width="18" height="18" viewBox="0 0 18 18"><path d="M12.864 11.321L18 16.5 16.5 18l-5.178-5.136v-.357a7 7 0 1 1 1.186-1.186h.356zM7 12A5 5 0 1 0 7 2a5 5 0 0 0 0 10z"/></svg>
+        <input name="q" type="text" placeholder="Search..." value="" tabindex="1" autocomplete="off" maxlength="240" class="f-input js-search-field" />
+        <button type="submit" class="btn js-search-submit">
+          <svg role="icon" class="svg-icon iconSearch" width="18" height="18" viewBox="0 0 18 18"><path d="M12.864 11.321L18 16.5 16.5 18l-5.178-5.136v-.357a7 7 0 1 1 1.186-1.186h.356zM7 12A5 5 0 1 0 7 2a5 5 0 0 0 0 10z"/></svg>
+        </button>
+      </form>
+
+    </div>
+
+
+
+
+
+    <div class="-actions">
+      <nav class="secondary-nav">
+        <div class="-dialog-container js-topbar-dialog-corral">
+
+
+          <div class="topbar-dialog siteSwitcher-dialog dno">
+            <div class="header">
+              <h3><a href="https://stackoverflow.com">current community</a>
+              </h3>
+            </div>
+            <div class="modal-content current-site-container">
+              <ul class="current-site">
+                <li>
+                  <div class="related-links">
+                    <a href="https://stackoverflow.com/help" class="js-gps-track"     data-gps-track="site_switcher.click({ item_type:14 })"
+                    >help</a>
+                    <a href="https://chat.stackoverflow.com" class="js-gps-track"     data-gps-track="site_switcher.click({ item_type:6 })"
+                    >chat</a>
+                  </div>
+
+                  <a href="https://stackoverflow.com"
+                     class="current-site-link site-link js-gps-track"
+                     data-id="1"
+                     data-gps-track="site_switcher.click({ item_type:3 })">
+                    <div class="site-icon favicon favicon-stackoverflow" title="Stack Overflow"></div>
+                    Stack Overflow
+                  </a>
+
+                </li>
+                <li class="related-site">
+                  <div class="L-shaped-icon-container">
+                    <span class="L-shaped-icon"></span>
+                  </div>
+
+
+                  <a href="https://meta.stackoverflow.com"
+                     class="site-link js-gps-track"
+                     data-id="552"
+                     data-gps-track="site.switch({ target_site:552, item_type:3 }),site_switcher.click({ item_type:4 })">
+                    <div class="site-icon favicon favicon-stackoverflowmeta" title="Meta Stack Overflow"></div>
+                    Meta Stack Overflow
+                  </a>
+
+                </li>
+              </ul>
+            </div>
+
+            <div class="header" id="your-communities-header">
+              <h3>
+                your communities            </h3>
+
+            </div>
+            <div class="modal-content" id="your-communities-section">
+
+              <div class="call-to-login">
+                <a href="https://stackoverflow.com/users/signup?ssrc=site_switcher&amp;returnurl=%2fusers%2fstory%2fcurrent&amp;amp;utm_source=stackoverflow.com&amp;amp;utm_medium=dev-story&amp;amp;utm_campaign=signup-redirect" class="login-link js-gps-track"     data-gps-track="site_switcher.click({ item_type:10 })"
+                >Sign up</a> or <a href="https://stackoverflow.com/users/login?ssrc=site_switcher&amp;returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f291978%2fshort-description-of-the-scoping-rules" class="login-link js-gps-track"     data-gps-track="site_switcher.click({ item_type:11 })"
+              >log in</a> to customize your list.
+              </div>
+            </div>
+
+            <div class="header">
+              <h3><a href="https://stackexchange.com/sites">more stack exchange communities</a>
+              </h3>
+              <a href="https://stackoverflow.blog" class="fr">company blog</a>
+            </div>
+            <div class="modal-content">
+              <div class="child-content"></div>
+            </div>
+          </div>
+          <div class="topbar-dialog help-dialog js-help-dialog dno">
+            <div class="modal-content">
+              <ul>
+                <li>
+                  <a href="/tour" class="js-gps-track" data-gps-track="help_popup.click({ item_type:1 })">
+                    Tour
+                    <span class="item-summary">
+                                Start here for a quick overview of the site
+                            </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:4 })">
+                    Help Center
+                    <span class="item-summary">
+                            Detailed answers to any questions you might have
+                        </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://meta.stackoverflow.com" class="js-gps-track" data-gps-track="help_popup.click({ item_type:2 })">
+                    Meta
+                    <span class="item-summary">
+                                    Discuss the workings and policies of this site
+                                </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://stackoverflow.com/company/about" class="js-gps-track" data-gps-track="help_popup.click({ item_type:6 })">
+                    About Us
+                    <span class="item-summary">
+                                    Learn more about Stack Overflow the company
+                                </span>
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.stackoverflowbusiness.com/?ref=topbar_help" class="js-gps-track" data-gps-track="help_popup.click({ item_type:7 })">
+                    Business
+                    <span class="item-summary">
+                                    Learn more about hiring developers or posting ads with us
+                                </span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+        <ol class="-list">
+
+
+          <li class="-item"><a href="#" class="-link js-help-button" title="Help Center and other resources">
+            <svg role="icon" class="svg-icon iconHelp" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1a8 8 0 1 0 0 16.001A8 8 0 0 0 9 1zm.812 12.126c-.02.716-.55 1.157-1.238 1.137-.659-.02-1.177-.49-1.157-1.209.02-.715.566-1.17 1.225-1.15.691.021 1.194.507 1.17 1.222zm1.956-5.114c-.168.237-.546.542-1.02.912l-.527.361c-.257.197-.417.43-.502.695-.044.141-.076.507-.084.752-.004.048-.032.156-.181.156H7.883c-.165 0-.185-.096-.18-.144.023-.667.12-1.218.397-1.66.374-.594 1.426-1.221 1.426-1.221.161-.12.286-.25.382-.39.177-.24.321-.51.321-.8 0-.333-.08-.65-.293-.915-.249-.31-.518-.458-1.036-.458-.51 0-.808.257-1.021.594-.213.338-.177.735-.177 1.097H5.746c0-1.366.357-2.238 1.112-2.752.51-.35 1.162-.502 1.921-.502.996 0 1.788.184 2.487.715.647.49.988 1.181.988 2.113 0 .575-.2 1.057-.486 1.447z"/></svg>
+          </a></li>
+          <li class="-item">
+            <a href="https://stackexchange.com" class="-link js-site-switcher-button js-gps-track" data-gps-track="site_switcher.show" title="A list of all 170 Stack Exchange sites">
+              <svg role="icon" class="svg-icon iconStackExchange" width="18" height="18" viewBox="0 0 18 18"><path d="M1 13a2 2 0 0 0 2 2h8v3l3-3h1a2 2 0 0 0 2-2v-2H1v2zM15 1H3a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2zM1 6h16v4H1V6z"/></svg>
+            </a>
+          </li>
+
+
+        </ol>
+      </nav>
+      <div class="-ctas">
+        <a href="https://stackoverflow.com/users/login?ssrc=head&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f291978%2fshort-description-of-the-scoping-rules" class="login-link btn-clear" rel="nofollow">Log In</a>
+        <a href="https://stackoverflow.com/users/signup?ssrc=head&returnurl=%2fusers%2fstory%2fcurrent&amp;utm_source=stackoverflow.com&amp;utm_medium=dev-story&amp;utm_campaign=signup-redirect" class="login-link btn" rel="nofollow">Sign Up</a>
+
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  StackExchange.ready(function () { StackExchange.topbar.init(); });
+  StackExchange.scrollPadding.setPaddingTop(60, 10);     </script>
+
+<div class="container _full ">
+
+
+
+  <div id="content" class="snippet-hidden">
+
+
+
+
+
+    <div itemscope itemtype="http://schema.org/Question">
+      <link itemprop="image" href="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a">
+
+
+
+
+
+      <div class="s-hero hero-container">
+        <div class="-container g-row jc-sp-between ai-center">
+          <div class="g-col6">
+            <h1 class="-title">Learn, Share, Build</h1>
+            <p class="-paragraph">Each month, over 50 million developers come to Stack Overflow to learn, share their knowledge, and build their careers.</p>
+            <p class="-paragraph">Join the world’s largest developer community.</p>
+            <p class="-paragraph g-col3"><a href="/users/signup?ssrc=hero&amp;returnurl=%2fusers%2fstory%2fcurrent&amp;amp;utm_source=stackoverflow.com&amp;amp;utm_medium=dev-story&amp;amp;utm_campaign=signup-redirect" class="btn-outlined -white _medium _block">Sign Up</a></p>
+          </div>
+
+
+          <a id="close" href="#" class="js-dismiss -dismiss" title="dismiss"><svg role="icon" class="svg-icon iconClear" width="18" height="18" viewBox="0 0 18 18"><path d="M15 4.41L13.59 3 9 7.59 4.41 3 3 4.41 7.59 9 3 13.59 4.41 15 9 10.41 13.59 15 15 13.59 10.41 9z"/></svg></a>
+        </div>
+      </div><script>
+      StackExchange.ready(function () {
+
+        var location = 0;
+        if ($("body").hasClass("questions-page")) {
+          location = 1;
+        } else if ($("body").hasClass("question-page")) {
+          location = 1;
+        } else if ($("body").hasClass("faq-page")) {
+          location = 5;
+        } else if ($("body").hasClass("home-page")) {
+          location = 6;
+        }
+
+        $('#tell-me-more').click(function () {
+          StackExchange.using("gps", function () {
+            StackExchange.gps.track("hero.action", { hero_action_type: 'cta', location: location }, true);
+          });
+        });
+
+        $('.hero-container #close').click(function () {
+          StackExchange.using("gps", function () {
+            StackExchange.gps.track("hero.action", { hero_action_type: "minimize", location: location }, true);
+          });
+
+          $.cookie("hero", "mini", { path: "/", expires: 365 });
+          $.ajax({
+            url: "/hero-mini",
+            success: function (data) {
+              $(".hero-container").fadeOut("fast", function () {
+                $(".hero-container").replaceWith(data);
+                $("#herobox-mini").fadeIn("fast");
+              });
+            }
+          });
+          return false;
+        });
+      });
+
+    </script>    <div class="inner-content">
+      <div id="question-header">
+        <h1 itemprop="name"><a href="/questions/291978/short-description-of-the-scoping-rules" class="question-hyperlink">Short Description of the Scoping Rules?</a></h1>
+
+
+        <div class="aside-cta" role="navigation" aria-label="ask new question">
+          <a href="/questions/ask" class="btn-outlined">Ask Question</a>
+        </div>
+      </div>
+      <div id="mainbar" role="main" aria-label="question and answers">
+
+
+
+        <div class="question" data-questionid="291978"  id="question">
+
+          <script>
+            var ados = ados || {}; ados.run = ados.run || [];
+            ados.run.push(function () { ados_add_placement(22,8277,"adzerk1462352789",4).setZone(43); });
+          </script>
+          <div class="everyonelovesstackoverflow" id="adzerk1462352789"></div>    <table>
+          <tr>
+            <td class="votecell">
+
+
+              <div class="vote">
+                <input type="hidden" name="_id_" value="291978">
+                <a class="vote-up-off" title="This question shows research effort; it is useful and clear">up vote</a>
+                <span itemprop="upvoteCount" class="vote-count-post ">290</span>
+                <a class="vote-down-off" title="This question does not show any research effort; it is unclear or not useful">down vote</a>
+
+                <a class="star-off" href="#">favorite</a>
+                <div class="favoritecount"><b>152</b></div>
+
+
+              </div>
+
+            </td>
+
+            <td class="postcell">
+              <div>
+                <div class="post-text" itemprop="text">
+
+                  <p>What <strong>exactly</strong> are the Python scoping rules?</p>
+
+                  <p>If I have some code:</p>
+
+                  <pre><code>code1
+class Foo:
+   code2
+   def spam.....
+      code3
+      for code4..:
+       code5
+       x()
+</code></pre>
+
+                  <p>Where is <em>x</em> found?  Some possible choices include the list above:</p>
+
+                  <ol>
+                    <li>In the enclosing source file</li>
+                    <li>In the class namespace</li>
+                    <li>In the function definition</li>
+                    <li>In the for loop index variable</li>
+                    <li>Inside the for loop</li>
+                  </ol>
+
+                  <p>Also there is the context during execution, when the function spam is passed somewhere else.  And maybe lambda functions pass a bit differently?</p>
+
+                  <p>There must be a simple reference or algorithm somewhere.  It's a confusing world for intermediate Python programmers.</p>
+                </div>
+                <div class="post-taglist">
+                  <a href="/questions/tagged/python" class="post-tag" title="show questions tagged &#39;python&#39;" rel="tag">python</a> <a href="/questions/tagged/scope" class="post-tag" title="show questions tagged &#39;scope&#39;" rel="tag">scope</a> <a href="/questions/tagged/dynamic-languages" class="post-tag" title="show questions tagged &#39;dynamic-languages&#39;" rel="tag">dynamic-languages</a>
+                </div>
+                <table class="fw">
+                  <tr>
+                    <td class="vt">
+                      <div class="post-menu"><a href="/q/291978" title="short permalink to this question" class="short-link" id="link-post-291978">share</a><span class="lsep">|</span><a href="/posts/291978/edit" class="suggest-edit-post" title="">improve this question</a></div>
+                    </td>
+                    <td align="right" class="post-signature">
+                      <div class="user-info user-hover">
+                        <div class="user-action-time">
+                          <a href="/posts/291978/revisions" title="show all edits to this post">edited <span title="2017-04-23 03:10:44Z" class="relativetime">Apr 23 at 3:10</span></a>
+                        </div>
+                        <div class="user-gravatar32">
+                          <a href="/users/355230/martineau"><div class="gravatar-wrapper-32"><img src="https://i.stack.imgur.com/VjcbL.jpg?s=32&amp;g=1" alt="" width="32" height="32"></div></a>
+                        </div>
+                        <div class="user-details">
+                          <a href="/users/355230/martineau">martineau</a>
+                          <div class="-flair">
+                            <span class="reputation-score" title="reputation score 49,131" dir="ltr">49.1k</span><span title="6 gold badges"><span class="badge1"></span><span class="badgecount">6</span></span><span title="68 silver badges"><span class="badge2"></span><span class="badgecount">68</span></span><span title="116 bronze badges"><span class="badge3"></span><span class="badgecount">116</span></span>
+                          </div>
+                        </div>
+                      </div>    </td>
+                    <td class="post-signature owner">
+                      <div class="user-info user-hover">
+                        <div class="user-action-time">
+                          asked <span title="2008-11-15 01:48:37Z" class="relativetime">Nov 15 '08 at 1:48</span>
+                        </div>
+                        <div class="user-gravatar32">
+                          <a href="/users/1320510/charles-merriam"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/2c437d3c8dac4ec473243d7f15ca4a8c?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                        </div>
+                        <div class="user-details">
+                          <a href="/users/1320510/charles-merriam">Charles Merriam</a>
+                          <div class="-flair">
+                            <span class="reputation-score" title="reputation score " dir="ltr">8,572</span><span title="4 gold badges"><span class="badge1"></span><span class="badgecount">4</span></span><span title="41 silver badges"><span class="badge2"></span><span class="badgecount">41</span></span><span title="52 bronze badges"><span class="badge3"></span><span class="badgecount">52</span></span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="votecell"></td>
+            <td>
+              <div id="comments-291978" class="comments ">
+                <table>
+                  <tbody data-remaining-comments-count="0"
+                         data-canpost="false"
+                         data-cansee="true"
+                         data-comments-unavailable="false"
+                         data-addlink-disabled="true">
+
+
+
+                  <tr id="comment-73105654" class="comment ">
+                    <td>
+                      <table>
+                        <tbody>
+                        <tr>
+                          <td class=" comment-score">
+                            &nbsp;&nbsp;
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td class="comment-text">
+                      <div style="display: block;" class="comment-body">
+                        <span class="comment-copy">Could people stop doing little &quot;karma edits&quot; to this question please?</span>
+                        &ndash;&nbsp;<a href="/users/1320510/charles-merriam"
+                                        title="8,572 reputation"
+                                        class="comment-user owner">Charles Merriam</a>
+                        <span class="comment-date" dir="ltr"><span title="2017-03-24 19:53:10Z" class="relativetime-clean">Mar 24 at 19:53</span></span>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr id="comment-74184311" class="comment ">
+                    <td>
+                      <table>
+                        <tbody>
+                        <tr>
+                          <td class=" comment-score">
+                            &nbsp;&nbsp;
+                          </td>
+                          <td>
+                            &nbsp;
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                    <td class="comment-text">
+                      <div style="display: block;" class="comment-body">
+                        <span class="comment-copy">They&#39;re not all &quot;karma edits&quot;. Some are because folks don&#39;t understand how things work. See <a href="https://meta.stackexchange.com/questions/19190/should-questions-include-tags-in-their-titles"><b><i>Should questions include “tags” in their titles?</i></b></a>.</span>
+                        &ndash;&nbsp;<a href="/users/355230/martineau"
+                                        title="49,131 reputation"
+                                        class="comment-user">martineau</a>
+                        <span class="comment-date" dir="ltr"><span title="2017-04-23 03:10:13Z" class="relativetime-clean">Apr 23 at 3:10</span></span>
+                        <span class="edited-yes" title="this comment was edited 1 time"></span>
+                      </div>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div id="comments-link-291978" data-rep=50 data-anon=true>
+
+                <a class="js-add-link comments-link disabled-link "
+                   title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments."
+                >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+              </div>
+            </td>
+          </tr>        </table>
+        </div>
+
+        <div id="answers">
+
+          <a name="tab-top"></a>
+          <div id="answers-header">
+            <div class="subheader answers-subheader">
+              <h2>
+                7 Answers
+                <span style="display:none;" itemprop="answerCount">7</span>
+              </h2>
+              <div>
+                <div id="tabs">
+                  <a href="/questions/291978/short-description-of-the-scoping-rules?answertab=active#tab-top" data-nav-xhref="" title="Answers with the latest activity first" data-value="active" data-shortcut="A">
+                    active</a>
+                  <a href="/questions/291978/short-description-of-the-scoping-rules?answertab=oldest#tab-top" data-nav-xhref="" title="Answers in the order they were provided" data-value="oldest" data-shortcut="O">
+                    oldest</a>
+                  <a class="youarehere" href="/questions/291978/short-description-of-the-scoping-rules?answertab=votes#tab-top" data-nav-xhref="" title="Answers with the highest score first" data-value="votes" data-shortcut="V">
+                    votes</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+          <a name="292502"></a>
+          <div id="answer-292502" class="answer accepted-answer" data-answerid="292502"  itemscope itemtype="http://schema.org/Answer" itemprop="acceptedAnswer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="292502">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">259</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+                    <span class="vote-accepted-on load-accepted-answer-date" title="loading when this answer was accepted...">accepted</span>
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>Actually, a concise rule for Python Scope resolution, from <a href="http://rads.stackoverflow.com/amzn/click/0596513984" rel="noreferrer">Learning Python, 3rd. Ed.</a>. (These rules are specific to variable names, not attributes. If you reference it without a period, these rules apply)</p>
+
+                    <p>LEGB Rule.</p>
+
+                    <p><strong>L</strong>, Local — Names assigned in any way within a function (<code>def</code> or <code>lambda</code>)), and not declared global in that function.</p>
+
+                    <p><strong>E</strong>, Enclosing-function locals — Name in the local scope of any and all statically enclosing functions (<code>def</code> or <code>lambda</code>), from inner to outer.</p>
+
+                    <p><strong>G</strong>, Global (module) — Names assigned at the top-level of a module file, or by executing a <code>global</code> statement in a <code>def</code> within the file.</p>
+
+                    <p><strong>B</strong>, Built-in (Python) — Names preassigned in the built-in names module : <code>open</code>,<code>range</code>,<code>SyntaxError</code>,...</p>
+
+                    <p>So, in the case of</p>
+
+                    <pre><code>code1
+class Foo:
+   code2
+   def spam.....
+      code3
+      for code4..:
+       code5
+       x()
+</code></pre>
+
+                    <p>The for loop does not have its own namespace. In LEGB order, the scopes would be </p>
+
+                    <p>L : local, in <code>def spam</code> (in <code>code3</code>, <code>code 4</code>, <code>code5</code>).</p>
+
+                    <p>E : Enclosed function, any enclosing functions (if the whole example were in another <code>def</code>)</p>
+
+                    <p>G : Global. Were there any <code>x</code> declared globally in the module (<code>code1</code>)?</p>
+
+                    <p>B : Any builtin <code>x</code> in Python.</p>
+
+                    <p><code>x</code> will never be found in <code>code2</code> (even in cases where you might expect it would, see <a href="https://stackoverflow.com/a/23471004/2810305">Antti's answer</a> or <a href="https://stackoverflow.com/q/13905741/2810305">here</a>).</p>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/292502" title="short permalink to this answer" class="short-link" id="link-post-292502">share</a><span class="lsep">|</span><a href="/posts/292502/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+                      <td align="right" class="post-signature">
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            <a href="/posts/292502/revisions" title="show all edits to this post">edited <span title="2017-05-23 12:34:41Z" class="relativetime">May 23 at 12:34</span></a>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/-1/community"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/a007be5a61f6aa8f3e85ae2fc18dd66e?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/-1/community">Community</a><span class="mod-flair" title="moderator">&#9830;</span>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score " dir="ltr">1</span><span title="1 silver badge"><span class="badge2"></span><span class="badgecount">1</span></span>
+                            </div>
+                          </div>
+                        </div>    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            answered <span title="2008-11-15 12:47:22Z" class="relativetime">Nov 15 '08 at 12:47</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/35335/rizwan-kassim"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/cea4dbf0bf2672b0121374c6423329e8?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/35335/rizwan-kassim">Rizwan Kassim</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score " dir="ltr">4,563</span><span title="2 gold badges"><span class="badge1"></span><span class="badgecount">2</span></span><span title="16 silver badges"><span class="badge2"></span><span class="badgecount">16</span></span><span title="31 bronze badges"><span class="badge3"></span><span class="badgecount">31</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-292502" class="comments ">
+                    <table>
+                      <tbody data-remaining-comments-count="2"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+
+
+                      <tr id="comment-763944" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="cool">1</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">U did not cover the scope of <code>code2</code>. That is not a variable and is a class/instance attribute. Is that right.</span>
+                            &ndash;&nbsp;<a href="/users/55562/lakshman-prasad"
+                                            title="37,262 reputation"
+                                            class="comment-user">Lakshman Prasad</a>
+                            <span class="comment-date" dir="ltr"><span title="2009-06-05 12:39:09Z" class="relativetime-clean">Jun 5 '09 at 12:39</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr id="comment-12559231" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="cool">1</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">my intuition says that code2 exists inside the class scope of <code>Foo</code>, and could be accessed from any scope with access to <code>Foo</code> with <code>Foo.code2</code> or from within <code>Foo</code> with the same syntax.  But I&#39;m not sure yet where that falls within the LEGB mnemonic.</span>
+                            &ndash;&nbsp;<a href="/users/656833/conrad-dean"
+                                            title="1,580 reputation"
+                                            class="comment-user">Conrad.Dean</a>
+                            <span class="comment-date" dir="ltr"><span title="2012-03-24 15:51:36Z" class="relativetime-clean">Mar 24 '12 at 15:51</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr id="comment-14735255" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="hot">22</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">As a caveat to Global access - reading a global variable can happen without explicit declaration, but writing to it without declaring global(var_name) will instead create a new local instance.</span>
+                            &ndash;&nbsp;<a href="/users/66349/peter-gibson"
+                                            title="10,577 reputation"
+                                            class="comment-user">Peter Gibson</a>
+                            <span class="comment-date" dir="ltr"><span title="2012-06-27 05:53:37Z" class="relativetime-clean">Jun 27 '12 at 5:53</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr id="comment-19372083" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="warm">7</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">Actually @Peter, <code>global(var_name)</code> is syntactically incorrect. The correct syntax would be <code>global var_name</code> without parentheses. You have a valid point though.</span>
+                            &ndash;&nbsp;<a href="/users/355230/martineau"
+                                            title="49,131 reputation"
+                                            class="comment-user">martineau</a>
+                            <span class="comment-date" dir="ltr"><span title="2012-12-24 21:48:48Z" class="relativetime-clean">Dec 24 '12 at 21:48</span></span>
+                            <span class="edited-yes" title="this comment was edited 2 times"></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr id="comment-26476658" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="cool">2</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">@Jonathan: Because each <code>y</code> is being written to and there are no <code>global y</code> declarations -- see @Peter&#39;s comment.</span>
+                            &ndash;&nbsp;<a href="/users/355230/martineau"
+                                            title="49,131 reputation"
+                                            class="comment-user">martineau</a>
+                            <span class="comment-date" dir="ltr"><span title="2013-08-06 19:19:10Z" class="relativetime-clean">Aug 6 '13 at 19:19</span></span>
+                            <span class="edited-yes" title="this comment was edited 1 time"></span>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-292502" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link  dno"
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    ></a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link " title="expand to show all comments on this post" href=# onclick="">show <b>2</b> more comments</a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+          <div class="newsletter-anon">
+            <img src="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a" class="newsletter-logo" />
+            <div class="newsletter-container">
+              <h2>Did you find this question interesting? Try our newsletter</h2>
+              <p class="newsletter-description">
+                Sign up for our newsletter and get our top new questions delivered to your inbox (<a href="https://stackexchange.com/newsletters/newsletter?site=stackoverflow.com" id="newsletter-preview">see an example</a>).
+              </p>
+              <form id="anon-newsletter-form" data-error="There was a problem signing up for the newsletter. Please try again later.">
+                <input type="email" id="newsletter-email-input" placeholder="email address" title="your email address" />
+                <input type="submit" value="Subscribe" id="newsletter-email-submit"/>
+              </form>
+              <div style="margin-top: 10px; float:right;" class="dno cbt newsletter-status-confirmed">
+                <b>Subscribed!</b>
+              </div>
+              <div style="margin-top: 10px; float:right;" class="dno cbt newsletter-status-unconfirmed">
+                <b>Success!</b> Please click the link in the confirmation email to activate your subscription.
+              </div>
+            </div>
+          </div>
+
+          <script>
+            StackExchange.ready(function () {
+              StackExchange.newsletterAd.init();
+            });
+
+            $('#anon-newsletter-form').submit(function () {
+              var $form = $(this);
+              var $input = $form.find('#newsletter-email-input');
+              var $submit = $form.find('#newsletter-email-submit');
+              var $container = $form.closest('.newsletter-container');
+
+              var email = $.trim($input.val());
+              if (email.length == 0) {
+                return false;
+              }
+              StackExchange.helpers.addSpinner($form);
+
+              $.ajax({
+                url: '/newsletter/signup/anon',
+                type: 'POST',
+                dataType: 'json',
+                data: { fkey: StackExchange.options.user.fkey, email: email, viaAnonNewsletterAd: true },
+                success: function (data) {
+                  if (!data.error && (data.status == 'confirmed' || data.status == 'unconfirmed')) {
+                    $input.attr('disabled', true);
+                    $submit.remove();
+                    $container.find('.newsletter-status-' + data.status).show();
+                  }
+                  else {
+                    $container.showErrorMessage(data.error || $form.data('error'));
+                  }
+                },
+                error: function () {
+                  $container.showErrorMessage($form.data('error'));
+                },
+                complete: function () {
+                  StackExchange.helpers.removeSpinner($form);
+                }
+              });
+
+              return false;
+            });
+          </script>
+
+
+          <a name="293097"></a>
+          <div id="answer-293097" class="answer" data-answerid="293097"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="293097">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">111</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>Essentially, the only thing in Python that introduces a new scope is a function definition.  Classes are a bit of a special case in that anything defined directly in the body is placed in the class's namespace, but they are not directly accessible from within the methods (or nested classes) they contain.</p>
+
+                    <p>In your example there are only 3 scopes where x will be searched in:</p>
+
+                    <ul>
+                      <li><p>spam's scope - containing everything defined in code3 and code5 (as well as code4, your loop variable)</p></li>
+                      <li><p>The global scope - containing everything defined in code1, as well as Foo (and whatever changes after it)</p></li>
+                      <li><p>The builtins namespace.  A bit of a special case - this contains the various Python builtin functions and types such as len() and str(). Generally this shouldn't be modified by any user code, so expect it to contain the standard functions and nothing else.</p></li>
+                    </ul>
+
+                    <p>More scopes only appear when you introduce a nested function (or lambda) into the picture.
+                      These will behave pretty much as you'd expect however.  The nested function can access everything in the local scope, as well as anything in the enclosing function's scope. eg.</p>
+
+                    <pre><code>def foo():
+    x=4
+    def bar():
+        print x  # Accesses x from foo's scope
+    bar()  # Prints 4
+    x=5
+    bar()  # Prints 5
+</code></pre>
+
+                    <p><strong>Restrictions:</strong></p>
+
+                    <p>Variables in scopes other than the local function's variables can be accessed, but can't be rebound to new parameters without further syntax.  Instead, assignment will create a new <strong>local</strong> variable instead of affecting the variable in the parent scope.  For example:</p>
+
+                    <pre><code>global_var1 = []
+global_var2 = 1
+
+def func():
+    # This is OK: It's just accessing, not rebinding
+    global_var1.append(4)
+
+    # This won't affect global_var2. Instead it creates a new variable
+    global_var2 = 2
+
+    local1 = 4
+    def embedded_func():
+        # Again, this doen't affect func's local1 variable.  It creates a
+        # new local variable also called local1 instead.
+        local1 = 5
+        print local1
+
+    embedded_func() # Prints 5
+    print local1    # Prints 4
+</code></pre>
+
+                    <p>In order to actually modify the bindings of global variables from within a function scope, you need to specify that the variable is global with the global keyword.  Eg:</p>
+
+                    <pre><code>global_var = 4
+def change_global():
+    global global_var
+    global_var = global_var + 1
+</code></pre>
+
+                    <p>Currently there is no way to do the same for variables in enclosing <em>function</em> scopes, but Python 3 introduces a new keyword, "<code>nonlocal</code>" which will act in a similar way to global, but for nested function scopes.</p>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/293097" title="short permalink to this answer" class="short-link" id="link-post-293097">share</a><span class="lsep">|</span><a href="/posts/293097/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            answered <span title="2008-11-15 21:51:09Z" class="relativetime">Nov 15 '08 at 21:51</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/9493/brian"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/7895e5fdbabe3fc5e09272bb602257d7?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/9493/brian">Brian</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score 75,019" dir="ltr">75k</span><span title="22 gold badges"><span class="badge1"></span><span class="badgecount">22</span></span><span title="81 silver badges"><span class="badge2"></span><span class="badgecount">81</span></span><span title="102 bronze badges"><span class="badge3"></span><span class="badgecount">102</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-293097" class="comments  dno">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+                      <tr><td></td><td></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-293097" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+
+
+          <a name="23471004"></a>
+          <div id="answer-23471004" class="answer" data-answerid="23471004"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="23471004">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">58</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>There was no thorough answer concerning Python3 time, so I made an answer here.</p>
+
+                    <p>As provided in other answers, there are 4 basic scopes, the LEGB, for Local, Enclosing, Global and Builtin. In addition to those, there is a special scope, the <strong>class body</strong>, which does not comprise an enclosing scope for methods defined within the class; any assignments within the class body make the variable from there on be bound in the class body.</p>
+
+                    <p>Especially, <strong>no</strong> block statement, besides <code>def</code> and <code>class</code>, create a variable scope. In Python 2 the list comprehension does not create a variable scope, however in Python 3 the loop variable is created in a new scope.</p>
+
+                    <p>To demonstrate the peculiarities of the class body</p>
+
+                    <pre><code>x = 0
+class X(object):
+    y = x
+    x = x + 1 # x is now a variable
+    z = x
+
+    def method(self):
+        print(self.x) # -&gt; 1
+        print(x)      # -&gt; 0, the global x
+        print(y)      # -&gt; NameError: global name 'y' is not defined
+
+inst = X()
+print(inst.x, inst.y, inst.z, x) # -&gt; (1, 0, 1, 0)
+</code></pre>
+
+                    <p>Thus unlike in function body, you can reassign the variable to the same name in class body, to get a class variable with the same name; further lookups on this name resolve
+                      to the class variable instead.</p>
+
+                    <hr>
+
+                    <p>One of the greater surprises to many newcomers to Python is that a <code>for</code> loop does not create a variable scope. In Python 2 the list comprehensions do not create a scope either (while generators and dict comprehensions do!) Instead they leak the value in the function or the global scope:</p>
+
+                    <pre><code>&gt;&gt;&gt; [ i for i in range(5) ]
+&gt;&gt;&gt; i
+4
+</code></pre>
+
+                    <p>The comprehensions can be used as a cunning (or awful if you will) way to make modifiable variables within lambda expressions in Python 2 - a lambda expression does create a variable scope, like the <code>def</code> statement would, but within lambda no statements are allowed. Assignment being a statement in Python means that no variable assignments in lambda are allowed, but a list comprehension is an expression...</p>
+
+                    <p>This behaviour has been fixed in Python 3 - no comprehension expressions or generators leak variables.</p>
+
+                    <hr>
+
+                    <p>The global really means the module scope; the main python module is the <code>__main__</code>; all imported modules are accessible through the <code>sys.modules</code> variable; to get access to <code>__main__</code> one can use <code>sys.modules['__main__']</code>, or <code>import __main__</code>; it is perfectly acceptable to access and assign attributes there; they will show up as variables in the global scope of the main module.</p>
+
+                    <hr>
+
+                    <p>If a name is ever assigned to in the current scope (except in the class scope), it will be considered belonging to that scope, otherwise it will be considered to belonging to any enclosing scope that assigns to the variable (it might not be assigned yet, or not at all), or finally the global scope. If the variable is considered local, but it is not set yet, or has been deleted, reading the variable value will result in <code>UnboundLocalError</code>, which is a subclass of <code>NameError</code>.</p>
+
+                    <pre><code>x = 5
+def foobar()
+    print(x)  # UnboundLocalError!
+    x += 1    # assignment here makes x a local variable!
+</code></pre>
+
+                    <p>The scope can declare that it explicitly wants to modify the global (module scope) variable, with the global keyword:</p>
+
+                    <pre><code>x = 5
+def foobar():
+    global x
+    print(x) # -&gt; 5
+    x += 1
+
+foobar()
+print(x) # -&gt; 6
+</code></pre>
+
+                    <p>This also is possible even if it was shadowed in enclosing scope:</p>
+
+                    <pre><code>x = 5
+y = 13
+def make_closure():
+    x = 42
+    y = 911
+    def func():
+        global x # sees the global value
+        print(x, y)
+        x += 1
+
+    return func
+
+func = make_closure()
+func()      # -&gt; print 5 911
+print(x, y) # -&gt; 6 13
+</code></pre>
+
+                    <p>In python 2 there is no easy way to modify the value in the enclosing scope; usually this is simulated by having a mutable value, such as a list with length of 1:</p>
+
+                    <pre><code>def make_closure():
+    value = [0]
+    def get_next_value():
+        value[0] += 1
+        return value[0]
+
+    return get_next_value
+
+get_next = make_closure()
+print(get_next()) # -&gt; 1
+print(get_next()) # -&gt; 2
+</code></pre>
+
+                    <p>However in python 3, the <code>nonlocal</code> comes to rescue:</p>
+
+                    <pre><code>def make_closure():
+    value = 0
+    def get_next_value():
+        nonlocal value
+        value += 1
+        return value
+    return get_next_value
+
+get_next = make_closure() # identical behavior to the previous example.
+</code></pre>
+
+                    <hr>
+
+                    <p>Any variable that is not deemed to be local to the current scope, or any enclosing scope, is a global variable. A global name is looked up in the module global dictionary; if not found, the global is then looked up from the builtins module; the name of the module was changed from python 2 to python 3; in python 2 it was <code>__builtin__</code> and in python 3 it is now called <code>builtins</code>. If you assign to an attribute of builtins module, it will be visible thereafter to any module as a readable global variable, unless that module shadows them with its own global variable with the same name.</p>
+
+                    <hr>
+
+                    <p>Reading the builtin module can also be useful; suppose that you want the python 3 style print function in some parts of file, but other parts of file still use the <code>print</code> statement, if your python version is >= 2.6, you can get the new style function as:</p>
+
+                    <pre><code>import __builtin__
+
+print3 = __builtin__.__dict__['print']
+</code></pre>
+
+                    <p>The <code>from __future__ import print_function</code> actually does not import the <code>print</code> function anywhere in Python 2 - instead it just disables the parsing rules for <code>print</code> statement in the current module, handling <code>print</code> like any other variable identifier, and thus allowing the <code>print</code> the function be looked up in the builtins.</p>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/23471004" title="short permalink to this answer" class="short-link" id="link-post-23471004">share</a><span class="lsep">|</span><a href="/posts/23471004/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+                      <td align="right" class="post-signature">
+                        <div class="user-info ">
+                          <div class="user-action-time">
+                            <a href="/posts/23471004/revisions" title="show all edits to this post">edited <span title="2015-10-14 17:40:27Z" class="relativetime">Oct 14 '15 at 17:40</span></a>
+                          </div>
+                          <div class="user-gravatar32">
+
+                          </div>
+                          <div class="user-details">
+
+                            <div class="-flair">
+
+                            </div>
+                          </div>
+                        </div>    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            answered <span title="2014-05-05 11:08:54Z" class="relativetime">May 5 '14 at 11:08</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/918959/antti-haapala"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/b9051b2917c3d55d55b3d7042fa49f6c?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/918959/antti-haapala">Antti Haapala</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score 55,480" dir="ltr">55.5k</span><span title="11 gold badges"><span class="badge1"></span><span class="badgecount">11</span></span><span title="94 silver badges"><span class="badge2"></span><span class="badgecount">94</span></span><span title="147 bronze badges"><span class="badge3"></span><span class="badgecount">147</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-23471004" class="comments  dno">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+                      <tr><td></td><td></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-23471004" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+
+
+          <a name="292907"></a>
+          <div id="answer-292907" class="answer" data-answerid="292907"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="292907">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">18</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>The scoping rules for Python 2.x have been outlined already in other answers. The only thing I would add is that in Python 3.0, there is also the concept of a non-local scope (indicated by the 'nonlocal' keyword). This allows you to access outer scopes directly, and opens up the ability to do some neat tricks, including lexical closures (without ugly hacks involving mutable objects).</p>
+
+                    <p>EDIT: Here's the <a href="http://www.python.org/dev/peps/pep-3104/" rel="noreferrer">PEP</a> with more information on this.</p>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/292907" title="short permalink to this answer" class="short-link" id="link-post-292907">share</a><span class="lsep">|</span><a href="/posts/292907/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info ">
+                          <div class="user-action-time">
+                            answered <span title="2008-11-15 18:52:49Z" class="relativetime">Nov 15 '08 at 18:52</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/18866/jeremy-cantrell"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/0b887c77a19c495b68a6772972c23a23?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/18866/jeremy-cantrell">Jeremy Cantrell</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score 13,905" dir="ltr">13.9k</span><span title="8 gold badges"><span class="badge1"></span><span class="badgecount">8</span></span><span title="41 silver badges"><span class="badge2"></span><span class="badgecount">41</span></span><span title="74 bronze badges"><span class="badge3"></span><span class="badgecount">74</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-292907" class="comments  dno">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+                      <tr><td></td><td></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-292907" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+
+
+          <a name="34094235"></a>
+          <div id="answer-34094235" class="answer" data-answerid="34094235"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="34094235">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">13</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>A slightly more complete example of scope:</p>
+
+                    <pre><code>x = 100
+print "1. Global x:", x
+class Test(object):
+    y = x
+    print "2. Enclosed y:", y
+    x = x + 1
+    print "3. Enclosed x:", x
+    z = x
+
+    def method(self):
+        print "4. Enclosed self.x", self.x
+        print "5. Global x", x
+        try:
+            print y
+        except NameError, e:
+            print "6.", e
+
+    def method_local_ref(self):
+        try:
+            print x
+        except UnboundLocalError, e:
+            print "7.", e
+        x = 200
+        print "8. Local x", x
+
+inst = Test()
+inst.method()
+inst.method_local_ref()
+</code></pre>
+
+                    <p>output:</p>
+
+                    <blockquote>
+                      <ol>
+                        <li>Global x: 100</li>
+                        <li>Enclosed y: 100</li>
+                        <li>Enclosed x: 101</li>
+                        <li>Enclosed self.x 101</li>
+                        <li>Global x 100</li>
+                        <li>global name 'y' is not defined</li>
+                        <li>local variable 'x' referenced before assignment</li>
+                        <li>Local x 200</li>
+                      </ol>
+                    </blockquote>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/34094235" title="short permalink to this answer" class="short-link" id="link-post-34094235">share</a><span class="lsep">|</span><a href="/posts/34094235/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info ">
+                          <div class="user-action-time">
+                            answered <span title="2015-12-04 17:38:37Z" class="relativetime">Dec 4 '15 at 17:38</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/226800/brianray"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/bd6a167af632fea802707ce70fffebd1?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/226800/brianray">brianray</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score " dir="ltr">692</span><span title="7 silver badges"><span class="badge2"></span><span class="badgecount">7</span></span><span title="12 bronze badges"><span class="badge3"></span><span class="badgecount">12</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-34094235" class="comments ">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+
+
+                      <tr id="comment-66143541" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="cool">3</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">This is great answer. However, I think that the differences between <code>method</code> and <code>method_local_ref</code> should be highlighted. <code>method</code> is able to access the global variable and print it as in <code>5. Global x</code>. But <code>method_local_ref</code> cannot because later on it defines a local variable with that same name. You can test this by removing the <code>x = 200</code> line and see the difference</span>
+                            &ndash;&nbsp;<a href="/users/1919237/kiril"
+                                            title="1,404 reputation"
+                                            class="comment-user">kiril</a>
+                            <span class="comment-date" dir="ltr"><span title="2016-09-09 10:35:54Z" class="relativetime-clean">Sep 9 '16 at 10:35</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-34094235" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+
+
+          <a name="292002"></a>
+          <div id="answer-292002" class="answer" data-answerid="292002"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="292002">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">6</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <p>Python resolves your variables with -- generally -- three namespaces available.  </p>
+
+                    <blockquote>
+                      <p>At any time during execution, there
+                        are at least three nested scopes whose
+                        namespaces are directly accessible:
+                        the innermost scope, which is searched
+                        first, contains the local names; the
+                        namespaces of any enclosing functions,
+                        which are searched starting with the
+                        nearest enclosing scope; the middle
+                        scope, searched next, contains the
+                        current module's global names; and the
+                        outermost scope (searched last) is the
+                        namespace containing built-in names.</p>
+                    </blockquote>
+
+                    <p>There are two functions: <code>globals</code> and <code>locals</code> which show you the contents two of these namespaces.</p>
+
+                    <p>Namespaces are created by packages, modules, classes, object construction and functions.  There aren't any other flavors of namespaces.  </p>
+
+                    <p>In this case, the call to a function named <code>x</code> has to be resolved in the local name space or the global namespace.</p>
+
+                    <p>Local in this case, is the body of the method function <code>Foo.spam</code>.</p>
+
+                    <p>Global is -- well -- global. </p>
+
+                    <p>The rule is to search the nested local spaces created by method functions (and nested function definitions), then search global.  That's it.</p>
+
+                    <p>There are no other scopes.  The <code>for</code> statement (and other compound statements like <code>if</code> and <code>try</code>) don't create new nested scopes.  Only definitions (packages, modules, functions, classes and object instances.)</p>
+
+                    <p>Inside a class definition, the names are part of the class namespace.  <code>code2</code>, for instance, must be qualified by the class name.  Generally <code>Foo.code2</code>.  However, <code>self.code2</code> will also work because Python objects look at the containing class as a fall-back.</p>
+
+                    <p>An object (an instance of a class) has instance variables.  These names are in the object's namespace.  They must be qualified by the object.  (<code>variable.instance</code>.)  </p>
+
+                    <p>From within a class method, you have locals and globals.  You say <code>self.variable</code> to pick the instance as the namespace.  You'll note that <code>self</code> is an argument to every class member function, making it part of the local namespace.</p>
+
+                    <p>See <a href="http://www.network-theory.co.uk/docs/pytut/PythonScopesandNameSpaces.html" rel="nofollow noreferrer">Python Scope Rules</a>, <a href="https://stackoverflow.com/questions/146359/python-scope">Python Scope</a>, <a href="http://showmedo.com/videos/video?name=2800020&amp;fromSeriesID=280" rel="nofollow noreferrer">Variable Scope</a>.</p>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/292002" title="short permalink to this answer" class="short-link" id="link-post-292002">share</a><span class="lsep">|</span><a href="/posts/292002/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+                      <td align="right" class="post-signature">
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            <a href="/posts/292002/revisions" title="show all edits to this post">edited <span title="2017-05-23 12:10:44Z" class="relativetime">May 23 at 12:10</span></a>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/-1/community"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/a007be5a61f6aa8f3e85ae2fc18dd66e?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/-1/community">Community</a><span class="mod-flair" title="moderator">&#9830;</span>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score " dir="ltr">1</span><span title="1 silver badge"><span class="badge2"></span><span class="badgecount">1</span></span>
+                            </div>
+                          </div>
+                        </div>    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            answered <span title="2008-11-15 02:03:38Z" class="relativetime">Nov 15 '08 at 2:03</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/10661/s-lott"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/c2c732bbf13dc96670b210b3c0c1ead5?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/10661/s-lott">S.Lott</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score 281,805" dir="ltr">282k</span><span title="56 gold badges"><span class="badge1"></span><span class="badgecount">56</span></span><span title="397 silver badges"><span class="badge2"></span><span class="badgecount">397</span></span><span title="680 bronze badges"><span class="badge3"></span><span class="badgecount">680</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-292002" class="comments ">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+
+
+                      <tr id="comment-140935" class="comment ">
+                        <td class="comment-actions">
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                <span title="number of &#39;useful comment&#39; votes received"
+                                      class="cool">4</span>
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">This is out of date. Since 2.1 (7 years ago) there are more than two scopes, as nested functions introduce new scopes, so a function within a function will have access to its local scope, the enclosing functions scope, and global scope (also builtins).</span>
+                            &ndash;&nbsp;<a href="/users/9493/brian"
+                                            title="75,019 reputation"
+                                            class="comment-user">Brian</a>
+                            <span class="comment-date" dir="ltr"><span title="2008-11-15 21:24:00Z" class="relativetime-clean">Nov 15 '08 at 21:24</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr id="comment-141122" class="comment ">
+                        <td>
+                          <table>
+                            <tbody>
+                            <tr>
+                              <td class=" comment-score">
+                                &nbsp;&nbsp;
+                              </td>
+                              <td>
+                                &nbsp;
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                        <td class="comment-text">
+                          <div style="display: block;" class="comment-body">
+                            <span class="comment-copy">I&#39;m sorry, this is no longer the case. <code>Python has two namespaces available. Global and local-to-something.</code></span>
+                            &ndash;&nbsp;<a href="/users/35335/rizwan-kassim"
+                                            title="4,563 reputation"
+                                            class="comment-user">Rizwan Kassim</a>
+                            <span class="comment-date" dir="ltr"><span title="2008-11-16 00:56:26Z" class="relativetime-clean">Nov 16 '08 at 0:56</span></span>
+                          </div>
+                        </td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-292002" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+
+
+          <a name="292498"></a>
+          <div id="answer-292498" class="answer" data-answerid="292498"  itemscope itemtype="http://schema.org/Answer">
+            <table>
+              <tr>
+                <td class="votecell">
+
+
+                  <div class="vote">
+                    <input type="hidden" name="_id_" value="292498">
+                    <a class="vote-up-off" title="This answer is useful">up vote</a>
+                    <span itemprop="upvoteCount" class="vote-count-post ">5</span>
+                    <a class="vote-down-off" title="This answer is not useful">down vote</a>
+
+
+
+
+                  </div>
+
+                </td>
+
+
+
+                <td class="answercell">
+                  <div class="post-text" itemprop="text">
+                    <blockquote>
+                      <p>Where is x found?</p>
+                    </blockquote>
+
+                    <p>x is not found as you haven't defined it. :-) It could be found in code1 (global) or code3 (local) if you put it there.</p>
+
+                    <p>code2 (class members) aren't visible to code inside methods of the same class — you would usually access them using self. code4/code5 (loops) live in the same scope as code3, so if you wrote to x in there you would be changing the x instance defined in code3, not making a new x.</p>
+
+                    <p>Python is statically scoped, so if you pass ‘spam’ to another function spam will still have access to globals in the module it came from (defined in code1), and any other containing scopes (see below). code2 members would again be accessed through self.</p>
+
+                    <p>lambda is no different to def. If you have a lambda used inside a function, it's the same as defining a nested function. In Python 2.2 onwards, nested scopes are available. In this case you can bind x at any level of function nesting and Python will pick up the innermost instance:</p>
+
+                    <pre><code>x= 0
+def fun1():
+    x= 1
+    def fun2():
+        x= 2
+        def fun3():
+            return x
+        return fun3()
+    return fun2()
+print fun1(), x
+
+2 0
+</code></pre>
+
+                    <p>fun3 sees the instance x from the nearest containing scope, which is the function scope associated with fun2. But the other x instances, defined in fun1 and globally, are not affected.</p>
+
+                    <p>Before nested_scopes — in Python pre-2.1, and in 2.1 unless you specifically ask for the feature using a from-future-import — fun1 and fun2's scopes are not visible to fun3, so S.Lott's answer holds and you would get the global x:</p>
+
+                    <pre><code>0 0
+</code></pre>
+                  </div>
+                  <table class="fw">
+                    <tr>
+                      <td class="vt">
+                        <div class="post-menu"><a href="/a/292498" title="short permalink to this answer" class="short-link" id="link-post-292498">share</a><span class="lsep">|</span><a href="/posts/292498/edit" class="suggest-edit-post" title="">improve this answer</a></div>                    </td>
+
+
+
+                      <td align="right" class="post-signature">
+
+
+                        <div class="user-info user-hover">
+                          <div class="user-action-time">
+                            answered <span title="2008-11-15 12:44:59Z" class="relativetime">Nov 15 '08 at 12:44</span>
+                          </div>
+                          <div class="user-gravatar32">
+                            <a href="/users/18936/bobince"><div class="gravatar-wrapper-32"><img src="https://www.gravatar.com/avatar/3f6f1bea81a68b2f1cfe3efbb9be94bc?s=32&amp;d=identicon&amp;r=PG" alt="" width="32" height="32"></div></a>
+                          </div>
+                          <div class="user-details">
+                            <a href="/users/18936/bobince">bobince</a>
+                            <div class="-flair">
+                              <span class="reputation-score" title="reputation score 395,440" dir="ltr">395k</span><span title="81 gold badges"><span class="badge1"></span><span class="badgecount">81</span></span><span title="516 silver badges"><span class="badge2"></span><span class="badgecount">516</span></span><span title="720 bronze badges"><span class="badge3"></span><span class="badgecount">720</span></span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <tr>
+                <td class="votecell"></td>
+                <td>
+                  <div id="comments-292498" class="comments  dno">
+                    <table>
+                      <tbody data-remaining-comments-count="0"
+                             data-canpost="false"
+                             data-cansee="true"
+                             data-comments-unavailable="false"
+                             data-addlink-disabled="true">
+
+                      <tr><td></td><td></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div id="comments-link-292498" data-rep=50 data-anon=true>
+
+                    <a class="js-add-link comments-link disabled-link "
+                       title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."
+                    >add a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                    <a class="js-show-link comments-link dno" title="expand to show all comments on this post" href=# onclick=""></a>
+                  </div>
+                </td>
+              </tr>    </table>
+          </div>
+          <a name='new-answer'></a>
+          <form id="post-form" action="/questions/291978/answer/submit" method="post"  class="post-form">
+            <input type="hidden" id="post-id" value="291978" />
+            <input type="hidden" id="qualityBanWarningShown" name="qualityBanWarningShown" value="false" />
+            <input type="hidden" name="referrer" value=""/>
+            <h2 class="space">Your Answer</h2>
+
+
+            <script>
+              StackExchange.ifUsing("editor", function () {
+                StackExchange.using("externalEditor", function () {
+                  StackExchange.using("snippets", function () {
+                    StackExchange.snippets.init();
+                  });
+                });
+              }, "code-snippets");
+            </script>
+
+
+            <script>
+              StackExchange.ready(function() {
+                initTagRenderer("".split(" "), "".split(" "));
+
+                StackExchange.using("externalEditor", function() {
+                  // Have to fire editor after snippets, if snippets enabled
+                  if (StackExchange.settings.snippets.snippetsEnabled) {
+                    StackExchange.using("snippets", function() {
+                      createEditor();
+                    });
+                  }
+                  else {
+                    createEditor();
+                  }
+                });
+
+                function createEditor() {
+                  StackExchange.prepareEditor({
+                    heartbeatType: 'answer',
+                    convertImagesToLinks: true,
+                    reputationToPostImages: 10,
+                    bindNavPrevention: true,
+                    postfix: "",
+                    onDemand: true,
+                    discardSelector: ".discard-answer"
+                    ,immediatelyShowMarkdownHelp:true
+                  });
+
+
+                }
+              });
+            </script>
+
+
+            <div id="post-editor" class="post-editor js-post-editor">
+
+              <div style="position: relative;">
+                <div class="wmd-container">
+                  <div id="wmd-button-bar" class="wmd-button-bar"></div>
+                  <textarea id="wmd-input" class="wmd-input" name="post-text" cols="92" rows="15" tabindex="101" data-min-length=""></textarea>
+                </div>
+              </div>
+
+              <div class="fl" style="margin-top: 8px; height:24px;">&nbsp;</div>
+              <div id="draft-saved" class="draft-saved community-option fl" style="margin-top: 8px; height:24px; display:none;">draft saved</div>
+
+              <div id="draft-discarded" class="draft-discarded community-option fl" style="margin-top: 8px; height:24px; display:none;">draft discarded</div>
+
+
+
+              <div id="wmd-preview" class="wmd-preview"></div>
+              <div></div>
+              <div class="edit-block">
+                <input id="fkey" name="fkey" type="hidden" value="0430108249900165ccbb03c301d2ce88">
+                <input id="author" name="author" type="text">
+              </div>
+
+
+
+            </div>
+
+            <div style="position: relative;">
+
+              <div class="form-item dno new-post-login">
+
+                <div class="new-login-form">
+                  <div class="new-login-left">
+                    <h3>Sign up or <a id="login-link" href="/users/login?ssrc=question_page&returnurl=https%3a%2f%2fstackoverflow.com%2fquestions%2f291978%2fshort-description-of-the-scoping-rules%23new-answer">log in</a></h3>
+                    <script>
+                      StackExchange.ready(function () {
+                        StackExchange.helpers.onClickDraftSave('#login-link');
+                      });
+                    </script>
+                    <div class="preferred-login google-login">
+                      <p><span class="icon"></span><span>Sign up using Google</span></p>
+                    </div>
+                    <div class="preferred-login facebook-login">
+                      <p><span class="icon"></span><span>Sign up using Facebook</span></p>
+                    </div>
+                    <div class="preferred-login stackexchange-login">
+                      <p><span class="icon"></span><span>Sign up using Email and Password</span></p>
+                    </div>
+                  </div>
+                  <input type="hidden" name="manual-openid" class="manual-openid" />
+                  <input type="hidden" name="use-facebook" class="use-facebook" value="false" />
+                  <input type="hidden" name="use-google" class="use-google" value="false" />
+                  <input type="button" class="submit-openid" value="Submit" style="display:none" />
+                  <div class="new-login-right">
+                    <h3>Post as a guest</h3>
+                    <div class="form-item">
+                      <table>
+                        <tr>
+                          <td class="vm">
+                            <div>
+                              <label for="display-name">Name</label>
+                              <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105">
+                            </div>
+                            <div>
+                              <label for="m-address">Email</label>
+                              <input id="m-address" name="m-address" type="email" size="30" maxlength="100" value="" tabindex="106" placeholder="required, but never shown" />
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <script>
+                StackExchange.ready(
+                  function () {
+                    StackExchange.openid.initPostLogin('.new-post-login', 'https%3a%2f%2fstackoverflow.com%2fquestions%2f291978%2fshort-description-of-the-scoping-rules%23new-answer', 'question_page');
+                  }
+                );
+              </script>
+              <noscript>
+                <h3>Post as a guest</h3>
+                <div class="form-item">
+                  <table>
+                    <tr>
+                      <td class="vm">
+                        <div>
+                          <label for="display-name">Name</label>
+                          <input id="display-name" name="display-name" type="text" size="30" maxlength="30" value="" tabindex="105">
+                        </div>
+                        <div>
+                          <label for="m-address">Email</label>
+                          <input id="m-address" name="m-address" type="email" size="30" maxlength="100" value="" tabindex="106" placeholder="required, but never shown" />
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+
+              </noscript>
+
+            </div>
+
+            <div class="form-submit cbt">
+              <input id="submit-button" type="submit" value="Post Your Answer" tabindex="110">
+              <a href="#" class="btn-clear discard-answer dno">discard</a>
+
+              <p class="privacy-policy-agreement">
+                By posting your answer, you agree to the <a href='https://stackexchange.com/legal/privacy-policy' name='privacy' target='_blank'>privacy policy</a> and <a href='https://stackexchange.com/legal/terms-of-service' name='tos' target='_blank'>terms of service</a>.</p>
+              <input type="hidden" name="legalLinksShown" value="1" />								</div>
+          </form>
+
+
+
+          <h2 class="bottom-notice" data-loc="1">
+            Not the answer you&#39;re looking for?							Browse other questions tagged <a href="/questions/tagged/python" class="post-tag" title="show questions tagged &#39;python&#39;" rel="tag">python</a> <a href="/questions/tagged/scope" class="post-tag" title="show questions tagged &#39;scope&#39;" rel="tag">scope</a> <a href="/questions/tagged/dynamic-languages" class="post-tag" title="show questions tagged &#39;dynamic-languages&#39;" rel="tag">dynamic-languages</a>  or <a href="/questions/ask">ask your own question</a>.						</h2>
+        </div>
+      </div>
+      <div id="sidebar" class="show-votes" role="complementary" aria-label="sidebar">
+        <div class="module question-stats">
+          <table id="qinfo">
+            <tr>
+              <td>
+                <p class="label-key">asked</p>
+              </td>
+              <td style="padding-left: 10px">
+                <p class="label-key" title="2008-11-15 01:48:37Z"><b>8 years, 8 months ago</b></p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p class="label-key">viewed</p>
+              </td>
+
+              <td style="padding-left: 10px">
+                <p class="label-key">
+                  <b>166,409 times</b>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <p class="label-key">active</p>
+              </td>
+              <td style="padding-left: 10px">
+                <p class="label-key"><b><a href="?lastactivity" class="lastactivity-link" title="2017-04-23 03:10:44Z">2 months ago</a></b></p>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="module community-bulletin" data-tracker="cb=1">
+          <div class="related">
+            <div class="bulletin-title">
+              Upcoming Events
+            </div>
+            <hr />
+            <div class="spacer bulletin-item-important">
+
+              <div class="bulletin-item-type"><a href="http://stackoverflow.com/election" class="question-hyperlink"><div class="favicon favicon-stackoverflow" title="Stack Overflow"></div></a></div>
+              <div class="bulletin-item-content">
+                <a href="http://stackoverflow.com/election" class="question-hyperlink">2017 Community Moderator Election</a>
+                <div>ends <span title="2017-08-01 20:00:00Z">Aug 1</span></div>
+              </div>
+              <br class="cbt" />
+            </div>
+            <div class="bulletin-title">
+              Blog
+            </div>
+            <hr />
+            <div class="spacer">
+              <div class="bulletin-item-type">
+                <a href="https://stackoverflow.blog/2017/07/17/podcast-112-please-direct-hate-mail-jay-hanlon-℅-stack-overflow/" class="question-hyperlink">
+                  <div class="favicon favicon-stackexchangemeta" title="Meta Stack Exchange"></div>                </a>
+              </div>
+              <div class="bulletin-item-content">
+                <a href="https://stackoverflow.blog/2017/07/17/podcast-112-please-direct-hate-mail-jay-hanlon-℅-stack-overflow/" class="question-hyperlink">Podcast #112 – Please Direct All Hate Mail to Jay Hanlon c/o Stack Overflow…</a>
+              </div>
+              <br class="cbt" />
+            </div>
+          </div>
+        </div>
+        <script>
+          var ados = ados || {}; ados.run = ados.run || [];
+          ados.run.push(function () { ados_add_placement(22,8277,"adzerk809365385",[5,17,2221,1129,43]).setZone(45); });
+        </script>
+        <div class="everyonelovesstackoverflow" id="adzerk809365385"></div>
+        <div id="hireme"></div>
+        <script>
+          window.clc_request = 'Au-PFdBqz9QIAAAAAIp0BAACAAAAAgAAAAAzAAAAfHB5dGhvbnxzY29wZXxkeW5hbWljLWxhbmd1YWdlc3x4LXBlcnNvbmEtZnJvbnRlbmR8AHT4eKuhMvjngv4';;!function i(n){try{if("function"!=typeof[].indexOf)return;if(!window.addEventListener)return;if(!n.allowed)return;if(!RegExp(n.allowed).test(location.hostname))return;var t=window,e=t.document,c=n.wv;if(e.hidden&&c)return void e.addEventListener("visibilitychange",function t(){e.hidden||(i(n),e.removeEventListener("visibilitychange",t))});if(t.clc=t.clc||{},t.clc.init=t.clc.init||[],n.autoload&&t.clc.init.push(function(i){return i.load()}),t.clc.options){for(var o in t.clc.options)n[o]=t.clc.options[o];t.clc.options=n}else t.clc.options=n;var r=e.createElement("script");r.async=!0,r.src=n.lib,e.body.appendChild(r)}catch(i){}}.call(null, {"lib":"https://cdn.sstatic.net/clc/clc.min.js?v=d80e98d967bf","u":"https://clc.stackoverflow.com/markup.js","azw":true,"kt":2000,"tto":true,"d":{"sb":["hireme","clc-sb"],"tlb":["careers1","clc-tlb"],"mlb":["careers3","clc-mlb"]},"h":"clc.stackoverflow.com","autoload":true,"allowed":"^(((talent\\.)?stackoverflow)|(blog\\.codinghorror)|(serverfault|askubuntu)|([^\\.]+\\.stackexchange))\\.com$","wv":true});        </script>
+
+
+        <div class="module sidebar-linked">
+          <h4 id="h-linked">Linked</h4>
+          <div class="linked" data-tracker="lq=1">
+
+            <div class="spacer">
+              <a href="/q/32148442" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">-3</div>
+              </a>
+              <a href="/questions/32148442/why-name-cursor-is-not-defined-when-pyodbc-cursor-is-in-main?noredirect=1" class="question-hyperlink">Why &ldquo;name &#39;cursor&#39; is not defined&rdquo; when pyodbc cursor is in main()?</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/27321568" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes  default">0</div>
+              </a>
+              <a href="/questions/27321568/local-variable-referenced-before-assignment?noredirect=1" class="question-hyperlink">&ldquo;local variable referenced before assignment&rdquo;</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/22042619" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">1</div>
+              </a>
+              <a href="/questions/22042619/what-does-scope-mean?noredirect=1" class="question-hyperlink">What does scope mean</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/12382472" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">2</div>
+              </a>
+              <a href="/questions/12382472/doubts-about-python-variable-scope?noredirect=1" class="question-hyperlink">Doubts about python variable scope</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/28679000" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">2</div>
+              </a>
+              <a href="/questions/28679000/scope-in-functions-vs-methods?noredirect=1" class="question-hyperlink">Scope in Functions vs. Methods</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/34986775" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">2</div>
+              </a>
+              <a href="/questions/34986775/what-are-the-differences-if-exist-in-variable-scope-between-python-and-c?noredirect=1" class="question-hyperlink">What are the differences (if exist) in variable scope between Python and C++?</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/30727711" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">0</div>
+              </a>
+              <a href="/questions/30727711/local-variable-scope-in-java-vs-python?noredirect=1" class="question-hyperlink">Local variable scope in Java vs Python</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/39793453" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">4</div>
+              </a>
+              <a href="/questions/39793453/class-vs-instance-initialization-in-python?noredirect=1" class="question-hyperlink">Class vs instance initialization in Python</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/21112495" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes  default">-1</div>
+              </a>
+              <a href="/questions/21112495/why-does-this-works-sometimes-in-python-variable-scope?noredirect=1" class="question-hyperlink">why does this works SOMETIMES in python ? (variable scope)</a>
+            </div>
+            <div class="spacer">
+              <a href="/q/22321499" title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">0</div>
+              </a>
+              <a href="/questions/22321499/why-4-is-returned-for-the-follow-code-in-python?noredirect=1" class="question-hyperlink">Why 4 is returned for the follow code in Python</a>
+            </div>					<div class="spacer more">
+            <a href="/questions/linked/291978">see more linked questions…</a>
+          </div>
+          </div>
+        </div>
+
+        <div class="module sidebar-related">
+          <h4 id="h-related">Related</h4>
+          <div class="related js-gps-related-questions" data-tracker="rq=1">
+            <div class="spacer"><a href="/q/146359" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">36</div></a><a href="/questions/146359/python-scope" class="question-hyperlink">Python scope</a></div><div class="spacer"><a href="/q/370357" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted large">149</div></a><a href="/questions/370357/python-variable-scope-error" class="question-hyperlink">Python variable scope error</a></div><div class="spacer"><a href="/q/500431" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted extra-large">1484</div></a><a href="/questions/500431/what-is-the-scope-of-variables-in-javascript" class="question-hyperlink">What is the scope of variables in JavaScript?</a></div><div class="spacer"><a href="/q/2261628" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">7</div></a><a href="/questions/2261628/how-to-access-locals-through-stack-trace-mimicking-dynamic-scope" class="question-hyperlink">How to access locals through stack trace? (Mimicking dynamic scope)</a></div><div class="spacer"><a href="/q/2829528" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted large">128</div></a><a href="/questions/2829528/whats-the-scope-of-a-python-variable-declared-in-an-if-statement" class="question-hyperlink">What&#39;s the scope of a Python variable declared in an if statement?</a></div><div class="spacer"><a href="/q/3611760" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">90</div></a><a href="/questions/3611760/scoping-in-python-for-loops" class="question-hyperlink">Scoping in Python &#39;for&#39; loops</a></div><div class="spacer"><a href="/q/4296677" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">42</div></a><a href="/questions/4296677/creating-a-class-within-a-function-and-access-a-function-defined-in-the-containi" class="question-hyperlink">Creating a class within a function and access a function defined in the containing function&#39;s scope</a></div><div class="spacer"><a href="/q/5008191" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">1</div></a><a href="/questions/5008191/python-question-about-variable-scope-rules" class="question-hyperlink">Python Question about Variable Scope Rules</a></div><div class="spacer"><a href="/q/6167923" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">46</div></a><a href="/questions/6167923/block-scope-in-python" class="question-hyperlink">Block scope in Python</a></div><div class="spacer"><a href="/q/33560562" title="Vote score (upvotes - downvotes)"><div class="answer-votes answered-accepted default">3</div></a><a href="/questions/33560562/python-temporarily-change-variable-scoping-rules" class="question-hyperlink">Python: temporarily change variable scoping rules</a></div>
+          </div>
+        </div>
+
+
+        <div id="hot-network-questions" class="module tex2jax_ignore">
+          <h4>
+            <a href="https://stackexchange.com/questions?tab=hot"
+               class="js-gps-track"
+               data-gps-track="posts_hot_network.click({ item_type:1, location:11 })">
+              Hot Network Questions
+            </a>
+          </h4>
+          <ul>
+            <li >
+              <div class="favicon favicon-worldbuilding" title="Worldbuilding Stack Exchange"></div><a href="https://worldbuilding.stackexchange.com/questions/86457/what-is-a-medieval-technology-method-of-underwater-enemy-detection" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:579 }); posts_hot_network.click({ item_type:2, location:11 })">
+              What is a medieval technology method of underwater enemy detection?
+            </a>
+
+            </li>
+            <li >
+              <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="https://scifi.stackexchange.com/questions/164080/is-palpatines-execution-of-order-66-legally-justified" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Is Palpatine&#39;s execution of Order 66 legally justified?
+            </a>
+
+            </li>
+            <li >
+              <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="https://codegolf.stackexchange.com/questions/133496/round-like-a-zero" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Round like a Zero
+            </a>
+
+            </li>
+            <li >
+              <div class="favicon favicon-academia" title="Academia Stack Exchange"></div><a href="https://academia.stackexchange.com/questions/93341/if-i-request-a-paper-through-my-university-library-must-they-pay-a-substantial" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+              If I request a paper through my university library, must they pay a substantial amount of money?
+            </a>
+
+            </li>
+            <li >
+              <div class="favicon favicon-workplace" title="The Workplace Stack Exchange"></div><a href="https://workplace.stackexchange.com/questions/95235/how-to-diplomatically-reject-someones-project-due-to-their-attitude" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:423 }); posts_hot_network.click({ item_type:2, location:11 })">
+              How to diplomatically reject someone&#39;s project due to their attitude
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-interpersonal" title="Interpersonal Skills Stack Exchange"></div><a href="https://interpersonal.stackexchange.com/questions/663/is-it-rude-to-drive-at-the-speed-limit-on-dangerous-roads-when-another-driver-wa" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:680 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Is it rude to drive at the speed limit on dangerous roads when another driver wants to go faster?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-puzzling" title="Puzzling Stack Exchange"></div><a href="https://puzzling.stackexchange.com/questions/53509/dont-settle-for-a-billion" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:559 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Don&#39;t settle for a billion
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-movies" title="Movies &amp; TV Stack Exchange"></div><a href="https://movies.stackexchange.com/questions/76570/what-is-this-movie-where-a-father-convinces-his-son-that-the-concentration-camp" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:367 }); posts_hot_network.click({ item_type:2, location:11 })">
+              What is this movie where a father convinces his son that the concentration camp they are in is all just a game?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-stackoverflow" title="Stack Overflow"></div><a href="https://stackoverflow.com/questions/45208442/how-to-detect-the-last-2-words-using-javascript" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:1 }); posts_hot_network.click({ item_type:2, location:11 })">
+              How to detect the last 2 words using javascript
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-fitness" title="Physical Fitness Stack Exchange"></div><a href="https://fitness.stackexchange.com/questions/34673/barbell-says-20kg-on-each-side-am-i-lifting-20-or-40kg" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:216 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Barbell says 20kg on each side. Am I lifting 20 or 40kg?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-money" title="Personal Finance &amp; Money Stack Exchange"></div><a href="https://money.stackexchange.com/questions/81962/was-my-insurance-technically-cancelled" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:93 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Was my insurance technically cancelled?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="https://codegolf.stackexchange.com/questions/132558/i-double-the-source-you-double-the-output" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+              I double the source, you double the output!
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-parenting" title="Parenting Stack Exchange"></div><a href="https://parenting.stackexchange.com/questions/30999/how-would-i-tell-my-father-in-law-that-hes-being-too-lenient-in-disciplining-my" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:228 }); posts_hot_network.click({ item_type:2, location:11 })">
+              How would I tell my Father-In-Law that he&#39;s being too lenient in disciplining my brother-in-law?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-english" title="English Language &amp; Usage Stack Exchange"></div><a href="https://english.stackexchange.com/questions/400545/looking-for-a-word-to-describe-someone-who-is-famous-to-a-small-group-of-people" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:97 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Looking for a word to describe someone who is famous to a small group of people
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-travel" title="Travel Stack Exchange"></div><a href="https://travel.stackexchange.com/questions/98455/singapore-do-we-need-to-carry-our-passport-all-the-time-or-is-the-ep-card-eno" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:273 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Singapore - Do we need to carry our Passport all the time? Or is the EP card enough?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-security" title="Information Security Stack Exchange"></div><a href="https://security.stackexchange.com/questions/165559/why-would-i-choose-sha-256-over-sha-512-for-a-ssl-tls-certificate" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:162 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Why would I choose SHA-256 over SHA-512 for a SSL/TLS certificate?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-electronics" title="Electrical Engineering Stack Exchange"></div><a href="https://electronics.stackexchange.com/questions/318369/can-an-electrical-arc-be-pushed-by-wind" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:135 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Can an electrical arc be pushed by wind?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-codegolf" title="Programming Puzzles &amp; Code Golf Stack Exchange"></div><a href="https://codegolf.stackexchange.com/questions/133109/sum-of-all-integers-from-1-to-n" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:200 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Sum of all integers from 1 to n
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="https://scifi.stackexchange.com/questions/164211/how-are-spells-in-the-harry-potter-universe-made-official" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+              How are spells in the Harry Potter universe made official
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-academia" title="Academia Stack Exchange"></div><a href="https://academia.stackexchange.com/questions/93380/who-should-be-first-author-theory-person-or-experiment-person" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Who should be first author? Theory person or Experiment person?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-workplace" title="The Workplace Stack Exchange"></div><a href="https://workplace.stackexchange.com/questions/95337/how-to-handle-another-intern-from-the-same-school-lying-to-leave-work-early" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:423 }); posts_hot_network.click({ item_type:2, location:11 })">
+              How to handle another intern from the same school lying to leave work early?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-tex" title="TeX - LaTeX Stack Exchange"></div><a href="https://tex.stackexchange.com/questions/381426/advantage-of-floating-figures" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Advantage of Floating Figures
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-scifi" title="Science Fiction &amp; Fantasy Stack Exchange"></div><a href="https://scifi.stackexchange.com/questions/164186/why-is-the-doctor-overwhelmingly-male" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+              Why is the Doctor overwhelmingly male?
+            </a>
+
+            </li>
+            <li class="dno js-hidden">
+              <div class="favicon favicon-german" title="German Language Stack Exchange"></div><a href="https://german.stackexchange.com/questions/37942/what-dialect-might-this-be" class="js-gps-track" data-gps-track="site.switch({ item_type:11, target_site:253 }); posts_hot_network.click({ item_type:2, location:11 })">
+              What dialect might this be?
+            </a>
+
+            </li>
+          </ul>
+
+          <a href="#"
+             class="show-more js-show-more js-gps-track"
+             data-gps-track="posts_hot_network.click({ item_type:3, location:11 })">
+            more hot questions
+          </a>
+        </div>
+      </div>
+
+      <div id="feed-link">
+        <div id="feed-link-text">
+          <a href="/feeds/question/291978" title="feed of this question and its answers">
+            <span class="feed-icon"></span>question feed
+          </a>
+        </div>
+      </div>    </div>
+      <script>
+        StackExchange.ready(function(){$.get('/posts/291978/ivc/a581');});
+      </script>
+      <noscript>
+        <div><img src="/posts/291978/ivc/a581" class="dno" alt="" width="0" height="0"></div>
+      </noscript><div style="display:none" id="prettify-lang">lang-py</div></div>
+
+
+  </div>
+</div>
+
+<footer id="footer" class="s-footer js-footer _short" role="contentinfo">
+  <div class="-container">
+    <div class="g-row js-sp-between">
+      <div class="-logo">
+        <a href="https://stackoverflow.com"><svg role="icon" class="svg-icon iconLogo" width="150" height="30" viewBox="0 0 150 30"><g><path d="M33.9 18.6l-1.7-.2c-1.3-.1-1.9-.6-1.9-1.6 0-1.1.8-1.8 2.4-1.8 1.1 0 2.1.3 2.8.8l1-1c-1-.8-2.3-1.1-3.8-1.1-2.3 0-3.9 1.2-3.9 3.1 0 1.8 1.1 2.7 3.2 2.9l1.8.2c1.2.1 1.8.6 1.8 1.6 0 1.3-1.1 1.9-2.8 1.9-1.3 0-2.5-.3-3.3-1.2l-1 1c1.2 1.1 2.6 1.5 4.4 1.5 2.6 0 4.3-1.2 4.3-3.2-.2-2-1.5-2.7-3.3-2.9zm13.3-4.8c-1.7 0-2.8.3-3.7 1.5l1 1c.6-.9 1.3-1.2 2.7-1.2 1.9 0 2.7.8 2.7 2.3v1h-3.2c-2.4 0-3.7 1.2-3.7 3.1 0 .8.3 1.6.8 2.2.7.7 1.5 1 3 1 1.4 0 2.2-.3 3.1-1.1v1h1.6v-7.2c-.1-2.4-1.5-3.6-4.3-3.6zm2.7 7c0 .9-.2 1.5-.5 1.8-.7.6-1.5.7-2.4.7-1.7 0-2.4-.6-2.4-1.8 0-1.2.8-1.9 2.4-1.9h3l-.1 1.2zm7.6-5.6c1 0 1.6.3 2.4 1.2l1-1c-1.1-1.2-2-1.6-3.5-1.6-2.7 0-4.7 1.8-4.7 5.5 0 3.6 2 5.5 4.7 5.5 1.5 0 2.4-.4 3.5-1.6l-1.1-1c-.8.9-1.4 1.2-2.4 1.2s-1.9-.4-2.5-1.2c-.5-.7-.7-1.5-.7-2.9 0-1.3.2-2.2.7-2.9.7-.8 1.6-1.2 2.6-1.2zm13.4-1.3H69l-4.8 4.7V9.1h-1.6v15.4h1.6v-3.9l1.9-1.9 3.6 5.8h1.9l-4.4-6.9 3.7-3.7zm7.3-.5c-1.6 0-2.7.6-3.4 1.4-1 1-1.3 2.3-1.3 4.3s.3 3.3 1.3 4.3c.7.7 1.8 1.4 3.4 1.4 1.6 0 2.8-.6 3.4-1.4 1-1 1.3-2.3 1.3-4.3s-.3-3.3-1.3-4.3c-.6-.8-1.7-1.4-3.4-1.4zm1.3 8.3c-.3.3-.7.5-1.3.5-.6 0-1-.2-1.3-.5-.6-.6-.6-1.6-.6-2.7 0-1.2.1-2.1.6-2.7.3-.3.7-.5 1.3-.5.6 0 1 .2 1.3.5.6.6.6 1.5.6 2.7.1 1.2 0 2.2-.6 2.7zm10.8-8.2l-2.2 6.9-2.3-6.9h-2.9L87 24.6h2.2l4.1-11.1h-3zm7.6-.1c-2.9 0-4.8 2-4.8 5.7 0 4.5 2.5 5.7 5.1 5.7 2 0 3.1-.6 4.2-1.7l-1.7-1.6c-.7.7-1.3 1-2.5 1-1.6 0-2.4-1-2.4-2.5h6.9v-1.2c0-3.2-1.7-5.4-4.8-5.4zM95.8 18c0-.5.1-.8.3-1.2.3-.7.9-1.2 1.9-1.2.9 0 1.6.5 1.9 1.2.2.4.2.7.3 1.2h-4.4zm11-3.4v-1.1h-2.7v11.1h2.8v-6.7c0-1.4.9-2 1.8-2 .7 0 1 .2 1.5.7l2.1-2.1c-.8-.8-1.5-1-2.6-1-1.3-.1-2.3.4-2.9 1.1zm6.3-2.3v12.3h2.8v-8.8h2v-2.1h-2v-1.2c0-.6.3-1 1-1h1.1V9.2h-1.6c-2.3 0-3.3 1.6-3.3 3.1zm16.2 1.1c-1.6 0-2.7.6-3.4 1.4-1 1-1.3 2.3-1.3 4.3s.3 3.3 1.3 4.3c.7.7 1.8 1.4 3.4 1.4 1.6 0 2.8-.6 3.4-1.4 1-1 1.3-2.3 1.3-4.3s-.3-3.3-1.3-4.3c-.6-.8-1.8-1.4-3.4-1.4zm1.3 8.3c-.3.3-.7.5-1.3.5-.6 0-1-.2-1.3-.5-.6-.6-.6-1.6-.6-2.7 0-1.2.1-2.1.6-2.7.3-.3.7-.5 1.3-.5.6 0 1 .2 1.3.5.6.6.6 1.5.6 2.7 0 1.2 0 2.2-.6 2.7zm16.5-8.2l-1.8 6.9-2.3-6.9h-2l-2.3 6.9-1.8-6.9H134l3.4 11.1h2.3l2.3-7 2.3 7h2.3l3.4-11.1h-2.9zM122 21.2V9.1h-2.8v12.3c0 1.6 1 3.2 3.2 3.2h1.6v-2.3h-1c-.7 0-1-.4-1-1.1zm-80.7-5.6l1.4-1.4h-3v-3.5h-1.6v11.1c0 1.6.9 2.9 2.7 2.9h1.1v-1.3h-.8c-1 0-1.5-.6-1.5-1.6v-6.1h1.7v-.1z" fill="#222426"/><path fill="#BCBBBB" d="M21 27v-8h3v11H0V19h3v8z"/><path d="M5.402 19.101l13.561 1.96.164-2.38-13.256-2.547-.469 2.967zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm3.4-5.9l10.2 8.5 1.7-2-10.2-8.5-1.7 2zM17.1.2L15 1.8l7.9 10.6 2.1-1.6L17.1.2zM5 25h14v-3H5v3z" fill="#F48024"/></g></svg></a>
+      </div>
+
+      <nav class="-nav js-category _visible" data-name="default">
+        <h5 class="-title"><a href="https://stackoverflow.com" class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 15})">Stack Overflow</a></h5>
+        <ul class="-list">
+          <li class="-item"><a href="/questions" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 16})">Questions</a></li>
+          <li class="-item"><a href="/jobs" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 17})">Jobs</a></li>
+          <li class="-item"><a href="https://stackoverflow.com/jobs/directory/developer-jobs" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 11})">Developer Jobs Directory</a></li>
+          <li class="-item"><a href="/documentation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 18})">Documentation</a></li>
+          <li class="-item"><a href="/help" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 3 })">Help</a></li>
+          <li class="-item"><a onclick='StackExchange.switchMobile("on")' class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 12 })">Mobile</a></li>
+        </ul>
+      </nav>
+
+      <nav class="-nav js-category _visible" data-name="default">
+        <h5 class="-title"><a href="https://www.stackoverflowbusiness.com/?utm_source=so-footer&utm_medium=referral&utm_campaign=brand-activation" class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 19 })">Stack Overflow<br /> Business</a></h5>
+        <ul class="-list">
+          <li class="-item"><a href="https://www.stackoverflowbusiness.com/talent?utm_source=so-footer&utm_medium=referral&utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 20 })">Talent</a></li>
+          <li class="-item"><a href="https://www.stackoverflowbusiness.com/advertise?utm_source=so-footer&utm_medium=referral&utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 21 })">Ads</a></li>
+          <li class="-item"><a href="https://www.stackoverflowbusiness.com/enterprise?utm_source=so-footer&utm_medium=referral&utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 22 })">Enterprise</a></li>
+          <li class="-item"><a href="https://www.stackoverflowbusiness.com/insights?utm_source=so-footer&utm_medium=referral&utm_campaign=brand-activation" class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 23 })">Insights</a></li>
+        </ul>
+      </nav>
+
+      <nav class="-nav js-category _visible" data-name="default">
+        <h5 class="-title"><a class="js-gps-track" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.com/company/about">Company</a></h5>
+        <ul class="-list">
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 1 })" href="https://stackoverflow.com/company/about">About</a></li>
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 27 })" href="https://stackoverflow.com/company/press">Press</a></li>
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 9 })" href="https://stackoverflow.com/company/work-here">Work Here</a></li>
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 7 })" href="https://stackexchange.com/legal">Legal</a></li>
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 8 })" href="https://stackexchange.com/legal/privacy-policy">Privacy Policy</a></li>
+          <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link: 13 })" href="https://stackoverflow.com/company/contact">Contact Us</a></li>
+        </ul>
+      </nav>
+
+      <div class="-network g-row">
+        <a href="#" class="-back-trigger js-back"><svg role="icon" class="svg-icon iconArrowLeftAlt" width="18" height="18" viewBox="0 0 18 18"><path d="M10.582 16l1.41-1.41L6.402 9l5.59-5.59L10.582 2l-7 7z"/></svg></a>
+        <div>
+          <h5 class="-title"><a href="https://stackexchange.com">Stack Exchange<br> Network</a></h5>
+          <ul class="-list">
+            <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Technology">Technology</a></li>
+            <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Life / Arts">Life / Arts</a></li>
+            <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Culture / Recreation">Culture / Recreation</a></li>
+            <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Science">Science</a></li>
+            <li class="-item"><a href="#" class="-link _expandable js-category-trigger js-gps-track" data-gps-track="footer.click({ location: 2, link: 24 })" data-target="Other">Other</a></li>
+
+          </ul>
+        </div>
+      </div>
+      <nav class="-nav js-category" data-name="Technology">
+        <ul class="-list">
+          <li class="-item"><a href="//stackoverflow.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professional and enthusiast programmers">Stack Overflow</a></li>
+          <li class="-item"><a href="//serverfault.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="system and network administrators">Server Fault</a></li>
+          <li class="-item"><a href="//superuser.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="computer enthusiasts and power users">Super User</a></li>
+          <li class="-item"><a href="//webapps.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="power users of web applications">Web Applications</a></li>
+          <li class="-item"><a href="//askubuntu.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="Ubuntu users and developers">Ask Ubuntu</a></li>
+          <li class="-item"><a href="//webmasters.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="pro webmasters">Webmasters</a></li>
+          <li class="-item"><a href="//gamedev.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professional and independent game developers">Game Development</a></li>
+        </ul></nav><nav class="-nav js-category" data-name="Technology"><ul class="-list">
+      <li class="-item"><a href="//tex.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users of TeX, LaTeX, ConTeXt, and related typesetting systems">TeX - LaTeX</a></li>
+      <li class="-item"><a href="//softwareengineering.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professionals, academics, and students working within the systems development life cycle">Software Engineering</a></li>
+      <li class="-item"><a href="//unix.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users of Linux, FreeBSD and other Un*x-like operating systems">Unix &amp; Linux</a></li>
+      <li class="-item"><a href="//apple.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="power users of Apple hardware and software">Ask Different (Apple)</a></li>
+      <li class="-item"><a href="//wordpress.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="WordPress developers and administrators">WordPress Development</a></li>
+      <li class="-item"><a href="//gis.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="cartographers, geographers and GIS professionals">Geographic Information Systems</a></li>
+      <li class="-item"><a href="//electronics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="electronics and electrical engineering professionals, students, and enthusiasts">Electrical Engineering</a></li>
+    </ul></nav><nav class="-nav js-category" data-name="Technology"><ul class="-list">
+      <li class="-item"><a href="//android.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="enthusiasts and power users of the Android operating system">Android Enthusiasts</a></li>
+      <li class="-item"><a href="//security.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="information security professionals">Information Security</a></li>
+      <li class="-item"><a href="//dba.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="database professionals who wish to improve their database skills and learn from others in the community">Database Administrators</a></li>
+      <li class="-item"><a href="//drupal.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="Drupal developers and administrators">Drupal Answers</a></li>
+      <li class="-item"><a href="//sharepoint.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="SharePoint enthusiasts">SharePoint</a></li>
+      <li class="-item"><a href="//ux.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="user experience researchers and experts">User Experience</a></li>
+      <li class="-item"><a href="//mathematica.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users of Wolfram Mathematica">Mathematica</a></li>
+    </ul></nav><nav class="-nav js-category" data-name="Technology"><ul class="-list">
+      <li class="-item"><a href="//salesforce.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="Salesforce administrators, implementation experts, developers and anybody in-between">Salesforce</a></li>
+      <li class="-item"><a href="//expressionengine.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="administrators, end users, developers and designers for ExpressionEngine&#174; CMS">ExpressionEngine&#174; Answers</a></li>
+      <li class="-item"><a href="//blender.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people who use Blender to create 3D graphics, animations, or games">Blender</a></li>
+      <li class="-item"><a href="//networkengineering.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="network engineers">Network Engineering</a></li>
+      <li class="-item"><a href="//crypto.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="software developers, mathematicians and others interested in cryptography">Cryptography</a></li>
+      <li class="-item"><a href="//codereview.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="peer programmer code reviews">Code Review</a></li>
+      <li class="-item"><a href="//magento.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users of the Magento e-Commerce platform">Magento</a></li>
+    </ul></nav><nav class="-nav js-category" data-name="Technology"><ul class="-list">
+      <li class="-item"><a href="//softwarerecs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people seeking specific software recommendations">Software Recommendations</a></li>
+      <li class="-item"><a href="//dsp.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="practitioners of the art and science of signal, image and video processing">Signal Processing</a></li>
+      <li class="-item"><a href="//emacs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="those using, extending or developing Emacs">Emacs</a></li>
+      <li class="-item"><a href="//raspberrypi.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users and developers of hardware and software for Raspberry Pi">Raspberry Pi</a></li>
+      <li class="-item"><a href="//codegolf.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="programming puzzle enthusiasts and code golfers">Programming Puzzles &amp; Code Golf</a></li>
+      <li class="-item"><a href="//ethereum.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="users of Ethereum, the decentralized application platform and smart contract enabled blockchain">Ethereum</a></li>
+      <li class="-item"><a href="//datascience.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="Data science professionals, Machine Learning specialists, and those interested in learning more about the field">Data Science</a></li>
+    </ul></nav><nav class="-nav js-category" data-name="Technology"><ul class="-list">
+      <li class="-item"><a href="//arduino.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="developers of open-source hardware and software that is compatible with Arduino">Arduino</a></li>
+      <li class="-item">
+        <a href="https://stackexchange.com/sites#technology" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 26 })">
+          <strong>
+            more (26)
+          </strong>
+        </a>
+      </li>
+    </ul>
+    </nav>
+      <nav class="-nav js-category" data-name="Life / Arts">
+        <ul class="-list">
+          <li class="-item"><a href="//photo.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professional, enthusiast and amateur photographers">Photography</a></li>
+          <li class="-item"><a href="//scifi.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="science fiction and fantasy enthusiasts">Science Fiction &amp; Fantasy</a></li>
+          <li class="-item"><a href="//graphicdesign.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="Graphic Design professionals, students, and enthusiasts">Graphic Design</a></li>
+          <li class="-item"><a href="//movies.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="movie and tv enthusiasts">Movies &amp; TV</a></li>
+          <li class="-item"><a href="//music.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="musicians, students, and enthusiasts">Music: Practice &amp; Theory</a></li>
+          <li class="-item"><a href="//worldbuilding.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="writers/artists using science, geography and culture to construct imaginary worlds and settings">Worldbuilding</a></li>
+          <li class="-item"><a href="//cooking.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professional and amateur chefs">Seasoned Advice (cooking)</a></li>
+        </ul></nav><nav class="-nav js-category" data-name="Life / Arts"><ul class="-list">
+      <li class="-item"><a href="//diy.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="contractors and serious DIYers">Home Improvement</a></li>
+      <li class="-item"><a href="//money.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people who want to be financially literate">Personal Finance &amp; Money</a></li>
+      <li class="-item"><a href="//academia.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="academics and those enrolled in higher education">Academia</a></li>
+      <li class="-item"><a href="//law.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="legal professionals, students, and others with experience or interest in law">Law</a></li>
+      <li class="-item">
+        <a href="https://stackexchange.com/sites#lifearts" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 26 })">
+          <strong>
+            more (17)
+          </strong>
+        </a>
+      </li>
+    </ul>
+    </nav>
+      <nav class="-nav js-category" data-name="Culture / Recreation">
+        <ul class="-list">
+          <li class="-item"><a href="//english.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="linguists, etymologists, and serious English language enthusiasts">English Language &amp; Usage</a></li>
+          <li class="-item"><a href="//skeptics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="scientific skepticism">Skeptics</a></li>
+          <li class="-item"><a href="//judaism.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="those who base their lives on Jewish law and tradition and anyone interested in learning more">Mi Yodeya (Judaism)</a></li>
+          <li class="-item"><a href="//travel.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="road warriors and seasoned travelers">Travel</a></li>
+          <li class="-item"><a href="//christianity.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="committed Christians, experts in Christianity and those interested in learning more">Christianity</a></li>
+          <li class="-item"><a href="//ell.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="speakers of other languages learning English">English Language Learners</a></li>
+          <li class="-item"><a href="//japanese.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="students, teachers, and linguists wanting to discuss the finer points of the Japanese language">Japanese Language</a></li>
+        </ul></nav><nav class="-nav js-category" data-name="Culture / Recreation"><ul class="-list">
+      <li class="-item"><a href="//gaming.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="passionate videogamers on all platforms">Arqade (gaming)</a></li>
+      <li class="-item"><a href="//bicycles.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people who build and repair bicycles, people who train cycling, or commute on bicycles">Bicycles</a></li>
+      <li class="-item"><a href="//rpg.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="gamemasters and players of tabletop, paper-and-pencil role-playing games">Role-playing Games</a></li>
+      <li class="-item"><a href="//anime.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="anime and manga fans">Anime &amp; Manga</a></li>
+      <li class="-item"><a href="//puzzling.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="those who create, solve, and study puzzles">Puzzling</a></li>
+      <li class="-item"><a href="//mechanics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="mechanics and DIY enthusiast owners of cars, trucks, and motorcycles">Motor Vehicle Maintenance &amp; Repair</a></li>
+      <li class="-item">
+        <a href="https://stackexchange.com/sites#culturerecreation" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 26 })">
+          <strong>
+            more (32)
+          </strong>
+        </a>
+      </li>
+    </ul>
+    </nav>
+      <nav class="-nav js-category" data-name="Science">
+        <ul class="-list">
+          <li class="-item"><a href="//mathoverflow.net" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="professional mathematicians">MathOverflow</a></li>
+          <li class="-item"><a href="//math.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people studying math at any level and professionals in related fields">Mathematics</a></li>
+          <li class="-item"><a href="//stats.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="people interested in statistics, machine learning, data analysis, data mining, and data visualization">Cross Validated (stats)</a></li>
+          <li class="-item"><a href="//cstheory.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="theoretical computer scientists and researchers in related fields">Theoretical Computer Science</a></li>
+          <li class="-item"><a href="//physics.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="active researchers, academics and students of physics">Physics</a></li>
+          <li class="-item"><a href="//chemistry.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="scientists, academics, teachers and students">Chemistry</a></li>
+          <li class="-item"><a href="//biology.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="biology researchers, academics, and students">Biology</a></li>
+        </ul></nav><nav class="-nav js-category" data-name="Science"><ul class="-list">
+      <li class="-item"><a href="//cs.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="students, researchers and practitioners of computer science">Computer Science</a></li>
+      <li class="-item"><a href="//philosophy.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="those interested in the study of the fundamental nature of knowledge, reality, and existence">Philosophy</a></li>
+      <li class="-item">
+        <a href="https://stackexchange.com/sites#science" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 26 })">
+          <strong>
+            more (10)
+          </strong>
+        </a>
+      </li>
+    </ul>
+    </nav>
+      <nav class="-nav js-category" data-name="Other">
+        <ul class="-list">
+          <li class="-item"><a href="//meta.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="meta-discussion of the Stack Exchange family of Q&amp;A websites">Meta Stack Exchange</a></li>
+          <li class="-item"><a href="//stackapps.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="apps, scripts, and development with the Stack Exchange API">Stack Apps</a></li>
+          <li class="-item"><a href="https://api.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="programmatic interaction with Stack Exchange sites">API</a></li>
+          <li class="-item"><a href="https://data.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="querying Stack Exchange data using SQL">Data</a></li>
+          <li class="-item"><a href="//area51.stackexchange.com" class="-link js-gps-track" data-gps-track="footer.click({ location: 2, link: 25 })" title="proposing new sites in the Stack Exchange network">Area 51</a></li>
+        </ul>
+      </nav>
+      <div class="-copyright text-right">
+        <div class="g-column jc-sp-between">
+          <ul class="-list">
+            <li class="-item"><a class="js-gps-track -link" data-gps-track="footer.click({ location: 2, link:4 })" href="https://stackoverflow.blog?blb=1">Blog</a></li>
+            <li class="-item"><a href="https://www.facebook.com/officialstackoverflow/" class="-link">Facebook</a></li>
+            <li class="-item"><a href="https://twitter.com/stackoverflow" class="-link">Twitter</a></li>
+            <li class="-item"><a href="https://linkedin.com/company/stack-overflow" class="-link">LinkedIn</a></li>
+          </ul>
+
+          <div>
+            <p>
+              site design / logo &#169; 2017 Stack Exchange Inc; user contributions licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="license">cc by-sa 3.0</a>
+              with <a href="https://stackoverflow.blog/2009/06/25/attribution-required/" rel="license">attribution required</a>.
+              <span id="svnrev">rev 2017.7.20.1291</span>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<noscript>
+  <div id="noscript-warning">Stack Overflow works best with JavaScript enabled
+    <img src="https://pixel.quantserve.com/pixel/p-c1rF4kxgLUzNc.gif" alt="" class="dno">
+  </div>
+</noscript>
+<script>var z=document.createElement("script");z.type="text/javascript",z.async=!0,z.src="https://static.adzerk.net/ados.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(z,s);</script>
+<script>
+  var ados = ados || {};
+  ados.run = ados.run || [];
+
+
+  ados.run.push(function () {
+    setTimeout(function () { $("#adzerk-user-match").remove(); }, window.AUMIframeDone ? 0 : 2000);
+    ados_setKeywords('python,scope,dynamic-languages,x-persona-frontend');; ados_load();
+  });
+
+</script>
+
+<script>
+  (function(i, s, o, g, r, a, m) {
+    i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function() { (i[r].q = i[r].q || []).push(arguments) }, i[r].l = 1 * new Date(); a = s.createElement(o),
+      m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m);
+  })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+  ga('create', 'UA-5620270-1');
+  ga('create', 'UA-5620270-59', {name: 'pageData', sampleRate: 5 });
+  ga('set', 'dimension2', '|python|scope|dynamic-languages|');
+  ga('pageData.set', 'dimension2', '|python|scope|dynamic-languages|');
+  ga('send', 'pageview');
+  ga('pageData.send', 'pageview');
+  var _qevents = _qevents || [],
+    _comscore = _comscore || [];
+  (function () {
+    var ssl='https:'==document.location.protocol,
+      s=document.getElementsByTagName('script')[0],
+      qc=document.createElement('script');
+    qc.async = true;
+    qc.src = (ssl ? 'https://secure' : 'http://edge') + '.quantserve.com/quant.js';
+    s.parentNode.insertBefore(qc, s);
+    _qevents.push({ qacct: "p-c1rF4kxgLUzNc" });
+    var sc=document.createElement('script');
+    sc.async=true;
+    sc.src=(ssl?'https://sb':'http://b') + '.scorecardresearch.com/beacon.js';
+    s.parentNode.insertBefore(sc, s);
+    _comscore.push({ c1: "2", c2: "17440561" });
+  })();
+
+</script>
+
+
+<script type="text/javascript">
+
+  (function(appendChild) {
+    Node.prototype.appendChild = function() {
+      var parent = this;
+      var newNode = arguments[0];
+      if (parent.nodeName === 'HEAD'
+        && newNode
+        && newNode.nodeName === 'SCRIPT'
+        && newNode.src) {
+
+        window.setTimeout(function() {
+          var result = newNode.src.match(/^https:\/\/maps\.googleapis\.com\/maps\/api\/place\/js\/(\w+)Service\./i) || [];
+          var service = result[1];
+          if (service) {
+            if (service === 'Autocompletion') service =  2;
+            else if (service === 'Place') service = 1;
+            else service = 0;
+            StackExchange.using('gps', function() {
+              StackExchange.gps.track('google_maps_places_api.call', { service: service });
+            });
+          }
+        }, 0);
+      }
+      return appendChild.apply(this, arguments);
+    };
+  })(Node.prototype.appendChild);
+</script>
+</body>
+</html>
