@@ -1,5 +1,8 @@
 /// <reference types="cheerio" />
 import * as pegjs from 'pegjs';
+export declare const errors: {
+    hasLeadingCapture(): string;
+};
 export declare const temmeParser: pegjs.Parser;
 export interface Filter {
     (v: any): any;
@@ -42,6 +45,7 @@ export declare type Capture<T> = {
     capture: T;
     filterList: string[];
 };
+export declare function mergeResult<T, S>(target: T, source: S): T & S;
 export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector, extraFilters?: {
     [key: string]: Filter;
 }): any;

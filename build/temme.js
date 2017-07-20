@@ -4,9 +4,12 @@ const pegjs = require("pegjs");
 const cheerio = require("cheerio");
 const grammar_1 = require("./grammar");
 const makeGrammarErrorMessage_1 = require("./makeGrammarErrorMessage");
-const errors = {
-    funcNameNotSupported(f) {
-        return `${f} is not a valid content func-name.`;
+exports.errors = {
+    // funcNameNotSupported(f: string) {
+    //   return `${f} is not a valid content func-name.`
+    // },
+    hasLeadingCapture() {
+        return 'Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?';
     },
 };
 const defaultCaptureKey = '@@default-capture@@';
@@ -19,8 +22,8 @@ function isEmptyObject(x) {
 function isCheerioStatic(arg) {
     return typeof arg.root === 'function';
 }
-function checkLeadingCssParts(cssParts) {
-    const hasLeadingCapture = cssParts.some(part => {
+function containsAnyCaptureInAttrListOrContent(cssParts) {
+    return cssParts.some(part => {
         const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string');
         if (hasAttrCapture) {
             return true;
@@ -31,18 +34,18 @@ function checkLeadingCssParts(cssParts) {
         }
         return false;
     });
-    if (hasLeadingCapture) {
-        console.warn('Attr capturing and content matching/capturing are only allowed in the last part of css-selector. Capture in leading css-selectors will be omitted. Did you forget the comma?');
-    }
 }
-// notice 递归的检查 selector是否合法, 目前暂时不会抛出异常, 只会提示对应的出错消息
+// notice 递归的检查 selector是否合法
 function check(selector) {
     if (selector.self === true) {
     }
     else {
         const cssPartsLength = selector.css.length;
         const leadingParts = selector.css.slice(0, cssPartsLength - 1);
-        checkLeadingCssParts(leadingParts);
+        const hasLeadingCapture = containsAnyCaptureInAttrListOrContent(leadingParts);
+        if (hasLeadingCapture) {
+            throw new Error(exports.errors.hasLeadingCapture());
+        }
         if (selector.children) {
             for (const child of selector.children) {
                 check(child);
@@ -50,6 +53,15 @@ function check(selector) {
         }
     }
 }
+function mergeResult(target, source) {
+    for (const key in source) {
+        if (source[key] != null) {
+            target[key] = source[key];
+        }
+    }
+    return target;
+}
+exports.mergeResult = mergeResult;
 function temme(html, selector, extraFilters = {}) {
     let $;
     if (typeof html === 'string') {
@@ -85,7 +97,7 @@ function temme(html, selector, extraFilters = {}) {
                 const subCheerio = cntCheerio.find(cssSelector);
                 if (subCheerio.length > 0) {
                     const capturer = makeValueCapturer(selector.css);
-                    Object.assign(result, capturer(subCheerio));
+                    mergeResult(result, capturer(subCheerio));
                     if (selector.name && selector.children) {
                         const beforeValue = subCheerio.toArray()
                             .map(sub => helper($(sub), selector.children));
@@ -107,7 +119,7 @@ function temme(html, selector, extraFilters = {}) {
                     }]);
                 if (cssSelector === '' || cntCheerio.is(cssSelector)) {
                     const capturer = makeSelfCapturer(selector);
-                    Object.assign(result, capturer(cntCheerio));
+                    mergeResult(result, capturer(cntCheerio));
                 }
             }
         });
@@ -116,7 +128,7 @@ function temme(html, selector, extraFilters = {}) {
         if (result.hasOwnProperty(defaultCaptureKey)) {
             returnVal = result[defaultCaptureKey];
         }
-        if (isEmptyObject(returnVal)) {
+        if (returnVal == null || isEmptyObject(returnVal)) {
             return null;
         }
         else {
@@ -150,7 +162,8 @@ function temme(html, selector, extraFilters = {}) {
         const result = {};
         for (const part of content) {
             // 目前只支持这几个func
-            console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName), errors.funcNameNotSupported(part.funcName));
+            // console.assert(['text', 'html', 'node', 'contains'].includes(part.funcName),
+            // errors.funcNameNotSupported(part.funcName))
             // 至少有一个是value-capture
             // console.assert(part.args.some(isCapture),
             //   errors.needValueCapture(part.funcName))
@@ -161,14 +174,14 @@ function temme(html, selector, extraFilters = {}) {
                 if (textCaptureResult == null) {
                     return null;
                 }
-                Object.assign(result, textCaptureResult);
+                mergeResult(result, textCaptureResult);
             }
             else if (part.funcName === 'html') {
                 const htmlCaptureResult = captureString(node.html(), part.args);
                 if (htmlCaptureResult == null) {
                     return null;
                 }
-                Object.assign(result, htmlCaptureResult);
+                mergeResult(result, htmlCaptureResult);
             }
             else if (part.funcName === 'node') {
                 console.assert(part.args.length === 1);
@@ -177,7 +190,7 @@ function temme(html, selector, extraFilters = {}) {
                     result[arg.capture] = applyFilters(cheerio(node), arg.filterList);
                 }
                 else {
-                    throw new Error('Cotnent func `text` must be in `text($foo)` form');
+                    throw new Error('Content func `node` must be in `node($foo)` form');
                 }
             }
             else if (part.funcName === 'contains') {
@@ -189,10 +202,10 @@ function temme(html, selector, extraFilters = {}) {
                     if (textCaptureResult == null) {
                         return null;
                     }
-                    Object.assign(result, textCaptureResult);
+                    mergeResult(result, textCaptureResult);
                 }
                 else {
-                    throw new Error('Cotnent func `contains` must be in `text(<some-text>)` form');
+                    throw new Error('Content func `contains` must be in `text(<some-text>)` form');
                 }
             }
             else {
@@ -205,14 +218,14 @@ function temme(html, selector, extraFilters = {}) {
         return (node) => {
             const result = {};
             if (selfSelector.attrList) {
-                Object.assign(result, captureAttrs(node, selfSelector.attrList));
+                mergeResult(result, captureAttrs(node, selfSelector.attrList));
             }
             if (selfSelector.content) {
                 const contentCaptureResult = captureContent(node, selfSelector.content);
                 if (contentCaptureResult == null) {
                     return null;
                 }
-                Object.assign(result, contentCaptureResult);
+                mergeResult(result, contentCaptureResult);
             }
             return result;
         };
@@ -271,14 +284,14 @@ function temme(html, selector, extraFilters = {}) {
             // notice 目前只能在最后一个part中进行value-capture
             const lastCssPart = cssPartArray[cssPartArray.length - 1];
             if (lastCssPart.attrList) {
-                Object.assign(result, captureAttrs(node, lastCssPart.attrList));
+                mergeResult(result, captureAttrs(node, lastCssPart.attrList));
             }
             if (lastCssPart.content) {
                 const contentCaptureResult = captureContent(node, lastCssPart.content);
                 if (contentCaptureResult == null) {
                     return null;
                 }
-                Object.assign(result, contentCaptureResult);
+                mergeResult(result, contentCaptureResult);
             }
             return result;
         };

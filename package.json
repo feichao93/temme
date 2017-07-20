@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Better CSS selector for node crawlers.",
   "main": "build/temme.js",
   "types": "build/temme.d.ts",
