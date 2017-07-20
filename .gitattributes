@@ -1,0 +1,3 @@
+__tests__/testHtml/* linguist-vendored
+docs/**/* linguist-documentation
+build/**/* linguist-generated
