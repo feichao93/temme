@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const pegjs = require("pegjs");
 const cheerio = require("cheerio");
+exports.cheerio = cheerio;
 const grammar_1 = require("./grammar");
 const makeGrammarErrorMessage_1 = require("./makeGrammarErrorMessage");
 exports.errors = {

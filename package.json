@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Better CSS selector for node crawlers.",
   "main": "build/temme.js",
   "types": "build/temme.d.ts",
@@ -25,16 +25,16 @@
   },
   "dependencies": {
     "@types/cheerio": "^0.22.1",
-    "cheerio": "^1.0.0-rc.1"
+    "@types/pegjs": "^0.10.0",
+    "cheerio": "^1.0.0-rc.1",
+    "pegjs": "^0.10.0"
   },
   "devDependencies": {
     "@types/jest": "^20.0.2",
     "@types/node": "^7.0.31",
-    "@types/pegjs": "^0.10.0",
     "coveralls": "^2.13.1",
     "jest": "^20.0.4",
     "node-fetch": "^1.7.1",
-    "pegjs": "^0.10.0",
     "ts-jest": "^20.0.7",
     "typescript": "^2.4.1"
   }

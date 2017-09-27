@@ -3,6 +3,8 @@ import * as cheerio from 'cheerio'
 import grammar from './grammar'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 
+export { cheerio }
+
 export const errors = {
   // funcNameNotSupported(f: string) {
   //   return `${f} is not a valid content func-name.`

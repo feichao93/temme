@@ -1,5 +1,7 @@
 /// <reference types="cheerio" />
 import * as pegjs from 'pegjs';
+import * as cheerio from 'cheerio';
+export { cheerio };
 export declare const errors: {
     hasLeadingCapture(): string;
 };
