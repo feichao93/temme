@@ -18,7 +18,9 @@ const ignoreCaptureKey = '@@ignore-capture@@';
 const ignoreCapture = { capture: ignoreCaptureKey, filterList: [] };
 exports.temmeParser = pegjs.generate(grammar_1.default);
 function isEmptyObject(x) {
-    return typeof x === 'object' && Object.keys(x).length === 0;
+    return typeof x === 'object'
+        && Object.getPrototypeOf(x) === Object.prototype
+        && Object.keys(x).length === 0;
 }
 function isCheerioStatic(arg) {
     return typeof arg.root === 'function';

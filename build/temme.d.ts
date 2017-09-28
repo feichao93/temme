@@ -9,6 +9,9 @@ export declare const temmeParser: pegjs.Parser;
 export interface FilterFn {
     (this: any, ...args: any[]): any;
 }
+export interface FilterFnMap {
+    [key: string]: FilterFn;
+}
 export declare type TemmeSelector = SelfSelector | NonSelfSelector;
 export interface NonSelfSelector {
     self: false;

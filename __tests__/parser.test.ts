@@ -1,4 +1,4 @@
-import { temmeParser, TemmeSelector } from '../src/temme'
+import { temmeParser, TemmeSelector } from '..'
 
 test('parse `div`', () => {
   const parseResult: TemmeSelector[] = temmeParser.parse('div')

@@ -197,4 +197,4 @@ s 'whitespace'
 
 d 'digit'
   = [0-9]
-`
+` as string

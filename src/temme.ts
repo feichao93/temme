@@ -29,7 +29,7 @@ export interface FilterFn {
   (this: any, ...args: any[]): any
 }
 
-interface FilterFnMap {
+export interface FilterFnMap {
   [key: string]: FilterFn
 }
 
@@ -85,7 +85,9 @@ export interface Filter {
 }
 
 function isEmptyObject(x: any) {
-  return typeof x === 'object' && Object.keys(x).length === 0
+  return typeof x === 'object'
+    && Object.getPrototypeOf(x) === Object.prototype
+    && Object.keys(x).length === 0
 }
 
 function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioStatic {
@@ -134,8 +136,8 @@ export function mergeResult<T, S>(target: T, source: S): T & S {
 }
 
 export default function temme(html: string | CheerioStatic | CheerioElement,
-  selector: string | TemmeSelector[],
-  extraFilters: { [key: string]: FilterFn } = {}) {
+                              selector: string | TemmeSelector[],
+                              extraFilters: { [key: string]: FilterFn } = {}) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
