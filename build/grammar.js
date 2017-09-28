@@ -5,15 +5,26 @@ exports.default = `{
   const ingoreCaptureKey = '@@ignore-capture@@'
 }
 
-Start = s* selector:Selector s* { return selector }
+// 起始规则
+Start = s* selectorList:MultipleSelector s* { return selectorList }
 
+MultipleSelector
+  = head:Selector s* tail:(',' s* s:Selector { return s })*
+  s* ','? // optional extra comma
+  {
+    return [head].concat(tail)
+  }
+
+// 选择器
 Selector = SelfSelector / NonSelfSelector
 
+// 自身选择器, 以 & 为开头的选择器
 SelfSelector
   = '&' id:Id? classList:Class* attrList:AttrSelector? content:Content? {
     return { self: true, id, classList, attrList, content }
   }
 
+// 非自身选择器, 即不以 & 为开头的选择器
 NonSelfSelector
   = css:CssSelector s* nc:NameAndChildren? {
     return {
@@ -49,10 +60,11 @@ ParenthesizedChildren
   }
 
 Filter
-  = ':' chars:NormalChar+ {
+  = '|' chars:NormalChar+ {
     return chars.join('')
   }
 
+// 普通CSS选择器, 包含多个部分
 CssSelector
   = head:CssSelectorPart tail:(CssPartSep part:CssSelectorPart { return part })* {
     return [head].concat(tail)
@@ -64,15 +76,15 @@ CssPartSep 'css-selector-part-seperator'
 
 CssSelectorPart 'css-selector-part'
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
-  = direct:('>' s* { return '>' })? tag:Tag id:Id? classList:Class*
+  = direct:('>' s*)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:('>' s* { return '>' })? tag:Tag? id:Id classList:Class*
+  / direct:('>' s*)? tag:Tag? id:Id classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:('>' s* { return '>' })? tag:Tag? id:Id? classList:Class+
+  / direct:('>' s*)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
@@ -81,13 +93,13 @@ Content
   = '{'
     s* single:ValueCapture
     s* ','? // optimal extra comma
-    s* '}' { 
+    s* '}' {
     return [{ funcName: 'text', args: [single] }]
   }
-  / '{' 
+  / '{'
     s* head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
     s* ','? // optimal extra comma
-    s* '}' { 
+    s* '}' {
     return [head].concat(tail)
   }
 
@@ -150,13 +162,16 @@ Tag
 Name
   = chars:CssChar+ { return chars.join(''); }
 
-StrChar // 可以放在字符串中的字符
+// 可以放在字符串中的字符
+StrChar
  = [^'"]i
 
-CssChar // 可以作为css名称/tag名称的字符
+// 可以作为css名称/tag名称的字符
+CssChar
   = [_a-z0-9-]i
 
-NormalChar // 可以作为普通变量名的字符
+// 可以作为普通变量名的字符
+NormalChar
   = [_a-z0-9]i
 
 h 'hex-digit'

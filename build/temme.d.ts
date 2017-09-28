@@ -48,7 +48,7 @@ export declare type Capture<T> = {
     filterList: string[];
 };
 export declare function mergeResult<T, S>(target: T, source: S): T & S;
-export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector, extraFilters?: {
+export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector[], extraFilters?: {
     [key: string]: Filter;
 }): any;
 export declare function defineFilter(name: string, filter: Filter): void;

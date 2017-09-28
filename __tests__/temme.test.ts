@@ -5,9 +5,9 @@ import * as fs from 'fs'
 const stHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
 const maigooHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/maigoo-brand-page.html'), 'utf8')
 
-test('basic example-1', () => {
+test('parse `div`', () => {
   const parseResult: TemmeSelector = temmeParser.parse('div')
-  const expectedResult: TemmeSelector = {
+  const expectedResult: TemmeSelector[] = [{
     self: false,
     name: null,
     css: [{
@@ -20,16 +20,15 @@ test('basic example-1', () => {
     }],
     children: null,
     filterList: null,
-  }
+  }]
   expect(parseResult).toEqual(expectedResult)
 })
 
 test('text matching and filter pack', () => {
-  const selector = ` .content@:pack(
+  const selector = ` .content@|pack(
     .article_head h1{text($name, '-', _)},
-    .author{text('阅读：', $count:Number, '次')}
+    .author{text('阅读：', $count|Number, '次')}
   )`
-
 
   // language=TEXT
   const html = `
@@ -45,11 +44,11 @@ test('text matching and filter pack', () => {
   })
 })
 
-test('value capture', () => {
+test('basic value capture', () => {
   const selector = `#question-header .question-hyperlink[href=$url]{$title}`
 
-  const parseResult: TemmeSelector = temmeParser.parse(selector)
-  const expectedParseResult: TemmeSelector = {
+  const parseResult: TemmeSelector[] = temmeParser.parse(selector)
+  const expectedParseResult: TemmeSelector[] = [{
     self: false,
     name: null,
     css: [
@@ -66,7 +65,7 @@ test('value capture', () => {
     ],
     children: null,
     filterList: null,
-  }
+  }]
   expect(parseResult).toEqual(expectedParseResult)
 
   const selectResult: any = temme(stHtml, parseResult)
@@ -81,69 +80,7 @@ test('array capture', () => {
     .votecell .vote-count-post{$upvote},
     .user-info .user-details>a{$userName},
   )`
-  const parseResult: TemmeSelector = temmeParser.parse(selector)
-
-  const expectedResult: TemmeSelector = {
-    self: false,
-    name: 'answers',
-    css: [{
-      direct: false, tag: null, id: null,
-      classList: ['answer'],
-      attrList: null, content: null
-    }],
-    children: [
-      {
-        self: false, name: null,
-        css: [
-          {
-            direct: false, tag: null, id: null,
-            classList: ['votecell'],
-            attrList: null,
-            content: null,
-          },
-          {
-            direct: false, tag: null, id: null,
-            classList: ['vote-count-post'],
-            attrList: null,
-            content: [{
-              funcName: 'text',
-              args: [{ capture: 'upvote', filterList: [] }],
-            }],
-          },
-        ],
-        children: null,
-        filterList: null,
-      },
-      {
-        self: false, name: null,
-        css: [
-          {
-            direct: false, tag: null, id: null,
-            classList: ['user-info'],
-            attrList: null, content: null,
-          },
-          {
-            direct: false, tag: null, id: null,
-            classList: ['user-details'],
-            attrList: null, content: null,
-          },
-          {
-            direct: true, tag: 'a', id: null,
-            classList: null, attrList: null,
-            content: [{
-              funcName: 'text',
-              args: [{ capture: 'userName', filterList: [] }],
-            }],
-          },
-        ],
-        children: null,
-        filterList: null,
-      },
-    ],
-    filterList: [],
-  }
-
-  expect(parseResult).toEqual(expectedResult)
+  const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
   expect(temme(stHtml, parseResult)).toEqual({
     answers: [
@@ -164,17 +101,11 @@ test('complex example: recursive array capture, default capture, customized filt
     .user-info .user-details>a{$userName},
     .comment@comments (
       .comment-score{$score},
-      .comment-copy{$content:substring10},
+      .comment-copy{$content|substring10},
       .comment-user[href=$userUrl]{$userName},
       .comment-data span[title=$data],
     ),
   )`
-
-  // console.log(temme(html, selector, {
-  //   substring10(s: string) {
-  //     return s.substring(0, 10)
-  //   },
-  // }))
 
   expect(temme(stHtml, selector, {
     substring10(s: string) {
@@ -215,13 +146,13 @@ test('complex example: recursive array capture, default capture, customized filt
 })
 
 test('complex case: multiple parent-refs', () => {
-  const selector = `.brandinfo .info >li@:pack(
-      &{text('电话：', $phone:splitComma)},
+  const selector = `.brandinfo .info >li@|pack(
+      &{text('电话：', $phone|splitComma)},
       &{text('品牌创立时间：', $foundTime)},
       &{text('品牌发源地：', $origination)},
-      &{html($presidentUrl:extractPresidentUrl)},
+      &{html($presidentUrl|extractPresidentUrl)},
       &{text('品牌广告词：', $adText)},
-      script[language]{html($officialWebsite:extractUrl)},
+      script[language]{html($officialWebsite|extractUrl)},
     )`
 
   const filters = {
@@ -236,7 +167,7 @@ test('complex case: multiple parent-refs', () => {
         || html.indexOf('总裁') !== -1
         || html.indexOf('董事长') !== -1
         || html.indexOf('CEO') !== -1) {
-        const [_, presidentUrl]:string[] = html.match(/href="(.*)"/) || []
+        const [_, presidentUrl]: string[] = html.match(/href="(.*)"/) || []
         return presidentUrl
       }
     }
@@ -251,4 +182,13 @@ test('complex case: multiple parent-refs', () => {
       presidentUrl: 'http://www.maigoo.com/mingren/848.html',
       adText: '小米，为发烧而生',
     })
+})
+
+test('simple multiple selectors at root level', () => {
+  const selector = `h1{$h1}, h4{$h4|asWords}`
+
+  expect(temme(stHtml, selector)).toEqual({
+    h1: 'Learn, Share, BuildShort Description of the Scoping Rules?',
+    h4: 'LinkedRelated Hot Network Questions',
+  })
 })

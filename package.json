@@ -1,13 +1,14 @@
 {
   "name": "temme",
   "version": "0.1.6",
-  "description": "Better CSS selector for node crawlers.",
+  "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/temme.js",
   "types": "build/temme.d.ts",
   "repository": "https://github.com/shinima/temme.git",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "scripts": {
+    "start": "tsc --watch",
     "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
   },
   "jest": {

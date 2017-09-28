@@ -129,7 +129,7 @@ export function mergeResult<T, S>(target: T, source: S): T & S {
 }
 
 export default function temme(html: string | CheerioStatic | CheerioElement,
-                              selector: string | TemmeSelector,
+                              selector: string | TemmeSelector[],
                               extraFilters: { [key: string]: Filter } = {}) {
   let $: CheerioStatic
   if (typeof html === 'string') {
@@ -140,10 +140,10 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     $ = cheerio.load(html)
   }
 
-  let rootSelector: TemmeSelector
+  let rootSelector: TemmeSelector[]
   if (typeof selector === 'string') {
     try {
-      rootSelector = temmeParser.parse(selector) as TemmeSelector
+      rootSelector = temmeParser.parse(selector) as TemmeSelector[]
     } catch (error) {
       const message = makeGrammarErrorMessage(selector, error)
       throw new Error(message)
@@ -153,8 +153,8 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   }
 
   const filterMap: FilterMap = Object.assign({}, defaultFilterMap, extraFilters)
-  check(rootSelector)
-  return helper($.root(), [rootSelector])
+  rootSelector.forEach(check)
+  return helper($.root(), rootSelector)
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]) {
     const result: CaptureResult = {}

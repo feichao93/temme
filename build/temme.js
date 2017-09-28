@@ -88,8 +88,8 @@ function temme(html, selector, extraFilters = {}) {
         rootSelector = selector;
     }
     const filterMap = Object.assign({}, defaultFilterMap, extraFilters);
-    check(rootSelector);
-    return helper($.root(), [rootSelector]);
+    rootSelector.forEach(check);
+    return helper($.root(), rootSelector);
     function helper(cntCheerio, selectorArray) {
         const result = {};
         selectorArray.map(selector => {
