@@ -25,12 +25,12 @@ interface Dict<V> {
   [key: string]: V
 }
 
-export interface Filter {
-  (v: any): any
+export interface FilterFn {
+  (this: any, ...args: any[]): any
 }
 
-interface FilterMap {
-  [key: string]: Filter
+interface FilterFnMap {
+  [key: string]: FilterFn
 }
 
 export type TemmeSelector = SelfSelector | NonSelfSelector
@@ -40,7 +40,7 @@ export interface NonSelfSelector {
   name: string
   css: CssPart[]
   children: TemmeSelector[]
-  filterList: string[]
+  filterList: Filter[]
 }
 
 export interface SelfSelector {
@@ -76,7 +76,12 @@ export type FuncName = 'text' | 'html' | 'node' | 'contains'
 
 export type Capture<T> = {
   capture: T
-  filterList: string[]
+  filterList: Filter[]
+}
+
+export interface Filter {
+  name: string
+  args: string[]
 }
 
 function isEmptyObject(x: any) {
@@ -129,8 +134,8 @@ export function mergeResult<T, S>(target: T, source: S): T & S {
 }
 
 export default function temme(html: string | CheerioStatic | CheerioElement,
-                              selector: string | TemmeSelector[],
-                              extraFilters: { [key: string]: Filter } = {}) {
+  selector: string | TemmeSelector[],
+  extraFilters: { [key: string]: FilterFn } = {}) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -152,7 +157,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     rootSelector = selector
   }
 
-  const filterMap: FilterMap = Object.assign({}, defaultFilterMap, extraFilters)
+  const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   rootSelector.forEach(check)
   return helper($.root(), rootSelector)
 
@@ -202,12 +207,16 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     }
   }
 
-  function applyFilters(initValue: any, filterList: string[]) {
-    return filterList.reduce((value, filterName) => {
-      if (typeof filterMap[filterName] === 'function') {
-        return filterMap[filterName](value)
+  function applyFilters(initValue: any, filterList: Filter[]) {
+    return filterList.reduce((value, filter) => {
+      if (filter.name in filterFnMap) {
+        const filterFn = filterFnMap[filter.name]
+        return filterFn.apply(value, filter.args)
+      } else if (typeof value[filter.name] === 'function') {
+        const filterFn: FilterFn = value[filter.name]
+        return filterFn.apply(value, filter.args)
       } else {
-        throw new Error(`${filterName} is not a valid filter.`)
+        throw new Error(`${filter.name} is not a valid filter.`)
       }
     }, initValue)
   }
@@ -407,45 +416,37 @@ function makeNormalCssSelector(cssPartArray: CssPart[]) {
   return result.join('')
 }
 
-const defaultFilterMap: FilterMap = {
-  pack(v: any[]) {
-    return Object.assign({}, ...v)
+const defaultFilterMap: FilterFnMap = {
+  pack(this: any[]) {
+    return Object.assign({}, ...this)
   },
-  splitComma(s: string) {
-    return s.split(',')
+  compact(this: any[]) {
+    return this.filter(Boolean)
   },
-  splitBlanks(s: string) {
-    return s.split(/ +/)
+  flatten(this: any[][]) {
+    return this.reduce((r, a) => r.concat(a))
   },
-  Number,
-  String,
-  Boolean,
-  Date(arg: any) {
-    return new Date(arg)
+  words(this: string) {
+    return this.split(/\s+/g)
   },
-  first(arg: any[]) {
-    return arg[0]
+  lines(this: string) {
+    return this.split(/\r?\n/g)
   },
-  firstLine(s: string) {
-    return s.split(/(\r\n)|\r|\n/)[0]
+
+  Number() {
+    return Number(this)
   },
-  trim(s: string) {
-    return s.trim()
+  String() {
+    return String(this)
   },
-  asWords(s: string) {
-    return s.replace(/\s+/g, ' ')
+  Boolean() {
+    return Boolean(this)
   },
-  json(arg: any) {
-    return JSON.stringify(arg)
-  },
-  flatten(arg: any[][]) {
-    return arg.reduce((r, a) => r.concat(a))
-  },
-  filter(arg: any[]) {
-    return arg.filter(Boolean)
+  Date() {
+    return new Date(this)
   },
 }
 
-export function defineFilter(name: string, filter: Filter) {
+export function defineFilter(name: string, filter: FilterFn) {
   defaultFilterMap[name] = filter
 }

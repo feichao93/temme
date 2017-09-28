@@ -1,8 +1,10 @@
-[![Build Status](https://travis-ci.org/shinima/temme.svg?branch=master)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://coveralls.io/repos/github/shinima/temme/badge.svg?branch=master)](https://coveralls.io/github/shinima/temme?branch=master) 
+[![Build Status](https://travis-ci.org/shinima/temme.svg?branch=master)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://coveralls.io/repos/github/shinima/temme/badge.svg?branch=master)](https://coveralls.io/github/shinima/temme?branch=master)
+
+**CAUTION** Temme is in an early stage, so the syntax may change in the future.
 
 # Temme
 
-Temme is a more convenient selector to retrieve information from HTML for node spider. Temme is constructed on top of [cheerio](https://github.com/cheeriojs/cheerio), so the syntax is very similar. Temme add some extra grammar to enable selecting multiple items or selecting an array of items at a time.
+Temme is a more convenient selector to retrieve information from HTML for node spider. Temme is constructed on top of [cheerio](https://github.com/cheeriojs/cheerio), so the syntax is very similar. Temme add some extra grammar to enable selecting multiple items or selecting an array of items at a time. You can try Temme in [playground](http://shinima.pw/temme-playground/).
 
 # Install
 

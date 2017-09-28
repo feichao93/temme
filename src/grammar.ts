@@ -1,4 +1,5 @@
-export default `{
+export default `
+{
   const defaultCaptureKey = '@@default-capture@@'
   const ingoreCaptureKey = '@@ignore-capture@@'
 }
@@ -35,13 +36,14 @@ NonSelfSelector
   }
 
 NameAndChildren
-  = name:CssSelectorName filterList:Filter* s* children:ParenthesizedChildren {
+  = name:CssSelectorName filterList:FilterList s* children:ParenthesizedChildren {
     return { name, filterList, children }
   }
-  / name:CssSelectorName filterList:Filter* s+ singleChild:Selector {
+  // 注意下面是 s+ 而不是 s*
+  / name:CssSelectorName filterList:FilterList s+ singleChild:Selector {
     return { name, filterList, children: singleChild ? [singleChild] : null }
   }
-  / name:CssSelectorName filterList:Filter* {
+  / name:CssSelectorName filterList:FilterList {
     error('After @-sign there must be valid children selectors. You need to parenthesize the children selectors, or you need a blank after @-sign')
   }
 
@@ -57,10 +59,20 @@ ParenthesizedChildren
     return [head].concat(tail)
   }
 
+FilterList = filterList:Filter*
+
 Filter
-  = '|' chars:NormalChar+ {
-    return chars.join('')
+  = '|' chars:NormalChar+ args:('(' s* args:FilterArgList s* ')' { return args })? {
+    return { name: chars.join(''), args: args || [] }
   }
+
+FilterArgList
+  = head:FilterArg tail:(s* ',' arg:FilterArg { return arg })*
+    s* ','? {
+    return [head].concat(tail)
+  }
+
+FilterArg = JSString / JSNumber
 
 // 普通CSS选择器, 包含多个部分
 CssSelector
@@ -110,13 +122,13 @@ ContentPart
     return { funcName, args: [firstArg].concat(restArgs) }
   }
 
-Arg = String / ValueCapture
+Arg = JSString / ValueCapture
 
 ValueCapture
-  = '$' chars:NormalChar+ filterList:Filter* {
+  = '$' chars:NormalChar+ filterList:FilterList {
     return { capture: chars.join(''), filterList }
   }
-  / '$' filterList:Filter* {
+  / '$' filterList:FilterList {
     return { capture: defaultCaptureKey, filterList }
   }
   / '_' { return { capture: ingoreCaptureKey, filterList: [] } }
@@ -142,11 +154,16 @@ ContentPartSep 'content-part-seprator' = AttrPartSep
 AttrValue 'attribute-value'
   = ValueCapture
   / chars:NormalChar+ { return chars.join('') }
-  / String
+  / JSString
 
-String = SingleQuoteString / DoubleQuoteString
-SingleQuoteString = "'" chars:StrChar+ "'" { return chars.join('') }
-DoubleQuoteString = '"' chars:StrChar+ '"' { return chars.join('') }
+JSString = SingleQuoteJSString / DoubleQuoteJSString
+SingleQuoteJSString = "'" chars:StrChar+ "'" { return chars.join('') }
+DoubleQuoteJSString = '"' chars:StrChar+ '"' { return chars.join('') }
+
+JSNumber 'JS-number'
+  = digits:d+ {
+    return Number(digits.join(''))
+  }
 
 Id
   = '#' name:Name { return name }
@@ -177,4 +194,7 @@ h 'hex-digit'
 
 s 'whitespace'
   = [ \\t\\r\\n\\f]
+
+d 'digit'
+  = [0-9]
 `

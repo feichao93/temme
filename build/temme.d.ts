@@ -6,8 +6,8 @@ export declare const errors: {
     hasLeadingCapture(): string;
 };
 export declare const temmeParser: pegjs.Parser;
-export interface Filter {
-    (v: any): any;
+export interface FilterFn {
+    (this: any, ...args: any[]): any;
 }
 export declare type TemmeSelector = SelfSelector | NonSelfSelector;
 export interface NonSelfSelector {
@@ -15,7 +15,7 @@ export interface NonSelfSelector {
     name: string;
     css: CssPart[];
     children: TemmeSelector[];
-    filterList: string[];
+    filterList: Filter[];
 }
 export interface SelfSelector {
     self: true;
@@ -45,10 +45,14 @@ export declare type ContentPartArg = string | Capture<string>;
 export declare type FuncName = 'text' | 'html' | 'node' | 'contains';
 export declare type Capture<T> = {
     capture: T;
-    filterList: string[];
+    filterList: Filter[];
 };
+export interface Filter {
+    name: string;
+    args: string[];
+}
 export declare function mergeResult<T, S>(target: T, source: S): T & S;
 export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector[], extraFilters?: {
-    [key: string]: Filter;
+    [key: string]: FilterFn;
 }): any;
-export declare function defineFilter(name: string, filter: Filter): void;
+export declare function defineFilter(name: string, filter: FilterFn): void;

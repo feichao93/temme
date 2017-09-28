@@ -5,30 +5,10 @@ import * as fs from 'fs'
 const stHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
 const maigooHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/maigoo-brand-page.html'), 'utf8')
 
-test('parse `div`', () => {
-  const parseResult: TemmeSelector = temmeParser.parse('div')
-  const expectedResult: TemmeSelector[] = [{
-    self: false,
-    name: null,
-    css: [{
-      direct: false,
-      tag: 'div',
-      id: null,
-      classList: null,
-      attrList: null,
-      content: null,
-    }],
-    children: null,
-    filterList: null,
-  }]
-  expect(parseResult).toEqual(expectedResult)
-})
-
-test('text matching and filter pack', () => {
-  const selector = ` .content@|pack(
+test('text matching', () => {
+  const selector = `
     .article_head h1{text($name, '-', _)},
-    .author{text('阅读：', $count|Number, '次')}
-  )`
+    .author{text('阅读：', $count|Number, '次')}`
 
   // language=TEXT
   const html = `
@@ -47,29 +27,7 @@ test('text matching and filter pack', () => {
 test('basic value capture', () => {
   const selector = `#question-header .question-hyperlink[href=$url]{$title}`
 
-  const parseResult: TemmeSelector[] = temmeParser.parse(selector)
-  const expectedParseResult: TemmeSelector[] = [{
-    self: false,
-    name: null,
-    css: [
-      {
-        direct: false, tag: null, id: 'question-header',
-        classList: null, attrList: null, content: null,
-      },
-      {
-        direct: false, tag: null, id: null,
-        classList: ['question-hyperlink'],
-        attrList: [{ name: 'href', value: { capture: 'url', filterList: [] } }],
-        content: [{ funcName: 'text', args: [{ capture: 'title', filterList: [] }] }],
-      }
-    ],
-    children: null,
-    filterList: null,
-  }]
-  expect(parseResult).toEqual(expectedParseResult)
-
-  const selectResult: any = temme(stHtml, parseResult)
-  expect(selectResult).toEqual({
+  expect(temme(stHtml, selector)).toEqual({
     url: '/questions/291978/short-description-of-the-scoping-rules',
     title: 'Short Description of the Scoping Rules?',
   })
@@ -108,8 +66,8 @@ test('complex example: recursive array capture, default capture, customized filt
   )`
 
   expect(temme(stHtml, selector, {
-    substring10(s: string) {
-      return s.substring(0, 10)
+    substring10(this: string) {
+      return this.substring(0, 10)
     },
   })).toEqual([
     {
@@ -147,7 +105,7 @@ test('complex example: recursive array capture, default capture, customized filt
 
 test('complex case: multiple parent-refs', () => {
   const selector = `.brandinfo .info >li@|pack(
-      &{text('电话：', $phone|splitComma)},
+      &{text('电话：', $phone|split(','))},
       &{text('品牌创立时间：', $foundTime)},
       &{text('品牌发源地：', $origination)},
       &{html($presidentUrl|extractPresidentUrl)},
@@ -156,18 +114,18 @@ test('complex case: multiple parent-refs', () => {
     )`
 
   const filters = {
-    extractUrl(long: string) {
+    extractUrl(this: string) {
       const reg = /">(.*)<\/a>/
-      const result = long.match(reg)
+      const result = this.match(reg)
       return result && result[1]
     },
 
-    extractPresidentUrl(html: string) {
-      if (html.indexOf('首席执行官') !== -1
-        || html.indexOf('总裁') !== -1
-        || html.indexOf('董事长') !== -1
-        || html.indexOf('CEO') !== -1) {
-        const [_, presidentUrl]: string[] = html.match(/href="(.*)"/) || []
+    extractPresidentUrl(this: string) {
+      if (this.indexOf('首席执行官') !== -1
+        || this.indexOf('总裁') !== -1
+        || this.indexOf('董事长') !== -1
+        || this.indexOf('CEO') !== -1) {
+        const [_, presidentUrl]: string[] = this.match(/href="(.*)"/) || []
         return presidentUrl
       }
     }
@@ -182,13 +140,4 @@ test('complex case: multiple parent-refs', () => {
       presidentUrl: 'http://www.maigoo.com/mingren/848.html',
       adText: '小米，为发烧而生',
     })
-})
-
-test('simple multiple selectors at root level', () => {
-  const selector = `h1{$h1}, h4{$h4|asWords}`
-
-  expect(temme(stHtml, selector)).toEqual({
-    h1: 'Learn, Share, BuildShort Description of the Scoping Rules?',
-    h4: 'LinkedRelated Hot Network Questions',
-  })
 })

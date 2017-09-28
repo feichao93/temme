@@ -87,7 +87,7 @@ function temme(html, selector, extraFilters = {}) {
     else {
         rootSelector = selector;
     }
-    const filterMap = Object.assign({}, defaultFilterMap, extraFilters);
+    const filterFnMap = Object.assign({}, defaultFilterMap, extraFilters);
     rootSelector.forEach(check);
     return helper($.root(), rootSelector);
     function helper(cntCheerio, selectorArray) {
@@ -137,12 +137,17 @@ function temme(html, selector, extraFilters = {}) {
         }
     }
     function applyFilters(initValue, filterList) {
-        return filterList.reduce((value, filterName) => {
-            if (typeof filterMap[filterName] === 'function') {
-                return filterMap[filterName](value);
+        return filterList.reduce((value, filter) => {
+            if (filter.name in filterFnMap) {
+                const filterFn = filterFnMap[filter.name];
+                return filterFn.apply(value, filter.args);
+            }
+            else if (typeof value[filter.name] === 'function') {
+                const filterFn = value[filter.name];
+                return filterFn.apply(value, filter.args);
             }
             else {
-                throw new Error(`${filterName} is not a valid filter.`);
+                throw new Error(`${filter.name} is not a valid filter.`);
             }
         }, initValue);
     }
@@ -345,41 +350,32 @@ function makeNormalCssSelector(cssPartArray) {
     return result.join('');
 }
 const defaultFilterMap = {
-    pack(v) {
-        return Object.assign({}, ...v);
+    pack() {
+        return Object.assign({}, ...this);
     },
-    splitComma(s) {
-        return s.split(',');
+    compact() {
+        return this.filter(Boolean);
     },
-    splitBlanks(s) {
-        return s.split(/ +/);
+    flatten() {
+        return this.reduce((r, a) => r.concat(a));
     },
-    Number,
-    String,
-    Boolean,
-    Date(arg) {
-        return new Date(arg);
+    words() {
+        return this.split(/\s+/g);
     },
-    first(arg) {
-        return arg[0];
+    lines() {
+        return this.split(/\r?\n/g);
     },
-    firstLine(s) {
-        return s.split(/(\r\n)|\r|\n/)[0];
+    Number() {
+        return Number(this);
     },
-    trim(s) {
-        return s.trim();
+    String() {
+        return String(this);
     },
-    asWords(s) {
-        return s.replace(/\s+/g, ' ');
+    Boolean() {
+        return Boolean(this);
     },
-    json(arg) {
-        return JSON.stringify(arg);
-    },
-    flatten(arg) {
-        return arg.reduce((r, a) => r.concat(a));
-    },
-    filter(arg) {
-        return arg.filter(Boolean);
+    Date() {
+        return new Date(this);
     },
 };
 function defineFilter(name, filter) {
