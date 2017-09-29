@@ -14,6 +14,33 @@ export const examples = [
 )`
   },
   {
+    name: 'douban-short-reviews',
+    desc: '',
+    selector: `// 豆瓣短评网页数据抓取
+// https://movie.douban.com/subject/1292052/comments?start=42&limit=20&sort=new_score&status=P
+title{text($movieName, ' 短评')},
+.aside>p>a[href=$movieUrl],
+.movie-summary .attrs p@movieDetail|pack (
+  &{text('导演:', $director)},
+  &{text('主演:', $actors|split('/'))},
+  &{text('类型:', $movieType|split(','))},
+  &{text('片长:', $duration)},
+  &{text('上映:', $releaseTime|split(','))},
+),
+a.trail_link[href=$trailLink],
+#paginator a@links (
+  &[href=$href data-page=$page]{$content},
+),
+.comment-item@comments (
+  &[data-cid=$commentId],
+  .comment-time{$time},
+  .rating[title=$rating],
+  .comment-info>a[href=$userLink]{$userName},
+  .votes{$votes|Number},
+  .comment > p{$commentText},
+),`,
+  },
+  {
     name: 'all-answers-and-comments',
     desc: '抓取所有答案和评论以及相关用户的信息',
     selector: `
