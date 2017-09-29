@@ -1,4 +1,4 @@
-import temme from '..'
+import { default as temme, cheerio } from '..'
 
 test('use String#split as filter in value-capture', () => {
   const html = `<p>A B C D</p>`
@@ -17,7 +17,7 @@ test('use Array#slice as filter in array-capture', () => {
   </ul>
   `
   const selector = 'li@|slice(1,4) &{$}'
-  expect(temme(html, selector)).toEqual([
+  expect(temme(cheerio.load(html), selector)).toEqual([
     'banana',
     'cherry',
     'pear',
@@ -44,5 +44,37 @@ test('multiple selectors at root level', () => {
     country: 'China',
     city: 'Hangzhou, Zhejiang',
     university: 'ZJU',
+  })
+})
+
+test('temme(html, selector) supports html as CheerioElement', () => {
+  const html = `
+  <ul>
+    <li class="name">shinima</li>
+    <li class="country">China</li>
+    <li class="city">Hangzhou, Zhejiang</li>
+    <li class="university">ZJU</li>
+  </ul>`
+
+  const selector = `.name{$}`
+  const $ = cheerio.load(html)
+  const cheerioElement = $('li').get(0)
+  expect(temme(cheerioElement, selector)).toBe('shinima')
+})
+
+test('attr predicate and value capture in attribute', () => {
+  const html = `
+  <ul>
+    <li class="name" data-full-name="Shi Feichao">shinima</li>
+    <li class="country">China</li>
+  </ul>`
+
+  const selector = `
+    [class=name data-full-name=$fullName],
+    [class=country]{$country},
+  `
+  expect(temme(html, selector)).toEqual({
+    fullName: 'Shi Feichao',
+    country: 'China',
   })
 })

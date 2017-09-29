@@ -5,6 +5,8 @@ const cheerio = require("cheerio");
 exports.cheerio = cheerio;
 const grammar_1 = require("./grammar");
 const makeGrammarErrorMessage_1 = require("./makeGrammarErrorMessage");
+const filters_1 = require("./filters");
+exports.defineFilter = filters_1.defineFilter;
 exports.errors = {
     // funcNameNotSupported(f: string) {
     //   return `${f} is not a valid content func-name.`
@@ -89,7 +91,7 @@ function temme(html, selector, extraFilters = {}) {
     else {
         rootSelector = selector;
     }
-    const filterFnMap = Object.assign({}, defaultFilterMap, extraFilters);
+    const filterFnMap = Object.assign({}, filters_1.defaultFilterMap, extraFilters);
     rootSelector.forEach(check);
     return helper($.root(), rootSelector);
     function helper(cntCheerio, selectorArray) {
@@ -316,6 +318,7 @@ function hasConsecutiveValueCapture(args) {
     }
     return false;
 }
+/** 根据CssPart数组构造标准的css selector */
 function makeNormalCssSelector(cssPartArray) {
     const seperator = ' ';
     const result = [];
@@ -333,7 +336,7 @@ function makeNormalCssSelector(cssPartArray) {
             result.push('#' + cssPart.id);
         }
         if (cssPart.classList) {
-            cssPart.classList.forEach(class_ => result.push('.' + class_));
+            cssPart.classList.forEach(cls => result.push('.' + cls));
         }
         if (cssPart.attrList && cssPart.attrList.some(attr => (typeof attr.value === 'string'))) {
             result.push('[');
@@ -343,44 +346,13 @@ function makeNormalCssSelector(cssPartArray) {
                 }
                 else if (typeof attr.value === 'string') {
                     result.push(`${attr.name}="${attr.value}"`);
-                } // else value-capture
-                result.push(seperator);
+                }
+                else {
+                    result.push(seperator);
+                }
             });
             result.push(']');
         }
     });
     return result.join('');
 }
-const defaultFilterMap = {
-    pack() {
-        return Object.assign({}, ...this);
-    },
-    compact() {
-        return this.filter(Boolean);
-    },
-    flatten() {
-        return this.reduce((r, a) => r.concat(a));
-    },
-    words() {
-        return this.split(/\s+/g);
-    },
-    lines() {
-        return this.split(/\r?\n/g);
-    },
-    Number() {
-        return Number(this);
-    },
-    String() {
-        return String(this);
-    },
-    Boolean() {
-        return Boolean(this);
-    },
-    Date() {
-        return new Date(this);
-    },
-};
-function defineFilter(name, filter) {
-    defaultFilterMap[name] = filter;
-}
-exports.defineFilter = defineFilter;

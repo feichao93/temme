@@ -1,17 +1,12 @@
 /// <reference types="cheerio" />
 import * as pegjs from 'pegjs';
 import * as cheerio from 'cheerio';
-export { cheerio };
+import { defineFilter, FilterFn } from './filters';
+export { cheerio, defineFilter };
 export declare const errors: {
     hasLeadingCapture(): string;
 };
 export declare const temmeParser: pegjs.Parser;
-export interface FilterFn {
-    (this: any, ...args: any[]): any;
-}
-export interface FilterFnMap {
-    [key: string]: FilterFn;
-}
 export declare type TemmeSelector = SelfSelector | NonSelfSelector;
 export interface NonSelfSelector {
     self: false;
@@ -58,4 +53,3 @@ export declare function mergeResult<T, S>(target: T, source: S): T & S;
 export default function temme(html: string | CheerioStatic | CheerioElement, selector: string | TemmeSelector[], extraFilters?: {
     [key: string]: FilterFn;
 }): any;
-export declare function defineFilter(name: string, filter: FilterFn): void;

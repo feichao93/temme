@@ -2,8 +2,9 @@ import * as pegjs from 'pegjs'
 import * as cheerio from 'cheerio'
 import grammar from './grammar'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
+import { defaultFilterMap, defineFilter, FilterFn, FilterFnMap } from './filters'
 
-export { cheerio }
+export { cheerio, defineFilter }
 
 export const errors = {
   // funcNameNotSupported(f: string) {
@@ -23,14 +24,6 @@ export const temmeParser = pegjs.generate(grammar)
 
 interface Dict<V> {
   [key: string]: V
-}
-
-export interface FilterFn {
-  (this: any, ...args: any[]): any
-}
-
-export interface FilterFnMap {
-  [key: string]: FilterFn
 }
 
 export type TemmeSelector = SelfSelector | NonSelfSelector
@@ -382,7 +375,7 @@ function hasConsecutiveValueCapture(args: ContentPartArg[]) {
   return false
 }
 
-
+/** 根据CssPart数组构造标准的css selector */
 function makeNormalCssSelector(cssPartArray: CssPart[]) {
   const seperator = ' '
   const result: string[] = []
@@ -400,7 +393,7 @@ function makeNormalCssSelector(cssPartArray: CssPart[]) {
       result.push('#' + cssPart.id)
     }
     if (cssPart.classList) {
-      cssPart.classList.forEach(class_ => result.push('.' + class_))
+      cssPart.classList.forEach(cls => result.push('.' + cls))
     }
     if (cssPart.attrList && cssPart.attrList.some(attr => (typeof attr.value === 'string'))) {
       result.push('[')
@@ -409,46 +402,12 @@ function makeNormalCssSelector(cssPartArray: CssPart[]) {
           result.push(attr.name)
         } else if (typeof attr.value === 'string') {
           result.push(`${attr.name}="${attr.value}"`)
-        } // else value-capture
-        result.push(seperator)
+        } else { // value-capture
+          result.push(seperator)
+        }
       })
       result.push(']')
     }
   })
   return result.join('')
-}
-
-const defaultFilterMap: FilterFnMap = {
-  pack(this: any[]) {
-    return Object.assign({}, ...this)
-  },
-  compact(this: any[]) {
-    return this.filter(Boolean)
-  },
-  flatten(this: any[][]) {
-    return this.reduce((r, a) => r.concat(a))
-  },
-  words(this: string) {
-    return this.split(/\s+/g)
-  },
-  lines(this: string) {
-    return this.split(/\r?\n/g)
-  },
-
-  Number() {
-    return Number(this)
-  },
-  String() {
-    return String(this)
-  },
-  Boolean() {
-    return Boolean(this)
-  },
-  Date() {
-    return new Date(this)
-  },
-}
-
-export function defineFilter(name: string, filter: FilterFn) {
-  defaultFilterMap[name] = filter
 }
