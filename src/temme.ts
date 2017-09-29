@@ -151,6 +151,9 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   } else {
     rootSelector = selector
   }
+  if (rootSelector == null) {
+    return null
+  }
 
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   rootSelector.forEach(check)

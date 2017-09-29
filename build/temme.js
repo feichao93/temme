@@ -91,6 +91,9 @@ function temme(html, selector, extraFilters = {}) {
     else {
         rootSelector = selector;
     }
+    if (rootSelector == null) {
+        return null;
+    }
     const filterFnMap = Object.assign({}, filters_1.defaultFilterMap, extraFilters);
     rootSelector.forEach(check);
     return helper($.root(), rootSelector);

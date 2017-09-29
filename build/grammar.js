@@ -1,17 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = `
-{
+exports.default = `{
   const defaultCaptureKey = '@@default-capture@@'
   const ingoreCaptureKey = '@@ignore-capture@@'
 }
 
 // 起始规则
-Start = s* selectorList:MultipleSelector s* { return selectorList }
+Start
+  = __ selectorList:MultipleSelector __ { return selectorList }
+  / __ { return null }
 
 MultipleSelector
-  = head:Selector s* tail:(',' s* s:Selector { return s })*
-  s* ','? // optional extra comma
+  = head:Selector __ tail:(',' __ selector:Selector { return selector })*
+  __ ','? // optional extra comma
   {
     return [head].concat(tail)
   }
@@ -27,7 +28,7 @@ SelfSelector
 
 // 非自身选择器, 即不以 & 为开头的选择器
 NonSelfSelector
-  = css:CssSelector s* nc:NameAndChildren? {
+  = css:CssSelector __ nc:NameAndChildren? {
     return {
       self: false,
       css,
@@ -38,11 +39,11 @@ NonSelfSelector
   }
 
 NameAndChildren
-  = name:CssSelectorName filterList:FilterList s* children:ParenthesizedChildren {
+  = name:CssSelectorName filterList:FilterList __ children:ParenthesizedChildren {
     return { name, filterList, children }
   }
-  // 注意下面是 s+ 而不是 s*
-  / name:CssSelectorName filterList:FilterList s+ singleChild:Selector {
+  // 注意下面是 s+ 而不是 __
+  / name:CssSelectorName filterList:FilterList __ singleChild:Selector {
     return { name, filterList, children: singleChild ? [singleChild] : null }
   }
   / name:CssSelectorName filterList:FilterList {
@@ -55,22 +56,22 @@ CssSelectorName
 
 ParenthesizedChildren
   = '('
-    s* head:Selector s* tail:(',' s* s:Selector { return s })*
-    s* ','? // optimal extra comma
-    s* ')' {
+    __ head:Selector __ tail:(',' __ s:Selector { return s })*
+    __ ','? // optimal extra comma
+    __ ')' {
     return [head].concat(tail)
   }
 
 FilterList = filterList:Filter*
 
 Filter
-  = '|' chars:NormalChar+ args:('(' s* args:FilterArgList s* ')' { return args })? {
+  = '|' chars:NormalChar+ args:('(' __ args:FilterArgList __ ')' { return args })? {
     return { name: chars.join(''), args: args || [] }
   }
 
 FilterArgList
-  = head:FilterArg tail:(s* ',' arg:FilterArg { return arg })*
-    s* ','? {
+  = head:FilterArg tail:(__ ',' arg:FilterArg { return arg })*
+    __ ','? {
     return [head].concat(tail)
   }
 
@@ -83,8 +84,8 @@ CssSelector
   }
 
 CssPartSep 'css-selector-part-seperator'
-  = s+
-  / & '>' s*
+  = WhiteSpace+
+  / & '>' __
 
 CssSelectorSlice 'css-selector-slice'
   // css-selector-slice表示常规css selector中的一个片段
@@ -92,43 +93,43 @@ CssSelectorSlice 'css-selector-slice'
   // 一个css-selector-slice中必须包含下面的一个部分:
   // tag, id, classList, attrList
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
-  = direct:('>' s*)? tag:Tag id:Id? classList:Class*
+  = direct:('>' __)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:('>' s*)? tag:Tag? id:Id classList:Class*
+  / direct:('>' __)? tag:Tag? id:Id classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:('>' s*)? tag:Tag? id:Id? classList:Class+
+  / direct:('>' __)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
-  / direct:('>' s*)? tag:Tag? id:Id? classList:Class*
+  / direct:('>' __)? tag:Tag? id:Id? classList:Class*
     attrList:AttrSelector content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
 
 Content
   = '{'
-    s* single:ValueCapture
-    s* ','? // optimal extra comma
-    s* '}' {
+    __ single:ValueCapture
+    __ ','? // optimal extra comma
+    __ '}' {
     return [{ funcName: 'text', args: [single] }]
   }
   / '{'
-    s* head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
-    s* ','? // optimal extra comma
-    s* '}' {
+    __ head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
+    __ ','? // optimal extra comma
+    __ '}' {
     return [head].concat(tail)
   }
 
 ContentPart
   = funcName:Name
-    s* '('
-    s* firstArg:Arg s* restArgs:(',' s* arg:Arg { return arg })*
-    s* ','? // optimal extra comma
-    s* ')' {
+    __ '('
+    __ firstArg:Arg __ restArgs:(',' __ arg:Arg { return arg })*
+    __ ','? // optimal extra comma
+    __ ')' {
     return { funcName, args: [firstArg].concat(restArgs) }
   }
 
@@ -144,10 +145,10 @@ ValueCapture
   / '_' { return { capture: ingoreCaptureKey, filterList: [] } }
 
 AttrSelector 'attribute-selector'
-  = '[' s*
+  = '[' __
     head:AttrPart tail:(AttrPartSep part:AttrPart { return part })*
-    s* ','? // optimal extra comma
-    s* ']' {
+    __ ','? // optimal extra comma
+    __ ']' {
     return [head].concat(tail)
   }
 
@@ -156,8 +157,8 @@ AttrPart 'attribute-selector-part'
   / name:Name { return { name, value: '' } }
 
 AttrPartSep 'attribute-selector-part-seprator'
-  = s* ',' s*
-  / s+
+  = __ ',' __
+  / WhiteSpace+
 
 ContentPartSep 'content-part-seprator' = AttrPartSep
 
@@ -202,9 +203,47 @@ NormalChar
 h 'hex-digit'
   = [0-9a-f]i
 
-s 'whitespace'
-  = [ \\t\\r\\n\\f]
-
 d 'digit'
   = [0-9]
+
+LineTerminator
+  = [\\n\\r\\u2028\\u2029]
+
+LineTerminatorSequence 'end of line'
+  = '\\n'
+  / '\\r\\n'
+  / '\\r'
+  / '\\u2028'
+  / '\\u2029'
+
+Comment 'comment'
+  = MultiLineComment
+  / SingleLineComment
+
+MultiLineComment
+  = '/*' (!'*/' SourceCharacter)* '*/'
+
+MultiLineCommentNoLineTerminator
+  = '/*' (!('*/' / LineTerminator) SourceCharacter)* '*/'
+
+SingleLineComment
+  = '//' (!LineTerminator SourceCharacter)*
+
+SourceCharacter
+  = .
+
+// Separator, Space
+Zs = [\\u0020\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u3000]
+
+WhiteSpace 'whitespace'
+  = "\\t"
+  / "\\v"
+  / "\\f"
+  / " "
+  / "\\u00A0"
+  / "\\uFEFF"
+  / Zs
+
+__
+  = (WhiteSpace / LineTerminatorSequence / Comment)*
 `;

@@ -1,5 +1,11 @@
 import { temmeParser, TemmeSelector } from '..'
 
+test('parse empty selector', () => {
+  expect(temmeParser.parse('')).toBeNull()
+  expect(temmeParser.parse('   ')).toBeNull()
+  expect(temmeParser.parse('\t\t  \n\n')).toBeNull()
+})
+
 test('parse `div`', () => {
   const parseResult: TemmeSelector[] = temmeParser.parse('div')
   const expectedResult: TemmeSelector[] = [{
@@ -42,6 +48,29 @@ test('parse value capture', () => {
     filterList: null,
   }]
   expect(parseResult).toEqual(expectedParseResult)
+})
+
+test('ignore JavaScript comments', () => {
+  expect(temmeParser.parse('/* abcdef */')).toBeNull()
+  expect(temmeParser.parse('// abcdef')).toBeNull()
+
+  const s1 = `
+    // single line comment
+    /* multi
+      line commnet */
+      /* pre*/div{$} // after 
+  `
+  const s2 = 'div{$}'
+  expect(temmeParser.parse(s1))
+    .toEqual(temmeParser.parse(s2))
+
+  const s3 = `
+    /*111*/div[/*222*/foo=$bar/*333*/]{ //444
+    html($foo)}
+  `
+  const s4 = 'div[foo=$bar]{html($foo)}'
+  expect(temmeParser.parse(s3))
+    .toEqual(temmeParser.parse(s4))
 })
 
 // todo test filterList...

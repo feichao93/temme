@@ -1,5 +1,12 @@
 import { default as temme, cheerio } from '..'
 
+test('empty selector', () => {
+  const html = `<p>A B C D</p>`
+  expect(temme(html, '')).toBeNull()
+  expect(temme(html, '   ')).toBeNull()
+  expect(temme(html, '\t\t  \n\n')).toBeNull()
+})
+
 test('use String#split as filter in value-capture', () => {
   const html = `<p>A B C D</p>`
   const selector = `p{$|split(' ')}`
