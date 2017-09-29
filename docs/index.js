@@ -76,7 +76,7 @@ FilterArg = JSString / JSNumber
 
 // 普通CSS选择器, 包含多个部分
 CssSelector
-  = head:CssSelectorPart tail:(CssPartSep part:CssSelectorPart { return part })* {
+  = head:CssSelectorSlice tail:(CssPartSep part:CssSelectorSlice { return part })* {
     return [head].concat(tail)
   }
 
@@ -84,7 +84,11 @@ CssPartSep 'css-selector-part-seperator'
   = s+
   / & '>' s*
 
-CssSelectorPart 'css-selector-part'
+CssSelectorSlice 'css-selector-slice'
+  // css-selector-slice表示常规css selector中的一个片段
+  // 格式大概如下: >tag#id.cls1.cls2[attr1=value1 attr2=$capture2]{$content}( <children> )
+  // 一个css-selector-slice中必须包含下面的一个部分:
+  // tag, id, classList, attrList
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
   = direct:('>' s*)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
@@ -96,6 +100,10 @@ CssSelectorPart 'css-selector-part'
   }
   / direct:('>' s*)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
+    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+  }
+  / direct:('>' s*)? tag:Tag? id:Id? classList:Class*
+    attrList:AttrSelector content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
 
@@ -198,31 +206,31 @@ s 'whitespace'
 d 'digit'
   = [0-9]
 `},function(e,t){'use strict';var n=Math.max;Object.defineProperty(t,'__esModule',{value:!0});const r='^',o='   ',a='>  ';t.default=function(e,t){const{start:s,end:i}=t.location,p=e.split('\n'),l=[t.message];3<=s.line&&l.push(a+p[s.line-3]),2<=s.line&&l.push(a+p[s.line-2]),l.push(a+p[s.line-1]);const c=' '.repeat(s.column-1);let d;d=s.line===i.line?r.repeat(n(1,i.column-s.column)):r.repeat(n(1,p[s.line-1].length-s.column-1)),l.push(o+c+d);for(let n=s.line+1;n<=i.line-1;n++){const e=p[n-1];0<e.length&&(l.push(a+e),l.push(o+r.repeat(e.length)))}if(s.line<i.line){const e=p[i.line-1];0<e.length&&(l.push(a+p[i.line-1]),l.push(o+r.repeat(i.column-1)))}return l.join('\n')}},function(e,t){'use strict';Object.defineProperty(t,'__esModule',{value:!0}),t.defaultFilterMap={pack(){return Object.assign({},...this)},compact(){return this.filter(Boolean)},flatten(){return this.reduce((e,t)=>e.concat(t))},words(){return this.split(/\s+/g)},lines(){return this.split(/\r?\n/g)},Number(){return+this},String(){return this+''},Boolean(){return!!this},Date(){return new Date(this)}},t.defineFilter=function(e,n){t.defaultFilterMap[e]=n}},function(e,t,n){(function(t){function n(e){var t=typeof e;return!!e&&('object'==t||'function'==t)}function r(e){return!!e&&'object'==typeof e}function o(e){return'symbol'==typeof e||r(e)&&g.call(e)==i}function a(e){if('number'==typeof e)return e;if(o(e))return s;if(n(e)){var t='function'==typeof e.valueOf?e.valueOf():e;e=n(t)?t+'':t}if('string'!=typeof e)return 0===e?e:+e;e=e.replace(p,'');var r=c.test(e);return r||d.test(e)?u(e.slice(2),r?2:8):l.test(e)?s:+e}var s=0/0,i='[object Symbol]',p=/^\s+|\s+$/g,l=/^[-+]0x[0-9a-f]+$/i,c=/^0b[01]+$/i,d=/^0o[0-7]+$/i,u=parseInt,_='object'==typeof t&&t&&t.Object===Object&&t,T='object'==typeof self&&self&&self.Object===Object&&self,E=_||T||Function('return this')(),m=Object.prototype,g=m.toString,h=Math.max,f=Math.min,A=function(){return E.Date.now()};e.exports=function(e,t,r){function o(t){var n=m,r=g;return m=g=void 0,u=t,S=e.apply(r,n),S}function s(e){return u=e,O=setTimeout(l,t),_?o(e):S}function i(e){var n=e-C,r=e-u,o=t-n;return T?f(o,N-r):o}function p(e){var n=e-C,r=e-u;return void 0==C||n>=t||0>n||T&&r>=N}function l(){var e=A();return p(e)?c(e):void(O=setTimeout(l,i(e)))}function c(e){return(O=void 0,E&&m)?o(e):(m=g=void 0,S)}function d(){var e=A(),n=p(e);if(m=arguments,g=this,C=e,n){if(void 0===O)return s(C);if(T)return O=setTimeout(l,t),o(C)}return void 0===O&&(O=setTimeout(l,t)),S}var u=0,_=!1,T=!1,E=!0,m,g,N,S,O,C;if('function'!=typeof e)throw new TypeError('Expected a function');return t=a(t)||0,n(r)&&(_=!!r.leading,T='maxWait'in r,N=T?h(a(r.maxWait)||0,t):N,E='trailing'in r?!!r.trailing:E),d.cancel=function(){void 0!==O&&clearTimeout(O),u=0,m=C=g=O=void 0},d.flush=function(){return void 0===O?S:c(A())},d}}).call(t,n(6))},function(e,t){'use strict';t.a=async function(e,t,r){r.setValue(''),t.setValue('');const o=n.find((t)=>t.name===e);o||alert('Invalid example name');const a=await fetch('./examples/example.html');if(a.ok){const e=await a.text();t.setValue(e),r.setValue(o.selector.trim())}else console.warn('load example.html failed...')};const n=[{name:'example-1',desc:'\u6293\u53D6\u95EE\u9898\u548C\u94FE\u63A5',selector:'#question-header .question-hyperlink[href=$href]{$title}'},{name:'linked-questions',desc:'',selector:`
-.linked .spacer@linkedQuestions:filter (
-  .question-hyperlink[href=$url]{$question:asWords},
-  .answer-votes{$votes:Number},
+.linked .spacer@linkedQuestions|compact (
+  .question-hyperlink[href=$url]{$question|words|join(' ')},
+  .answer-votes{$votes|Number},
 )`},{name:'all-answers-and-comments',desc:'\u6293\u53D6\u6240\u6709\u7B54\u6848\u548C\u8BC4\u8BBA\u4EE5\u53CA\u76F8\u5173\u7528\u6237\u7684\u4FE1\u606F',selector:`
 .answer@answers (
   .fw .user-info@users (
-    .user-action-time{$userAction:asWords},
+    .user-action-time{$userAction|words|join(' ')},
     .relativetime[title=$time],
-    .user-details@userDetail:pack (
-      a[href=$userlink]{$username:asWords},
+    .user-details@userDetail|pack (
+      a[href=$userlink]{$username|words|join(' ')},
       .reputation-score{$reputation},
-      span@badges:filter (
+      span@badges|compact (
         .badge1[class=$badgeType],
         .badge2[class=$badgeType],
         .badge3[class=$badgeType],
-        .badgecount{$count},
+        .badgecount{$count|Number},
       ),
     ),
   ),
-  .post-text{$answerText:asWords},
+  .post-text{$answerText|words|join(' ')},
   .comments .comment@comments (
     &[id=$commentId],
-    .comment-score{$commentScore:Number},
+    .comment-score{$commentScore|Number},
     .comment-text .comment-copy{$text},
-    .comment-user{$commentUser:asWords},
+    .comment-user{$commentUser|words|join(' ')},
     .comment-date span[title=$date],
   ),
 )`}]}]);

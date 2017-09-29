@@ -8,9 +8,9 @@ export const examples = [
     name: 'linked-questions',
     desc: '',
     selector: `
-.linked .spacer@linkedQuestions:filter (
-  .question-hyperlink[href=$url]{$question:asWords},
-  .answer-votes{$votes:Number},
+.linked .spacer@linkedQuestions|compact (
+  .question-hyperlink[href=$url]{$question|words|join(' ')},
+  .answer-votes{$votes|Number},
 )`
   },
   {
@@ -19,25 +19,25 @@ export const examples = [
     selector: `
 .answer@answers (
   .fw .user-info@users (
-    .user-action-time{$userAction:asWords},
+    .user-action-time{$userAction|words|join(' ')},
     .relativetime[title=$time],
-    .user-details@userDetail:pack (
-      a[href=$userlink]{$username:asWords},
+    .user-details@userDetail|pack (
+      a[href=$userlink]{$username|words|join(' ')},
       .reputation-score{$reputation},
-      span@badges:filter (
+      span@badges|compact (
         .badge1[class=$badgeType],
         .badge2[class=$badgeType],
         .badge3[class=$badgeType],
-        .badgecount{$count},
+        .badgecount{$count|Number},
       ),
     ),
   ),
-  .post-text{$answerText:asWords},
+  .post-text{$answerText|words|join(' ')},
   .comments .comment@comments (
     &[id=$commentId],
-    .comment-score{$commentScore:Number},
+    .comment-score{$commentScore|Number},
     .comment-text .comment-copy{$text},
-    .comment-user{$commentUser:asWords},
+    .comment-user{$commentUser|words|join(' ')},
     .comment-date span[title=$date],
   ),
 )`,
