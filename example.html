@@ -1,0 +1,2658 @@
+<!--
+    This file is downloaded from
+     https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
+ -->
+<html itemscope="" itemtype="http://schema.org/QAPage">
+<head>
+  <title>python - Short Description of the Scoping Rules? - Stack Overflow</title>
+  <link rel="shortcut icon"
+        href="https://cdn.sstatic.net/Sites/stackoverflow/img/favicon.ico?v=4f32ecc8f43d">
+  <link rel="apple-touch-icon image_src"
+        href="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon.png?v=c78bd457575a">
+  <link rel="search" type="application/opensearchdescription+xml" title="Stack Overflow"
+        href="/opensearch.xml">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:domain" content="stackoverflow.com">
+  <meta property="og:image" itemprop="image primaryImageOfPage"
+        content="https://cdn.sstatic.net/Sites/stackoverflow/img/apple-touch-icon@2.png?v=73d79a89bded">
+  <meta name="twitter:title" property="og:title" itemprop="title name"
+        content="Short Description of the Scoping Rules?">
+  <meta name="twitter:description" property="og:description" itemprop="description" content="What exactly are the Python scoping rules?
+If I have some code:
+code1
+class Foo:
+   code2
+   def spam.....
+      code3
+      for code4..:
+       code5
+       x()
+Where is x found?  Some possible ">
+  <meta property="og:url"
+        content="https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <link rel="canonical"
+        href="https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <link rel="stylesheet" type="text/css"
+        href="https://cdn.sstatic.net/Sites/stackoverflow/all.css?v=d91cc30e980f">
+  <link rel="alternate" type="application/atom+xml"
+        title="Feed for question 'Short Description of the Scoping Rules?'"
+        href="/feeds/question/291978">
+  <meta name="twitter:app:country" content="US">
+  <meta name="twitter:app:name:iphone" content="Stack Exchange iOS">
+  <meta name="twitter:app:id:iphone" content="871299723">
+  <meta name="twitter:app:url:iphone"
+        content="se-zaphod://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <meta name="twitter:app:name:ipad" content="Stack Exchange iOS">
+  <meta name="twitter:app:id:ipad" content="871299723">
+  <meta name="twitter:app:url:ipad"
+        content="se-zaphod://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <meta name="twitter:app:name:googleplay" content="Stack Exchange Android">
+  <meta name="twitter:app:url:googleplay"
+        content="http://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules">
+  <meta name="twitter:app:id:googleplay" content="com.stackexchange.marvin">
+  <noscript id="noscript-css">&lt;style&gt;body,.top-bar{margin-top:1.9em}&lt;/style&gt;
+  </noscript>
+
+  <link rel="prefetch" href="https://securepubads.g.doubleclick.net/static/3p_cookie.html">
+  <link rel="stylesheet" href="https://s.zkcdn.net/Extensions/adFeedback.css">
+</head>
+<body class="question-page new-topbar">
+<div class="container _full ">
+  <div id="content" class="snippet-hidden">
+    <div itemscope="" itemtype="http://schema.org/Question">
+      <div class="inner-content">
+        <div id="question-header">
+          <h1 itemprop="name"><a
+            href="/questions/291978/short-description-of-the-scoping-rules"
+            class="question-hyperlink">Short Description of the Scoping Rules?</a>
+          </h1>
+        </div>
+        <div id="mainbar" role="main" aria-label="question and answers">
+          <div class="question" data-questionid="291978" id="question">
+            <table>
+              <tbody>
+                <tr>
+                  <td class="votecell">
+                    <div class="vote">
+                      <input type="hidden" name="_id_" value="291978">
+                      <a class="vote-up-off"
+                         title="This question shows research effort; it is useful and clear">up
+                        vote</a>
+                      <span itemprop="upvoteCount" class="vote-count-post ">307</span>
+                      <a class="vote-down-off"
+                         title="This question does not show any research effort; it is unclear or not useful">down
+                        vote</a>
+                      <a class="star-off" href="#">favorite</a>
+                      <div class="favoritecount"><b>156</b></div>
+                    </div>
+                  </td>
+                  <td class="postcell">
+                    <div>
+                      <div class="post-text" itemprop="text">
+                        <p>What <strong>exactly</strong> are the Python
+                          scoping rules?</p>
+                        <p>If I have some code:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">code1
+</span><span class="kwd">class</span><span class="pln"> </span><span class="typ">Foo</span><span
+                          class="pun">:</span><span class="pln">
+   code2
+   </span><span class="kwd">def</span><span class="pln"> spam</span><span
+                          class="pun">.....</span><span class="pln">
+      code3
+      </span><span class="kwd">for</span><span class="pln"> code4</span><span class="pun">..:</span><span
+                          class="pln">
+       code5
+       x</span><span class="pun">()</span></code></pre>
+                        <p>Where is <em>x</em> found? Some possible choices
+                          include the list above:</p>
+                        <ol>
+                          <li>In the enclosing source file</li>
+                          <li>In the class namespace</li>
+                          <li>In the function definition</li>
+                          <li>In the for loop index variable</li>
+                          <li>Inside the for loop</li>
+                        </ol>
+                        <p>Also there is the context during execution, when
+                          the function spam is passed somewhere else. And
+                          maybe lambda functions pass a bit
+                          differently?</p>
+                        <p>There must be a simple reference or algorithm
+                          somewhere. It's a confusing world for
+                          intermediate Python programmers.</p>
+                      </div>
+                      <div class="post-taglist">
+                        <a href="/questions/tagged/python"
+                           class="post-tag js-gps-track"
+                           title="show questions tagged 'python'" rel="tag">python</a>
+                        <a href="/questions/tagged/scope"
+                           class="post-tag js-gps-track"
+                           title="show questions tagged 'scope'" rel="tag">scope</a>
+                        <a href="/questions/tagged/dynamic-languages"
+                           class="post-tag js-gps-track"
+                           title="show questions tagged 'dynamic-languages'"
+                           rel="tag">dynamic-languages</a>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/q/291978"
+                                title="short permalink to this question"
+                                class="short-link"
+                                id="link-post-291978">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/291978/edit"
+                                class="suggest-edit-post"
+                                title="">improve this
+                                question</a></div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  <a href="/posts/291978/revisions"
+                                     title="show all edits to this post">edited
+                                    <span title="2017-04-23 03:10:44Z"
+                                          class="relativetime">Apr 23 at 3:10</span></a>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/355230/martineau">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://i.stack.imgur.com/VjcbL.jpg?s=32&amp;g=1"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/355230/martineau">martineau</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 51,320"
+                                                                              dir="ltr">51.3k</span><span
+                                    title="6 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">6</span></span><span
+                                    title="70 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">70</span></span><span
+                                    title="126 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">126</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td class="post-signature owner">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  asked <span
+                                  title="2008-11-15 01:48:37Z"
+                                  class="relativetime">Nov 15 '08 at 1:48</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/1320510/charles-merriam">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/2c437d3c8dac4ec473243d7f15ca4a8c?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/1320510/charles-merriam">Charles
+                                    Merriam</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score "
+                                                                              dir="ltr">8,910</span><span
+                                    title="5 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">5</span></span><span
+                                    title="43 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">43</span></span><span
+                                    title="56 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">56</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="votecell"></td>
+                  <td>
+                    <div id="comments-291978" class="comments ">
+                      <table>
+                        <tbody data-remaining-comments-count="0"
+                               data-canpost="false" data-cansee="true"
+                               data-comments-unavailable="false"
+                               data-addlink-disabled="true">
+                          <tr id="comment-73105654" class="comment ">
+                            <td>
+                              <table>
+                                <tbody>
+                                  <tr>
+                                    <td class=" comment-score">
+                                      &nbsp;&nbsp;
+                                    </td>
+                                    <td>
+                                      &nbsp;
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                            <td class="comment-text">
+                              <div style="display: block;"
+                                   class="comment-body">
+                                <span class="comment-copy">Could people stop doing little "karma edits" to this question please?</span>
+                                –&nbsp;<a
+                                href="/users/1320510/charles-merriam"
+                                title="8,910 reputation"
+                                class="comment-user owner">Charles
+                                Merriam</a>
+                                <span class="comment-date"
+                                      dir="ltr"><a
+                                  class="comment-link"
+                                  href="#comment73105654_291978"><span
+                                  title="2017-03-24 19:53:10Z"
+                                  class="relativetime-clean">Mar 24 at 19:53</span></a></span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr id="comment-74184311" class="comment ">
+                            <td>
+                              <table>
+                                <tbody>
+                                  <tr>
+                                    <td class=" comment-score">
+                                      &nbsp;&nbsp;
+                                    </td>
+                                    <td>
+                                      &nbsp;
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </td>
+                            <td class="comment-text">
+                              <div style="display: block;"
+                                   class="comment-body">
+                                                                <span class="comment-copy">They're not all "karma edits". Some are because folks don't understand how things work. See <a
+                                                                  href="https://meta.stackexchange.com/questions/19190/should-questions-include-tags-in-their-titles"><b><i>Should questions include “tags” in their titles?</i></b></a>.</span>
+                                –&nbsp;<a
+                                href="/users/355230/martineau"
+                                title="51,320 reputation"
+                                class="comment-user">martineau</a>
+                                <span class="comment-date"
+                                      dir="ltr"><a
+                                  class="comment-link"
+                                  href="#comment74184311_291978"><span
+                                  title="2017-04-23 03:10:13Z"
+                                  class="relativetime-clean">Apr 23 at 3:10</span></a></span>
+                                <span class="edited-yes"
+                                      title="this comment was edited 1 time"></span>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div id="comments-link-291978" data-rep="50"
+                         data-anon="true">
+                      <a class="js-add-link comments-link disabled-link "
+                         title="Use comments to ask for more information or suggest improvements. Avoid answering questions in comments.">add
+                        a comment</a><span class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                      <a class="js-show-link comments-link dno"
+                         title="expand to show all comments on this post"
+                         href="#" onclick=""></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="answers">
+            <a name="tab-top"></a>
+            <div id="answers-header">
+              <div class="subheader answers-subheader">
+                <h2>
+                  7 Answers
+                  <span style="display:none;" itemprop="answerCount">7</span>
+                </h2>
+                <div>
+                  <div id="tabs">
+                    <a href="/questions/291978/short-description-of-the-scoping-rules?answertab=active#tab-top"
+                       data-nav-xhref=""
+                       title="Answers with the latest activity first"
+                       data-value="active" data-shortcut="A">
+                      active</a>
+                    <a href="/questions/291978/short-description-of-the-scoping-rules?answertab=oldest#tab-top"
+                       data-nav-xhref=""
+                       title="Answers in the order they were provided"
+                       data-value="oldest" data-shortcut="O">
+                      oldest</a>
+                    <a class="youarehere"
+                       href="/questions/291978/short-description-of-the-scoping-rules?answertab=votes#tab-top"
+                       data-nav-xhref=""
+                       title="Answers with the highest score first"
+                       data-value="votes" data-shortcut="V">
+                      votes</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <a name="292502"></a>
+            <div id="answer-292502" class="answer accepted-answer"
+                 data-answerid="292502" itemscope="" itemtype="http://schema.org/Answer"
+                 itemprop="acceptedAnswer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="292502">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">278</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                        <span class="vote-accepted-on load-accepted-answer-date"
+                              title="loading when this answer was accepted...">accepted</span>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>Actually, a concise rule for Python Scope
+                          resolution, from <a
+                            href="http://rads.stackoverflow.com/amzn/click/0596513984"
+                            rel="noreferrer">Learning Python, 3rd.
+                            Ed.</a>. (These rules are specific to
+                          variable names, not attributes. If you reference
+                          it without a period, these rules apply)</p>
+                        <p>LEGB Rule.</p>
+                        <p><strong>L</strong>, Local — Names assigned in any
+                          way within a function (<code>def</code> or
+                          <code>lambda</code>)), and not declared global
+                          in that function.</p>
+                        <p><strong>E</strong>, Enclosing-function locals —
+                          Name in the local scope of any and all
+                          statically enclosing functions (<code>def</code>
+                          or <code>lambda</code>), from inner to outer.
+                        </p>
+                        <p><strong>G</strong>, Global (module) — Names
+                          assigned at the top-level of a module file, or
+                          by executing a <code>global</code> statement in
+                          a <code>def</code> within the file.</p>
+                        <p><strong>B</strong>, Built-in (Python) — Names
+                          preassigned in the built-in names module :
+                          <code>open</code>,<code>range</code>,<code>SyntaxError</code>,...
+                        </p>
+                        <p>So, in the case of</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">code1
+</span><span class="kwd">class</span><span class="pln"> </span><span class="typ">Foo</span><span
+                          class="pun">:</span><span class="pln">
+   code2
+   </span><span class="kwd">def</span><span class="pln"> spam</span><span
+                          class="pun">.....</span><span class="pln">
+      code3
+      </span><span class="kwd">for</span><span class="pln"> code4</span><span class="pun">..:</span><span
+                          class="pln">
+       code5
+       x</span><span class="pun">()</span></code></pre>
+                        <p>The for loop does not have its own namespace. In
+                          LEGB order, the scopes would be </p>
+                        <p>L : local, in <code>def spam</code> (in <code>code3</code>,
+                          <code>code 4</code>, <code>code5</code>).</p>
+                        <p>E : Enclosed function, any enclosing functions
+                          (if the whole example were in another
+                          <code>def</code>)</p>
+                        <p>G : Global. Were there any <code>x</code>
+                          declared globally in the module
+                          (<code>code1</code>)?</p>
+                        <p>B : Any builtin <code>x</code> in Python.</p>
+                        <p><code>x</code> will never be found in
+                          <code>code2</code> (even in cases where you
+                          might expect it would, see <a
+                            href="https://stackoverflow.com/a/23471004/2810305">Antti's
+                            answer</a> or <a
+                            href="https://stackoverflow.com/q/13905741/2810305">here</a>).
+                        </p>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/292502"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-292502">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/292502/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  <a href="/posts/292502/revisions"
+                                     title="show all edits to this post">edited
+                                    <span title="2017-05-23 12:34:41Z"
+                                          class="relativetime">May 23 at 12:34</span></a>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/-1/community">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/a007be5a61f6aa8f3e85ae2fc18dd66e?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/-1/community">Community</a><span
+                                  class="mod-flair"
+                                  title="moderator">♦</span>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score "
+                                                                              dir="ltr">1</span><span
+                                    title="1 silver badge"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">1</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2008-11-15 12:47:22Z"
+                                  class="relativetime">Nov 15 '08 at 12:47</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/35335/rizwan-kassim">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/cea4dbf0bf2672b0121374c6423329e8?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/35335/rizwan-kassim">Rizwan
+                                    Kassim</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score "
+                                                                              dir="ltr">4,788</span><span
+                                    title="2 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">2</span></span><span
+                                    title="16 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">16</span></span><span
+                                    title="32 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">32</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-292502" class="comments ">
+                        <table>
+                          <tbody data-remaining-comments-count="2"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr id="comment-763944" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="cool">1</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">U did not cover the scope of <code>code2</code>. That is not a variable and is a class/instance attribute. Is that right.</span>
+                                  –&nbsp;<a
+                                  href="/users/55562/lakshman-prasad"
+                                  title="38,038 reputation"
+                                  class="comment-user">Lakshman
+                                  Prasad</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment763944_292502"><span
+                                    title="2009-06-05 12:39:09Z"
+                                    class="relativetime-clean">Jun 5 '09 at 12:39</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-12559231" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="cool">1</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">my intuition says that code2 exists inside the class scope of <code>Foo</code>, and could be accessed from any scope with access to <code>Foo</code> with <code>Foo.code2</code> or from within <code>Foo</code> with the same syntax.  But I'm not sure yet where that falls within the LEGB mnemonic.</span>
+                                  –&nbsp;<a
+                                  href="/users/656833/conrad-dean"
+                                  title="1,665 reputation"
+                                  class="comment-user">Conrad.Dean</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment12559231_292502"><span
+                                    title="2012-03-24 15:51:36Z"
+                                    class="relativetime-clean">Mar 24 '12 at 15:51</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-14735255" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="hot">23</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">As a caveat to Global access - reading a global variable can happen without explicit declaration, but writing to it without declaring global(var_name) will instead create a new local instance.</span>
+                                  –&nbsp;<a
+                                  href="/users/66349/peter-gibson"
+                                  title="10,897 reputation"
+                                  class="comment-user">Peter
+                                  Gibson</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment14735255_292502"><span
+                                    title="2012-06-27 05:53:37Z"
+                                    class="relativetime-clean">Jun 27 '12 at 5:53</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-19372083" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="warm">7</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">Actually @Peter, <code>global(var_name)</code> is syntactically incorrect. The correct syntax would be <code>global var_name</code> without parentheses. You have a valid point though.</span>
+                                  –&nbsp;<a
+                                  href="/users/355230/martineau"
+                                  title="51,320 reputation"
+                                  class="comment-user">martineau</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment19372083_292502"><span
+                                    title="2012-12-24 21:48:48Z"
+                                    class="relativetime-clean">Dec 24 '12 at 21:48</span></a></span>
+                                  <span class="edited-yes"
+                                        title="this comment was edited 2 times"></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-26476658" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="cool">2</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">@Jonathan: Because each <code>y</code> is being written to and there are no <code>global y</code> declarations -- see @Peter's comment.</span>
+                                  –&nbsp;<a
+                                  href="/users/355230/martineau"
+                                  title="51,320 reputation"
+                                  class="comment-user">martineau</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment26476658_292502"><span
+                                    title="2013-08-06 19:19:10Z"
+                                    class="relativetime-clean">Aug 6 '13 at 19:19</span></a></span>
+                                  <span class="edited-yes"
+                                        title="this comment was edited 1 time"></span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-292502" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link  dno"
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”."></a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link "
+                           title="expand to show all comments on this post"
+                           href="#" onclick="">show <b>2</b> more
+                          comments</a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="adzerk-1829106014" class="everyonelovesstackoverflow adzerk-vote">
+              <a href="https://engine.adzerk.net/r?e=eyJhdiI6NDE0LCJhdCI6NCwiYnQiOjAsImNtIjo0NzE0OTMsImNoIjoxMTc4LCJjayI6e30sImNyIjoxNjI3NzY3LCJkaSI6IjczMzIxZWVlYjYxODRkY2ZiMmJiZGYzYjc3NTI1YmVlIiwiZG0iOjEsImZjIjoxOTI0NDQ2LCJmbCI6MjE0MjMxMiwiaXAiOiIxODMuMTU3LjE2MC41OSIsImt3IjoicHl0aG9uLHNjb3BlLGR5bmFtaWMtbGFuZ3VhZ2VzIiwibnciOjIyLCJwYyI6MCwiZWMiOjAsInByIjoxNjA0LCJydCI6MSwic2EiOiI4Iiwic2IiOiJpLTA1ZTkzNDUwYjFmNzRmNDNkIiwic3AiOjk2NDMsInN0Ijo4Mjc3LCJ1ayI6InVlMS0yYTQzNmVmMzcyMjA0OTE4OTlkZGVmYzU1NjAzYWVjNSIsInpuIjo0NCwidHMiOjE1MDY1Mjc1MDA4MTUsImJmIjp0cnVlLCJwbiI6ImFkemVyay0xODI5MTA2MDE0IiwidXIiOiJodHRwOi8vc3RhY2tvdmVyZmxvdy5jb20vam9icy9yZW1vdGU_dXRtX3NvdXJjZT13ZWJzaXRlJnV0bV9tZWRpdW09YmFubmVyJnV0bV9jb250ZW50PWxlYWRlcmJvYXJkXzMmdXRtX2NhbXBhaWduPWhvdXNlX2Fkc19ST1NfU08ifQ&amp;s=2Cg90EIT-hl4u3aTJM6IjRLXcH8"
+                 rel="nofollow" target="_blank" title=""><img
+                src="https://s.zkcdn.net/Advertisers/d220101fccb24c5f805ac8f614335fc7.png"
+                title="" alt="" border="0" width="728" height="90"></a><img
+              height="0px" width="0px" border="0" style="position:absolute;"
+              src="https://engine.adzerk.net/i.gif?e=eyJhdiI6NDE0LCJhdCI6NCwiYnQiOjAsImNtIjo0NzE0OTMsImNoIjoxMTc4LCJjayI6e30sImNyIjoxNjI3NzY3LCJkaSI6IjczMzIxZWVlYjYxODRkY2ZiMmJiZGYzYjc3NTI1YmVlIiwiZG0iOjEsImZjIjoxOTI0NDQ2LCJmbCI6MjE0MjMxMiwiaXAiOiIxODMuMTU3LjE2MC41OSIsImt3IjoicHl0aG9uLHNjb3BlLGR5bmFtaWMtbGFuZ3VhZ2VzIiwibnciOjIyLCJwYyI6MCwiZWMiOjAsInByIjoxNjA0LCJydCI6MSwic2EiOiI4Iiwic2IiOiJpLTA1ZTkzNDUwYjFmNzRmNDNkIiwic3AiOjk2NDMsInN0Ijo4Mjc3LCJ1ayI6InVlMS0yYTQzNmVmMzcyMjA0OTE4OTlkZGVmYzU1NjAzYWVjNSIsInpuIjo0NCwidHMiOjE1MDY1Mjc1MDA4MTYsImJmIjp0cnVlLCJwbiI6ImFkemVyay0xODI5MTA2MDE0IiwiZnEiOjB9&amp;s=MTWtp--YgqX6176B0UYUts3VSaY">
+              <div class="adzerk-vote-controls" style="display:none;">
+                <div class="adzerk-vote-option adzerk-vote-up">
+                  <div class="adzerk-vote-icon"></div>
+                </div>
+                <div class="adzerk-vote-option adzerk-vote-down">
+                  <div class="adzerk-vote-icon"></div>
+                </div>
+              </div>
+              <div class="adzerk-vote-survey" style="display:none;">
+                <form><span>No problem. We won't show you that ad again. Why didn't you like it?</span>
+                  <ul>
+                    <li><label><input type="radio" value="12"
+                                      name="downvoteReason">Uninteresting</label>
+                    </li>
+                    <li><label><input type="radio" value="13"
+                                      name="downvoteReason">Misleading</label>
+                    </li>
+                    <li><label><input type="radio" value="14"
+                                      name="downvoteReason">Offensive</label>
+                    </li>
+                    <li><label><input type="radio" value="15"
+                                      name="downvoteReason">Repetitive</label>
+                    </li>
+                    <li><label><input type="radio" value="16"
+                                      name="downvoteReason">Other</label></li>
+                  </ul>
+                  <a href="#" class="adzerk-vote-cancel">Oops! I didn't mean to do
+                    this.</a></form>
+              </div>
+            </div>
+            <div id="dfp-mlb" class="dfpad"
+                 data-google-query-id="CPz2zqLcxdYCFQgzlgodbOcJ4w"
+                 data-clc-ready="true">
+              <div id="google_ads_iframe_/248424177/stackoverflow.com/mlb/question-pages_0__container__"
+                   style="border: 0pt none;">
+                <iframe id="google_ads_iframe_/248424177/stackoverflow.com/mlb/question-pages_0"
+                        title="3rd party ad content"
+                        name="google_ads_iframe_/248424177/stackoverflow.com/mlb/question-pages_0"
+                        width="728" height="90" scrolling="no" marginwidth="0"
+                        marginheight="0" frameborder="0" srcdoc=""
+                        style="border: 0px; vertical-align: bottom;"></iframe>
+              </div>
+            </div>
+            <a name="293097"></a>
+            <div id="answer-293097" class="answer" data-answerid="293097" itemscope=""
+                 itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="293097">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">117</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>Essentially, the only thing in Python that
+                          introduces a new scope is a function definition.
+                          Classes are a bit of a special case in that
+                          anything defined directly in the body is placed
+                          in the class's namespace, but they are not
+                          directly accessible from within the methods (or
+                          nested classes) they contain.</p>
+                        <p>In your example there are only 3 scopes where x
+                          will be searched in:</p>
+                        <ul>
+                          <li><p>spam's scope - containing everything
+                            defined in code3 and code5 (as well as
+                            code4, your loop variable)</p></li>
+                          <li><p>The global scope - containing everything
+                            defined in code1, as well as Foo (and
+                            whatever changes after it)</p></li>
+                          <li><p>The builtins namespace. A bit of a
+                            special case - this contains the various
+                            Python builtin functions and types such as
+                            len() and str(). Generally this shouldn't be
+                            modified by any user code, so expect it to
+                            contain the standard functions and nothing
+                            else.</p></li>
+                        </ul>
+                        <p>More scopes only appear when you introduce a
+                          nested function (or lambda) into the picture.
+                          These will behave pretty much as you'd expect
+                          however. The nested function can access
+                          everything in the local scope, as well as
+                          anything in the enclosing function's scope.
+                          eg.</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="kwd">def</span><span
+                          class="pln"> foo</span><span
+                          class="pun">():</span><span class="pln">
+    x</span><span class="pun">=</span><span class="lit">4</span><span class="pln">
+    </span><span class="kwd">def</span><span class="pln"> bar</span><span
+                          class="pun">():</span><span class="pln">
+        </span><span class="kwd">print</span><span class="pln"> x  </span><span class="com"># Accesses x from foo's scope</span><span
+                          class="pln">
+    bar</span><span class="pun">()</span><span class="pln">  </span><span
+                          class="com"># Prints 4</span><span
+                          class="pln">
+    x</span><span class="pun">=</span><span class="lit">5</span><span class="pln">
+    bar</span><span class="pun">()</span><span class="pln">  </span><span
+                          class="com"># Prints 5</span></code></pre>
+                        <p><strong>Restrictions:</strong></p>
+                        <p>Variables in scopes other than the local
+                          function's variables can be accessed, but can't
+                          be rebound to new parameters without further
+                          syntax. Instead, assignment will create a new
+                          <strong>local</strong> variable instead of
+                          affecting the variable in the parent scope. For
+                          example:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="pln">global_var1 </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="pun">[]</span><span class="pln">
+global_var2 </span><span class="pun">=</span><span class="pln"> </span><span
+                          class="lit">1</span><span class="pln">
+</span><span class="kwd">def</span><span class="pln"> func</span><span class="pun">():</span><span
+                          class="pln">
+    </span><span class="com"># This is OK: It's just accessing, not rebinding</span><span
+                          class="pln">
+    global_var1</span><span class="pun">.</span><span class="pln">append</span><span
+                          class="pun">(</span><span
+                          class="lit">4</span><span
+                          class="pun">)</span><span class="pln">
+    </span><span class="com"># This won't affect global_var2. Instead it creates a new variable</span><span
+                          class="pln">
+    global_var2 </span><span class="pun">=</span><span class="pln"> </span><span
+                          class="lit">2</span><span class="pln">
+    local1 </span><span class="pun">=</span><span class="pln"> </span><span
+                          class="lit">4</span><span class="pln">
+    </span><span class="kwd">def</span><span class="pln"> embedded_func</span><span
+                          class="pun">():</span><span class="pln">
+        </span><span class="com"># Again, this doen't affect func's local1 variable.  It creates a </span><span
+                          class="pln">
+        </span><span class="com"># new local variable also called local1 instead.</span><span
+                          class="pln">
+        local1 </span><span class="pun">=</span><span class="pln"> </span><span class="lit">5</span><span
+                          class="pln">
+        </span><span class="kwd">print</span><span class="pln"> local1
+    embedded_func</span><span class="pun">()</span><span class="pln"> </span><span class="com"># Prints 5</span><span
+                          class="pln">
+    </span><span class="kwd">print</span><span class="pln"> local1    </span><span class="com"># Prints 4</span></code></pre>
+                        <p>In order to actually modify the bindings of
+                          global variables from within a function scope,
+                          you need to specify that the variable is global
+                          with the global keyword. Eg:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="pln">global_var </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">4</span><span class="pln">
+</span><span class="kwd">def</span><span class="pln"> change_global</span><span
+                          class="pun">():</span><span class="pln">
+    </span><span class="kwd">global</span><span class="pln"> global_var
+    global_var </span><span class="pun">=</span><span class="pln"> global_var </span><span
+                          class="pun">+</span><span
+                          class="pln"> </span><span
+                          class="lit">1</span></code></pre>
+                        <p>Currently there is no way to do the same for
+                          variables in enclosing <em>function</em> scopes,
+                          but Python 3 introduces a new keyword, "<code>nonlocal</code>"
+                          which will act in a similar way to global, but
+                          for nested function scopes.</p>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/293097"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-293097">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/293097/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2008-11-15 21:51:09Z"
+                                  class="relativetime">Nov 15 '08 at 21:51</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/9493/brian">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/7895e5fdbabe3fc5e09272bb602257d7?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/9493/brian">Brian</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 76,719"
+                                                                              dir="ltr">76.7k</span><span
+                                    title="22 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">22</span></span><span
+                                    title="82 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">82</span></span><span
+                                    title="103 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">103</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-293097" class="comments  dno">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-293097" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a name="23471004"></a>
+            <div id="answer-23471004" class="answer" data-answerid="23471004"
+                 itemscope="" itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="23471004">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">65</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>There was no thorough answer concerning Python3
+                          time, so I made an answer here.</p>
+                        <p>As provided in other answers, there are 4 basic
+                          scopes, the LEGB, for Local, Enclosing, Global
+                          and Builtin. In addition to those, there is a
+                          special scope, the <strong>class body</strong>,
+                          which does not comprise an enclosing scope for
+                          methods defined within the class; any
+                          assignments within the class body make the
+                          variable from there on be bound in the class
+                          body.</p>
+                        <p>Especially, <strong>no</strong> block statement,
+                          besides <code>def</code> and <code>class</code>,
+                          create a variable scope. In Python 2 the list
+                          comprehension does not create a variable scope,
+                          however in Python 3 the loop variable is created
+                          in a new scope.</p>
+                        <p>To demonstrate the peculiarities of the class
+                          body</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">0</span><span class="pln">
+</span><span class="kwd">class</span><span class="pln"> X</span><span class="pun">(</span><span
+                          class="pln">object</span><span class="pun">):</span><span
+                          class="pln">
+    y </span><span class="pun">=</span><span class="pln"> x
+    x </span><span class="pun">=</span><span class="pln"> x </span><span class="pun">+</span><span
+                          class="pln"> </span><span
+                          class="lit">1</span><span
+                          class="pln"> </span><span class="com"># x is now a variable </span><span
+                          class="pln">
+    z </span><span class="pun">=</span><span class="pln"> x
+    </span><span class="kwd">def</span><span class="pln"> method</span><span
+                          class="pun">(</span><span
+                          class="pln">self</span><span
+                          class="pun">):</span><span class="pln">
+        </span><span class="kwd">print</span><span class="pun">(</span><span class="pln">self</span><span
+                          class="pun">.</span><span
+                          class="pln">x</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span class="com"># -&gt; 1</span><span
+                          class="pln">
+        </span><span class="kwd">print</span><span class="pun">(</span><span
+                          class="pln">x</span><span
+                          class="pun">)</span><span
+                          class="pln">      </span><span class="com"># -&gt; 0, the global x</span><span
+                          class="pln">
+        </span><span class="kwd">print</span><span class="pun">(</span><span
+                          class="pln">y</span><span
+                          class="pun">)</span><span
+                          class="pln">      </span><span class="com"># -&gt; NameError: global name 'y' is not defined</span><span
+                          class="pln">
+inst </span><span class="pun">=</span><span class="pln"> X</span><span class="pun">()</span><span
+                          class="pln">
+</span><span class="kwd">print</span><span class="pun">(</span><span class="pln">inst</span><span
+                          class="pun">.</span><span
+                          class="pln">x</span><span
+                          class="pun">,</span><span
+                          class="pln"> inst</span><span
+                          class="pun">.</span><span
+                          class="pln">y</span><span
+                          class="pun">,</span><span
+                          class="pln"> inst</span><span
+                          class="pun">.</span><span
+                          class="pln">z</span><span
+                          class="pun">,</span><span
+                          class="pln"> x</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span class="com"># -&gt; (1, 0, 1, 0)</span></code></pre>
+                        <p>Thus unlike in function body, you can reassign
+                          the variable to the same name in class body, to
+                          get a class variable with the same name; further
+                          lookups on this name resolve
+                          to the class variable instead.</p>
+                        <hr>
+                        <p>One of the greater surprises to many newcomers to
+                          Python is that a <code>for</code> loop does not
+                          create a variable scope. In Python 2 the list
+                          comprehensions do not create a scope either
+                          (while generators and dict comprehensions do!)
+                          Instead they leak the value in the function or
+                          the global scope:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="pun">&gt;&gt;&gt;</span><span
+                          class="pln"> </span><span
+                          class="pun">[</span><span
+                          class="pln"> i </span><span
+                          class="kwd">for</span><span
+                          class="pln"> i </span><span
+                          class="kwd">in</span><span class="pln"> range</span><span
+                          class="pun">(</span><span
+                          class="lit">5</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span
+                          class="pun">]</span><span class="pln">
+</span><span class="pun">&gt;&gt;&gt;</span><span class="pln"> i
+</span><span class="lit">4</span></code></pre>
+                        <p>The comprehensions can be used as a cunning (or
+                          awful if you will) way to make modifiable
+                          variables within lambda expressions in Python 2
+                          - a lambda expression does create a variable
+                          scope, like the <code>def</code> statement
+                          would, but within lambda no statements are
+                          allowed. Assignment being a statement in Python
+                          means that no variable assignments in lambda are
+                          allowed, but a list comprehension is an
+                          expression...</p>
+                        <p>This behaviour has been fixed in Python 3 - no
+                          comprehension expressions or generators leak
+                          variables.</p>
+                        <hr>
+                        <p>The global really means the module scope; the
+                          main python module is the <code>__main__</code>;
+                          all imported modules are accessible through the
+                          <code>sys.modules</code> variable; to get access
+                          to <code>__main__</code> one can use <code>sys.modules['__main__']</code>,
+                          or <code>import __main__</code>; it is perfectly
+                          acceptable to access and assign attributes
+                          there; they will show up as variables in the
+                          global scope of the main module.</p>
+                        <hr>
+                        <p>If a name is ever assigned to in the current
+                          scope (except in the class scope), it will be
+                          considered belonging to that scope, otherwise it
+                          will be considered to belonging to any enclosing
+                          scope that assigns to the variable (it might not
+                          be assigned yet, or not at all), or finally the
+                          global scope. If the variable is considered
+                          local, but it is not set yet, or has been
+                          deleted, reading the variable value will result
+                          in <code>UnboundLocalError</code>, which is a
+                          subclass of <code>NameError</code>.</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">5</span><span class="pln">
+</span><span class="kwd">def</span><span class="pln"> foobar</span><span class="pun">()</span><span
+                          class="pln">
+    </span><span class="kwd">print</span><span class="pun">(</span><span class="pln">x</span><span
+                          class="pun">)</span><span
+                          class="pln">  </span><span class="com"># UnboundLocalError!</span><span
+                          class="pln">
+    x </span><span class="pun">+=</span><span class="pln"> </span><span class="lit">1</span><span
+                          class="pln">    </span><span class="com"># assignment here makes x a local variable!</span></code></pre>
+                        <p>The scope can declare that it explicitly wants to
+                          modify the global (module scope) variable, with
+                          the global keyword:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">5</span><span class="pln">
+</span><span class="kwd">def</span><span class="pln"> foobar</span><span class="pun">():</span><span
+                          class="pln">
+    </span><span class="kwd">global</span><span class="pln"> x
+    </span><span class="kwd">print</span><span class="pun">(</span><span class="pln">x</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span class="com"># -&gt; 5</span><span
+                          class="pln">
+    x </span><span class="pun">+=</span><span class="pln"> </span><span class="lit">1</span><span
+                          class="pln">
+foobar</span><span class="pun">()</span><span class="pln">
+</span><span class="kwd">print</span><span class="pun">(</span><span class="pln">x</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span class="com"># -&gt; 6</span></code></pre>
+                        <p>This also is possible even if it was shadowed in
+                          enclosing scope:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">5</span><span class="pln">
+y </span><span class="pun">=</span><span class="pln"> </span><span class="lit">13</span><span
+                          class="pln">
+</span><span class="kwd">def</span><span class="pln"> make_closure</span><span
+                          class="pun">():</span><span class="pln">
+    x </span><span class="pun">=</span><span class="pln"> </span><span class="lit">42</span><span
+                          class="pln">
+    y </span><span class="pun">=</span><span class="pln"> </span><span class="lit">911</span><span
+                          class="pln">
+    </span><span class="kwd">def</span><span class="pln"> func</span><span
+                          class="pun">():</span><span class="pln">
+        </span><span class="kwd">global</span><span class="pln"> x </span><span class="com"># sees the global value</span><span
+                          class="pln">
+        </span><span class="kwd">print</span><span class="pun">(</span><span
+                          class="pln">x</span><span
+                          class="pun">,</span><span
+                          class="pln"> y</span><span
+                          class="pun">)</span><span class="pln">
+        x </span><span class="pun">+=</span><span class="pln"> </span><span
+                          class="lit">1</span><span class="pln">
+    </span><span class="kwd">return</span><span class="pln"> func
+func </span><span class="pun">=</span><span class="pln"> make_closure</span><span
+                          class="pun">()</span><span class="pln">
+func</span><span class="pun">()</span><span class="pln">      </span><span class="com"># -&gt; print 5 911</span><span
+                          class="pln">
+</span><span class="kwd">print</span><span class="pun">(</span><span class="pln">x</span><span
+                          class="pun">,</span><span
+                          class="pln"> y</span><span
+                          class="pun">)</span><span
+                          class="pln"> </span><span class="com"># -&gt; 6 13</span></code></pre>
+                        <p>In python 2 there is no easy way to modify the
+                          value in the enclosing scope; usually this is
+                          simulated by having a mutable value, such as a
+                          list with length of 1:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="kwd">def</span><span class="pln"> make_closure</span><span
+                          class="pun">():</span><span class="pln">
+    value </span><span class="pun">=</span><span class="pln"> </span><span class="pun">[</span><span
+                          class="lit">0</span><span
+                          class="pun">]</span><span class="pln">
+    </span><span class="kwd">def</span><span class="pln"> get_next_value</span><span
+                          class="pun">():</span><span class="pln">
+        value</span><span class="pun">[</span><span class="lit">0</span><span
+                          class="pun">]</span><span
+                          class="pln"> </span><span
+                          class="pun">+=</span><span
+                          class="pln"> </span><span
+                          class="lit">1</span><span class="pln">
+        </span><span class="kwd">return</span><span class="pln"> value</span><span
+                          class="pun">[</span><span
+                          class="lit">0</span><span
+                          class="pun">]</span><span class="pln">
+    </span><span class="kwd">return</span><span class="pln"> get_next_value
+get_next </span><span class="pun">=</span><span class="pln"> make_closure</span><span
+                          class="pun">()</span><span class="pln">
+</span><span class="kwd">print</span><span class="pun">(</span><span
+                          class="pln">get_next</span><span
+                          class="pun">())</span><span
+                          class="pln"> </span><span class="com"># -&gt; 1</span><span
+                          class="pln">
+</span><span class="kwd">print</span><span class="pun">(</span><span
+                          class="pln">get_next</span><span
+                          class="pun">())</span><span
+                          class="pln"> </span><span class="com"># -&gt; 2</span></code></pre>
+                        <p>However in python 3, the <code>nonlocal</code>
+                          comes to rescue:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="kwd">def</span><span class="pln"> make_closure</span><span
+                          class="pun">():</span><span class="pln">
+    value </span><span class="pun">=</span><span class="pln"> </span><span class="lit">0</span><span
+                          class="pln">
+    </span><span class="kwd">def</span><span class="pln"> get_next_value</span><span
+                          class="pun">():</span><span class="pln">
+        </span><span class="kwd">nonlocal</span><span class="pln"> value
+        value </span><span class="pun">+=</span><span class="pln"> </span><span class="lit">1</span><span
+                          class="pln">
+        </span><span class="kwd">return</span><span class="pln"> value
+    </span><span class="kwd">return</span><span class="pln"> get_next_value
+get_next </span><span class="pun">=</span><span class="pln"> make_closure</span><span
+                          class="pun">()</span><span
+                          class="pln"> </span><span class="com"># identical behavior to the previous example.</span></code></pre>
+                        <hr>
+                        <p>Any variable that is not deemed to be local to
+                          the current scope, or any enclosing scope, is a
+                          global variable. A global name is looked up in
+                          the module global dictionary; if not found, the
+                          global is then looked up from the builtins
+                          module; the name of the module was changed from
+                          python 2 to python 3; in python 2 it was <code>__builtin__</code>
+                          and in python 3 it is now called
+                          <code>builtins</code>. If you assign to an
+                          attribute of builtins module, it will be visible
+                          thereafter to any module as a readable global
+                          variable, unless that module shadows them with
+                          its own global variable with the same name.</p>
+                        <hr>
+                        <p>Reading the builtin module can also be useful;
+                          suppose that you want the python 3 style print
+                          function in some parts of file, but other parts
+                          of file still use the <code>print</code>
+                          statement, if your python version is &gt;= 2.6,
+                          you can get the new style function as:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span
+                          class="kwd">import</span><span class="pln"> __builtin__
+print3 </span><span class="pun">=</span><span class="pln"> __builtin__</span><span
+                          class="pun">.</span><span class="pln">__dict__</span><span
+                          class="pun">[</span><span class="str">'print'</span><span
+                          class="pun">]</span></code></pre>
+                        <p>The <code>from __future__ import
+                          print_function</code> actually does not import
+                          the <code>print</code> function anywhere in
+                          Python 2 - instead it just disables the parsing
+                          rules for <code>print</code> statement in the
+                          current module, handling <code>print</code> like
+                          any other variable identifier, and thus allowing
+                          the <code>print</code> the function be looked up
+                          in the builtins.</p>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/23471004"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-23471004">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/23471004/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info ">
+                                <div class="user-action-time">
+                                  <a href="/posts/23471004/revisions"
+                                     title="show all edits to this post">edited
+                                    <span title="2015-10-14 17:40:27Z"
+                                          class="relativetime">Oct 14 '15 at 17:40</span></a>
+                                </div>
+                                <div class="user-gravatar32">
+                                </div>
+                                <div class="user-details">
+                                  <div class="-flair">
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2014-05-05 11:08:54Z"
+                                  class="relativetime">May 5 '14 at 11:08</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/918959/antti-haapala">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/b9051b2917c3d55d55b3d7042fa49f6c?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/918959/antti-haapala">Antti
+                                    Haapala</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 60,058"
+                                                                              dir="ltr">60.1k</span><span
+                                    title="12 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">12</span></span><span
+                                    title="98 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">98</span></span><span
+                                    title="155 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">155</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-23471004" class="comments  dno">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-23471004" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a name="292907"></a>
+            <div id="answer-292907" class="answer" data-answerid="292907" itemscope=""
+                 itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="292907">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">18</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>The scoping rules for Python 2.x have been
+                          outlined already in other answers. The only
+                          thing I would add is that in Python 3.0, there
+                          is also the concept of a non-local scope
+                          (indicated by the 'nonlocal' keyword). This
+                          allows you to access outer scopes directly, and
+                          opens up the ability to do some neat tricks,
+                          including lexical closures (without ugly hacks
+                          involving mutable objects).</p>
+                        <p>EDIT: Here's the <a
+                          href="http://www.python.org/dev/peps/pep-3104/"
+                          rel="noreferrer">PEP</a> with more
+                          information on this.</p>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/292907"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-292907">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/292907/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info ">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2008-11-15 18:52:49Z"
+                                  class="relativetime">Nov 15 '08 at 18:52</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/18866/jeremy-cantrell">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/0b887c77a19c495b68a6772972c23a23?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/18866/jeremy-cantrell">Jeremy
+                                    Cantrell</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 14,168"
+                                                                              dir="ltr">14.2k</span><span
+                                    title="8 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">8</span></span><span
+                                    title="43 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">43</span></span><span
+                                    title="74 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">74</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-292907" class="comments  dno">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-292907" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a name="34094235"></a>
+            <div id="answer-34094235" class="answer" data-answerid="34094235"
+                 itemscope="" itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="34094235">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">15</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>A slightly more complete example of scope:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x </span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">100</span><span class="pln">
+</span><span class="kwd">print</span><span class="pln"> </span><span
+                          class="str">"1. Global x:"</span><span
+                          class="pun">,</span><span class="pln"> x
+</span><span class="kwd">class</span><span class="pln"> </span><span class="typ">Test</span><span
+                          class="pun">(</span><span
+                          class="pln">object</span><span class="pun">):</span><span
+                          class="pln">
+    y </span><span class="pun">=</span><span class="pln"> x
+    </span><span class="kwd">print</span><span class="pln"> </span><span class="str">"2. Enclosed y:"</span><span
+                          class="pun">,</span><span class="pln"> y
+    x </span><span class="pun">=</span><span class="pln"> x </span><span class="pun">+</span><span
+                          class="pln"> </span><span
+                          class="lit">1</span><span class="pln">
+    </span><span class="kwd">print</span><span class="pln"> </span><span class="str">"3. Enclosed x:"</span><span
+                          class="pun">,</span><span class="pln"> x
+    z </span><span class="pun">=</span><span class="pln"> x
+    </span><span class="kwd">def</span><span class="pln"> method</span><span
+                          class="pun">(</span><span
+                          class="pln">self</span><span
+                          class="pun">):</span><span class="pln">
+        </span><span class="kwd">print</span><span class="pln"> </span><span class="str">"4. Enclosed self.x"</span><span
+                          class="pun">,</span><span
+                          class="pln"> self</span><span
+                          class="pun">.</span><span class="pln">x
+        </span><span class="kwd">print</span><span class="pln"> </span><span class="str">"5. Global x"</span><span
+                          class="pun">,</span><span class="pln"> x
+        </span><span class="kwd">try</span><span class="pun">:</span><span class="pln">
+            </span><span class="kwd">print</span><span class="pln"> y
+        </span><span class="kwd">except</span><span class="pln"> </span><span
+                          class="typ">NameError</span><span
+                          class="pun">,</span><span
+                          class="pln"> e</span><span
+                          class="pun">:</span><span class="pln">
+            </span><span class="kwd">print</span><span class="pln"> </span><span
+                          class="str">"6."</span><span
+                          class="pun">,</span><span class="pln"> e
+    </span><span class="kwd">def</span><span class="pln"> method_local_ref</span><span
+                          class="pun">(</span><span
+                          class="pln">self</span><span
+                          class="pun">):</span><span class="pln">
+        </span><span class="kwd">try</span><span class="pun">:</span><span class="pln">
+            </span><span class="kwd">print</span><span class="pln"> x
+        </span><span class="kwd">except</span><span class="pln"> </span><span class="typ">UnboundLocalError</span><span
+                          class="pun">,</span><span
+                          class="pln"> e</span><span
+                          class="pun">:</span><span class="pln">
+            </span><span class="kwd">print</span><span class="pln"> </span><span
+                          class="str">"7."</span><span
+                          class="pun">,</span><span class="pln"> e
+        x </span><span class="pun">=</span><span class="pln"> </span><span
+                          class="lit">200</span><span class="pln">
+        </span><span class="kwd">print</span><span class="pln"> </span><span class="str">"8. Local x"</span><span
+                          class="pun">,</span><span class="pln"> x
+inst </span><span class="pun">=</span><span class="pln"> </span><span class="typ">Test</span><span
+                          class="pun">()</span><span class="pln">
+inst</span><span class="pun">.</span><span class="pln">method</span><span class="pun">()</span><span
+                          class="pln">
+inst</span><span class="pun">.</span><span class="pln">method_local_ref</span><span
+                          class="pun">()</span></code></pre>
+                        <p>output:</p>
+                        <blockquote>
+                          <ol>
+                            <li>Global x: 100</li>
+                            <li>Enclosed y: 100</li>
+                            <li>Enclosed x: 101</li>
+                            <li>Enclosed self.x 101</li>
+                            <li>Global x 100</li>
+                            <li>global name 'y' is not defined</li>
+                            <li>local variable 'x' referenced before
+                              assignment
+                            </li>
+                            <li>Local x 200</li>
+                          </ol>
+                        </blockquote>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/34094235"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-34094235">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/34094235/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info ">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2015-12-04 17:38:37Z"
+                                  class="relativetime">Dec 4 '15 at 17:38</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/226800/brianray">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/bd6a167af632fea802707ce70fffebd1?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/226800/brianray">brianray</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score "
+                                                                              dir="ltr">717</span><span
+                                    title="8 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">8</span></span><span
+                                    title="12 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">12</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-34094235" class="comments ">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr id="comment-66143541" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="cool">3</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">This is great answer. However, I think that the differences between <code>method</code> and <code>method_local_ref</code> should be highlighted. <code>method</code> is able to access the global variable and print it as in <code>5. Global x</code>. But <code>method_local_ref</code> cannot because later on it defines a local variable with that same name. You can test this by removing the <code>x = 200</code> line and see the difference</span>
+                                  –&nbsp;<a
+                                  href="/users/1919237/kiril"
+                                  title="1,489 reputation"
+                                  class="comment-user">kiril</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment66143541_34094235"><span
+                                    title="2016-09-09 10:35:54Z"
+                                    class="relativetime-clean">Sep 9 '16 at 10:35</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-78761696" class="comment ">
+                              <td>
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                        &nbsp;&nbsp;
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">@brianray: What about z?</span>
+                                  –&nbsp;<a
+                                  href="/users/2354685/malik-a-rumi"
+                                  title="340 reputation"
+                                  class="comment-user">Malik
+                                  A. Rumi</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment78761696_34094235"><span
+                                    title="2017-08-27 03:40:10Z"
+                                    class="relativetime-clean">Aug 27 at 3:40</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-34094235" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a name="292002"></a>
+            <div id="answer-292002" class="answer" data-answerid="292002" itemscope=""
+                 itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="292002">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">7</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <p>Python resolves your variables with -- generally
+                          -- three namespaces available. </p>
+                        <blockquote>
+                          <p>At any time during execution, there
+                            are at least three nested scopes whose
+                            namespaces are directly accessible:
+                            the innermost scope, which is searched
+                            first, contains the local names; the
+                            namespaces of any enclosing functions,
+                            which are searched starting with the
+                            nearest enclosing scope; the middle
+                            scope, searched next, contains the
+                            current module's global names; and the
+                            outermost scope (searched last) is the
+                            namespace containing built-in names.</p>
+                        </blockquote>
+                        <p>There are two functions: <code>globals</code> and
+                          <code>locals</code> which show you the contents
+                          two of these namespaces.</p>
+                        <p>Namespaces are created by packages, modules,
+                          classes, object construction and functions.
+                          There aren't any other flavors of
+                          namespaces. </p>
+                        <p>In this case, the call to a function named <code>x</code>
+                          has to be resolved in the local name space or
+                          the global namespace.</p>
+                        <p>Local in this case, is the body of the method
+                          function <code>Foo.spam</code>.</p>
+                        <p>Global is -- well -- global. </p>
+                        <p>The rule is to search the nested local spaces
+                          created by method functions (and nested function
+                          definitions), then search global. That's it.</p>
+                        <p>There are no other scopes. The <code>for</code>
+                          statement (and other compound statements like
+                          <code>if</code> and <code>try</code>) don't
+                          create new nested scopes. Only definitions
+                          (packages, modules, functions, classes and
+                          object instances.)</p>
+                        <p>Inside a class definition, the names are part of
+                          the class namespace. <code>code2</code>, for
+                          instance, must be qualified by the class name.
+                          Generally <code>Foo.code2</code>. However,
+                          <code>self.code2</code> will also work because
+                          Python objects look at the containing class as a
+                          fall-back.</p>
+                        <p>An object (an instance of a class) has instance
+                          variables. These names are in the object's
+                          namespace. They must be qualified by the object.
+                          (<code>variable.instance</code>.) </p>
+                        <p>From within a class method, you have locals and
+                          globals. You say <code>self.variable</code> to
+                          pick the instance as the namespace. You'll note
+                          that <code>self</code> is an argument to every
+                          class member function, making it part of the
+                          local namespace.</p>
+                        <p>See <a
+                          href="http://www.network-theory.co.uk/docs/pytut/PythonScopesandNameSpaces.html"
+                          rel="nofollow noreferrer">Python Scope
+                          Rules</a>, <a
+                          href="https://stackoverflow.com/questions/146359/python-scope">Python
+                          Scope</a>, <a
+                          href="http://showmedo.com/videos/video?name=2800020&amp;fromSeriesID=280"
+                          rel="nofollow noreferrer">Variable Scope</a>.
+                        </p>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/292002"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-292002">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/292002/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  <a href="/posts/292002/revisions"
+                                     title="show all edits to this post">edited
+                                    <span title="2017-05-23 12:10:44Z"
+                                          class="relativetime">May 23 at 12:10</span></a>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/-1/community">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/a007be5a61f6aa8f3e85ae2fc18dd66e?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/-1/community">Community</a><span
+                                  class="mod-flair"
+                                  title="moderator">♦</span>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score "
+                                                                              dir="ltr">1</span><span
+                                    title="1 silver badge"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">1</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2008-11-15 02:03:38Z"
+                                  class="relativetime">Nov 15 '08 at 2:03</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/10661/s-lott">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/c2c732bbf13dc96670b210b3c0c1ead5?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/10661/s-lott">S.Lott</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 286,712"
+                                                                              dir="ltr">287k</span><span
+                                    title="59 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">59</span></span><span
+                                    title="403 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">403</span></span><span
+                                    title="686 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">686</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-292002" class="comments ">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr id="comment-140935" class="comment ">
+                              <td class="comment-actions">
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                                                                <span title="number of 'useful comment' votes received"
+                                                                                      class="cool">4</span>
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">This is out of date. Since 2.1 (7 years ago) there are more than two scopes, as nested functions introduce new scopes, so a function within a function will have access to its local scope, the enclosing functions scope, and global scope (also builtins).</span>
+                                  –&nbsp;<a
+                                  href="/users/9493/brian"
+                                  title="76,719 reputation"
+                                  class="comment-user">Brian</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment140935_292002"><span
+                                    title="2008-11-15 21:24:00Z"
+                                    class="relativetime-clean">Nov 15 '08 at 21:24</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr id="comment-141122" class="comment ">
+                              <td>
+                                <table>
+                                  <tbody>
+                                    <tr>
+                                      <td class=" comment-score">
+                                        &nbsp;&nbsp;
+                                      </td>
+                                      <td>
+                                        &nbsp;
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
+                              <td class="comment-text">
+                                <div style="display: block;"
+                                     class="comment-body">
+                                  <span class="comment-copy">I'm sorry, this is no longer the case. <code>Python has two namespaces available. Global and local-to-something.</code></span>
+                                  –&nbsp;<a
+                                  href="/users/35335/rizwan-kassim"
+                                  title="4,788 reputation"
+                                  class="comment-user">Rizwan
+                                  Kassim</a>
+                                  <span class="comment-date"
+                                        dir="ltr"><a
+                                    class="comment-link"
+                                    href="#comment141122_292002"><span
+                                    title="2008-11-16 00:56:26Z"
+                                    class="relativetime-clean">Nov 16 '08 at 0:56</span></a></span>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-292002" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <a name="292498"></a>
+            <div id="answer-292498" class="answer" data-answerid="292498" itemscope=""
+                 itemtype="http://schema.org/Answer">
+              <table>
+                <tbody>
+                  <tr>
+                    <td class="votecell">
+                      <div class="vote">
+                        <input type="hidden" name="_id_" value="292498">
+                        <a class="vote-up-off"
+                           title="This answer is useful">up vote</a>
+                        <span itemprop="upvoteCount"
+                              class="vote-count-post ">5</span>
+                        <a class="vote-down-off"
+                           title="This answer is not useful">down vote</a>
+                      </div>
+                    </td>
+                    <td class="answercell">
+                      <div class="post-text" itemprop="text">
+                        <blockquote>
+                          <p>Where is x found?</p>
+                        </blockquote>
+                        <p>x is not found as you haven't defined it. :-) It
+                          could be found in code1 (global) or code3
+                          (local) if you put it there.</p>
+                        <p>code2 (class members) aren't visible to code
+                          inside methods of the same class — you would
+                          usually access them using self. code4/code5
+                          (loops) live in the same scope as code3, so if
+                          you wrote to x in there you would be changing
+                          the x instance defined in code3, not making a
+                          new x.</p>
+                        <p>Python is statically scoped, so if you pass
+                          ‘spam’ to another function spam will still have
+                          access to globals in the module it came from
+                          (defined in code1), and any other containing
+                          scopes (see below). code2 members would again be
+                          accessed through self.</p>
+                        <p>lambda is no different to def. If you have a
+                          lambda used inside a function, it's the same as
+                          defining a nested function. In Python 2.2
+                          onwards, nested scopes are available. In this
+                          case you can bind x at any level of function
+                          nesting and Python will pick up the innermost
+                          instance:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="pln">x</span><span
+                          class="pun">=</span><span
+                          class="pln"> </span><span
+                          class="lit">0</span><span class="pln">
+</span><span class="kwd">def</span><span class="pln"> fun1</span><span class="pun">():</span><span
+                          class="pln">
+    x</span><span class="pun">=</span><span class="pln"> </span><span class="lit">1</span><span
+                          class="pln">
+    </span><span class="kwd">def</span><span class="pln"> fun2</span><span
+                          class="pun">():</span><span class="pln">
+        x</span><span class="pun">=</span><span class="pln"> </span><span class="lit">2</span><span
+                          class="pln">
+        </span><span class="kwd">def</span><span class="pln"> fun3</span><span
+                          class="pun">():</span><span class="pln">
+            </span><span class="kwd">return</span><span class="pln"> x
+        </span><span class="kwd">return</span><span class="pln"> fun3</span><span
+                          class="pun">()</span><span class="pln">
+    </span><span class="kwd">return</span><span class="pln"> fun2</span><span
+                          class="pun">()</span><span class="pln">
+</span><span class="kwd">print</span><span class="pln"> fun1</span><span class="pun">(),</span><span
+                          class="pln"> x
+</span><span class="lit">2</span><span class="pln"> </span><span class="lit">0</span></code></pre>
+                        <p>fun3 sees the instance x from the nearest
+                          containing scope, which is the function scope
+                          associated with fun2. But the other x instances,
+                          defined in fun1 and globally, are not
+                          affected.</p>
+                        <p>Before nested_scopes — in Python pre-2.1, and in
+                          2.1 unless you specifically ask for the feature
+                          using a from-future-import — fun1 and fun2's
+                          scopes are not visible to fun3, so S.Lott's
+                          answer holds and you would get the global x:</p>
+                        <pre class="lang-py prettyprint prettyprinted"
+                             style=""><code><span class="lit">0</span><span
+                          class="pln"> </span><span
+                          class="lit">0</span></code></pre>
+                      </div>
+                      <table class="fw">
+                        <tbody>
+                          <tr>
+                            <td class="vt">
+                              <div class="post-menu"><a
+                                href="/a/292498"
+                                title="short permalink to this answer"
+                                class="short-link"
+                                id="link-post-292498">share</a><span
+                                class="lsep">|</span><a
+                                href="/posts/292498/edit"
+                                class="suggest-edit-post"
+                                title="">improve this answer</a>
+                              </div>
+                            </td>
+                            <td align="right" class="post-signature">
+                              <div class="user-info user-hover">
+                                <div class="user-action-time">
+                                  answered <span
+                                  title="2008-11-15 12:44:59Z"
+                                  class="relativetime">Nov 15 '08 at 12:44</span>
+                                </div>
+                                <div class="user-gravatar32">
+                                  <a href="/users/18936/bobince">
+                                    <div class="gravatar-wrapper-32">
+                                      <img src="https://www.gravatar.com/avatar/3f6f1bea81a68b2f1cfe3efbb9be94bc?s=32&amp;d=identicon&amp;r=PG"
+                                           alt="" width="32"
+                                           height="32"></div>
+                                  </a>
+                                </div>
+                                <div class="user-details">
+                                  <a href="/users/18936/bobince">bobince</a>
+                                  <div class="-flair">
+                                                                        <span class="reputation-score"
+                                                                              title="reputation score 401,628"
+                                                                              dir="ltr">402k</span><span
+                                    title="82 gold badges"><span
+                                    class="badge1"></span><span
+                                    class="badgecount">82</span></span><span
+                                    title="525 silver badges"><span
+                                    class="badge2"></span><span
+                                    class="badgecount">525</span></span><span
+                                    title="730 bronze badges"><span
+                                    class="badge3"></span><span
+                                    class="badgecount">730</span></span>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="votecell"></td>
+                    <td>
+                      <div id="comments-292498" class="comments  dno">
+                        <table>
+                          <tbody data-remaining-comments-count="0"
+                                 data-canpost="false" data-cansee="true"
+                                 data-comments-unavailable="false"
+                                 data-addlink-disabled="true">
+                            <tr>
+                              <td></td>
+                              <td></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div id="comments-link-292498" data-rep="50"
+                           data-anon="true">
+                        <a class="js-add-link comments-link disabled-link "
+                           title="Use comments to ask for more information or suggest improvements. Avoid comments like “+1” or “thanks”.">add
+                          a comment</a><span
+                        class="js-link-separator dno">&nbsp;|&nbsp;</span>
+                        <a class="js-show-link comments-link dno"
+                           title="expand to show all comments on this post"
+                           href="#" onclick=""></a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div id="sidebar" class="show-votes" role="complementary" aria-label="sidebar">
+          <div class="module question-stats">
+            <table id="qinfo">
+              <tbody>
+                <tr>
+                  <td>
+                    <p class="label-key">asked</p>
+                  </td>
+                  <td style="padding-left: 10px">
+                    <p class="label-key" title="2008-11-15 01:48:37Z"><b>8
+                      years, 10 months ago</b></p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p class="label-key">viewed</p>
+                  </td>
+                  <td style="padding-left: 10px">
+                    <p class="label-key">
+                      <b>175,994 times</b>
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <p class="label-key">active</p>
+                  </td>
+                  <td style="padding-left: 10px">
+                    <p class="label-key"><b><a href="?lastactivity"
+                                               class="lastactivity-link"
+                                               title="2017-04-23 03:10:44Z">5
+                      months ago</a></b></p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="dfp-tsb" class="dfpad"
+               data-google-query-id="CP32zqLcxdYCFQgzlgodbOcJ4w" data-clc-ready="true"
+               style="display: none;">
+            <div id="google_ads_iframe_/248424177/stackoverflow.com/sb/question-pages_0__container__"
+                 style="border: 0pt none;">
+              <iframe id="google_ads_iframe_/248424177/stackoverflow.com/sb/question-pages_0"
+                      title="3rd party ad content"
+                      name="google_ads_iframe_/248424177/stackoverflow.com/sb/question-pages_0"
+                      width="300" height="250" scrolling="no" marginwidth="0"
+                      marginheight="0" frameborder="0" srcdoc=""
+                      style="border: 0px; vertical-align: bottom;"></iframe>
+            </div>
+          </div>
+          <style></style>
+          <div class="module sidebar-linked">
+            <h4 id="h-linked">Linked</h4>
+            <div class="linked" data-tracker="lq=1">
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/32148442?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">-2</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/32148442/why-name-cursor-is-not-defined-when-pyodbc-cursor-is-in-main?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Why “name 'cursor' is not defined”
+                  when pyodbc cursor is in main()?</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/27321568?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes  default">0</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/27321568/local-variable-referenced-before-assignment?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">“local variable referenced before
+                  assignment”</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/22042619?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">0</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/22042619/what-does-scope-mean?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">What does scope mean</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/12382472?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">2</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/12382472/doubts-about-python-variable-scope?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Doubts about python variable scope</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/28679000?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">2</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/28679000/scope-in-functions-vs-methods?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Scope in Functions vs. Methods</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/34986775?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">3</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/34986775/what-are-the-differences-if-exist-in-variable-scope-between-python-and-c?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">What are the differences (if exist) in
+                  variable scope between Python and C++?</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/30727711?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">0</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/30727711/local-variable-scope-in-java-vs-python?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Local variable scope in Java vs
+                  Python</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/39793453?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">4</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/39793453/class-vs-instance-initialization-in-python?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Class vs instance initialization in
+                  Python</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/21112495?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes  default">-1</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/21112495/why-does-this-works-sometimes-in-python-variable-scope?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">why does this works SOMETIMES in
+                  python ? (variable scope)</a>
+              </div>
+              <div class="spacer">
+                <a href="https://stackoverflow.com/q/22321499?lq=1"
+                   title="Vote score (upvotes - downvotes)">
+                  <div class="answer-votes answered-accepted default">0</div>
+                </a>
+                <a href="https://stackoverflow.com/questions/22321499/why-4-is-returned-for-the-follow-code-in-python?noredirect=1&amp;lq=1"
+                   class="question-hyperlink">Why 4 is returned for the follow code
+                  in Python</a>
+              </div>
+              <div class="spacer more">
+                <a href="https://stackoverflow.com/questions/linked/291978?lq=1">see
+                  more linked questions…</a>
+              </div>
+            </div>
+          </div>
+          <div class="module sidebar-related">
+            <h4 id="h-related">Related</h4>
+            <div class="related js-gps-related-questions" data-tracker="rq=1">
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/146359?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">36</div>
+              </a><a href="https://stackoverflow.com/questions/146359/python-scope?rq=1"
+                     class="question-hyperlink">Python scope</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/370357?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted large">151</div>
+              </a><a href="https://stackoverflow.com/questions/370357/python-variable-scope-error?rq=1"
+                     class="question-hyperlink">Python variable scope error</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/500431?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted extra-large">1530</div>
+              </a><a href="https://stackoverflow.com/questions/500431/what-is-the-scope-of-variables-in-javascript?rq=1"
+                     class="question-hyperlink">What is the scope of variables in
+                JavaScript?</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/2261628?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">7</div>
+              </a><a href="https://stackoverflow.com/questions/2261628/how-to-access-locals-through-stack-trace-mimicking-dynamic-scope?rq=1"
+                     class="question-hyperlink">How to access locals through stack
+                trace? (Mimicking dynamic scope)</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/3611760?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">97</div>
+              </a><a href="https://stackoverflow.com/questions/3611760/scoping-in-python-for-loops?rq=1"
+                     class="question-hyperlink">Scoping in Python 'for' loops</a>
+              </div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/4296677?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">44</div>
+              </a><a href="https://stackoverflow.com/questions/4296677/creating-a-class-within-a-function-and-access-a-function-defined-in-the-containi?rq=1"
+                     class="question-hyperlink">Creating a class within a function and
+                access a function defined in the containing function's scope</a>
+              </div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/5008191?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">1</div>
+              </a><a href="https://stackoverflow.com/questions/5008191/python-question-about-variable-scope-rules?rq=1"
+                     class="question-hyperlink">Python Question about Variable Scope
+                Rules</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/6167923?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">49</div>
+              </a><a href="https://stackoverflow.com/questions/6167923/block-scope-in-python?rq=1"
+                     class="question-hyperlink">Block scope in Python</a></div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/18864041?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">21</div>
+              </a><a href="https://stackoverflow.com/questions/18864041/why-can-functions-in-python-print-variables-in-enclosing-scope-but-cannot-use-th?rq=1"
+                     class="question-hyperlink">Why can functions in Python print
+                variables in enclosing scope but cannot use them in assignment?</a>
+              </div>
+              <div class="spacer js-gps-track"><a
+                href="https://stackoverflow.com/q/33560562?rq=1"
+                title="Vote score (upvotes - downvotes)">
+                <div class="answer-votes answered-accepted default">3</div>
+              </a><a href="https://stackoverflow.com/questions/33560562/python-temporarily-change-variable-scoping-rules?rq=1"
+                     class="question-hyperlink">Python: temporarily change variable
+                scoping rules</a></div>
+            </div>
+          </div>
+          <div id="hot-network-questions" class="module tex2jax_ignore">
+            <h4>
+              <a href="https://stackexchange.com/questions?tab=hot"
+                 class="js-gps-track"
+                 data-gps-track="posts_hot_network.click({ item_type:1, location:11 })">
+                Hot Network Questions
+              </a>
+            </h4>
+            <ul>
+              <li>
+                <div class="favicon favicon-academia"
+                     title="Academia Stack Exchange"></div>
+                <a href="https://academia.stackexchange.com/questions/96470/how-to-deal-with-arrogant-e-mail-of-a-student"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  How to deal with arrogant e-mail of a student
+                </a>
+              </li>
+              <li>
+                <div class="favicon favicon-judaism" title="Mi Yodeya"></div>
+                <a href="https://judaism.stackexchange.com/questions/85821/where-in-the-tanakh-is-there-a-discussion-about-how-to-slaughter-an-animal"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:248 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Where in the TaNa"kh is there a discussion about how to
+                  slaughter an animal?
+                </a>
+              </li>
+              <li>
+                <div class="favicon favicon-scifi"
+                     title="Science Fiction &amp; Fantasy Stack Exchange"></div>
+                <a href="https://scifi.stackexchange.com/questions/170544/why-do-vorlons-live-in-special-gaseous-rooms-in-babylon-5-given-that-kosh-can-b"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why do Vorlons live in special gaseous rooms in Babylon 5, given
+                  that Kosh can be seen walking around the station with ease?
+                </a>
+              </li>
+              <li>
+                <div class="favicon favicon-tex"
+                     title="TeX - LaTeX Stack Exchange"></div>
+                <a href="https://tex.stackexchange.com/questions/393382/is-there-a-latex-implementation-of-bazins-punctuation-marks"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:85 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Is there a LaTeX implementation of Bazin's punctuation marks?
+                </a>
+              </li>
+              <li>
+                <div class="favicon favicon-chemistry"
+                     title="Chemistry Stack Exchange"></div>
+                <a href="https://chemistry.stackexchange.com/questions/83273/why-do-experiments-not-verify-the-law-of-mass-action"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:431 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why do experiments not verify the law of mass action?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-softwareengineering"
+                     title="Software Engineering Stack Exchange"></div>
+                <a href="https://softwareengineering.stackexchange.com/questions/358068/why-are-bit-masks-called-masks"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:131 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why are bit masks called "masks"?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-skeptics"
+                     title="Skeptics Stack Exchange"></div>
+                <a href="https://skeptics.stackexchange.com/questions/39573/is-there-plastic-microfiber-in-83-of-tap-water"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:212 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Is there plastic microfiber in 83% of tap water?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-stackoverflow"
+                     title="Stack Overflow"></div>
+                <a href="https://stackoverflow.com/questions/46446652/is-there-any-point-in-using-override-when-overriding-a-pure-virtual-function"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:1 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Is there any point in using `override` when overriding a pure
+                  virtual function?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-electronics"
+                     title="Electrical Engineering Stack Exchange"></div>
+                <a href="https://electronics.stackexchange.com/questions/331431/is-embedded-c-is-the-same-in-all-mcu"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:135 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Is embedded c is the same in all mcu
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-dba"
+                     title="Database Administrators Stack Exchange"></div>
+                <a href="https://dba.stackexchange.com/questions/187017/sql-server-set-nocount-on-still-returning-data"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:182 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  SQL Server: SET NOCOUNT ON still returning data
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-scifi"
+                     title="Science Fiction &amp; Fantasy Stack Exchange"></div>
+                <a href="https://scifi.stackexchange.com/questions/170473/why-exactly-would-witches-and-wizards-need-to-know-how-to-make-a-love-potion"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:186 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why exactly would witches and wizards need to know how to make a
+                  love potion?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-photo"
+                     title="Photography Stack Exchange"></div>
+                <a href="https://photo.stackexchange.com/questions/92966/what-is-the-resolution-of-a-satellite-image-when-measured-in-centimeters-and-met"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:61 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  What is the resolution of a satellite image when measured in
+                  centimeters and meters?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-history"
+                     title="History Stack Exchange"></div>
+                <a href="https://history.stackexchange.com/questions/40501/transatlantic-zeppelin-trips-usually-took-100-hours-how-did-they-stock-so-muc"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:324 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Transatlantic Zeppelin trips usually took &gt; 100 hours. How
+                  did they stock so much food and where did they sleep?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-english"
+                     title="English Language &amp; Usage Stack Exchange"></div>
+                <a href="https://english.stackexchange.com/questions/411430/is-there-a-word-for-the-joy-a-smart-aleck-feels-when-they-point-out-to-other-peo"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:97 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Is there a word for the joy a smart aleck feels when they point
+                  out to other people how stupid they are?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-money"
+                     title="Personal Finance &amp; Money Stack Exchange"></div>
+                <a href="https://money.stackexchange.com/questions/85508/why-does-the-morningstar-overview-of-vmmxx-say-81-cash"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:93 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why does the Morningstar overview of VMMXX say 81% cash?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-superuser" title="Super User"></div>
+                <a href="https://superuser.com/questions/1253830/does-git-prevent-data-degradation"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:3 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Does Git prevent data degradation
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-unix"
+                     title="Unix &amp; Linux Stack Exchange"></div>
+                <a href="https://unix.stackexchange.com/questions/394670/what-to-do-with-a-circular-dependency-between-two-packages-in-fedora"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:106 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  What to do with a circular dependency between two packages in
+                  Fedora?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-travel"
+                     title="Travel Stack Exchange"></div>
+                <a href="https://travel.stackexchange.com/questions/102518/how-to-escape-hip-hop-cd-giveaway-scam-in-new-york-city"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:273 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  How to escape hip-hop CD giveaway scam in New York City?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-academia"
+                     title="Academia Stack Exchange"></div>
+                <a href="https://academia.stackexchange.com/questions/96571/can-you-apply-for-a-faculty-position-via-a-recruiting-agency"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:415 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Can you apply for a faculty position via a recruiting agency?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-chemistry"
+                     title="Chemistry Stack Exchange"></div>
+                <a href="https://chemistry.stackexchange.com/questions/83281/why-are-electrons-added-in-the-ionic-counting-method"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:431 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why are electrons added in the ionic counting method?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-movies"
+                     title="Movies &amp; TV Stack Exchange"></div>
+                <a href="https://movies.stackexchange.com/questions/80827/why-does-luke-leave-the-wampa-s-cave"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:367 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Why does Luke leave the wampa’s cave?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-unix"
+                     title="Unix &amp; Linux Stack Exchange"></div>
+                <a href="https://unix.stackexchange.com/questions/394695/rename-multiple-files-removing-all-but-one-instance-of-a-pattern"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:106 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Rename multiple files, removing all but one instance of a
+                  pattern
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-gaming" title="Arqade"></div>
+                <a href="https://gaming.stackexchange.com/questions/318491/what-additional-features-do-you-get-after-spending-five-dollars-on-steam"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:41 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  What additional features do you get after spending five dollars
+                  on Steam?
+                </a>
+              </li>
+              <li class="dno js-hidden" style="display: list-item;">
+                <div class="favicon favicon-rpg"
+                     title="Role-playing Games Stack Exchange"></div>
+                <a href="https://rpg.stackexchange.com/questions/107501/player-vs-player-fight"
+                   class="js-gps-track"
+                   data-gps-track="site.switch({ item_type:11, target_site:122 }); posts_hot_network.click({ item_type:2, location:11 })">
+                  Player vs. Player Fight
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
+<!--
+    This file is downloaded from
+     https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
+ -->

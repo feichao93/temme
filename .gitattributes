@@ -1,0 +1,4 @@
+__tests__/testHtml/* linguist-vendored
+playground/html/example.html linguist-vendored
+assets/**/* linguist-documentation
+build/**/* linguist-generated
