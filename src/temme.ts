@@ -1,10 +1,19 @@
-import * as pegjs from 'pegjs'
 import * as cheerio from 'cheerio'
-import grammar from './grammar'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 import { defaultFilterMap, defineFilter, FilterFn, FilterFnMap } from './filters'
 
-export { cheerio, defineFilter }
+declare const WEBPACK_BUILD: boolean
+let temmeParser: any
+if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
+  temmeParser = require('./grammar.pegjs')
+} else {
+  const fs = require('fs')
+  const pegjs = require('pegjs')
+  const source = fs.readFileSync('./src/grammar.pegjs', 'utf8')
+  temmeParser = pegjs.generate(source)
+}
+
+export { cheerio, defineFilter, temmeParser, defaultFilterMap, FilterFn, FilterFnMap, makeGrammarErrorMessage }
 
 export const errors = {
   // funcNameNotSupported(f: string) {
@@ -19,8 +28,6 @@ const defaultCaptureKey = '@@default-capture@@'
 const ignoreCaptureKey = '@@ignore-capture@@'
 
 const ignoreCapture: Capture<string> = { capture: ignoreCaptureKey, filterList: [] }
-
-export const temmeParser = pegjs.generate(grammar)
 
 interface Dict<V> {
   [key: string]: V

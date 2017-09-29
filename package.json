@@ -4,12 +4,15 @@
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/temme.js",
   "types": "build/temme.d.ts",
+  "module": "src/temme.ts",
   "repository": "https://github.com/shinima/temme.git",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "scripts": {
     "start": "tsc --watch",
-    "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "build": "webpack",
+    "build-playground": "webpack --config webpack.playground.config.ts && cp playground/html/* playground-build"
   },
   "jest": {
     "transform": {
@@ -26,17 +29,24 @@
   },
   "dependencies": {
     "@types/cheerio": "^0.22.1",
-    "@types/pegjs": "^0.10.0",
-    "cheerio": "^1.0.0-rc.1",
-    "pegjs": "^0.10.0"
+    "cheerio": "^1.0.0-rc.1"
   },
   "devDependencies": {
     "@types/jest": "^20.0.2",
-    "@types/node": "^7.0.31",
+    "@types/node": "^8.0.31",
+    "@types/pegjs": "^0.10.0",
+    "@types/webpack": "^3.0.12",
+    "awesome-typescript-loader": "^3.2.3",
+    "babel-minify-webpack-plugin": "^0.2.0",
     "coveralls": "^2.13.1",
     "jest": "^20.0.4",
+    "lodash.debounce": "^4.0.8",
     "node-fetch": "^1.7.1",
+    "pegjs": "^0.10.0",
+    "pegjs-loader": "^0.5.4",
     "ts-jest": "^20.0.7",
-    "typescript": "^2.4.1"
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.1",
+    "webpack": "^3.6.0"
   }
 }

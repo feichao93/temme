@@ -1,0 +1,41 @@
+const MinifyPlugin = require('babel-minify-webpack-plugin')
+import * as webpack from 'webpack'
+import * as path from 'path'
+
+const config: webpack.Configuration = {
+  context: __dirname,
+  entry: './playground/index.js',
+  devtool: false,
+  target: 'web',
+  output: {
+    path: path.resolve(__dirname, 'playground-build'),
+    filename: 'bundle.js',
+  },
+
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+  },
+
+  module: {
+    rules: [
+      {
+        test: /\.pegjs$/,
+        loader: 'pegjs-loader'
+      },
+      {
+        test: /\.tsx?$/,
+        loader: 'awesome-typescript-loader',
+        exclude: /node_modules/,
+      },
+    ]
+  },
+
+  plugins: [
+    new webpack.DefinePlugin({
+      WEBPACK_BUILD: JSON.stringify(true),
+    }),
+    new MinifyPlugin(),
+  ],
+}
+
+export default config

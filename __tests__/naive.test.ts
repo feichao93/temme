@@ -1,4 +1,4 @@
-import { default as temme, cheerio } from '..'
+import { default as temme, cheerio } from '../src/temme'
 
 test('empty selector', () => {
   const html = `<p>A B C D</p>`

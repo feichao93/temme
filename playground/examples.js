@@ -78,7 +78,7 @@ export default async function loadExamples(exampleName, htmlEditor, selectorEdit
   if (!example) {
     alert('Invalid example name')
   }
-  const response = await fetch('./examples/example.html')
+  const response = await fetch('./example.html')
   if (response.ok) {
     const html = await response.text()
     htmlEditor.setValue(html)

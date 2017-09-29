@@ -1,4 +1,4 @@
-import { default as temme, defineFilter } from '..'
+import { default as temme, defineFilter } from '../src/temme'
 
 test('filter `pack`', () => {
   const html = `

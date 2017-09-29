@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "outDir": "build",
     "module": "commonjs",
     "target": "es2017",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "declaration": true,
+    "declarationDir": "build"
   },
   "include": [
     "src/**/*"

@@ -1,4 +1,4 @@
-import { temmeParser, TemmeSelector } from '..'
+import { temmeParser, TemmeSelector } from '../src/temme'
 
 test('parse empty selector', () => {
   expect(temmeParser.parse('')).toBeNull()
@@ -58,7 +58,7 @@ test('ignore JavaScript comments', () => {
     // single line comment
     /* multi
       line commnet */
-      /* pre*/div{$} // after 
+      /* pre*/div{$} // after
   `
   const s2 = 'div{$}'
   expect(temmeParser.parse(s1))

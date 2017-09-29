@@ -1,4 +1,4 @@
-import temme, { temmeParser, cheerio } from '../..'
+import temme, { temmeParser, cheerio } from '../src/temme'
 import debounce from 'lodash.debounce'
 import loadExamples from './examples'
 
@@ -66,7 +66,7 @@ function measureExecutionTime(fn) {
   const result = fn()
   const end = performance.now()
   const time = end - start
-  return { time, result }
+  return {time, result}
 }
 
 function computeResultAndDisplay(html, selectorString, outputEditor) {
@@ -74,7 +74,7 @@ function computeResultAndDisplay(html, selectorString, outputEditor) {
     try {
       const selector = parseSelector(selectorString)
       if (html) {
-        const { time, result: json } = measureExecutionTime(() => {
+        const {time, result: json} = measureExecutionTime(() => {
           const cheerioStatic = parseHtml(html)
           return temme(cheerioStatic, selector)
         })

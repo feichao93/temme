@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = `{
+{
   const defaultCaptureKey = '@@default-capture@@'
   const ingoreCaptureKey = '@@ignore-capture@@'
 }
@@ -207,14 +205,14 @@ d 'digit'
   = [0-9]
 
 LineTerminator
-  = [\\n\\r\\u2028\\u2029]
+  = [\n\r\u2028\u2029]
 
 LineTerminatorSequence 'end of line'
-  = '\\n'
-  / '\\r\\n'
-  / '\\r'
-  / '\\u2028'
-  / '\\u2029'
+  = '\n'
+  / '\r\n'
+  / '\r'
+  / '\u2028'
+  / '\u2029'
 
 Comment 'comment'
   = MultiLineComment
@@ -233,17 +231,16 @@ SourceCharacter
   = .
 
 // Separator, Space
-Zs = [\\u0020\\u00A0\\u1680\\u2000-\\u200A\\u202F\\u205F\\u3000]
+Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]
 
 WhiteSpace 'whitespace'
-  = "\\t"
-  / "\\v"
-  / "\\f"
-  / " "
-  / "\\u00A0"
-  / "\\uFEFF"
+  = '\t'
+  / '\v'
+  / '\f'
+  / ' '
+  / '\u00A0'
+  / '\uFEFF'
   / Zs
 
 __
   = (WhiteSpace / LineTerminatorSequence / Comment)*
-`;

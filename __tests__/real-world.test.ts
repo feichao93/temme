@@ -1,4 +1,4 @@
-import temme, { TemmeSelector, temmeParser } from '..'
+import temme, { TemmeSelector, temmeParser } from '../src/temme'
 import * as path from 'path'
 import * as fs from 'fs'
 
