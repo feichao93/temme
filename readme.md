@@ -56,11 +56,11 @@ When use value-capture, the result will be an object containing the fields that 
 
 * **HTML preview**
 
-![value-capture-preview](/docs/value-capture-preview.jpg)
+![value-capture-preview](/assets/value-capture-preview.jpg)
 
 * **DOM structure**
 
-![value-capture-dom-structure](/docs/value-capture-dom-structure.jpg)
+![value-capture-dom-structure](/assets/value-capture-dom-structure.jpg)
 
 * **Normal CSS selector** `#question-header .question-hyperlink`
 * **Temme selector** `#question-header .question-hyperlink[href=$url]{$title}`
@@ -81,25 +81,25 @@ In temme, you could use `@foo` to make an array-capture. You place `@foo` after 
 
 * **HTML preview** Below is what an answer looks like. In the page there are several answers of the same structure.
 
-![array-capture-preview](/docs/array-capture-preview.jpg)
+![array-capture-preview](/assets/array-capture-preview.jpg)
 
 * **DOM structure**
 
-![array-capture-dom-structure](/docs/array-capture-dom-structure.jpg)
+![array-capture-dom-structure](/assets/array-capture-dom-structure.jpg)
 
 * **Selectors and result**
 
-![array-capture-selectors-and-result](/docs/array-capture-selectors-and-result.jpg)
+![array-capture-selectors-and-result](/assets/array-capture-selectors-and-result.jpg)
 
 * **Default array capture**
 
-![default-array-capture-selectors-and-result](/docs/default-array-capture-selectors-and-result.jpg)
+![default-array-capture-selectors-and-result](/assets/default-array-capture-selectors-and-result.jpg)
 
 # Recursive array-captures
 
 Array-capture can be recursive. Just place `@foo` within another array-capture's children part. For example, in stackoverflow.com, one question has several answers and each answer has several comments. We could use the following temme selector to capture an array of arrays(answers) of items(comments).
 
-![array-of-arrays](/docs/array-of-arrays.jpg)
+![array-of-arrays](/assets/array-of-arrays.jpg)
 
 # Parent Reference `&`
 
