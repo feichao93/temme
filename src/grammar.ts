@@ -76,7 +76,7 @@ FilterArg = JSString / JSNumber
 
 // 普通CSS选择器, 包含多个部分
 CssSelector
-  = head:CssSelectorPart tail:(CssPartSep part:CssSelectorPart { return part })* {
+  = head:CssSelectorSlice tail:(CssPartSep part:CssSelectorSlice { return part })* {
     return [head].concat(tail)
   }
 
@@ -84,7 +84,11 @@ CssPartSep 'css-selector-part-seperator'
   = s+
   / & '>' s*
 
-CssSelectorPart 'css-selector-part'
+CssSelectorSlice 'css-selector-slice'
+  // css-selector-slice表示常规css selector中的一个片段
+  // 格式大概如下: >tag#id.cls1.cls2[attr1=value1 attr2=$capture2]{$content}( <children> )
+  // 一个css-selector-slice中必须包含下面的一个部分:
+  // tag, id, classList, attrList
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
   = direct:('>' s*)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
@@ -96,6 +100,10 @@ CssSelectorPart 'css-selector-part'
   }
   / direct:('>' s*)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
+    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+  }
+  / direct:('>' s*)? tag:Tag? id:Id? classList:Class*
+    attrList:AttrSelector content:Content? {
     return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
   }
 
