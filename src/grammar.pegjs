@@ -10,7 +10,7 @@ Start
 
 MultipleSelector
   = head:Selector __ tail:(',' __ selector:Selector { return selector })*
-  __ ','? // optional extra comma
+  OptionalExtraComma
   {
     return [head].concat(tail)
   }
@@ -21,18 +21,24 @@ Selector = SelfSelector / NormalSelector / AssignmentSelector
 // 自身选择器, 以 & 为开头的选择器
 SelfSelector
   = '&' id:Id? classList:Class* attrList:AttrSelector? content:Content? {
-    return { type: 'self', id, classList, attrList, content }
+    return {
+      type: 'self',
+      id,
+      classList: classList || [],
+      attrList: attrList || [],
+      content: content || [],
+    }
   }
 
 // 普通的选择器
 NormalSelector
-  = css:CssSelector __ nc:NameAndChildren? {
+  = css:CssSliceList __ nc:ArrayCaptureNameAndChildrenSelectors? {
     return {
       type: 'normal',
       css,
       name: nc && nc.name,
-      filterList: nc && nc.filterList,
-      children: nc && nc.children,
+      filterList: nc && nc.filterList || [],
+      children: nc && nc.children || [],
     }
   }
 
@@ -46,57 +52,60 @@ AssignmentSelector
     }
   }
 
-NameAndChildren
-  = name:CssSelectorName filterList:FilterList __ children:ParenthesizedChildren {
+ArrayCaptureNameAndChildrenSelectors
+  = name:ArrayCaptureName filterList:Filter* __ children:ParenthesizedChildrenSelectors {
     return { name, filterList, children }
   }
-  // 注意下面是 s+ 而不是 __
-  / name:CssSelectorName filterList:FilterList __ singleChild:Selector {
-    return { name, filterList, children: singleChild ? [singleChild] : null }
+  / name:ArrayCaptureName filterList:Filter* __ singleChild:Selector {
+    return { name, filterList, children: singleChild ? [singleChild] : [] }
   }
-  / name:CssSelectorName filterList:FilterList {
-    // TODO this error info does not help at all
-    error('After @-sign there must be valid children selectors. You need to parenthesize the children selectors, or you need a blank after @-sign')
+  / name:ArrayCaptureName filterList:Filter* {
+    error() // TODO
   }
 
-CssSelectorName
+ArrayCaptureName
   = '@' captureKey:IdentifierName? {
     return captureKey || defaultCaptureKey
   }
 
-ParenthesizedChildren
-  // TODO 支持空孩子
-  = '('
-    __ head:Selector __ tail:(',' __ s:Selector { return s })*
-    __ ','? // optimal extra comma
+ParenthesizedChildrenSelectors
+  = '(' __ ')' {
+    return []
+  }
+  / '('
+    __ head:Selector tail:(__ ',' __ s:Selector { return s })*
+    OptionalExtraComma
     __ ')' {
     return [head].concat(tail)
   }
 
-FilterList = filterList:Filter*
-
 Filter
-  = '|' name:IdentifierName args:('(' __ args:FilterArgList __ ')' { return args })? {
+  = '|' name:IdentifierName args:FilterArgs? {
     return { name, args: args || [] }
   }
 
-FilterArgList
-  = head:JSLiteral tail:(__ ',' __ arg:JSLiteral { return arg })*
-    __ ','? {
+FilterArgs
+  = '(' __ ')' {
+    return []
+  }
+  / '('
+    __ head:JSLiteral tail:(__ ',' __ arg:JSLiteral { return arg })*
+    OptionalExtraComma
+    __ ')' {
     return [head].concat(tail)
   }
 
 // 普通CSS选择器, 包含多个部分
-CssSelector
-  = head:CssSelectorSlice tail:(CssPartSep part:CssSelectorSlice { return part })* {
+CssSliceList
+  = head:CssSlice tail:(CssPartSep part:CssSlice { return part })* {
     return [head].concat(tail)
   }
 
 CssPartSep 'css-selector-part-seperator'
   = WhiteSpace+
-  / & '>' __
+  / & '>' __ // TODO 这里的selector是否有问题??
 
-CssSelectorSlice 'css-selector-slice'
+CssSlice 'css-selector-slice'
   // css-selector-slice表示常规css selector中的一个片段
   // 格式大概如下: >tag#id.cls1.cls2[attr1=value1 attr2=$capture2]{$content}( <children> )
   // 一个css-selector-slice中必须包含下面的一个部分:
@@ -104,31 +113,34 @@ CssSelectorSlice 'css-selector-slice'
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
   = direct:('>' __)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
-    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' __)? tag:Tag? id:Id classList:Class*
     attrList:AttrSelector? content:Content? {
-    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' __)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
-    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' __)? tag:Tag? id:Id? classList:Class*
     attrList:AttrSelector content:Content? {
-    return { direct: Boolean(direct), tag, id, classList: classList.length ? classList : null, attrList, content }
+    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
 
 Content
-  = '{'
+  = '{' __ '}' {
+    return []
+  }
+  / '{'
     __ single:ValueCapture
-    __ ','? // optimal extra comma
+    OptionalExtraComma
     __ '}' {
     return [{ funcName: 'text', args: [single] }]
   }
   / '{'
     __ head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
-    __ ','? // optimal extra comma
+    OptionalExtraComma
     __ '}' {
     return [head].concat(tail)
   }
@@ -137,7 +149,7 @@ ContentPart
   = funcName:Name
     __ '('
     __ firstArg:ContentPartArg __ restArgs:(',' __ arg:ContentPartArg { return arg })*
-    __ ','? // optimal extra comma
+    OptionalExtraComma
     __ ')' {
     return { funcName, args: [firstArg].concat(restArgs) }
   }
@@ -145,10 +157,10 @@ ContentPart
 ContentPartArg = JSLiteral / ValueCapture
 
 ValueCapture
-  = '$' capture:IdentifierName filterList:FilterList {
+  = '$' capture:IdentifierName filterList:Filter* {
     return { capture, filterList }
   }
-  / '$' filterList:FilterList {
+  / '$' filterList:Filter* {
     return { capture: defaultCaptureKey, filterList }
   }
   / '_' { return { capture: ingoreCaptureKey, filterList: [] } }
@@ -156,7 +168,7 @@ ValueCapture
 AttrSelector 'attribute-selector'
   = '[' __
     head:AttrPart tail:(AttrPartSep part:AttrPart { return part })*
-    __ ','? // optimal extra comma
+    OptionalExtraComma
     __ ']' {
     return [head].concat(tail)
   }
@@ -193,10 +205,15 @@ Name
 CssChar
   = [_a-z0-9-]i
 
+OptionalExtraComma 'optional-extra-comma'
+  = (__ ',')?
+
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
     return head + tail.join('')
   }
+
+// TODO css-identifier-name
 
 JSLiteral
   = NullLiteral
@@ -284,7 +301,6 @@ IdentifierStart
   = UnicodeLetter
   / "$"
   / "_"
-  / "\\" sequence:UnicodeEscapeSequence { return sequence; }
 
 UnicodeCombiningMark
   = Mn
@@ -297,14 +313,6 @@ UnicodeConnectorPunctuation
   = Pc
 
 UnicodeLetter = Lu / Ll / Lt / Lm / Lo / Nl
-
-UnicodeEscapeSequence
-  = 'u' digits:$(HexDigit HexDigit HexDigit HexDigit) {
-      return String.fromCharCode(parseInt(digits, 16))
-    }
-
-HexDigit
-  = [0-9a-f]i
 
 StringLiteral "string"
   = '"' chars:DoubleStringCharacter* '"' {
@@ -320,33 +328,24 @@ DecimalDigit
 NonZeroDigit
   = [1-9]
 
+HexDigit
+  = [0-9a-f]i
+
 DoubleStringCharacter
   = !('"' / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
-  / LineContinuation
 
 SingleStringCharacter
   = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
-  / LineContinuation
 
-LineContinuation
-  = "\\" LineTerminatorSequence { return ""; }
-
-EscapeSequence
+EscapeSequence // TODO 字符转义感觉可以去掉
   = CharacterEscapeSequence
   / "0" !DecimalDigit { return "\0"; }
-  / HexEscapeSequence
-  / UnicodeEscapeSequence
 
 CharacterEscapeSequence
   = SingleEscapeCharacter
   / NonEscapeCharacter
-
-HexEscapeSequence
-  = "x" digits:$(HexDigit HexDigit) {
-      return String.fromCharCode(parseInt(digits, 16));
-    }
 
 SingleEscapeCharacter
   = "'"

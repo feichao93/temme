@@ -26,12 +26,12 @@ test('parse `div`', () => {
       direct: false,
       tag: 'div',
       id: null,
-      classList: null,
-      attrList: null,
-      content: null,
+      classList: [],
+      attrList: [],
+      content: [],
     }],
-    children: null,
-    filterList: null,
+    children: [],
+    filterList: [],
   }]
   expect(parseResult).toEqual(expectedResult)
 })
@@ -46,7 +46,7 @@ test('parse value capture', () => {
     css: [
       {
         direct: false, tag: null, id: 'question-header',
-        classList: null, attrList: null, content: null,
+        classList: [], attrList: [], content: [],
       },
       {
         direct: false, tag: null, id: null,
@@ -55,8 +55,8 @@ test('parse value capture', () => {
         content: [{ funcName: 'text', args: [{ capture: 'title', filterList: [] }] }],
       }
     ],
-    children: null,
-    filterList: null,
+    children: [],
+    filterList: [],
   }]
   expect(parseResult).toEqual(expectedParseResult)
 })
@@ -84,4 +84,46 @@ test('ignore JavaScript comments', () => {
     .toEqual(temmeParser.parse(s4))
 })
 
-// todo test filterList...
+test('filters', () => {
+  expect(temmeParser.parse('html{$h|f1|f2}')).toEqual([{
+    type: 'normal',
+    css: [{
+      direct: false, tag: 'html', id: null,
+      classList: [],
+      attrList: [],
+      content: [{
+        funcName: 'text',
+        args: [{
+          capture: 'h',
+          filterList: [{ name: 'f1', args: [] }, { name: 'f2', args: [] }]
+        }],
+      }],
+    }],
+    name: null,
+    filterList: [],
+    children: [],
+  }])
+
+  expect(temmeParser.parse(`html{$h|f(1,null,'3')|g()|h(false,true,'234')}`)).toEqual([{
+    type: 'normal',
+    css: [{
+      direct: false, tag: 'html', id: null,
+      classList: [],
+      attrList: [],
+      content: [{
+        funcName: 'text',
+        args: [{
+          capture: 'h',
+          filterList: [
+            { name: 'f', args: [1, null, '3'] },
+            { name: 'g', args: [] },
+            { name: 'h', args: [false, true, '234'] },
+          ],
+        }],
+      }],
+    }],
+    name: null,
+    filterList: [],
+    children: [],
+  }])
+})
