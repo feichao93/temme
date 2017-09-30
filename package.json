@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.2.0",
+  "version": "0.3.0-SNAPSHOT",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/temme.js",
   "types": "build/temme.d.ts",
@@ -9,7 +9,6 @@
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "scripts": {
-    "start": "tsc --watch",
     "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "build": "webpack",
     "build-playground": "webpack --config webpack.playground.config.ts && cp playground/html/* playground-build"

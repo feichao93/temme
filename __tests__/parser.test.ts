@@ -6,10 +6,21 @@ test('parse empty selector', () => {
   expect(temmeParser.parse('\t\t  \n\n')).toBeNull()
 })
 
+test('parse value assignment', () => {
+  const expected: TemmeSelector[] = [{
+    type: 'assignment',
+    capture: { capture: 'a', filterList: [] },
+    value: '123',
+  }]
+  expect(temmeParser.parse(`$a="123"`)).toEqual(expected)
+  expect(temmeParser.parse(`$a = '123'`)).toEqual(expected)
+  expect(temmeParser.parse(`$a   \t\n= '123'`)).toEqual(expected)
+})
+
 test('parse `div`', () => {
   const parseResult: TemmeSelector[] = temmeParser.parse('div')
   const expectedResult: TemmeSelector[] = [{
-    self: false,
+    type: 'normal',
     name: null,
     css: [{
       direct: false,
@@ -30,7 +41,7 @@ test('parse value capture', () => {
 
   const parseResult: TemmeSelector[] = temmeParser.parse(selector)
   const expectedParseResult: TemmeSelector[] = [{
-    self: false,
+    type: 'normal',
     name: null,
     css: [
       {

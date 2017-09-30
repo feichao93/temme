@@ -2,6 +2,10 @@ import * as cheerio from 'cheerio'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 import { defaultFilterMap, defineFilter, FilterFn, FilterFnMap } from './filters'
 
+/* 准备temmeParser.
+  在webpack build的时候, 用pegjs-loader来载入parser
+  在jest的时候, 使用fs来载入语法文件, 然后用pegjs程序生成parser
+*/
 declare const WEBPACK_BUILD: boolean
 let temmeParser: any
 if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
@@ -27,28 +31,40 @@ export const errors = {
 const defaultCaptureKey = '@@default-capture@@'
 const ignoreCaptureKey = '@@ignore-capture@@'
 
+// TODO filterList: [] -> null
 const ignoreCapture: Capture<string> = { capture: ignoreCaptureKey, filterList: [] }
 
-interface Dict<V> {
+export interface Dict<V> {
   [key: string]: V
 }
 
-export type TemmeSelector = SelfSelector | NonSelfSelector
+export type JSLiteral = string | number | boolean | RegExp | null | undefined
 
-export interface NonSelfSelector {
-  self: false
+export type TemmeSelector = SelfSelector | NormalSelector | AssignmentSelector
+
+export interface NormalSelector {
+  type: 'normal'
   name: string
-  css: CssPart[]
+  css: CssSlice[]
   children: TemmeSelector[]
   filterList: Filter[]
 }
 
 export interface SelfSelector {
-  self: true
+  type: 'self'
   id: string
   classList: string[]
   attrList: CssAttr[]
   content: ContentPart[]
+}
+/**
+ * 赋值选择器. 该选择器执行的时候, 会在结果中添加指定的值到指定的字段
+ * 例如`$a = 123`, 其执行结果为 { a: 123 }
+ */
+export interface AssignmentSelector {
+  type: 'assignment'
+  capture: Capture<string>
+  value: JSLiteral
 }
 
 export interface CssAttr {
@@ -58,7 +74,7 @@ export interface CssAttr {
 
 export type CaptureResult = any
 
-export interface CssPart {
+export interface CssSlice {
   direct: boolean
   tag: string
   id: string
@@ -74,7 +90,7 @@ export type ContentPart = {
 export type ContentPartArg = string | Capture<string>
 export type FuncName = 'text' | 'html' | 'node' | 'contains'
 
-export type Capture<T> = {
+export interface Capture<T> {
   capture: T
   filterList: Filter[]
 }
@@ -94,8 +110,8 @@ function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioSta
   return typeof (<CheerioStatic>arg).root === 'function'
 }
 
-function containsAnyCaptureInAttrListOrContent(cssParts: CssPart[]) {
-  return cssParts.some(part => {
+function containsAnyCaptureInAttrListOrContent(slices: CssSlice[]) {
+  return slices.some(part => {
     const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string')
     if (hasAttrCapture) {
       return true
@@ -110,7 +126,8 @@ function containsAnyCaptureInAttrListOrContent(cssParts: CssPart[]) {
 
 // notice 递归的检查 selector是否合法
 function check(selector: TemmeSelector) {
-  if (selector.self === true) {
+  if (selector.type === 'self') {
+  } else if (selector.type === 'assignment') {
   } else {
     const cssPartsLength = selector.css.length
     const leadingParts = selector.css.slice(0, cssPartsLength - 1)
@@ -136,8 +153,8 @@ export function mergeResult<T, S>(target: T, source: S): T & S {
 }
 
 export default function temme(html: string | CheerioStatic | CheerioElement,
-                              selector: string | TemmeSelector[],
-                              extraFilters: { [key: string]: FilterFn } = {}) {
+  selector: string | TemmeSelector[],
+  extraFilters: { [key: string]: FilterFn } = {}) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -169,7 +186,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]) {
     const result: CaptureResult = {}
     selectorArray.map(selector => {
-      if (selector.self === false) {
+      if (selector.type === 'normal') {
         const cssSelector = makeNormalCssSelector(selector.css)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
@@ -184,7 +201,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         } else if (selector.name) {
           result[selector.name] = applyFilters([], selector.filterList)
         }
-      } else { // self === true
+      } else if (selector.type === 'self') {
         const cssSelector = makeNormalCssSelector([{
           direct: false,
           tag: '',
@@ -197,6 +214,8 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
           const capturer = makeSelfCapturer(selector)
           mergeResult(result, capturer(cntCheerio))
         }
+      } else { // selector.type === 'assignment'
+        result[selector.capture.capture] = applyFilters(selector.value, selector.capture.filterList)
       }
     })
     delete result[ignoreCaptureKey]
@@ -354,7 +373,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   }
 
   // todo makeValueCapturer命名是不是有问题???
-  function makeValueCapturer(cssPartArray: CssPart[]) {
+  function makeValueCapturer(cssPartArray: CssSlice[]) {
     return (node: Cheerio) => {
       const result: CaptureResult = {}
       // notice 目前只能在最后一个part中进行value-capture
@@ -386,7 +405,7 @@ function hasConsecutiveValueCapture(args: ContentPartArg[]) {
 }
 
 /** 根据CssPart数组构造标准的css selector */
-function makeNormalCssSelector(cssPartArray: CssPart[]) {
+function makeNormalCssSelector(cssPartArray: CssSlice[]) {
   const seperator = ' '
   const result: string[] = []
   cssPartArray.forEach((cssPart, index) => {

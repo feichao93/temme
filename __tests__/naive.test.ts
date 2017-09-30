@@ -85,3 +85,46 @@ test('attr predicate and value capture in attribute', () => {
     country: 'China',
   })
 })
+
+test('basic assignment selector', () => {
+  expect(temme('', "$str = '123'")).toEqual({
+    str: '123',
+  })
+  expect(temme('', '$str = "double-quote"')).toEqual({
+    str: 'double-quote',
+  })
+  expect(temme('', '$num = 1234')).toEqual({
+    num: 1234,
+  })
+  expect(temme('', '$nil = null')).toEqual({
+    nil: null,
+  })
+  expect(temme('', '$T = true, $F = false')).toEqual({
+    T: true,
+    F: false,
+  })
+})
+
+test('assignment in array capture', () => {
+  const html = `
+  <ul>
+    <li>apple</li>
+    <li>banana</li>
+    <li>cherry</li>
+    <li>pear</li>
+    <li>watermelon</li>
+  </ul>
+  `
+  const selector = `
+    li@ (
+      $foo = 'bar',
+    ),
+  `
+  expect(temme(html, selector)).toEqual([
+    { foo: 'bar' },
+    { foo: 'bar' },
+    { foo: 'bar' },
+    { foo: 'bar' },
+    { foo: 'bar' },
+  ])
+})
