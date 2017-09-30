@@ -1,6 +1,7 @@
-[![Build Status](https://travis-ci.org/shinima/temme.svg?branch=master)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://coveralls.io/repos/github/shinima/temme/badge.svg?branch=master)](https://coveralls.io/github/shinima/temme?branch=master)
+[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme)
 
-**CAUTION** Temme is in an early stage, so the syntax may change in the future.
+
+**CAUTION** Temme is in an early stage, so the syntax may change in the future. Doc is **outdated** now.
 
 # Temme
 
