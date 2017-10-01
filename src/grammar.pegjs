@@ -31,7 +31,7 @@ SelfSelector
 
 // 普通的选择器
 NormalSelector
-  = css:CssSliceList __ nc:ArrayCaptureNameAndChildrenSelectors? {
+  = css:SliceList __ nc:ArrayCaptureNameAndChildrenSelectors? {
     return {
       type: 'normal',
       css,
@@ -95,16 +95,16 @@ FilterArgs
   }
 
 // 普通CSS选择器, 包含多个部分
-CssSliceList
-  = head:CssSlice tail:(CssPartSep part:CssSlice { return part })* {
+SliceList 'normal css selector'
+  = head:Slice tail:(SliceSep part:Slice { return part })* {
     return [head].concat(tail)
   }
 
-CssPartSep 'css-selector-part-seperator'
+SliceSep 'css-selector-part-seperator'
   = WhiteSpace+
   / &('>' _)
 
-CssSlice 'css-selector-slice'
+Slice 'part of css selector'
   // css-selector-slice表示常规css selector中的一个片段
   // 格式大概如下: >tag#id.cls1.cls2[attr1=value1 attr2=$capture2]{$content}( <children> )
   // 一个css-selector-slice中必须包含下面的一个部分:
@@ -145,7 +145,7 @@ Content
   }
 
 ContentPart
-  = funcName:Name
+  = funcName:IdentifierName
     __ '('
     __ firstArg:ContentPartArg __ restArgs:(',' __ arg:ContentPartArg { return arg })*
     OptionalExtraComma
@@ -173,8 +173,8 @@ AttrSelector 'attribute-selector'
   }
 
 AttrPart 'attribute-selector-part'
-  = name:Name '=' value:AttrValue { return { name, value } }
-  / name:Name { return { name, value: '' } }
+  = name:CSSIdentifierName '=' value:AttrValue { return { name, value } }
+  / name:CSSIdentifierName { return { name, value: '' } }
 
 AttrPartSep 'attribute-selector-part-seprator'
   = __ ',' __
@@ -187,22 +187,26 @@ AttrValue 'attribute-value'
   / IdentifierName
   / StringLiteral
 
-// TODO rename Id,Class,Tag to more specific name
+// TODO use css.pegjs to amend grammar
 Id
-  = '#' name:Name { return name }
+  = '#' name:$CSSIdentifierNameChar+ { return name }
 
 Class
-  = '.' name:Name { return name }
+  = '.' name:CSSIdentifierName { return name }
 
-Tag
-  = name:Name
+Tag = CSSIdentifierName
 
-Name
-  = chars:CssChar+ { return chars.join(''); }
+CSSIdentifierName = $('-'? CSSIdentifierNameStart CSSIdentifierNameChar*)
 
-// TODO rename 可以作为css名称/tag名称的字符
-CssChar
+CSSIdentifierNameStart
+  = [_a-z]i
+  / NonAscii
+
+CSSIdentifierNameChar
   = [_a-z0-9-]i
+  / NonAscii
+
+NonAscii = [\x80-\uFFFF]
 
 OptionalExtraComma 'optional-extra-comma'
   = (__ ',')?
