@@ -9,8 +9,8 @@ Start
   / __ { return null }
 
 MultipleSelector
-  = head:Selector tail:(__ ',' __ selector:Selector { return selector })*
-  OptionalExtraComma {
+  = head:Selector tail:(__ SelectorSeprator __ selector:Selector { return selector })*
+  OptionalExtraCommaOrSemicolon {
     return [head].concat(tail)
   }
 
@@ -51,6 +51,8 @@ AssignmentSelector
     }
   }
 
+SelectorSeprator = [,;]
+
 ArrayCaptureNameAndChildrenSelectors
   = name:ArrayCaptureName filterList:Filter* __ children:ParenthesizedChildrenSelectors {
     return { name, filterList, children }
@@ -72,8 +74,8 @@ ParenthesizedChildrenSelectors
     return []
   }
   / '('
-    __ head:Selector tail:(__ ',' __ s:Selector { return s })*
-    OptionalExtraComma
+    __ head:Selector tail:(__ SelectorSeprator __ s:Selector { return s })*
+    OptionalExtraCommaOrSemicolon
     __ ')' {
     return [head].concat(tail)
   }
@@ -211,12 +213,13 @@ NonAscii = [\x80-\uFFFF]
 OptionalExtraComma 'optional-extra-comma'
   = (__ ',')?
 
+OptionalExtraCommaOrSemicolon 'optional-extra-comma-or-semicolon'
+  = (__ [,;])?
+
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
     return head + tail.join('')
   }
-
-// TODO css-identifier-name
 
 Literal
   = NullLiteral
@@ -342,7 +345,7 @@ SingleStringCharacter
   = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
   / "\\" sequence:EscapeSequence { return sequence; }
 
-EscapeSequence // TODO 字符转义感觉可以去掉
+EscapeSequence
   = CharacterEscapeSequence
   / "0" !DecimalDigit { return "\0"; }
 

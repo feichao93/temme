@@ -24,7 +24,8 @@
       "js",
       "json",
       "jsx"
-    ]
+    ],
+    "mapCoverage": true
   },
   "dependencies": {
     "@types/cheerio": "^0.22.1",

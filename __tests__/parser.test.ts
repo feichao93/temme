@@ -84,46 +84,51 @@ test('ignore JavaScript comments', () => {
     .toEqual(temmeParser.parse(s4))
 })
 
-test('filters', () => {
-  expect(temmeParser.parse('html{$h|f1|f2}')).toEqual([{
+test('parse fitlers', () => {
+  function extractFilterList(selectors: any) {
+    return selectors[0].css[0].content[0].args[0].filterList
+  }
+
+  expect(extractFilterList(temmeParser.parse('html{$h|f}')))
+    .toEqual([{ name: 'f', args: [] }])
+
+  expect(extractFilterList(temmeParser.parse(`html{$h|f(1,null,'3')|g()|h(false,true,'234')}`)))
+    .toEqual([
+      { name: 'f', args: [1, null, '3'] },
+      { name: 'g', args: [] },
+      { name: 'h', args: [false, true, '234'] },
+    ])
+})
+
+test('use comma as selector seprator', () => {
+  expect(temmeParser.parse('div, li,')).toEqual([{
     type: 'normal',
-    css: [{
-      direct: false, tag: 'html', id: null,
-      classList: [],
-      attrList: [],
-      content: [{
-        funcName: 'text',
-        args: [{
-          capture: 'h',
-          filterList: [{ name: 'f1', args: [] }, { name: 'f2', args: [] }]
-        }],
-      }],
-    }],
     name: null,
-    filterList: [],
+    css: [{ direct: false, tag: 'div', id: null, classList: [], attrList: [], content: [] }],
     children: [],
+    filterList: [],
+  }, {
+    type: 'normal',
+    name: null,
+    css: [{ direct: false, tag: 'li', id: null, classList: [], attrList: [], content: [] }],
+    children: [],
+    filterList: [],
   }])
 
-  expect(temmeParser.parse(`html{$h|f(1,null,'3')|g()|h(false,true,'234')}`)).toEqual([{
-    type: 'normal',
-    css: [{
-      direct: false, tag: 'html', id: null,
-      classList: [],
-      attrList: [],
-      content: [{
-        funcName: 'text',
-        args: [{
-          capture: 'h',
-          filterList: [
-            { name: 'f', args: [1, null, '3'] },
-            { name: 'g', args: [] },
-            { name: 'h', args: [false, true, '234'] },
-          ],
-        }],
-      }],
-    }],
-    name: null,
-    filterList: [],
-    children: [],
-  }])
+  const selector = 'a,b,c,d,e'
+  const parseOneByOneAndConcat = selector.split(',').map(s => temmeParser.parse(s))
+    .reduce((a: TemmeSelector[], b: TemmeSelector) => a.concat(b))
+  const parseMultipleAtOneTime = temmeParser.parse(selector)
+  expect(parseMultipleAtOneTime).toEqual(parseOneByOneAndConcat)
+})
+
+test('use semicolon as selector seprator', () => {
+  expect(temmeParser.parse('div; li;'))
+    .toEqual(temmeParser.parse('div, li,'))
+
+  expect(temmeParser.parse('a;b;c;d;e'))
+    .toEqual(temmeParser.parse('a,b,c,d,e'))
+
+  expect(temmeParser.parse('parent@p ( div; li; .foo; ); another'))
+    .toEqual(temmeParser.parse('parent@p ( div, li, .foo, ), another'))
 })
