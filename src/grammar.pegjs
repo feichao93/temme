@@ -9,9 +9,8 @@ Start
   / __ { return null }
 
 MultipleSelector
-  = head:Selector __ tail:(',' __ selector:Selector { return selector })*
-  OptionalExtraComma
-  {
+  = head:Selector tail:(__ ',' __ selector:Selector { return selector })*
+  OptionalExtraComma {
     return [head].concat(tail)
   }
 
@@ -44,7 +43,7 @@ NormalSelector
 
 // 赋值选择器
 AssignmentSelector
-  = capture:ValueCapture __ '=' __ value:JSLiteral {
+  = capture:ValueCapture __ '=' __ value:Literal {
     return {
       type: 'assignment',
       capture,
@@ -89,7 +88,7 @@ FilterArgs
     return []
   }
   / '('
-    __ head:JSLiteral tail:(__ ',' __ arg:JSLiteral { return arg })*
+    __ head:Literal tail:(__ ',' __ arg:Literal { return arg })*
     OptionalExtraComma
     __ ')' {
     return [head].concat(tail)
@@ -103,7 +102,7 @@ CssSliceList
 
 CssPartSep 'css-selector-part-seperator'
   = WhiteSpace+
-  / & '>' __ // TODO 这里的selector是否有问题??
+  / &('>' _)
 
 CssSlice 'css-selector-slice'
   // css-selector-slice表示常规css selector中的一个片段
@@ -111,19 +110,19 @@ CssSlice 'css-selector-slice'
   // 一个css-selector-slice中必须包含下面的一个部分:
   // tag, id, classList, attrList
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
-  = direct:('>' __)? tag:Tag id:Id? classList:Class*
+  = direct:('>' _)? tag:Tag id:Id? classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
-  / direct:('>' __)? tag:Tag? id:Id classList:Class*
+  / direct:('>' _)? tag:Tag? id:Id classList:Class*
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
-  / direct:('>' __)? tag:Tag? id:Id? classList:Class+
+  / direct:('>' _)? tag:Tag? id:Id? classList:Class+
     attrList:AttrSelector? content:Content? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
-  / direct:('>' __)? tag:Tag? id:Id? classList:Class*
+  / direct:('>' _)? tag:Tag? id:Id? classList:Class*
     attrList:AttrSelector content:Content? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
@@ -154,7 +153,7 @@ ContentPart
     return { funcName, args: [firstArg].concat(restArgs) }
   }
 
-ContentPartArg = JSLiteral / ValueCapture
+ContentPartArg = Literal / ValueCapture
 
 ValueCapture
   = '$' capture:IdentifierName filterList:Filter* {
@@ -215,7 +214,7 @@ IdentifierName "identifier"
 
 // TODO css-identifier-name
 
-JSLiteral
+Literal
   = NullLiteral
   / BooleanLiteral
   / NumericLiteral
