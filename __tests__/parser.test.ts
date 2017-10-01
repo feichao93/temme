@@ -9,7 +9,7 @@ test('parse empty selector', () => {
 test('parse value assignment', () => {
   const expected: TemmeSelector[] = [{
     type: 'assignment',
-    capture: { capture: 'a', filterList: [] },
+    capture: { name: 'a', filterList: [] },
     value: '123',
   }]
   expect(temmeParser.parse(`$a="123"`)).toEqual(expected)
@@ -51,8 +51,8 @@ test('parse value capture', () => {
       {
         direct: false, tag: null, id: null,
         classList: ['question-hyperlink'],
-        attrList: [{ name: 'href', value: { capture: 'url', filterList: [] } }],
-        content: [{ funcName: 'text', args: [{ capture: 'title', filterList: [] }] }],
+        attrList: [{ name: 'href', value: { name: 'url', filterList: [] } }],
+        content: [{ type: 'capture', capture: { name: 'title', filterList: [] } }],
       }
     ],
     children: [],
@@ -86,7 +86,7 @@ test('ignore JavaScript comments', () => {
 
 test('parse fitlers', () => {
   function extractFilterList(selectors: any) {
-    return selectors[0].css[0].content[0].args[0].filterList
+    return selectors[0].css[0].content[0].capture.filterList
   }
 
   expect(extractFilterList(temmeParser.parse('html{$h|f}')))

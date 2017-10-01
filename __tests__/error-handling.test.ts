@@ -42,16 +42,8 @@ test('error in content part', () => {
   </div>`
 
   expect(() => temme(html, `.content@|pack(
-    .article_head h1{fooooo($name, '-', _)},
-  )`)).toThrowError('fooooo is not a valid content-func.')
-
-  expect(() => temme(html, `.content@|pack(
-    .article_head h1{node('abc')},
-  )`)).toThrowError('Content func `node` must be in `node($foo)` form')
-
-  expect(() => temme(html, `.content@|pack(
-    .article_head h1{contains($abc)},
-  )`)).toThrowError('Content func `contains` must be in `text(<some-text>)` form')
+    .article_head h1{fooooo($name, '-', $_)},
+  )`)).toThrowError('fooooo is not a valid content function.')
 
   expect(() => temme(html, `.leading-css-part{$value} .content{$foo}`))
     .toThrowError(errors.hasLeadingCapture())

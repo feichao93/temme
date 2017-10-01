@@ -1,6 +1,5 @@
 {
   const defaultCaptureKey = '@@default-capture@@'
-  const ingoreCaptureKey = '@@ignore-capture@@'
 }
 
 // 起始规则
@@ -43,15 +42,22 @@ NormalSelector
 
 // 赋值选择器
 AssignmentSelector
-  = capture:ValueCapture __ '=' __ value:Literal {
+  = assignment:Assignment {
     return {
       type: 'assignment',
-      capture,
-      value,
+      capture: assignment.capture,
+      value: assignment.value,
     }
   }
 
-SelectorSeprator = [,;]
+Assignment
+  = capture:ValueCapture __ '=' __ value:Literal {
+    return { capture, value }
+  }
+
+Seprator = [,;]
+SelectorSeprator = Seprator
+ContentPartSeprator = Seprator
 
 ArrayCaptureNameAndChildrenSelectors
   = name:ArrayCaptureName filterList:Filter* __ children:ParenthesizedChildrenSelectors {
@@ -134,37 +140,47 @@ Content
     return []
   }
   / '{'
-    __ single:ValueCapture
-    OptionalExtraComma
-    __ '}' {
-    return [{ funcName: 'text', args: [single] }]
-  }
-  / '{'
-    __ head:ContentPart tail:(ContentPartSep part:ContentPart { return part })*
-    OptionalExtraComma
+    __ head:ContentPart tail:(__ ContentPartSeprator __ part:ContentPart { return part })*
+    OptionalExtraCommaOrSemicolon
     __ '}' {
     return [head].concat(tail)
   }
 
 ContentPart
-  = funcName:IdentifierName
+  = capture:ValueCapture {
+    return {
+      type: 'capture',
+      capture,
+    }
+  }
+  / assignment:Assignment {
+    return {
+      type: 'assignment',
+      capture: assignment.capture,
+      value: assignment.value,
+    }
+  }
+  / funcName:IdentifierName
     __ '('
-    __ firstArg:ContentPartArg __ restArgs:(',' __ arg:ContentPartArg { return arg })*
-    OptionalExtraComma
+    __ head:ContentPartArg tail:(__ ContentPartSeprator __ arg:ContentPartArg { return arg })*
+    OptionalExtraCommaOrSemicolon
     __ ')' {
-    return { funcName, args: [firstArg].concat(restArgs) }
+    return {
+      type: 'call',
+      funcName,
+      args: [head].concat(tail),
+    }
   }
 
 ContentPartArg = Literal / ValueCapture
 
 ValueCapture
-  = '$' capture:IdentifierName filterList:Filter* {
-    return { capture, filterList }
+  = '$' name:IdentifierName filterList:Filter* {
+    return { name, filterList }
   }
   / '$' filterList:Filter* {
-    return { capture: defaultCaptureKey, filterList }
+    return { name: defaultCaptureKey, filterList }
   }
-  / '_' { return { capture: ingoreCaptureKey, filterList: [] } }
 
 AttrSelector 'attribute-selector'
   = '[' __
@@ -181,8 +197,6 @@ AttrPart 'attribute-selector-part'
 AttrPartSep 'attribute-selector-part-seprator'
   = __ ',' __
   / WhiteSpace+
-
-ContentPartSep 'content-part-seprator' = AttrPartSep
 
 AttrValue 'attribute-value'
   = ValueCapture
@@ -214,7 +228,7 @@ OptionalExtraComma 'optional-extra-comma'
   = (__ ',')?
 
 OptionalExtraCommaOrSemicolon 'optional-extra-comma-or-semicolon'
-  = (__ [,;])?
+  = (__ Seprator)?
 
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
