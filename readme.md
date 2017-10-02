@@ -5,6 +5,8 @@
 
 # Temme
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg)](https://greenkeeper.io/)
+
 Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio), so the syntax is very similar to cheerio/jQuery. Temme add some extra grammar to enable selecting multiple items at one time. Try temme in [playground](http://shinima.pw/temme-playground/).
 
 # Install
