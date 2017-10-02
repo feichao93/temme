@@ -86,7 +86,7 @@ test('attr predicate and value capture in attribute', () => {
   })
 })
 
-test('basic assignment selector', () => {
+test('assignments at top level', () => {
   expect(temme('', "$str = '123'")).toEqual({
     str: '123',
   })
@@ -105,7 +105,7 @@ test('basic assignment selector', () => {
   })
 })
 
-test('assignment in array capture', () => {
+test('assignments in array capture', () => {
   const html = `
   <ul>
     <li>apple</li>
@@ -127,4 +127,45 @@ test('assignment in array capture', () => {
     { foo: 'bar' },
     { foo: 'bar' },
   ])
+})
+
+test('assignments in content part', () => {
+  const html = `<div></div>`
+  const selector = `
+    div { $divFound = true };
+    li { $liFound = true }; 
+  `
+  const result = temme(html, selector)
+  expect(result.divFound).toBeTruthy()
+  expect(result.liFound).toBeFalsy()
+})
+
+test('assignments at top level and in content part', () => {
+  const html = `
+    <div>
+      <ul>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+  `
+  const selector = `
+    $div = false;
+    $ul = false;
+    $li = false;
+    $table = false;
+    $a = false;
+    div { $div = true };
+    ul { $ul = true };
+    li { $li = true };
+    table { $table = true };
+    a { $a = true };
+  `
+  expect(temme(html, selector)).toEqual({
+    div: true,
+    ul: true,
+    li: true,
+    table: false,
+    a: false,
+  })
 })

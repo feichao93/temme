@@ -119,19 +119,19 @@ Slice 'part of css selector'
   // tag, id, classList, attrList
   // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
   = direct:('>' _)? tag:Tag id:Id? classList:Class*
-    attrList:AttrSelector? content:Content? {
+    attrList:AttrSelector? content:(__ c:Content { return c })? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' _)? tag:Tag? id:Id classList:Class*
-    attrList:AttrSelector? content:Content? {
+    attrList:AttrSelector? content:(__ c:Content { return c })? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' _)? tag:Tag? id:Id? classList:Class+
-    attrList:AttrSelector? content:Content? {
+    attrList:AttrSelector? content:(__ c:Content { return c })? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
   / direct:('>' _)? tag:Tag? id:Id? classList:Class*
-    attrList:AttrSelector content:Content? {
+    attrList:AttrSelector content:(__ c:Content { return c })? {
     return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
   }
 
