@@ -6,18 +6,53 @@ test('parse empty selector', () => {
   expect(temmeParser.parse('\t\t  \n\n')).toBeNull()
 })
 
-test('parse value assignment', () => {
-  const expected: TemmeSelector[] = [{
-    type: 'assignment',
-    capture: { name: 'a', filterList: [] },
-    value: '123',
-  }]
-  expect(temmeParser.parse(`$a="123"`)).toEqual(expected)
-  expect(temmeParser.parse(`$a = '123'`)).toEqual(expected)
-  expect(temmeParser.parse(`$a   \t\n= '123'`)).toEqual(expected)
+describe('parse value assignment', () => {
+  test('at top-level', () => {
+    const expected: TemmeSelector[] = [{
+      type: 'assignment',
+      capture: { name: 'a', filterList: [] },
+      value: '123',
+    }]
+    expect(temmeParser.parse(`$a="123"`)).toEqual(expected)
+    expect(temmeParser.parse(`$a = '123'`)).toEqual(expected)
+    expect(temmeParser.parse(`$a   \t\n= '123'`)).toEqual(expected)
+  })
+
+  test('in children selectors', () => {
+    const selector = `
+      div@list (
+        $a = null;
+      );
+    `
+    const expected: TemmeSelector[] = [{
+      type: 'normal',
+      name: 'list',
+      filterList: [],
+      css: [{ direct: false, tag: 'div', id: null, classList: [], attrList: [], content: [] }],
+      children: [{
+        type: 'assignment',
+        capture: { name: 'a', filterList: [] },
+        value: null,
+      }],
+    }]
+    expect(temmeParser.parse(selector)).toEqual(expected)
+  })
+
+  test('in content', () => {
+    const selector = 'div{$foo = true}'
+    const expected: TemmeSelector[] = [{
+      type: 'normal', name: null, filterList: [],
+      css: [{
+        direct: false, tag: 'div', id: null, classList: [], attrList: [],
+        content: [{ type: 'assignment', capture: { name: 'foo', filterList: [] }, value: true }]
+      }],
+      children: [],
+    }]
+    expect(temmeParser.parse(selector)).toEqual(expected)
+  })
 })
 
-test('parse `div`', () => {
+test('parse simple selector: `div`', () => {
   const parseResult: TemmeSelector[] = temmeParser.parse('div')
   const expectedResult: TemmeSelector[] = [{
     type: 'normal',

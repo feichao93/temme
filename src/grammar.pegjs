@@ -8,7 +8,7 @@ Start
   / __ { return null }
 
 MultipleSelector
-  = head:Selector tail:(__ SelectorSeprator __ selector:Selector { return selector })*
+  = head:Selector tail:(__ SelectorSeparator __ selector:Selector { return selector })*
   OptionalExtraCommaOrSemicolon {
     return [head].concat(tail)
   }
@@ -55,9 +55,9 @@ Assignment
     return { capture, value }
   }
 
-Seprator = [,;]
-SelectorSeprator = Seprator
-ContentPartSeprator = Seprator
+Separator 'separator' = [,;]
+SelectorSeparator 'selector-separator' = Separator
+ContentPartSeparator 'content-part-separator' = Separator
 
 ArrayCaptureNameAndChildrenSelectors
   = name:ArrayCaptureName filterList:Filter* __ children:ParenthesizedChildrenSelectors {
@@ -80,7 +80,7 @@ ParenthesizedChildrenSelectors
     return []
   }
   / '('
-    __ head:Selector tail:(__ SelectorSeprator __ s:Selector { return s })*
+    __ head:Selector tail:(__ SelectorSeparator __ s:Selector { return s })*
     OptionalExtraCommaOrSemicolon
     __ ')' {
     return [head].concat(tail)
@@ -140,29 +140,29 @@ Content
     return []
   }
   / '{'
-    __ head:ContentPart tail:(__ ContentPartSeprator __ part:ContentPart { return part })*
+    __ head:ContentPart tail:(__ ContentPartSeparator __ part:ContentPart { return part })*
     OptionalExtraCommaOrSemicolon
     __ '}' {
     return [head].concat(tail)
   }
 
 ContentPart
-  = capture:ValueCapture {
-    return {
-      type: 'capture',
-      capture,
-    }
-  }
-  / assignment:Assignment {
+  =  assignment:Assignment {
     return {
       type: 'assignment',
       capture: assignment.capture,
       value: assignment.value,
     }
   }
+  / capture:ValueCapture {
+    return {
+      type: 'capture',
+      capture,
+    }
+  }
   / funcName:IdentifierName
     __ '('
-    __ head:ContentPartArg tail:(__ ContentPartSeprator __ arg:ContentPartArg { return arg })*
+    __ head:ContentPartArg tail:(__ ContentPartSeparator __ arg:ContentPartArg { return arg })*
     OptionalExtraCommaOrSemicolon
     __ ')' {
     return {
@@ -194,7 +194,7 @@ AttrPart 'attribute-selector-part'
   = name:CSSIdentifierName '=' value:AttrValue { return { name, value } }
   / name:CSSIdentifierName { return { name, value: '' } }
 
-AttrPartSep 'attribute-selector-part-seprator'
+AttrPartSep 'attribute-selector-part-separator'
   = __ ',' __
   / WhiteSpace+
 
@@ -228,7 +228,7 @@ OptionalExtraComma 'optional-extra-comma'
   = (__ ',')?
 
 OptionalExtraCommaOrSemicolon 'optional-extra-comma-or-semicolon'
-  = (__ Seprator)?
+  = (__ Separator)?
 
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
