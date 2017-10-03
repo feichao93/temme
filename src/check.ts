@@ -1,4 +1,4 @@
-import { CssSlice, TemmeSelector } from './temme'
+import { Section, TemmeSelector } from './interfaces'
 
 export const errors = {
   // funcNameNotSupported(f: string) {
@@ -9,7 +9,7 @@ export const errors = {
   },
 }
 
-function containsAnyCaptureInAttrListOrContent(slices: CssSlice[]) {
+function containsAnyCaptureInAttrListOrContent(slices: Section[]) {
   return slices.some(part => {
     const hasAttrCapture = part.attrList && part.attrList.some(attr => typeof attr.value !== 'string')
     if (hasAttrCapture) {
@@ -25,7 +25,7 @@ function containsAnyCaptureInAttrListOrContent(slices: CssSlice[]) {
 
 // notice 递归的检查 selector是否合法
 export default function check(selector: TemmeSelector) {
-  if (selector.type === 'self') {
+  if (selector.type === 'self-selector') {
   } else if (selector.type === 'assignment') {
   } else {
     const cssPartsLength = selector.css.length
@@ -34,10 +34,8 @@ export default function check(selector: TemmeSelector) {
     if (hasLeadingCapture) {
       throw new Error(errors.hasLeadingCapture())
     }
-    if (selector.children) {
-      for (const child of selector.children) {
-        check(child)
-      }
+    for (const child of selector.children) {
+      check(child)
     }
   }
 }

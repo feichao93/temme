@@ -1,22 +1,31 @@
 import * as cheerio from 'cheerio'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
-import { defaultFilterMap, defineFilter, FilterFn, FilterFnMap } from './filters'
+import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
+import check, { errors } from './check'
+import CaptureResult from './CaptureResult'
+import { specialFilterNames } from './constants'
 import {
   multisectionMatch,
   makeNormalCssSelector,
-  makeNormalCssSelectorFromSelfSelector,
-  mergeResult,
   isCheerioStatic,
-  isEmptyObject,
+  isAttributeQualifier,
 } from './utils'
-import check, { errors } from './check'
+import {
+  TemmeSelector,
+  ContentPart,
+  AttributeQualifier,
+} from './interfaces'
+
+export interface TemmeParser {
+  parse(temmeSelectorString: string): TemmeSelector[]
+}
 
 /* 准备temmeParser.
   在webpack build的时候, 用pegjs-loader来载入parser
   在jest的时候, 使用fs来载入语法文件, 然后用pegjs程序生成parser
 */
 declare const WEBPACK_BUILD: boolean
-let temmeParser: any
+let temmeParser: TemmeParser
 if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
   temmeParser = require('./grammar.pegjs')
 } else {
@@ -26,101 +35,13 @@ if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
   temmeParser = pegjs.generate(source)
 }
 
-export {
-  cheerio,
-  defineFilter,
-  temmeParser,
-  defaultFilterMap,
-  FilterFn,
-  FilterFnMap,
-  makeGrammarErrorMessage,
-  errors,
-}
+export { cheerio, temmeParser }
 
-const defaultCaptureKey = '@@default-capture@@'
-
-export interface Dict<V> {
-  [key: string]: V
-}
-
-export type Literal = string | number | boolean | null | undefined
-
-export type TemmeSelector = SelfSelector | NormalSelector | AssignmentSelector
-
-export interface NormalSelector {
-  type: 'normal'
-  name: string
-  css: CssSlice[]
-  children: TemmeSelector[]
-  filterList: Filter[]
-}
-
-export interface SelfSelector {
-  type: 'self'
-  id: string
-  classList: string[]
-  attrList: CssAttr[]
-  content: ContentPart[]
-}
-
-/**
- * 赋值选择器. 该选择器执行的时候, 会在结果中添加指定的值到指定的字段
- * 例如`$a = 123`, 其执行结果为 { a: 123 }
- */
-export interface AssignmentSelector {
-  type: 'assignment'
-  capture: Capture
-  value: Literal
-}
-
-export interface CssAttr {
-  name: string
-  value: string | Capture
-}
-
-export type CaptureResult = any
-
-export interface CssSlice {
-  direct: boolean
-  tag: string
-  id: string
-  classList: string[]
-  attrList: CssAttr[]
-  content: ContentPart[]
-}
-
-export type ContentPart = ContentPartCapture | ContentPartAssignment | ContentPartCall
-
-export interface ContentPartCapture {
-  type: 'capture'
-  capture: Capture
-}
-
-export interface ContentPartAssignment {
-  type: 'assignment'
-  capture: Capture
-  value: Literal
-}
-
-export interface ContentPartCall {
-  type: 'call'
-  funcName: string
-  args: (Literal | Capture)[]
-}
-
-export interface Capture {
-  name: string
-  filterList: Filter[]
-}
-
-export interface Filter {
-  name: string
-  args: string[]
-}
-
-export default function temme(html: string | CheerioStatic | CheerioElement,
-                              selector: string | TemmeSelector[],
-                              extraFilters: { [key: string]: FilterFn } = {}) {
+export default function temme(
+  html: string | CheerioStatic | CheerioElement,
+  selector: string | TemmeSelector[],
+  extraFilters: { [key: string]: FilterFn } = {},
+) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -133,7 +54,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   let rootSelector: TemmeSelector[]
   if (typeof selector === 'string') {
     try {
-      rootSelector = temmeParser.parse(selector) as TemmeSelector[]
+      rootSelector = temmeParser.parse(selector)
     } catch (error) {
       const message = makeGrammarErrorMessage(selector, error)
       throw new Error(message)
@@ -146,79 +67,76 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
   }
 
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
-  rootSelector.forEach(check)
+  // TODO rootSelector.forEach(check)
   return helper($.root(), rootSelector)
 
-  function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]) {
-    const result: CaptureResult = {}
-    selectorArray.map(selector => {
-      if (selector.type === 'normal') {
-        const cssSelector = makeNormalCssSelector(selector.css)
+  function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
+    const result = new CaptureResult(filterFnMap)
+
+    for (const selector of selectorArray) {
+      if (selector.type === 'normal-selector') {
+        const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
-          const capturer = makeValueCapturer(selector.css)
-          mergeResult(result, capturer(subCheerio))
+          result.merge(capture(subCheerio, selector))
 
-          if (selector.name) {
+          if (selector.arrayCapture) {
+            const { name, filterList } = selector.arrayCapture
             const beforeValue = subCheerio.toArray()
               .map(sub => helper($(sub), selector.children))
-            result[selector.name] = applyFilters(beforeValue, selector.filterList)
+            result.add(name, beforeValue, filterList)
           }
-        } else if (selector.name) {
-          result[selector.name] = applyFilters([], selector.filterList)
+        } else if (selector.arrayCapture) {
+          const { name, filterList } = selector.arrayCapture
+          result.add(name, [], filterList)
         }
-      } else if (selector.type === 'self') {
-        const cssSelector = makeNormalCssSelectorFromSelfSelector(selector)
+      } else if (selector.type === 'self-selector') {
+        const cssSelector = makeNormalCssSelector([selector.section])
         if (cssSelector === '' || cntCheerio.is(cssSelector)) {
-          const capturer = makeSelfCapturer(selector)
-          mergeResult(result, capturer(cntCheerio))
+          result.merge(capture(cntCheerio, selector))
         }
       } else { // selector.type === 'assignment'
-        result[selector.capture.name] = applyFilters(selector.value, selector.capture.filterList)
+        const { name, filterList } = selector.capture
+        result.add(name, selector.value, filterList, true)
       }
-    })
-
-    let returnVal = result
-    if (result.hasOwnProperty(defaultCaptureKey)) {
-      returnVal = result[defaultCaptureKey]
-    }
-    if (returnVal == null || isEmptyObject(returnVal)) {
-      return null
-    } else {
-      return returnVal
-    }
-  }
-
-  function applyFilters(initValue: any, filterList: Filter[]) {
-    return filterList.reduce((value, filter) => {
-      if (filter.name in filterFnMap) {
-        const filterFn = filterFnMap[filter.name]
-        return filterFn.apply(value, filter.args)
-      } else if (typeof value[filter.name] === 'function') {
-        const filterFn: FilterFn = value[filter.name]
-        return filterFn.apply(value, filter.args)
-      } else {
-        throw new Error(`${filter.name} is not a valid filter.`)
-      }
-    }, initValue)
-  }
-
-  function captureAttrs(node: Cheerio, attrList: CssAttr[]) {
-    const result: CaptureResult = {}
-    for (const attr of attrList) {
-      if (typeof attr.value === 'object') {
-        const value = node.attr(attr.name)
-        if (value !== undefined) {
-          result[attr.value.name] = applyFilters(value, attr.value.filterList)
-        }
-      }
-      // todo 这里是否需要同时验证匹配? 例如 foo=bar
     }
     return result
   }
 
-  function captureContent(node: Cheerio, content: ContentPart[]) {
-    const result: CaptureResult = {}
+  function capture(node: Cheerio, selector: TemmeSelector): CaptureResult {
+    const result = new CaptureResult(filterFnMap)
+
+    if (selector.type === 'normal-selector') {
+      const { sections } = selector
+      // Value-captures in the last section will be processed.
+      // Preceding value-captures will be ignored.
+      const { qualifiers, content } = sections[sections.length - 1]
+      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+      result.merge(captureContent(node, content))
+    } else if (selector.type === 'self-selector') {
+      const { section: { qualifiers, content } } = selector
+      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+      result.merge(captureContent(node, content))
+    }
+    return result
+  }
+
+  function captureAttributes(node: Cheerio, attributeQualifiers: AttributeQualifier[]) {
+    const result = new CaptureResult(filterFnMap)
+    for (const qualifier of attributeQualifiers) {
+      if (typeof qualifier.value === 'object') { // value-capture
+        const { attribute, value: { name, filterList } } = qualifier
+        const attributeValue = node.attr(qualifier.attribute)
+        if (attributeValue !== undefined) { // capture only when attribute exists
+          result.add(name, attributeValue, filterList)
+        }
+      }
+    }
+    return result
+  }
+
+  function captureContent(node: Cheerio, content: ContentPart[]): CaptureResult {
+    const result = new CaptureResult(filterFnMap)
     for (const part of content) {
       if (part.type === 'capture') {
         const { capture: { name, filterList } } = part
@@ -232,63 +150,22 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         } else { // 默认情况下使用节点内的文本来作为initValue
           initValue = node.text()
         }
-        const normalFilterList = ['html', 'node', 'text'].includes(firstFilterName)
+        const normalFilterList = specialFilterNames.includes(firstFilterName)
           ? filterList.slice(1)
           : filterList
-        result[name] = applyFilters(initValue, normalFilterList)
+        result.add(name, initValue, normalFilterList)
       } else if (part.type === 'assignment') {
         const { capture: { name, filterList }, value } = part
-        result[name] = applyFilters(value, filterList)
+        result.add(name, value, filterList, true)
       } else { // part.type === 'call'
         const { funcName, args } = part
         if (funcName === 'match') {
-          const matchResult = multisectionMatch(node.text(), part.args as any)
-          if (matchResult == null) {
-            return null
-          }
-          for (const arg of args) {
-            if (typeof arg === 'object') {
-              matchResult[arg.name] = applyFilters(matchResult[arg.name], arg.filterList)
-            }
-          }
-          mergeResult(result, matchResult)
-          // } else if (part.funcName === 'contains') { // TODO
-          //   const included = node.text().includes(args[0] as string)
+          multisectionMatch(result, node, part.args as any)
         } else {
           throw new Error(`${funcName} is not a valid content function.`)
         }
       }
     }
     return result
-  }
-
-  function makeSelfCapturer(selfSelector: SelfSelector) {
-    return (node: Cheerio) => {
-      const result: CaptureResult = {}
-      mergeResult(result, captureAttrs(node, selfSelector.attrList))
-      const contentCaptureResult = captureContent(node, selfSelector.content)
-      if (contentCaptureResult == null) {
-        return null
-      }
-      mergeResult(result, contentCaptureResult)
-      return result
-    }
-  }
-
-  function makeValueCapturer(slices: CssSlice[]) {
-    return (node: Cheerio) => {
-      const result: CaptureResult = {}
-      // notice 目前只能在最后一个part中进行value-capture
-      const lastSlice = slices[slices.length - 1]
-      mergeResult(result, captureAttrs(node, lastSlice.attrList))
-
-      const contentCaptureResult = captureContent(node, lastSlice.content)
-      if (contentCaptureResult == null) {
-        return null
-      }
-      mergeResult(result, contentCaptureResult)
-
-      return result
-    }
   }
 }

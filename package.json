@@ -29,7 +29,9 @@
   },
   "dependencies": {
     "@types/cheerio": "^0.22.1",
-    "cheerio": "^1.0.0-rc.1"
+    "@types/invariant": "^2.2.29",
+    "cheerio": "^1.0.0-rc.1",
+    "invariant": "^2.2.2"
   },
   "devDependencies": {
     "@types/jest": "^21.1.1",
