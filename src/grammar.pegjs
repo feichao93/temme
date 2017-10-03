@@ -1,5 +1,6 @@
 {
   const defaultCaptureKey = '@@default-capture@@'
+  const universalSelector = '*'
 }
 
 // 起始规则
@@ -8,35 +9,59 @@ Start
   / __ { return null }
 
 MultipleSelector
-  = head:Selector tail:(__ SelectorSeparator __ selector:Selector { return selector })*
+  = head:NonSelfSelector tail:(__ SelectorSeparator __ selector:NonSelfSelector { return selector })*
   OptionalExtraCommaOrSemicolon {
     return [head].concat(tail)
   }
 
+NonSelfSelector = NormalSelector / AssignmentSelector
 // 选择器
 Selector = SelfSelector / NormalSelector / AssignmentSelector
 
 // 自身选择器, 以 & 为开头的选择器
 SelfSelector
-  = '&' id:Id? classList:Class* attrList:AttrSelector? content:Content? {
+  = '&' section:Section {
     return {
-      type: 'self',
-      id,
-      classList: classList || [],
-      attrList: attrList || [],
-      content: content || [],
+      type: 'self-selector',
+      section,
+    }
+  }
+  / '&' content:Content {
+    return {
+      type: 'self-selector',
+      section: {
+        combinator: ' ',
+        element: universalSelector,
+        qualifiers: [],
+        content,
+      },
     }
   }
 
 // 普通的选择器
 NormalSelector
-  = css:SliceList __ nc:ArrayCaptureNameAndChildrenSelectors? {
+  = sections:Sections __ arrayCapture:ArrayCapture __ children:ParenthesizedChildrenSelectors {
     return {
-      type: 'normal',
-      css,
-      name: nc && nc.name,
-      filterList: nc && nc.filterList || [],
-      children: nc && nc.children || [],
+      type: 'normal-selector',
+      sections,
+      arrayCapture,
+      children,
+    }
+  }
+  / sections:Sections __ arrayCapture:ArrayCapture __ singleChild:Selector {
+    return {
+      type: 'normal-selector',
+      sections,
+      arrayCapture,
+      children: [singleChild],
+    }
+  }
+  / sections:Sections {
+    return {
+      type: 'normal-selector',
+      sections,
+      arrayCapture: null,
+      children: [],
     }
   }
 
@@ -58,16 +83,12 @@ Assignment
 Separator 'separator' = [,;]
 SelectorSeparator 'selector-separator' = Separator
 ContentPartSeparator 'content-part-separator' = Separator
+Combinator = [ >+~]
+AttributeOperator = '=' / '~=' / '|=' / '*=' / '^=' / '$='
 
-ArrayCaptureNameAndChildrenSelectors
-  = name:ArrayCaptureName filterList:Filter* __ children:ParenthesizedChildrenSelectors {
-    return { name, filterList, children }
-  }
-  / name:ArrayCaptureName filterList:Filter* __ singleChild:Selector {
-    return { name, filterList, children: singleChild ? [singleChild] : [] }
-  }
-  / name:ArrayCaptureName filterList:Filter* {
-    error() // TODO
+ArrayCapture
+  = name:ArrayCaptureName filterList:Filter* {
+    return { name, filterList }
   }
 
 ArrayCaptureName
@@ -103,37 +124,81 @@ FilterArgs
   }
 
 // 普通CSS选择器, 包含多个部分
-SliceList 'normal css selector'
-  = head:Slice tail:(SliceSep part:Slice { return part })* {
+Sections 'normal css selector'
+  = head:Section tail:(SectionSep section:Section { return section })* {
     return [head].concat(tail)
   }
 
-SliceSep 'css-selector-part-seperator'
-  = WhiteSpace+
-  / &('>' _)
+SectionSep 'css-selector-section-seperator'
+  = __ &Combinator
+  / ' ' __ // TODO 应该还有更好的写法
 
-Slice 'part of css selector'
-  // css-selector-slice表示常规css selector中的一个片段
-  // 格式大概如下: >tag#id.cls1.cls2[attr1=value1 attr2=$capture2]{$content}( <children> )
-  // 一个css-selector-slice中必须包含下面的一个部分:
-  // tag, id, classList, attrList
-  // todo 这里可以用 !操作符(也有可能是&操作符) 来简化规则
-  = direct:('>' _)? tag:Tag id:Id? classList:Class*
-    attrList:AttrSelector? content:(__ c:Content { return c })? {
-    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
+Section 'section of css selector'
+  = combinator:(c:Combinator __ { return c })?
+    element:(CSSIdentifierName / '*')
+    qualifiers:Qualifier*
+    content:(__ c:Content { return c })? {
+    return {
+      combinator: combinator || ' ',
+      element,
+      qualifiers,
+      content: content || [],
+    }
   }
-  / direct:('>' _)? tag:Tag? id:Id classList:Class*
-    attrList:AttrSelector? content:(__ c:Content { return c })? {
-    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
+  / combinator:(c:Combinator __ { return c })?
+    /* no element */
+    qualifiers:Qualifier+
+    content:(__ c:Content { return c })? {
+      return {
+        combinator: combinator || ' ',
+        element: '*',
+        qualifiers,
+        content: content || [],
+      }
   }
-  / direct:('>' _)? tag:Tag? id:Id? classList:Class+
-    attrList:AttrSelector? content:(__ c:Content { return c })? {
-    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
+
+Qualifier 'css-selector-qualifier' = IdQualifier / ClassQualifier / AttributeQualifier / PseudoQualifier
+
+IdQualifier 'css-selector-id-qualifier'
+  = '#' id:$CSSIdentifierNameChar+ {
+    return {
+      type: 'id-qualifier',
+      id,
+    }
   }
-  / direct:('>' _)? tag:Tag? id:Id? classList:Class*
-    attrList:AttrSelector content:(__ c:Content { return c })? {
-    return { direct: Boolean(direct), tag, id, classList, attrList: attrList || [], content: content || [] }
+
+ClassQualifier 'css-selector-class-qualifier'
+  = '.' className:CSSIdentifierName {
+    return {
+      type: 'class-qulifier',
+      className,
+    }
   }
+
+AttributeQualifier 'css-selector-attribute-qualifier'
+  = '[' __ attribute:CSSIdentifierName __ ']' {
+    return {
+      type: 'attribute-qualifier',
+      attribute,
+      operator: null,
+      value: null,
+    }
+  }
+  / '['
+    __ attribute:CSSIdentifierName
+    __ operator:AttributeOperator
+    __ value:(CSSIdentifierName / StringLiteral / ValueCapture)
+    __ ']' {
+    return {
+      type: 'attribute-qualifier',
+      attribute,
+      operator,
+      value,
+    }
+  }
+
+PseudoQualifier 'css-selector-pseudo-qualifier'
+  = ':not-implemented' // TODO
 
 Content
   = '{' __ '}' {
@@ -181,36 +246,6 @@ ValueCapture
   / '$' filterList:Filter* {
     return { name: defaultCaptureKey, filterList }
   }
-
-AttrSelector 'attribute-selector'
-  = '[' __
-    head:AttrPart tail:(AttrPartSep part:AttrPart { return part })*
-    OptionalExtraComma
-    __ ']' {
-    return [head].concat(tail)
-  }
-
-AttrPart 'attribute-selector-part'
-  = name:CSSIdentifierName '=' value:AttrValue { return { name, value } }
-  / name:CSSIdentifierName { return { name, value: '' } }
-
-AttrPartSep 'attribute-selector-part-separator'
-  = __ ',' __
-  / WhiteSpace+
-
-AttrValue 'attribute-value'
-  = ValueCapture
-  / IdentifierName
-  / StringLiteral
-
-// TODO use css.pegjs to amend grammar
-Id
-  = '#' name:$CSSIdentifierNameChar+ { return name }
-
-Class
-  = '.' name:CSSIdentifierName { return name }
-
-Tag = CSSIdentifierName
 
 CSSIdentifierName = $('-'? CSSIdentifierNameStart CSSIdentifierNameChar*)
 
@@ -335,12 +370,8 @@ UnicodeConnectorPunctuation
 UnicodeLetter = Lu / Ll / Lt / Lm / Lo / Nl
 
 StringLiteral "string"
-  = '"' chars:DoubleStringCharacter* '"' {
-    return  chars.join("")
-  }
-  / "'" chars:SingleStringCharacter* "'" {
-    return chars.join("")
-  }
+  = '"' str:$DoubleStringCharacter* '"' { return str }
+  / "'" str:$SingleStringCharacter* "'" { return str }
 
 DecimalDigit
   = [0-9]
@@ -353,11 +384,11 @@ HexDigit
 
 DoubleStringCharacter
   = !('"' / "\\" / LineTerminator) SourceCharacter { return text(); }
-  / "\\" sequence:EscapeSequence { return sequence; }
+  / "\\" sequence:EscapeSequence { return sequence }
 
 SingleStringCharacter
   = !("'" / "\\" / LineTerminator) SourceCharacter { return text(); }
-  / "\\" sequence:EscapeSequence { return sequence; }
+  / "\\" sequence:EscapeSequence { return sequence }
 
 EscapeSequence
   = CharacterEscapeSequence
@@ -425,7 +456,6 @@ Pc = [\u005F\u203F-\u2040\u2054\uFE33-\uFE34\uFE4D-\uFE4F\uFF3F]
 Zs = [\u0020\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]
 
 
-// Tokens
 FalseToken      = "false"      !IdentifierPart
 NullToken       = "null"       !IdentifierPart
 TrueToken       = "true"       !IdentifierPart

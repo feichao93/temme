@@ -1,4 +1,4 @@
-import temme, { errors } from '../src/temme'
+import temme, { errors } from '../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
 

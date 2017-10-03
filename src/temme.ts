@@ -1,11 +1,11 @@
 import * as cheerio from 'cheerio'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
-import check, { errors } from './check'
+import { defaultContentFunctions } from './contentFunction'
+import check from './check'
 import CaptureResult from './CaptureResult'
 import { specialFilterNames } from './constants'
 import {
-  multisectionMatch,
   makeNormalCssSelector,
   isCheerioStatic,
   isAttributeQualifier,
@@ -37,11 +37,9 @@ if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
 
 export { cheerio, temmeParser }
 
-export default function temme(
-  html: string | CheerioStatic | CheerioElement,
-  selector: string | TemmeSelector[],
-  extraFilters: { [key: string]: FilterFn } = {},
-) {
+export default function temme(html: string | CheerioStatic | CheerioElement,
+                              selector: string | TemmeSelector[],
+                              extraFilters: { [key: string]: FilterFn } = {},) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -67,8 +65,8 @@ export default function temme(
   }
 
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
-  // TODO rootSelector.forEach(check)
-  return helper($.root(), rootSelector)
+  rootSelector.forEach(check)
+  return helper($.root(), rootSelector).get()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
@@ -83,7 +81,7 @@ export default function temme(
           if (selector.arrayCapture) {
             const { name, filterList } = selector.arrayCapture
             const beforeValue = subCheerio.toArray()
-              .map(sub => helper($(sub), selector.children))
+              .map(sub => helper($(sub), selector.children).get())
             result.add(name, beforeValue, filterList)
           }
         } else if (selector.arrayCapture) {
@@ -124,7 +122,7 @@ export default function temme(
   function captureAttributes(node: Cheerio, attributeQualifiers: AttributeQualifier[]) {
     const result = new CaptureResult(filterFnMap)
     for (const qualifier of attributeQualifiers) {
-      if (typeof qualifier.value === 'object') { // value-capture
+      if (qualifier.value != null && typeof qualifier.value === 'object') { // value-capture
         const { attribute, value: { name, filterList } } = qualifier
         const attributeValue = node.attr(qualifier.attribute)
         if (attributeValue !== undefined) { // capture only when attribute exists
@@ -159,8 +157,8 @@ export default function temme(
         result.add(name, value, filterList, true)
       } else { // part.type === 'call'
         const { funcName, args } = part
-        if (funcName === 'match') {
-          multisectionMatch(result, node, part.args as any)
+        if (funcName in defaultContentFunctions) {
+          defaultContentFunctions[funcName](result, node, args as any)
         } else {
           throw new Error(`${funcName} is not a valid content function.`)
         }

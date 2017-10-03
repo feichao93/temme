@@ -5,7 +5,7 @@ import { isEmptyObject } from './utils'
 
 export default class CaptureResult {
   private filterFnMap: FilterFnMap
-  private result: any
+  private result: any = {}
   private failed = false
 
   constructor(filterFnMap: FilterFnMap) {
@@ -38,7 +38,7 @@ export default class CaptureResult {
     } else {
       const source = other.result
       for (const key in source) {
-        this.add(key, source[key])
+        this.result[key] = source[key]
       }
     }
   }

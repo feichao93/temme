@@ -77,7 +77,7 @@ test('attr predicate and value capture in attribute', () => {
   </ul>`
 
   const selector = `
-    [class=name data-full-name=$fullName],
+    [class=name][data-full-name=$fullName],
     [class=country]{$country},
   `
   expect(temme(html, selector)).toEqual({

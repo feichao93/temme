@@ -1,4 +1,4 @@
-import temme, { TemmeSelector, temmeParser } from '../src/temme'
+import temme, { TemmeSelector, temmeParser } from '../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -101,12 +101,12 @@ test('complex example: recursive array capture, default capture, customized filt
 
 test('complex case: multiple parent-refs', () => {
   const selector = `.brandinfo .info >li@|pack(
-      &{match('电话：', $phone|split(','))},
-      &{match('品牌创立时间：', $foundTime)},
-      &{match('品牌发源地：', $origination)},
-      &{$presidentUrl|html|extractPresidentUrl},
-      &{match('品牌广告词：', $adText)},
-      script[language]{$officialWebsite|html|extractUrl},
+      &{match('电话：', $phone|split(','))};
+      &{match('品牌创立时间：', $foundTime)};
+      &{match('品牌发源地：', $origination)};
+      &{match('品牌广告词：', $adText)};
+      &{$presidentUrl|html|extractPresidentUrl};
+      script[language]{$officialWebsite|html|extractUrl};
     )`
 
   const filters = {

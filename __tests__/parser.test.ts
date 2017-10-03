@@ -1,4 +1,10 @@
-import { temmeParser, TemmeSelector } from '../src/temme'
+import {
+  temmeParser,
+  TemmeSelector,
+  universalSelector,
+  NormalSelector,
+  ContentPartCapture,
+} from '../src/index'
 
 test('parse empty selector', () => {
   expect(temmeParser.parse('')).toBeNull()
@@ -25,10 +31,14 @@ describe('parse value assignment', () => {
       );
     `
     const expected: TemmeSelector[] = [{
-      type: 'normal',
-      name: 'list',
-      filterList: [],
-      css: [{ direct: false, tag: 'div', id: null, classList: [], attrList: [], content: [] }],
+      type: 'normal-selector',
+      arrayCapture: { name: 'list', filterList: [] },
+      sections: [{
+        combinator: ' ',
+        element: 'div',
+        qualifiers: [],
+        content: [],
+      }],
       children: [{
         type: 'assignment',
         capture: { name: 'a', filterList: [] },
@@ -41,10 +51,17 @@ describe('parse value assignment', () => {
   test('in content', () => {
     const selector = 'div{$foo = true}'
     const expected: TemmeSelector[] = [{
-      type: 'normal', name: null, filterList: [],
-      css: [{
-        direct: false, tag: 'div', id: null, classList: [], attrList: [],
-        content: [{ type: 'assignment', capture: { name: 'foo', filterList: [] }, value: true }]
+      type: 'normal-selector',
+      arrayCapture: null,
+      sections: [{
+        combinator: ' ',
+        element: 'div',
+        qualifiers: [],
+        content: [{
+          type: 'assignment',
+          capture: { name: 'foo', filterList: [] },
+          value: true,
+        }],
       }],
       children: [],
     }]
@@ -55,45 +72,88 @@ describe('parse value assignment', () => {
 test('parse simple selector: `div`', () => {
   const parseResult: TemmeSelector[] = temmeParser.parse('div')
   const expectedResult: TemmeSelector[] = [{
-    type: 'normal',
-    name: null,
-    css: [{
-      direct: false,
-      tag: 'div',
-      id: null,
-      classList: [],
-      attrList: [],
+    type: 'normal-selector',
+    arrayCapture: null,
+    sections: [{
+      combinator: ' ',
+      element: 'div',
+      qualifiers: [],
       content: [],
     }],
     children: [],
-    filterList: [],
   }]
   expect(parseResult).toEqual(expectedResult)
 })
 
-test('parse value capture', () => {
-  const selector = `#question-header .question-hyperlink[href=$url]{$title}`
+describe('parse capture', () => {
+  test('attribute capture and content capture at top level', () => {
+    const selector = `#question-header .question-hyperlink[href=$url]{$title}`
+    const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
-  const parseResult: TemmeSelector[] = temmeParser.parse(selector)
-  const expectedParseResult: TemmeSelector[] = [{
-    type: 'normal',
-    name: null,
-    css: [
-      {
-        direct: false, tag: null, id: 'question-header',
-        classList: [], attrList: [], content: [],
-      },
-      {
-        direct: false, tag: null, id: null,
-        classList: ['question-hyperlink'],
-        attrList: [{ name: 'href', value: { name: 'url', filterList: [] } }],
-        content: [{ type: 'capture', capture: { name: 'title', filterList: [] } }],
-      }
-    ],
-    children: [],
-    filterList: [],
-  }]
-  expect(parseResult).toEqual(expectedParseResult)
+    const expectedResult: TemmeSelector[] = [{
+      type: 'normal-selector',
+      arrayCapture: null,
+      sections: [{
+        combinator: ' ',
+        element: universalSelector,
+        qualifiers: [{
+          type: 'id-qualifier',
+          id: 'question-header',
+        }],
+        content: [],
+      }, {
+        combinator: ' ',
+        element: universalSelector,
+        qualifiers: [{
+          type: 'class-qulifier',
+          className: 'question-hyperlink',
+        }, {
+          type: 'attribute-qualifier',
+          attribute: 'href',
+          operator: '=',
+          value: { name: 'url', filterList: [] },
+        }],
+        content: [{
+          type: 'capture',
+          capture: { name: 'title', filterList: [] },
+        }],
+      }],
+      children: [],
+    }]
+
+    expect(parseResult).toEqual(expectedResult)
+  })
+
+  test('array capture and content capture in children selectors', () => {
+    const selector = `
+      div@list (
+        .foo{$h|html};
+      );
+    `
+    const parseResult = temmeParser.parse(selector)
+
+    const expectedResult: TemmeSelector[] = [{
+      type: 'normal-selector',
+      arrayCapture: { name: 'list', filterList: [] },
+      sections: [{ combinator: ' ', element: 'div', qualifiers: [], content: [] }],
+      children: [{
+        type: 'normal-selector',
+        arrayCapture: null,
+        sections: [{
+          combinator: ' ',
+          element: universalSelector,
+          qualifiers: [{ type: 'class-qulifier', className: 'foo' }],
+          content: [{
+            type: 'capture',
+            capture: { name: 'h', filterList: [{ name: 'html', args: [] }] },
+          }],
+        }],
+        children: [],
+      }],
+    }]
+
+    expect(parseResult).toEqual(expectedResult)
+  })
 })
 
 test('ignore JavaScript comments', () => {
@@ -120,8 +180,9 @@ test('ignore JavaScript comments', () => {
 })
 
 test('parse fitlers', () => {
-  function extractFilterList(selectors: any) {
-    return selectors[0].css[0].content[0].capture.filterList
+  function extractFilterList(selectors: TemmeSelector[]) {
+    return ((selectors[0] as NormalSelector).sections[0].content[0] as ContentPartCapture)
+      .capture.filterList
   }
 
   expect(extractFilterList(temmeParser.parse('html{$h|f}')))
@@ -137,22 +198,30 @@ test('parse fitlers', () => {
 
 test('use comma as selector seprator', () => {
   expect(temmeParser.parse('div, li,')).toEqual([{
-    type: 'normal',
-    name: null,
-    css: [{ direct: false, tag: 'div', id: null, classList: [], attrList: [], content: [] }],
+    type: 'normal-selector',
+    sections: [{
+      combinator: ' ',
+      element: 'div',
+      qualifiers: [],
+      content: [],
+    }],
+    arrayCapture: null,
     children: [],
-    filterList: [],
   }, {
-    type: 'normal',
-    name: null,
-    css: [{ direct: false, tag: 'li', id: null, classList: [], attrList: [], content: [] }],
+    type: 'normal-selector',
+    sections: [{
+      combinator: ' ',
+      element: 'li',
+      qualifiers: [],
+      content: [],
+    }],
+    arrayCapture: null,
     children: [],
-    filterList: [],
-  }])
+  }] as TemmeSelector[])
 
   const selector = 'a,b,c,d,e'
   const parseOneByOneAndConcat = selector.split(',').map(s => temmeParser.parse(s))
-    .reduce((a: TemmeSelector[], b: TemmeSelector) => a.concat(b))
+    .reduce((a: TemmeSelector[], b: TemmeSelector[]) => a.concat(b))
   const parseMultipleAtOneTime = temmeParser.parse(selector)
   expect(parseMultipleAtOneTime).toEqual(parseOneByOneAndConcat)
 })

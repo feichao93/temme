@@ -35,7 +35,6 @@ export interface Assignment {
 }
 
 export interface Section {
-  type: 'section'
   combinator: Combinator
   element: string
   qualifiers: Qualifier[]
@@ -56,7 +55,7 @@ export interface ClassQualifirer {
   className: string
 }
 
-export type AttributeOperator = '=' | '~=' | '|=' | '*=' | '^=' | '$=' | null
+export type AttributeOperator = '=' | '~=' | '|=' | '*=' | '^=' | '$='
 
 export interface AttributeQualifier {
   type: 'attribute-qualifier'
