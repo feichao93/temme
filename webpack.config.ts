@@ -4,7 +4,7 @@ import * as path from 'path'
 
 const config: webpack.Configuration = {
   context: __dirname,
-  entry: './src/temme.ts',
+  entry: './src/index.ts',
   devtool: false,
   target: 'node',
   output: {
