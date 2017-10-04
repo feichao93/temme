@@ -34,10 +34,10 @@ test('basic value capture', () => {
 })
 
 test('array capture', () => {
-  const selector = `.answer@answers (
+  const selector = `.answer@answers {
     .votecell .vote-count-post{$upvote},
     .user-info .user-details>a{$userName},
-  )`
+  }`
   const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
   expect(temme(stHtml, parseResult)).toEqual({
@@ -53,17 +53,17 @@ test('array capture', () => {
 })
 
 test('complex example: recursive array capture, default capture, customized filters', () => {
-  const selector = `.answer@ (
-    .votecell .vote-count-post{$upvote},
-    .post-test{$postText},
-    .user-info .user-details>a{$userName},
-    .comment@comments (
-      .comment-score{$score|trim|Number},
-      .comment-copy{$content|substring(0,10)},
-      .comment-user[href=$userUrl]{$userName},
-      .comment-data span[title=$data],
-    ),
-  )`
+  const selector = `.answer@ {
+    .votecell .vote-count-post{$upvote};
+    .post-test{$postText};
+    .user-info .user-details>a{$userName};
+    .comment@comments {
+      .comment-score{$score|trim|Number};
+      .comment-copy{$content|substring(0,10)};
+      .comment-user[href=$userUrl]{$userName};
+      .comment-data span[title=$data];
+    };
+  }`
 
   expect(temme(stHtml, selector)).toEqual([
     {
@@ -100,14 +100,14 @@ test('complex example: recursive array capture, default capture, customized filt
 })
 
 test('complex case: multiple parent-refs', () => {
-  const selector = `.brandinfo .info >li@|pack(
+  const selector = `.brandinfo .info >li@|pack{
       &{match('电话：', $phone|split(','))};
       &{match('品牌创立时间：', $foundTime)};
       &{match('品牌发源地：', $origination)};
       &{match('品牌广告词：', $adText)};
       &{$presidentUrl|html|extractPresidentUrl};
       script[language]{$officialWebsite|html|extractUrl};
-    )`
+    }`
 
   const filters = {
     extractUrl(this: string) {

@@ -76,7 +76,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
-          result.merge(capture(subCheerio, selector))
+          result.merge(capture(subCheerio, selector), false)
 
           if (selector.arrayCapture) {
             const { name, filterList } = selector.arrayCapture
@@ -90,8 +90,8 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         }
       } else if (selector.type === 'self-selector') {
         const cssSelector = makeNormalCssSelector([selector.section])
-        if (cssSelector === '' || cntCheerio.is(cssSelector)) {
-          result.merge(capture(cntCheerio, selector))
+        if (cntCheerio.is(cssSelector)) {
+          result.merge(capture(cntCheerio, selector), false)
         }
       } else { // selector.type === 'assignment'
         const { name, filterList } = selector.capture
@@ -109,12 +109,12 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
       // Value-captures in the last section will be processed.
       // Preceding value-captures will be ignored.
       const { qualifiers, content } = sections[sections.length - 1]
-      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
-      result.merge(captureContent(node, content))
+      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
+      result.merge(captureContent(node, content), true)
     } else if (selector.type === 'self-selector') {
       const { section: { qualifiers, content } } = selector
-      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
-      result.merge(captureContent(node, content))
+      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
+      result.merge(captureContent(node, content), true)
     }
     return result
   }
@@ -124,7 +124,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     for (const qualifier of attributeQualifiers) {
       if (qualifier.value != null && typeof qualifier.value === 'object') { // value-capture
         const { attribute, value: { name, filterList } } = qualifier
-        const attributeValue = node.attr(qualifier.attribute)
+        const attributeValue = node.attr(attribute)
         if (attributeValue !== undefined) { // capture only when attribute exists
           result.add(name, attributeValue, filterList)
         }
@@ -158,7 +158,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
       } else { // part.type === 'call'
         const { funcName, args } = part
         if (funcName in defaultContentFunctions) {
-          defaultContentFunctions[funcName](result, node, args as any)
+          defaultContentFunctions[funcName](result, node, args)
         } else {
           throw new Error(`${funcName} is not a valid content function.`)
         }

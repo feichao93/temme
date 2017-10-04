@@ -41,9 +41,9 @@ test('error in content part', () => {
     </div>
   </div>`
 
-  expect(() => temme(html, `.content@|pack(
+  expect(() => temme(html, `.content@|pack{
     .article_head h1{fooooo($name, '-', $_)},
-  )`)).toThrowError('fooooo is not a valid content function.')
+  }`)).toThrowError('fooooo is not a valid content function.')
 
   expect(() => temme(html, `.leading-css-part{$value} .content{$foo}`))
     .toThrowError(errors.hasLeadingCapture())

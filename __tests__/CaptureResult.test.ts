@@ -73,7 +73,7 @@ test('merge CaptureResult', () => {
     a2: 'v2',
   })
 
-  a.merge(b)
+  a.merge(b, true)
   expect(a.get()).toEqual({
     a1: 'v1',
     a2: 'v2',
@@ -95,6 +95,6 @@ test('merge propagrates capture-failure', () => {
     a2: 'v2',
   })
 
-  a.merge(b)
+  a.merge(b, true)
   expect(a.isFailed()).toBe(true)
 })

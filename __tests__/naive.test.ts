@@ -23,7 +23,7 @@ test('use Array#slice as filter in array-capture', () => {
     <li>watermelon</li>
   </ul>
   `
-  const selector = 'li@|slice(1,4) &{$}'
+  const selector = 'li@|slice(1,4){ &{$} }'
   expect(temme(cheerio.load(html), selector)).toEqual([
     'banana',
     'cherry',
@@ -116,9 +116,9 @@ test('assignments in array capture', () => {
   </ul>
   `
   const selector = `
-    li@ (
+    li@ {
       $foo = 'bar',
-    ),
+    },
   `
   expect(temme(html, selector)).toEqual([
     { foo: 'bar' },

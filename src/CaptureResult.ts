@@ -32,9 +32,11 @@ export default class CaptureResult {
     }
   }
 
-  merge(other: CaptureResult) {
+  merge(other: CaptureResult, failPropagation: boolean) {
     if (other.isFailed()) { // fail propagation
-      this.setFailed()
+      if (failPropagation) {
+        this.setFailed()
+      } // else do nothing
     } else {
       const source = other.result
       for (const key in source) {

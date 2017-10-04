@@ -40,20 +40,12 @@ SelfSelector
 
 // 普通的选择器
 NormalSelector
-  = sections:Sections __ arrayCapture:ArrayCapture __ children:ParenthesizedChildrenSelectors {
+  = sections:Sections __ arrayCapture:ArrayCapture __ children:ChildrenSelectors {
     return {
       type: 'normal-selector',
       sections,
       arrayCapture,
       children,
-    }
-  }
-  / sections:Sections __ arrayCapture:ArrayCapture __ singleChild:Selector {
-    return {
-      type: 'normal-selector',
-      sections,
-      arrayCapture,
-      children: [singleChild],
     }
   }
   / sections:Sections {
@@ -96,14 +88,14 @@ ArrayCaptureName
     return captureKey || defaultCaptureKey
   }
 
-ParenthesizedChildrenSelectors
-  = '(' __ ')' {
+ChildrenSelectors
+  = '{' __ '}' {
     return []
   }
-  / '('
+  / '{'
     __ head:Selector tail:(__ SelectorSeparator __ s:Selector { return s })*
     OptionalExtraCommaOrSemicolon
-    __ ')' {
+    __ '}' {
     return [head].concat(tail)
   }
 

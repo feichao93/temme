@@ -26,9 +26,9 @@ describe('parse value assignment', () => {
 
   test('in children selectors', () => {
     const selector = `
-      div@list (
+      div@list {
         $a = null;
-      );
+      };
     `
     const expected: TemmeSelector[] = [{
       type: 'normal-selector',
@@ -126,9 +126,9 @@ describe('parse capture', () => {
 
   test('array capture and content capture in children selectors', () => {
     const selector = `
-      div@list (
+      div@list {
         .foo{$h|html};
-      );
+      };
     `
     const parseResult = temmeParser.parse(selector)
 
@@ -233,6 +233,6 @@ test('use semicolon as selector seprator', () => {
   expect(temmeParser.parse('a;b;c;d;e'))
     .toEqual(temmeParser.parse('a,b,c,d,e'))
 
-  expect(temmeParser.parse('parent@p ( div; li; .foo; ); another'))
-    .toEqual(temmeParser.parse('parent@p ( div, li, .foo, ), another'))
+  expect(temmeParser.parse('parent@p { div; li; .foo; }; another'))
+    .toEqual(temmeParser.parse('parent@p { div, li, .foo, }, another'))
 })

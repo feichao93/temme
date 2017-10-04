@@ -10,12 +10,12 @@ test('filter `pack`', () => {
         <li class="hobbies"></li>
       </ul>`
   const selector = `
-      ul li@|pack(
-        &.name{$name},
-        &.country{$country},
-        &.city{$city},
-        &.university{$university},
-      )`
+    ul li@|pack{
+      &.name{$name},
+      &.country{$country},
+      &.city{$city},
+      &.university{$university},
+    }`
   expect(temme(html, selector)).toEqual({
     name: 'shinima',
     country: 'China',
@@ -33,7 +33,7 @@ test('filter `compact`', () => {
       <li data-color="white">pear</li>
       <li data-color="">watermelon</li>
     </ul>`
-  const selector = `ul li@|compact &[data-color=$]`
+  const selector = `ul li@|compact{ &[data-color=$] }`
   expect(temme(html, selector)).toEqual([
     'red', 'yellow', 'white'
   ])
@@ -52,7 +52,7 @@ test('filter `flatten`', () => {
       </tr>
     </table>
     `
-  const selector = `tr@|flatten td@ &{$}`
+  const selector = `tr@|flatten{ td@{ &{$} } }`
   expect(temme(html, selector)).toEqual([
     '0-0', '0-1', '1-0', '1-1',
   ])
@@ -103,7 +103,7 @@ test('customized filter `wrap`', () => {
       <li>pear</li>
       <li>watermelon</li>
     </ul>`
-  const selector = `li@ &{$|wrap('fruit')}`
+  const selector = `li@{&{$|wrap('fruit')}}`
   expect(temme(html, selector)).toEqual([
     '<fruit>apple</fruit>',
     '<fruit>banana</fruit>',
