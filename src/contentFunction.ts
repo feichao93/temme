@@ -6,11 +6,8 @@ import CaptureResult from './CaptureResult'
 //  { foo: ' like apple' }
 // 如果匹配失败, 则返回null
 // 注意有的时候会有多种匹配结果, 该匹配算法是贪心的, 只会选取第一种匹配结果
-export function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[], trim = true): void {
-  let s = node.text()
-  if (trim) {
-    s = s.trim()
-  }
+export function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
+  const s = node.text().trim()
   // 标记正在进行的capture, null表示没有在捕获中
   let capturing: Capture = null
   let charIndex = 0

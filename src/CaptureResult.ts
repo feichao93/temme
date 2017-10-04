@@ -2,6 +2,7 @@ import { Filter } from './interfaces'
 import { FilterFnMap, FilterFn } from './filters'
 import { defaultCaptureKey } from './constants'
 import { isEmptyObject } from './utils'
+import { errorMessages } from './check'
 
 export default class CaptureResult {
   private filterFnMap: FilterFnMap
@@ -68,7 +69,7 @@ export default class CaptureResult {
         const filterFn: FilterFn = value[filter.name]
         return filterFn.apply(value, filter.args)
       } else {
-        throw new Error(`${filter.name} is not a valid filter.`)
+        throw new Error(errorMessages.invalidFilter(filter.name))
       }
     }, initValue)
   }

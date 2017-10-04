@@ -2,10 +2,13 @@ import { Section, TemmeSelector, Qualifier } from './interfaces'
 
 // TODO enhance error reporting
 
-export const errors = {
-  // funcNameNotSupported(f: string) {
-  //   return `${f} is not a valid content func-name.`
-  // },
+export const errorMessages = {
+  invalidFilter(name: string) {
+    return `${name} is not a valid filter.`
+  },
+  invalidContentFunction(name: string) {
+    return `${name} is not a valid content function.`
+  },
   hasLeadingCapture() {
     return 'Attr capturing and content matching/capturing are only allowed in the last css section. Capture in leading css-selectors will be omitted. Did you forget the semicolon?'
   },
@@ -33,7 +36,7 @@ export default function check(selector: TemmeSelector) {
     const leadingSections = selector.sections.slice(0, sectionCount - 1)
     const hasLeadingCapture = containsAnyCapture(leadingSections)
     if (hasLeadingCapture) {
-      throw new Error(errors.hasLeadingCapture())
+      throw new Error(errorMessages.hasLeadingCapture())
     }
     for (const child of selector.children) {
       check(child)

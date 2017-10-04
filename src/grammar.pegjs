@@ -123,7 +123,7 @@ Sections 'normal css selector'
 
 SectionSep 'css-selector-section-seperator'
   = __ &Combinator
-  / ' ' __ // TODO 应该还有更好的写法
+  / ' ' __ // TODO I think there is a better way to write this rule
 
 Section 'section of css selector'
   = combinator:(c:Combinator __ { return c })?
@@ -188,9 +188,15 @@ AttributeQualifier 'css-selector-attribute-qualifier'
       value,
     }
   }
+  // TODO allow multiple attribute qualifiers appeares in one pair of brackets
 
 PseudoQualifier 'css-selector-pseudo-qualifier'
-  = ':not-implemented' // TODO
+  = ':' value:CSSIdentifierName {
+    return {
+      type: 'pseudo-qualifier',
+      value,
+    }
+  } // pseudo-qualifier has another function-like form
 
 Content
   = '{' __ '}' {

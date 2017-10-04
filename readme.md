@@ -80,9 +80,9 @@ The output of value-capture will be an object containing the data at specific fi
 
 ## Array-capture `@`
 
-Array-capture is another form of capture. It is useful when we want to capture an array of similar items. We need place `@foo` after normal CSS selector (called parent-selector), and define several children selectors within trailing parenthesis. This means: for every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds an object as result, and the result of array-capture is the array composed of parent-node result. The array itself will be the `foo` field of the upper-level result. Like default value-capture, we could just use a signle dollar sign to make a default array-capture, and the array will be the result of upper-level result.
+Array-capture is another form of capture. It is useful when we want to capture an array of similar items. We need place `@foo` after normal CSS selector (called parent-selector), and define several children selectors within a trailing curly brackets. This means: for every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds an object as result, and the result of array-capture is the array composed of parent-node result. The array itself will be the `foo` field of the upper-level result. Like default value-capture, we could just use a signle dollar sign to make a default array-capture, and the array will be the result of upper-level result.
 
-In the following example, we want to capture all answers in this [stackoverflow question][]. We know that every answer is in an `<div class="answer">...</div>` and we use `.answer@answers` as the parent selector. There are 4 value-capture selectors in the parenthesis and these children selectors will capture four different parts of an answer. The running procedure is straightforward: `.answer` selector will match an array of answer-div; for each answer-div, run the children selectors, and get an answer-object `{ upvote: ..., postText: "...", userName: ..., comments: "..." }`; put all the answer-objects into an array, and the array is the `answers` field of the final result.
+In the following example, we want to capture all answers in this [stackoverflow question][]. We know that every answer is in an `<div class="answer">...</div>` and we use `.answer@answers` as the parent selector. There are 4 value-capture selectors in the curly brackets and these children selectors will capture four different parts of an answer. The running procedure is straightforward: `.answer` selector will match an array of answer-div; for each answer-div, run the children selectors, and get an answer-object `{ upvote: ..., postText: "...", userName: ..., comments: "..." }`; put all the answer-objects into an array, and the array is the `answers` field of the final result.
 
 ### Example: Retrieve all answers
 
@@ -120,12 +120,12 @@ const cssSelectorForAnswerUserInfo = '.answer .user-info .user-info>a'
 const cssSelectorForAnswerComments = '.answer .comments'
 
 const temmeSelector = `
-  .answer@answers (
+  .answer@answers {
     .votecell .vote-count-post{$upvote};
     .post-text{$postText};
     .user-info .user-info >a{$userName};
     .comments{$comments};
-  )
+  }
 `
 // output of temme(html, temmeSelector):
 const output = {

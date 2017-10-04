@@ -1,4 +1,4 @@
-import temme, { errors } from '../src/index'
+import temme, { errorMessages } from '../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -7,7 +7,7 @@ const html = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-o
 test('invalid filter name', () => {
   expect(() => temme(html, `
     #question-header .question-hyperlink[href=$url]{$title|foo}
-  `)).toThrowError('foo is not a valid filter.')
+  `)).toThrowError(errorMessages.invalidFilter('foo'))
 })
 
 test('wrong syntax example 1', () => {
@@ -42,12 +42,12 @@ test('error in content part', () => {
   </div>`
 
   expect(() => temme(html, `.content@|pack{
-    .article_head h1{fooooo($name, '-', $_)},
-  }`)).toThrowError('fooooo is not a valid content function.')
+    .article_head h1{foo($name, '-', $_)},
+  }`)).toThrowError(errorMessages.invalidContentFunction('foo'))
 
   expect(() => temme(html, `.leading-css-part{$value} .content{$foo}`))
-    .toThrowError(errors.hasLeadingCapture())
+    .toThrowError(errorMessages.hasLeadingCapture())
 
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`))
-    .toThrowError(errors.hasLeadingCapture())
+    .toThrowError(errorMessages.hasLeadingCapture())
 })

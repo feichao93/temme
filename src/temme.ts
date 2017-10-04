@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio'
 import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import { defaultContentFunctions } from './contentFunction'
-import check from './check'
+import check, { errorMessages } from './check'
 import CaptureResult from './CaptureResult'
 import { specialFilterNames } from './constants'
 import {
@@ -160,7 +160,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         if (funcName in defaultContentFunctions) {
           defaultContentFunctions[funcName](result, node, args)
         } else {
-          throw new Error(`${funcName} is not a valid content function.`)
+          throw new Error(errorMessages.invalidContentFunction(funcName))
         }
       }
     }

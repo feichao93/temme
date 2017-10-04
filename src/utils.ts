@@ -19,7 +19,7 @@ export function makeNormalCssSelector(sections: Section[]) {
         } else if (typeof value === 'object') { // capture
           invariant(operator === '=', 'Value capture in attribute qualifier only works with `=` operator.')
         } else { // normal qualifier
-          // TODO 这里是否需要考虑引号的问题?
+          // TODO 这里需要考虑引号问题
           result.push('[', attribute, operator, value, ']')
         }
       } else { // pseudo-qualifier
@@ -27,7 +27,7 @@ export function makeNormalCssSelector(sections: Section[]) {
       }
     }
   }
-  return result.join('')
+  return result.join('').trim()
 }
 
 export function isEmptyObject(x: any) {
