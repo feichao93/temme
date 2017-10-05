@@ -33,6 +33,28 @@ const temmeSelector = `
 const result = temme(html, temmeSelector)
 ```
 
+# Inspiration
+
+Temme is inspired by [Emmet](https://emmet.io/). Emmet generates HTML according to a css-selector-like template. The behavior of `emmet` is like the following function:
+```JavaScript
+emmet('div[class=red]{text content}')
+// => <div class="red">text content</div>
+```
+
+If we extend this function and let the function do string interpolation, then the function is like:
+```JavaScript
+emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
+// => <div class="red">text content</div>
+```
+
+As the name indicates, temme is the reverse of `emmet`. If we express temme as a function, then it looks like:
+```JavaScript
+temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
+// => { cls: 'red', content: 'text content' }
+```
+
+Given a selector/template, `emmet` expand this template to HTML using data of the object, while `temme` capture data from HTML into an object according to the selector.
+
 # Concepts
 
 ## 匹配(MATCH)

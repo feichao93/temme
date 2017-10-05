@@ -1,6 +1,18 @@
 {
   const defaultCaptureKey = '@@default-capture@@'
   const universalSelector = '*'
+
+  function flatten(array) {
+    const result = []
+    for (const item of array) {
+      if (Array.isArray(item)) {
+        result.push(...item)
+      } else {
+        result.push(item)
+      }
+    }
+    return result
+  }
 }
 
 // 起始规则
@@ -133,7 +145,7 @@ Section 'section of css selector'
     return {
       combinator: combinator || ' ',
       element,
-      qualifiers,
+      qualifiers: flatten(qualifiers),
       content: content || [],
     }
   }
@@ -144,7 +156,7 @@ Section 'section of css selector'
       return {
         combinator: combinator || ' ',
         element: '*',
-        qualifiers,
+        qualifiers: flatten(qualifiers),
         content: content || [],
       }
   }
@@ -168,19 +180,17 @@ ClassQualifier 'css-selector-class-qualifier'
   }
 
 AttributeQualifier 'css-selector-attribute-qualifier'
-  = '[' __ attribute:CSSIdentifierName __ ']' {
-    return {
-      type: 'attribute-qualifier',
-      attribute,
-      operator: null,
-      value: null,
-    }
-  }
-  / '['
-    __ attribute:CSSIdentifierName
-    __ operator:AttributeOperator
-    __ value:(CSSIdentifierName / StringLiteral / ValueCapture)
+  = '['
+    __ head:AttributeQualifierPart
+    tail:(__ part:AttributeQualifierPart { return part })*
     __ ']' {
+    return [head].concat(tail)
+  }
+
+AttributeQualifierPart 'css-selector-attribute-qualifier-part'
+  = attribute:CSSIdentifierName
+    __ operator:AttributeOperator
+    __ value:(CSSIdentifierName / StringLiteral / ValueCapture) {
     return {
       type: 'attribute-qualifier',
       attribute,
@@ -188,7 +198,14 @@ AttributeQualifier 'css-selector-attribute-qualifier'
       value,
     }
   }
-  // TODO allow multiple attribute qualifiers appeares in one pair of brackets
+  / attribute:CSSIdentifierName {
+    return {
+      type: 'attribute-qualifier',
+      attribute,
+      operator: null,
+      value: null,
+    }
+  }
 
 PseudoQualifier 'css-selector-pseudo-qualifier'
   = ':' value:CSSIdentifierName {

@@ -4,6 +4,7 @@ import {
   universalSelector,
   NormalSelector,
   ContentPartCapture,
+  AttributeOperator,
 } from '../src/index'
 
 test('parse empty selector', () => {
@@ -154,7 +155,61 @@ describe('parse capture', () => {
 
     expect(parseResult).toEqual(expectedResult)
   })
+
+  test('multiple attribute capture in one pair of brackets', () => {
+    const selector = 'div[foo=$x bar=$y]'
+    const parseResult = temmeParser.parse(selector)
+    const expectedResult: TemmeSelector[] = [{
+      type: 'normal-selector',
+      sections: [{
+        combinator: ' ',
+        element: 'div',
+        qualifiers: [{
+          type: 'attribute-qualifier',
+          attribute: 'foo',
+          operator: '=',
+          value: { name: 'x', filterList: [] },
+        }, {
+          type: 'attribute-qualifier',
+          attribute: 'bar',
+          operator: '=',
+          value: { name: 'y', filterList: [] },
+        }],
+        content: [],
+      }],
+      arrayCapture: null,
+      children: [],
+    }]
+    expect(parseResult).toEqual(expectedResult)
+  })
+
+  test('other different attribute operators', () => {
+    const operators: AttributeOperator[] = ['=', '~=', '|=', '*=', '^=', '$=']
+    for (const operator of operators) {
+      const selector = `div[foo${operator}$x]`
+      const parseResult = temmeParser.parse(selector)
+      const expectedResult: TemmeSelector[] = [{
+        type: 'normal-selector',
+        sections: [{
+          combinator: ' ',
+          element: 'div',
+          qualifiers: [{
+            type: 'attribute-qualifier',
+            attribute: 'foo',
+            operator,
+            value: { name: 'x', filterList: [] },
+          }],
+          content: [],
+        }],
+        arrayCapture: null,
+        children: [],
+      }]
+      expect(parseResult).toEqual(expectedResult)
+    }
+  })
 })
+
+// TODO parse other section combinators: + > ~
 
 test('ignore JavaScript comments', () => {
   expect(temmeParser.parse('/* abcdef */')).toBeNull()
