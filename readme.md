@@ -4,7 +4,7 @@
 
 # Temme
 
-Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio), so the syntax is very similar to cheerio/jQuery. Temme add some extra grammar to enable selecting multiple items at one time. Try temme in [playground](http://shinima.pw/temme-playground/).
+Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammars to enable capturing data into result. Try temme in [playground](http://shinima.pw/temme-playground/).
 
 # Install
 
@@ -16,21 +16,14 @@ Install from npm:
 
 ```typescript
 // es-module
-import temme, { defineFilter } from 'temme'
+import temme from 'temme'
 // or use require
 // const temme = require('temme').default
 
-const html = '<div id="answers"> <a name="tab-top"></a> <div id="answers-header"> <div class="subhe......'
-
-const temmeSelector = `
-  .answer@answers (
-    .votecell .vote-count-post{$upvote},
-    .post-text{$postText},
-    .user-info .user-details>a{$userName},
-    .comments{$comments},
-  )
-`
-const result = temme(html, temmeSelector)
+const html = '<div color="red">hello world</div>'
+const temmeSelector = 'div[color=$c]{$t}'
+temme(html, temmeSelector)
+// => { c: 'red', t: 'hello world' }
 ```
 
 # Inspiration
@@ -41,7 +34,7 @@ emmet('div[class=red]{text content}')
 // => <div class="red">text content</div>
 ```
 
-If we extend this function and let the function do string interpolation, then the function is like:
+If we extend this function to allow a second argument `data`. Then the function could looks like:
 ```JavaScript
 emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
 // => <div class="red">text content</div>
@@ -53,21 +46,27 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 // => { cls: 'red', content: 'text content' }
 ```
 
-Given a selector/template, `emmet` expand this template to HTML using data of the object, while `temme` capture data from HTML into an object according to the selector.
+Comparison between emmet and temme:
+* `emmet(selector, data) -> html`
+* `temme(html, selector) -> data`
+
+Given a selector, `emmet` expand this selector to HTML using data of the object, while `temme` capture data from HTML into an object according to the selector.
 
 # Concepts
 
-## 匹配(MATCH)
+## Match
 
-匹配的含义是: 给定一个根节点和一个选择器, 找到符合该选择器的节点. Temme使用普通的CSS选择器作为匹配语法, 具体由cheerio来执行匹配.
+Given a root node (DOM node or cheerio node) and a selector, find the nodes that satisfies the selector. Frequently, we use `querySelectorAll(selector)` or `$(selector)` with jQuery to find the nodes that we want. CSS selectors contains only match information.
 
-## 捕获(CAPTURE)
+## Capture
 
-捕获的含义是: 给定一个节点和一个选择器, 将该节点的内容放到结果的对应字段中, 并返回结果. 节点的内容可以是节点文本, 节点HTML, 或者节点的某个特性值(例如\<a>标签的`href`特性); 一般情况下, 返回的捕获结果是一个JavaScript对象, 包含了多个字段, 存放了节点不同的内容, 字段由选择器指定.
+Given a node and a temme-selector, and returns an object containing the specified content. Content can be value of attribute, text or html. Which fields contains which content are designated by the temme-selector.
 
-Temme定义了一个新的选择器语法(TemmeSelector), 该语法同时包含匹配信息和捕获信息. 其中匹配部分用来表示"我们想从什么样的节点中获取数据", 捕获部分用来表示"从节点中获取什么样的数据".
+## Match and Capture
 
-# Grammar Syntax and Semantics
+Temme defines a new selector syntax called temme-selector. Temme-selector contains both match information and capture information. Match part is just like CSS selector; Capture part is described below.
+
+# Extra Grammar Syntax and Semantics
 
 ## Value-Capture `$`
 

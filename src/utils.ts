@@ -15,12 +15,11 @@ export function makeNormalCssSelector(sections: Section[]) {
       } else if (qualifier.type === 'attribute-qualifier') {
         const { attribute, operator, value } = qualifier
         if (operator == null && value == null) { // existence
-          result.push('[', attribute, ']')
+          result.push(`[${attribute}]`)
         } else if (typeof value === 'object') { // capture
           invariant(operator === '=', 'Value capture in attribute qualifier only works with `=` operator.')
         } else { // normal qualifier
-          // TODO 这里需要考虑引号问题
-          result.push('[', attribute, operator, value, ']')
+          result.push(`[${attribute}${operator}"${value}"]`)
         }
       } else { // pseudo-qualifier
         console.warn('pseudo-qualifier is not supported.')

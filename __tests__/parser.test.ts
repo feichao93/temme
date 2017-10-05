@@ -209,6 +209,29 @@ describe('parse capture', () => {
   })
 })
 
+test('using string literal in attribute qualifiers', () => {
+  const parseResult = temmeParser.parse(`[foo="a b c"]`)
+  const expectedResult: TemmeSelector[] = [{
+    type: 'normal-selector',
+    sections: [{
+      combinator: ' ',
+      element: universalSelector,
+      qualifiers: [{
+        type: 'attribute-qualifier',
+        attribute: 'foo',
+        operator: '=',
+        value: 'a b c',
+      }],
+      content: [],
+    }],
+    arrayCapture: null,
+    children: [],
+  }]
+  expect(parseResult).toEqual(expectedResult)
+
+  expect(temmeParser.parse(`[foo='a b c']`)).toEqual(expectedResult)
+})
+
 // TODO parse other section combinators: + > ~
 
 test('ignore JavaScript comments', () => {
