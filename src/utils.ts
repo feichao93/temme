@@ -6,7 +6,7 @@ export function makeNormalCssSelector(sections: Section[]) {
   const result: string[] = []
   for (const sec of sections) {
     result.push(sec.combinator)
-    result.push(sec.element) // TODO * universal element??
+    result.push(sec.element)
     for (const qualifier of sec.qualifiers) {
       if (qualifier.type === 'id-qualifier') {
         result.push('#' + qualifier.id)

@@ -135,7 +135,7 @@ Sections 'normal css selector'
 
 SectionSep 'css-selector-section-seperator'
   = __ &Combinator
-  / ' ' __ // TODO I think there is a better way to write this rule
+  / (WhiteSpace / LineTerminatorSequence / Comment) __
 
 Section 'section of css selector'
   = combinator:(c:Combinator __ { return c })?
