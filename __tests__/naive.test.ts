@@ -7,14 +7,15 @@ test('empty selector', () => {
   expect(temme(html, '\t\t  \n\n')).toBeNull()
 })
 
-test('use String#split as filter in value-capture', () => {
-  const html = `<p>A B C D</p>`
-  const selector = `p{$|split(' ')}`
-  expect(temme(html, selector)).toEqual(['A', 'B', 'C', 'D'])
-})
+describe('test filters', () => {
+  test('use String#split as filter in value-capture', () => {
+    const html = `<p>A B C D</p>`
+    const selector = `p{$|split(' ')}`
+    expect(temme(html, selector)).toEqual(['A', 'B', 'C', 'D'])
+  })
 
-test('use Array#slice as filter in array-capture', () => {
-  const html = `
+  test('use Array#slice as filter in array-capture', () => {
+    const html = `
   <ul>
     <li>apple</li>
     <li>banana</li>
@@ -23,12 +24,13 @@ test('use Array#slice as filter in array-capture', () => {
     <li>watermelon</li>
   </ul>
   `
-  const selector = 'li@|slice(1,4){ &{$} }'
-  expect(temme(cheerio.load(html), selector)).toEqual([
-    'banana',
-    'cherry',
-    'pear',
-  ])
+    const selector = 'li@|slice(1,4){ &{$} }'
+    expect(temme(cheerio.load(html), selector)).toEqual([
+      'banana',
+      'cherry',
+      'pear',
+    ])
+  })
 })
 
 test('multiple selectors at root level', () => {
@@ -69,7 +71,7 @@ test('temme(html, selector) supports html as CheerioElement', () => {
   expect(temme(cheerioElement, selector)).toBe('shinima')
 })
 
-test('attr predicate and value capture in attribute', () => {
+test('attr predicate and value capture without element in attribute', () => {
   const html = `
   <ul>
     <li class="name" data-full-name="Shi Feichao">shinima</li>
@@ -86,27 +88,28 @@ test('attr predicate and value capture in attribute', () => {
   })
 })
 
-test('assignments at top level', () => {
-  expect(temme('', "$str = '123'")).toEqual({
-    str: '123',
+describe('assigments in different places', () => {
+  test('assignments at top level', () => {
+    expect(temme('', "$str = '123'")).toEqual({
+      str: '123',
+    })
+    expect(temme('', '$str = "double-quote"')).toEqual({
+      str: 'double-quote',
+    })
+    expect(temme('', '$num = 1234')).toEqual({
+      num: 1234,
+    })
+    expect(temme('', '$nil = null')).toEqual({
+      nil: null,
+    })
+    expect(temme('', '$T = true, $F = false')).toEqual({
+      T: true,
+      F: false,
+    })
   })
-  expect(temme('', '$str = "double-quote"')).toEqual({
-    str: 'double-quote',
-  })
-  expect(temme('', '$num = 1234')).toEqual({
-    num: 1234,
-  })
-  expect(temme('', '$nil = null')).toEqual({
-    nil: null,
-  })
-  expect(temme('', '$T = true, $F = false')).toEqual({
-    T: true,
-    F: false,
-  })
-})
 
-test('assignments in array capture', () => {
-  const html = `
+  test('assignments in array capture', () => {
+    const html = `
   <ul>
     <li>apple</li>
     <li>banana</li>
@@ -115,33 +118,33 @@ test('assignments in array capture', () => {
     <li>watermelon</li>
   </ul>
   `
-  const selector = `
+    const selector = `
     li@ {
       $foo = 'bar',
     },
   `
-  expect(temme(html, selector)).toEqual([
-    { foo: 'bar' },
-    { foo: 'bar' },
-    { foo: 'bar' },
-    { foo: 'bar' },
-    { foo: 'bar' },
-  ])
-})
+    expect(temme(html, selector)).toEqual([
+      { foo: 'bar' },
+      { foo: 'bar' },
+      { foo: 'bar' },
+      { foo: 'bar' },
+      { foo: 'bar' },
+    ])
+  })
 
-test('assignments in content part', () => {
-  const html = `<div></div>`
-  const selector = `
+  test('assignments in content part', () => {
+    const html = `<div></div>`
+    const selector = `
     div { $divFound = true };
-    li { $liFound = true }; 
+    li { $liFound = true };
   `
-  const result = temme(html, selector)
-  expect(result.divFound).toBeTruthy()
-  expect(result.liFound).toBeFalsy()
-})
+    const result = temme(html, selector)
+    expect(result.divFound).toBeTruthy()
+    expect(result.liFound).toBeFalsy()
+  })
 
-test('assignments at top level and in content part', () => {
-  const html = `
+  test('assignments at top level and in content part', () => {
+    const html = `
     <div>
       <ul>
         <li></li>
@@ -149,7 +152,7 @@ test('assignments at top level and in content part', () => {
       </ul>
     </div>
   `
-  const selector = `
+    const selector = `
     $div = false;
     $ul = false;
     $li = false;
@@ -161,11 +164,44 @@ test('assignments at top level and in content part', () => {
     table { $table = true };
     a { $a = true };
   `
-  expect(temme(html, selector)).toEqual({
-    div: true,
-    ul: true,
-    li: true,
-    table: false,
-    a: false,
+    expect(temme(html, selector)).toEqual({
+      div: true,
+      ul: true,
+      li: true,
+      table: false,
+      a: false,
+    })
+  })
+})
+
+describe('using " ", "+", ">" and "~" as section seperators', () => {
+  const html = `
+    <p>text-0</p>
+    <div>
+      <article>
+        <p>text-1</p>
+      </article>
+      <p>text-2</p>
+      <div></div>
+      <p>text-3</p>
+    </div>
+    <p>text-4</p>
+    <p>text-5</p>
+  `
+
+  test('test " "', () => {
+    expect(temme(html, 'div p@{ &{$} }')).toEqual(['text-1', 'text-2', 'text-3'])
+  })
+
+  test('test "+"', () => {
+    expect(temme(html, 'div +p@{ &{$} }')).toEqual(['text-3', 'text-4'])
+  })
+
+  test('test ">"', () => {
+    expect(temme(html, 'div >p@{ &{$} }')).toEqual(['text-2', 'text-3'])
+  })
+
+  test('test "~"', () => {
+    expect(temme(html, 'div ~p@{ &{$} }')).toEqual(['text-3', 'text-4', 'text-5'])
   })
 })

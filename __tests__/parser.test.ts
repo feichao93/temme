@@ -5,6 +5,7 @@ import {
   NormalSelector,
   ContentPartCapture,
   AttributeOperator,
+  Combinator,
 } from '../src/index'
 
 test('parse empty selector', () => {
@@ -232,7 +233,33 @@ test('using string literal in attribute qualifiers', () => {
   expect(temmeParser.parse(`[foo='a b c']`)).toEqual(expectedResult)
 })
 
-// TODO parse other section combinators: + > ~
+describe('test different section combinator', () => {
+  function getExpectedResult(combinator: Combinator): TemmeSelector[] {
+    return [{
+      type: 'normal-selector',
+      sections: [{
+        combinator: ' ',
+        element: 'div',
+        qualifiers: [],
+        content: [],
+      }, {
+        combinator,
+        element: 'div',
+        qualifiers: [],
+        content: [],
+      }],
+      arrayCapture: null,
+      children: [],
+    }]
+  }
+
+  for (const combinator of [' ', '>', '+', '~'] as Combinator[]) {
+    test(`test ${JSON.stringify(combinator)}`, () => {
+      const parseResult = temmeParser.parse(`div ${combinator} div`)
+      expect(parseResult).toEqual(getExpectedResult(combinator))
+    })
+  }
+})
 
 test('ignore JavaScript comments', () => {
   expect(temmeParser.parse('/* abcdef */')).toBeNull()
