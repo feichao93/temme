@@ -36,6 +36,13 @@ const config: webpack.Configuration = {
     }),
     new MinifyPlugin(),
   ],
+
+  devServer: {
+    contentBase: [
+      path.resolve(__dirname, 'playground'),
+      path.resolve(__dirname, 'playground/public'),
+    ],
+  },
 }
 
 export default config

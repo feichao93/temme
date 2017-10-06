@@ -2,6 +2,11 @@ import temme, { temmeParser, cheerio } from '../src/temme'
 import debounce from 'lodash.debounce'
 import loadExamples from './examples'
 
+/* example mode */
+const url = new URL(document.URL)
+const exampleName = url.searchParams.get('example')
+const EXAMPLE_MODE = exampleName !== null
+
 /* static elements */
 const lsKeyHtml = 'temme-playground-html'
 const lsKeySelectorString = 'temme-playground-selector-string'
@@ -11,8 +16,23 @@ const outputDiv = document.querySelector('#output')
 const resultTimeHint = document.querySelector('#result-time-hint')
 const errorIndicator = document.querySelector('#error-indicator')
 const copyResultButton = document.querySelector('#copy-result-button')
+const htmlPart = document.querySelector('#html-part')
+const selectorOutputPart = document.querySelector('#selector-output-part')
+const toggleWidthButton = document.querySelector('#toggle-width-button')
 
 /* functions and utilities */
+function onToggleWidth() {
+  if (htmlPart.style.width === '50%') {
+    htmlPart.style.width = '15%'
+    selectorOutputPart.style.width = '85%'
+    toggleWidthButton.textContent = '>'
+  } else {
+    htmlPart.style.width = '50%'
+    selectorOutputPart.style.width = '50%'
+    toggleWidthButton.textContent = '<'
+  }
+}
+
 const syntaxError = {
   show(e) {
     errorIndicator.textContent = e.message
@@ -66,7 +86,7 @@ function measureExecutionTime(fn) {
   const result = fn()
   const end = performance.now()
   const time = end - start
-  return {time, result}
+  return { time, result }
 }
 
 function computeResultAndDisplay(html, selectorString, outputEditor) {
@@ -74,7 +94,7 @@ function computeResultAndDisplay(html, selectorString, outputEditor) {
     try {
       const selector = parseSelector(selectorString)
       if (html) {
-        const {time, result: json} = measureExecutionTime(() => {
+        const { time, result: json } = measureExecutionTime(() => {
           const cheerioStatic = parseHtml(html)
           return temme(cheerioStatic, selector)
         })
@@ -100,9 +120,13 @@ function initHtmlEditor() {
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
-  const html = localStorage.getItem(lsKeyHtml)
-  if (html) {
-    editor.setValue(html)
+  if (EXAMPLE_MODE) {
+    editor.setReadOnly(true)
+  } else {
+    const html = localStorage.getItem(lsKeyHtml)
+    if (html) {
+      editor.setValue(html)
+    }
   }
   return editor
 }
@@ -114,9 +138,11 @@ function initSelectorEditor() {
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
-  const selectorString = localStorage.getItem(lsKeySelectorString)
-  if (selectorString) {
-    editor.setValue(selectorString)
+  if (!EXAMPLE_MODE) {
+    const selectorString = localStorage.getItem(lsKeySelectorString)
+    if (selectorString) {
+      editor.setValue(selectorString)
+    }
   }
   return editor
 }
@@ -133,17 +159,19 @@ function initOutputEditor() {
 }
 
 window.addEventListener('beforeunload', () => {
-  const html = htmlEditor.getValue()
-  const selectorString = selectorEditor.getValue()
-  if (html) {
-    localStorage.setItem(lsKeyHtml, html)
-  } else {
-    localStorage.removeItem(lsKeyHtml)
-  }
-  if (selectorString) {
-    localStorage.setItem(lsKeySelectorString, selectorString)
-  } else {
-    localStorage.removeItem(lsKeySelectorString)
+  if (!EXAMPLE_MODE) {
+    const html = htmlEditor.getValue()
+    const selectorString = selectorEditor.getValue()
+    if (html) {
+      localStorage.setItem(lsKeyHtml, html)
+    } else {
+      localStorage.removeItem(lsKeyHtml)
+    }
+    if (selectorString) {
+      localStorage.setItem(lsKeySelectorString, selectorString)
+    } else {
+      localStorage.removeItem(lsKeySelectorString)
+    }
   }
 })
 
@@ -176,9 +204,10 @@ copyResultButton.onclick = () => {
   }
 }
 
+toggleWidthButton.addEventListener('click', onToggleWidth)
+
 onChange()
 
-const url = new URL(document.URL)
-if (url.searchParams.has('example')) {
-  loadExamples(url.searchParams.get('example'), htmlEditor, selectorEditor)
+if (EXAMPLE_MODE) {
+  loadExamples(exampleName, htmlEditor, selectorEditor)
 }
