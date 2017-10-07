@@ -9,7 +9,7 @@ const config: webpack.Configuration = {
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'temme.js',
+    filename: 'index.js',
     library: 'temme',
     libraryTarget: 'umd',
   },

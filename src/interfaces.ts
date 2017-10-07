@@ -83,3 +83,7 @@ export interface ContentPartCall {
   funcName: string
   args: (Literal | Capture)[]
 }
+
+// The following line is related to
+// https://github.com/s-panferov/awesome-typescript-loader/issues/501
+export const DummyValue325353 = '242gascdfe'
