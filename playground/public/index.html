@@ -42,6 +42,14 @@
       transition: width 300ms;
     }
 
+    .nav-button {
+      border: none;
+      width: 64px;
+      height: 24px;
+      color: aliceblue;
+      background: #5587d3;
+    }
+
     #error-indicator {
       color: #dc3545;
     }
@@ -98,15 +106,18 @@
         <a style="color: inherit" href="https://github.com/shinima/temme" target=_blank>GitHub</a>
       </span>
       <span style="padding-left: 8px;">
-        <a id=browse-example-link style="color: inherit" href="#">Browse Examples</a>
+        <a id=browse-tutorial-link style="color: inherit" href="#">Tutorial</a>
+      </span>
+      <span style="padding-left: 8px;">
+        <a id=browse-example-link style="color: inherit" href="#">Examples</a>
       </span>
     </p>
     <div id=example-select-part style="display: none; margin: 8px; margin-top: 12px">
       Example:
       <select id=example-select title="Select an example" style="width: 250px">
       </select>
-      <button id=prev-example-button>Prev</button>
-      <button id=next-example-button>Next</button>
+      <button id=prev-example-button class="nav-button">Prev</button>
+      <button id=next-example-button class="nav-button">Next</button>
     </div>
   </header>
   <div class="flex-grow-1" style="display: flex">

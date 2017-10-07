@@ -1,7 +1,5 @@
 [![Build Status](https://img.shields.io/travis/shinima/temme/master.svg)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg)](https://www.npmjs.org/package/temme) [![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg?style=flat-square)](https://greenkeeper.io/)
 
-**CAUTION** Temme is in an early stage, so the syntax may change in the future. Some parts of this doc is **outdated**. Playground may contains some bug.
-
 # Temme
 
 Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammars to enable capturing data into result. Try temme in [playground](http://shinima.pw/temme-playground/).

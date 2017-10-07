@@ -12,6 +12,7 @@ const EXAMPLE_MODE = exampleName !== null
 const lsKeyHtml = 'temme-playground-html'
 const lsKeySelectorString = 'temme-playground-selector-string'
 const browseExampleLink = document.querySelector('#browse-example-link')
+const browseTutorialLink = document.querySelector('#browse-tutorial-link')
 const htmlInputDiv = document.querySelector('#html-input')
 const selectorInputDiv = document.querySelector('#selector-input')
 const outputDiv = document.querySelector('#output')
@@ -177,8 +178,8 @@ window.addEventListener('beforeunload', () => {
 
 
 /* kick start! */
-
-browseExampleLink.href = `?example=${examples[0].name}`
+browseTutorialLink.href = `?example=${examples.find(exp => exp.name.startsWith('tutorial')).name}`
+browseExampleLink.href = `?example=${examples.find(exp => !exp.name.startsWith('tutorial')).name}`
 
 const htmlEditor = initHtmlEditor()
 const selectorEditor = initSelectorEditor()
