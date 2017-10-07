@@ -1,5 +1,4 @@
 import * as cheerio from 'cheerio'
-import makeGrammarErrorMessage from './makeGrammarErrorMessage'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import { defaultContentFunctions } from './contentFunction'
 import check, { errorMessages } from './check'
@@ -14,6 +13,8 @@ import {
   TemmeSelector,
   ContentPart,
   AttributeQualifier,
+  NormalSelector,
+  SelfSelector,
 } from './interfaces'
 
 export interface TemmeParser {
@@ -38,8 +39,8 @@ if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
 export { cheerio, temmeParser }
 
 export default function temme(html: string | CheerioStatic | CheerioElement,
-                              selector: string | TemmeSelector[],
-                              extraFilters: { [key: string]: FilterFn } = {},) {
+  selector: string | TemmeSelector[],
+  extraFilters: { [key: string]: FilterFn } = {}, ) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -51,12 +52,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
 
   let rootSelector: TemmeSelector[]
   if (typeof selector === 'string') {
-    try {
-      rootSelector = temmeParser.parse(selector)
-    } catch (error) {
-      const message = makeGrammarErrorMessage(selector, error)
-      throw new Error(message)
-    }
+    rootSelector = temmeParser.parse(selector)
   } else {
     rootSelector = selector
   }
@@ -101,7 +97,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
     return result
   }
 
-  function capture(node: Cheerio, selector: TemmeSelector): CaptureResult {
+  function capture(node: Cheerio, selector: NormalSelector | SelfSelector): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
     if (selector.type === 'normal-selector') {
@@ -111,7 +107,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
       const { qualifiers, content } = sections[sections.length - 1]
       result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
       result.merge(captureContent(node, content), true)
-    } else if (selector.type === 'self-selector') {
+    } else { // selector.type === 'self-selector'
       const { section: { qualifiers, content } } = selector
       result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
       result.merge(captureContent(node, content), true)

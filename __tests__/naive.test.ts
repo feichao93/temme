@@ -88,6 +88,30 @@ test('attr predicate and value capture without element in attribute', () => {
   })
 })
 
+test('try to capture a non-existent attribute', () => {
+  const html = '<div color=red speed=fast power=great>TEXT</div>'
+  expect(temme(html, 'div[name=$name age=$age]')).toBeNull()
+})
+
+test('using the special node filter', () => {
+  const html = '<div color=red speed=fast power=great>TEXT</div>'
+  const node: Cheerio = temme(html, 'div{$|node}')
+  expect(node.text()).toBe('TEXT')
+  expect(node.attr('color')).toBe('red')
+  expect(node.attr('speed')).toBe('fast')
+  expect(node.attr('power')).toBe('great')
+})
+
+test('test pseudo-qualifier. pseudo-qualifer is not supported now and should be ignored', () => {
+  const html = '<div color=red speed=fast power=great>TEXT</div>'
+  expect(temme(html, 'div[color=$color speed=$speed]:first-child{$text}'))
+    .toEqual({
+      color: 'red',
+      speed: 'fast',
+      text: 'TEXT',
+    })
+})
+
 describe('assigments in different places', () => {
   test('assignments at top level', () => {
     expect(temme('', "$str = '123'")).toEqual({
