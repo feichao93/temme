@@ -2,7 +2,7 @@ export interface Dict<V> {
   [key: string]: V
 }
 
-export type Literal = string | number | boolean | null
+export type Literal = string | number | boolean | null | RegExp
 
 export interface Capture {
   name: string

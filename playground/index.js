@@ -93,16 +93,14 @@ function computeResultAndDisplay(html, selectorString, outputEditor) {
   if (selectorString) {
     try {
       const selector = parseSelector(selectorString)
-      if (html) {
-        const { time, result: json } = measureExecutionTime(() => {
-          const cheerioStatic = parseHtml(html)
-          return temme(cheerioStatic, selector)
-        })
-        outputEditor.setValue(JSON.stringify(json, null, 2))
-        outputEditor.getSession().selection.moveCursorFileStart()
-        resultHint.setTime(time)
-        syntaxError.hide()
-      }
+      const { time, result: json } = measureExecutionTime(() => {
+        const cheerioStatic = parseHtml(html)
+        return temme(cheerioStatic, selector)
+      })
+      outputEditor.setValue(JSON.stringify(json, null, 2))
+      outputEditor.getSession().selection.moveCursorFileStart()
+      resultHint.setTime(time)
+      syntaxError.hide()
     } catch (e) {
       syntaxError.show(e)
       resultHint.clear()

@@ -1,5 +1,10 @@
-import { Capture, Dict } from './interfaces'
+import { Capture } from './interfaces'
 import CaptureResult from './CaptureResult'
+import { errorMessages } from './check'
+
+export interface ContentFn {
+  (result: CaptureResult, node: Cheerio, ...args: any[]): void
+}
 
 // 对string进行多段匹配/捕获 下面的文档已经过时了
 // multisectionMatch('I like apple', ['I', $foo])的结果为
@@ -43,12 +48,32 @@ export function match(result: CaptureResult, node: Cheerio, args: (string | Capt
   }
 }
 
-export interface ContentFn {
-  (result: CaptureResult, node: Cheerio, ...args: any[]): void
-}
-
-export const defaultContentFunctions: Dict<ContentFn> = {
+const defaultContentFunctions = {
   match,
 }
 
-// TODO add support for customized content functions
+const map = new Map<string, ContentFn>()
+
+const contentFunctions = {
+  get(name: string) {
+    if (map.has(name)) {
+      return map.get(name)
+    } else {
+      throw new Error(errorMessages.invalidContentFunction(name))
+    }
+  },
+
+  set(name: string, fn: ContentFn) {
+    map.set(name, fn)
+  },
+
+  remove(name: string) {
+    map.delete(name)
+  },
+}
+
+for (const [name, fn] of Object.entries(defaultContentFunctions)) {
+  contentFunctions.set(name, fn)
+}
+
+export default contentFunctions

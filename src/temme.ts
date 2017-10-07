@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
-import { defaultContentFunctions } from './contentFunction'
-import check, { errorMessages } from './check'
+import contentFunctions from './contentFunctions'
+import check from './check'
 import CaptureResult from './CaptureResult'
 import { specialFilterNames } from './constants'
 import {
@@ -10,6 +10,7 @@ import {
   isAttributeQualifier,
 } from './utils'
 import {
+  Dict,
   TemmeSelector,
   ContentPart,
   AttributeQualifier,
@@ -38,9 +39,11 @@ if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
 
 export { cheerio, temmeParser }
 
-export default function temme(html: string | CheerioStatic | CheerioElement,
+export default function temme(
+  html: string | CheerioStatic | CheerioElement,
   selector: string | TemmeSelector[],
-  extraFilters: { [key: string]: FilterFn } = {}, ) {
+  extraFilters: Dict<FilterFn> = {},
+) {
   let $: CheerioStatic
   if (typeof html === 'string') {
     $ = cheerio.load(html, { decodeEntities: false })
@@ -153,11 +156,7 @@ export default function temme(html: string | CheerioStatic | CheerioElement,
         result.add(name, value, filterList, true)
       } else { // part.type === 'call'
         const { funcName, args } = part
-        if (funcName in defaultContentFunctions) {
-          defaultContentFunctions[funcName](result, node, args)
-        } else {
-          throw new Error(errorMessages.invalidContentFunction(funcName))
-        }
+        contentFunctions.get(funcName)(result, node, args)
       }
     }
     return result

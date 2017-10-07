@@ -240,6 +240,13 @@ ContentPart
       capture,
     }
   }
+  / funcName:IdentifierName __ '(' __ ')' {
+    return {
+      type: 'call',
+      funcName,
+      args: [],
+    }
+  }
   / funcName:IdentifierName
     __ '('
     __ head:ContentPartArg tail:(__ ContentPartSeparator __ arg:ContentPartArg { return arg })*
@@ -290,6 +297,7 @@ Literal
   / BooleanLiteral
   / NumericLiteral
   / StringLiteral
+  / RegularExpressionLiteral
 
 NullLiteral
   = NullToken { return null }
@@ -317,6 +325,44 @@ DecimalLiteral
 DecimalIntegerLiteral
   = "0"
   / NonZeroDigit DecimalDigit*
+
+RegularExpressionLiteral "regular expression"
+  = "/" pattern:$RegularExpressionBody "/" flags:$RegularExpressionFlags {
+    try {
+      return new RegExp(pattern, flags)
+    } catch (e) {
+      error(e.message)
+    }
+  }
+
+RegularExpressionBody
+  = RegularExpressionFirstChar RegularExpressionChar*
+
+RegularExpressionFirstChar
+  = ![*\\/[] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+  / RegularExpressionClass
+
+RegularExpressionChar
+  = ![\\/[] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+  / RegularExpressionClass
+
+RegularExpressionBackslashSequence
+  = "\\" RegularExpressionNonTerminator
+
+RegularExpressionNonTerminator
+  = !LineTerminator SourceCharacter
+
+RegularExpressionClass
+  = "[" RegularExpressionClassChar* "]"
+
+RegularExpressionClassChar
+  = ![\]\\] RegularExpressionNonTerminator
+  / RegularExpressionBackslashSequence
+
+RegularExpressionFlags
+  = IdentifierPart*
 
 LineTerminator
   = [\n\r\u2028\u2029]
