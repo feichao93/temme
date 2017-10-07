@@ -1,6 +1,7 @@
 import temme, { temmeParser, cheerio } from '../src/temme'
 import debounce from 'lodash.debounce'
-import loadExamples from './examples'
+import examples from './examples'
+import loadExamples from './loadExample'
 
 /* example mode */
 const url = new URL(document.URL)
@@ -10,6 +11,7 @@ const EXAMPLE_MODE = exampleName !== null
 /* static elements */
 const lsKeyHtml = 'temme-playground-html'
 const lsKeySelectorString = 'temme-playground-selector-string'
+const browseExampleLink = document.querySelector('#browse-example-link')
 const htmlInputDiv = document.querySelector('#html-input')
 const selectorInputDiv = document.querySelector('#selector-input')
 const outputDiv = document.querySelector('#output')
@@ -175,6 +177,9 @@ window.addEventListener('beforeunload', () => {
 
 
 /* kick start! */
+
+browseExampleLink.href = `?example=${examples[0].name}`
+
 const htmlEditor = initHtmlEditor()
 const selectorEditor = initSelectorEditor()
 const outputEditor = initOutputEditor()
