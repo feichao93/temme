@@ -1,6 +1,6 @@
-const simplehtml1 = '<a href="/js.txt.yaml.json" class="link">TEXT CONTENT</a>'
+const simpleHtml1 = '<a href="/js.txt.yaml.json" class="link">TEXT CONTENT</a>'
 
-const simplehtml2 = `
+const simpleHtml2 = `
 <ul>
   <li data-fruit-id="1">
     <span data-color="red">apple</span>
@@ -13,7 +13,7 @@ const simplehtml2 = `
   </li>
 </ul>`
 
-const simplehtml3 = `
+const simpleHtml3 = `
 <a href="https://github.com/shinima/temme">Star Me on GitHub</a>
 <table class="awesome-table">
   <tr data-row-id="100321">
@@ -52,7 +52,7 @@ If you are ready, click the next button on the top.
   },
   {
     name: 'tutorial-1',
-    html: simplehtml1,
+    html: simpleHtml1,
     selector: `
 // value-capture
 .link[href=$href]{$txt}
@@ -68,14 +68,14 @@ In this basic example, CSS selector that matches element a is '.link'
   },
   {
     name: 'tutorial-2',
-    html: simplehtml1,
+    html: simpleHtml1,
     selector: `
 // default-value-capture
 
-.link[href=$]; // capture href attribut as result
+.link[href=$]; // capture href attribute as result
 
 // capture text content as result
-// .link{$}; // uncomment this line to see the effectes
+// .link{$}; // uncomment this line to see the effects
 
 /* We can use a single $ to make a default value-capture, and 
 the result will be a single value. 
@@ -83,14 +83,14 @@ the result will be a single value.
   },
   {
     name: 'tutorial-3',
-    html: simplehtml2,
+    html: simpleHtml2,
     selector: `
 // array-capture 
 li@fruits {
   span[data-color=$color]{$name};
 }
 
-/* Array-Capture is useful when we want to capture an array of similiar items.
+/* Array-Capture is useful when we want to capture an array of similar items.
 Place '@foo { ... }' after a css selector, and define several children selectors
 within the curly brackets. This means: for every node (called parent-node) that
 matches parent-selector, execute the children selectors one-by-one; every 
@@ -102,21 +102,21 @@ field of the upper-level result.
   },
   {
     name: 'tutorial-4',
-    html: simplehtml2,
+    html: simpleHtml2,
     selector: `
 // default-array-capture 
 li@ {
   span[data-color=$color]{$name};
 }
 
-/* Like default value-capture, we could just use a signle dollar sign to make a default 
+/* Like default value-capture, we could just use a single at-sign to make a default 
 array-capture, and the array will be the result of upper-level result.
 */
 `,
   },
   {
     name: 'tutorial-5',
-    html: simplehtml2,
+    html: simpleHtml2,
     selector: `
 // Parent-Reference 
 li@ {
@@ -132,7 +132,7 @@ array-capture when the data is stored in the parent node.
   },
   {
     name: 'tutorial-6',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 // Nested-Array-Captures
 tr@ {
@@ -146,7 +146,7 @@ tr@ {
   },
   {
     name: 'tutorial-7',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 // Multiple Selectors at Top-Level
 a[href=$link];
@@ -160,7 +160,7 @@ Do not forget to use the semicolon as the separator.
   },
   {
     name: 'tutorial-8',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 // Assignments at top-level
 $str = 'bar';
@@ -170,13 +170,13 @@ $bool = true;
 $regx = /.*/gi; // JSON.stringify(regx) => empty object
 
 /* Assignment at top-level is quite straightforward. You can supply a JavaScript
- literal on the right. String, Number, null, Boolean, and RegExp are accpected.
+ literal on the right. String, Number, null, Boolean, and RegExp is accepted.
 */
 `,
   },
   {
     name: 'tutorial-9',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 // Assignments in content
 $hasAElement = false;
@@ -185,7 +185,7 @@ $hasDivElement = false;
 a { $hasAElement = true };
 div { $hasDivElement = true };
 table.awesome-table { $hasAwesomeTable = 666 };
-table.foo-bar { $foobabr = null };
+table.foo-bar { $foobar = null };
 
 /* Assignments in content are like conditional assignments. If there is such an element
 that satisfies the given selector, then we assign.
@@ -194,7 +194,7 @@ that satisfies the given selector, then we assign.
   },
   {
     name: 'tutorial-10',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 // Assignments in children selectors
 tr@ {
@@ -204,13 +204,41 @@ tr@ {
 `,
   },
   {
-    name: 'tutorial-11 TODO', // TODO
-    html: simplehtml3,
-    selector: '// TODO filter and content functions',
+    name: 'tutorial-11',
+    html: simpleHtml3,
+    selector: `
+// filter and content functions
+tr@ {
+ &[data-row-id=$rid|Number];
+ td@cells|join(' ')|toLowerCase { &{$} };
+}
+
+/* When a value is captured, it is always a string. A filter is a 
+simple function that receive input as this context with several 
+arguments, and returns a single value. You could use filters to
+process the captured value.
+
+In the above example, '$rid|Number' means that every time $rid captures a value,
+it will be processed by 'Number' filter and it will be converted to a number.
+
+In "@cells|join(' ')|toLowerCase", two filters are chained, and both filters
+are from its prototype. Every time @cells is captured, it will be processed like
+cells = cells.join(' ').toLowerCase()
+
+See source file src/filters.ts to view all built-in filters. 
+
+*/`,
+  },
+  {
+    name: 'tutorial-12 TODO', // todo
+    html: simpleHtml3,
+    selector: `
+// content part
+`,
   },
   {
     name: 'tutorial-end',
-    html: simplehtml3,
+    html: simpleHtml3,
     selector: `
 /*
 Thank you for reading this short tutorial.

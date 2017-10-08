@@ -6,7 +6,7 @@ function gotoExample(name) {
 
 function enterExampleMode(currentExampleName) {
   const exampleModeHint = document.querySelector('#example-mode-hint')
-  exampleModeHint.textContent = '(readonly in example mode)'
+  exampleModeHint.textContent = '(Readonly in Example Mode)'
   const exitLink = document.querySelector('#exit-example-mode')
   exitLink.textContent = 'Exit Example Mode'
 

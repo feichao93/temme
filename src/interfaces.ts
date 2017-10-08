@@ -43,14 +43,14 @@ export interface Section {
 
 export type Combinator = ' ' | '>' | '+' | '~'
 
-export type Qualifier = IdQualifier | ClassQualifirer | AttributeQualifier | PseudoQualifier
+export type Qualifier = IdQualifier | ClassQualifier | AttributeQualifier | PseudoQualifier
 
 export interface IdQualifier {
   type: 'id-qualifier'
   id: string
 }
 
-export interface ClassQualifirer {
+export interface ClassQualifier {
   type: 'class-qulifier'
   className: string
 }
