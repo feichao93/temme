@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.3.0",
+  "version": "0.4.0-SNAPSHOT",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -8,7 +8,7 @@
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "engines": {
-    "node": ">= 8.0.0"
+    "node": ">= 7.6.0"
   },
   "scripts": {
     "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
