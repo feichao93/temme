@@ -2,7 +2,7 @@
 
 # Temme
 
-Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammars to enable capturing data into result. Try temme in [playground](http://shinima.pw/temme/).
+Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammar to enable capturing data into result. Try temme in [playground](http://shinima.pw/temme/).
 
 # Install
 
@@ -32,7 +32,7 @@ emmet('div[class=red]{text content}')
 // => <div class="red">text content</div>
 ```
 
-If we extend this function to allow a second argument `data`. Then the function could looks like:
+If we extend this function to allow a second argument `data`. Then the function could look like:
 ```JavaScript
 emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
 // => <div class="red">text content</div>
@@ -279,7 +279,7 @@ This selectors means: check the text content of element contains string 'hello'.
 
 ### Text matching(outdated)
 
-`text` content function supports string matching. `text` accepts multiple parameters. Each parameter is either a value-capture form or a string literal. It will try to match the text content against multiple parameters. If match succeed, the result will be an object in which field `foo` is the corresponding text  content in the whole text. (TODO text matching description should be more specific.)
+`text` content function supports string matching. `text` accepts multiple parameters. Each parameter is either a value-capture form or a string literal. It will try to match the text content against multiple parameters. If match succeed, the result will be an object in which field `foo` is the corresponding text content in the whole text. (TODO text matching description should be more specific.)
 
 For example:
 

@@ -28,12 +28,17 @@ const simpleHtml3 = `
     <td>E</td>
     <td>F</td>
   </tr>
-</table>
-`
+</table>`
+
+const simpleHtml4 = `
+<div class="outer">
+  <p>TEXT-1</p>
+  <div class="inner">TEXT-2</div>
+</div>`
 
 export default [
   {
-    name: 'tutorial-0',
+    name: 'tutorial-start',
     html: `
 <html>
   Here is the editor for HTML.
@@ -43,7 +48,9 @@ export default [
     selector: `
 /*
 
-Thank you for using Temme. Temme supports JavaScript-style comments.
+Thank you for using Temme. 
+
+Here is the editor for selector. You can edit here and see the result instantly.
 In this tutorial, I will explain temme grammars through several examples with comments.
 
 If you are ready, click the next button on the top.
@@ -207,7 +214,7 @@ tr@ {
     name: 'tutorial-11',
     html: simpleHtml3,
     selector: `
-// filter and content functions
+// filters
 tr@ {
  &[data-row-id=$rid|Number];
  td@cells|join(' ')|toLowerCase { &{$} };
@@ -230,11 +237,54 @@ See source file src/filters.ts to view all built-in filters.
 */`,
   },
   {
-    name: 'tutorial-12 TODO', // todo
+    name: 'tutorial-12',
     html: simpleHtml3,
     selector: `
-// content part
+// content
+a{
+  $text;                           // capture
+  $assignmentInContent = true;     // assignment
+  match('Star Me on ', $website);  // function call
+};
+
+/* The part in the curly brackets is called "content". Content consists of
+several parts. Content part could be a capture, an assignment or a function call. 
+*/
 `,
+  },
+  {
+    name: 'tutorial-13',
+    html: simpleHtml4,
+    selector: `
+// special filters in content
+div.outer{
+  $a;
+  $b|text;
+  $c|html;
+  $d|node|attr('class');
+  $e|toLowerCase;
+}
+
+/* 'text', 'html' and 'node' are special filters in content. One of the three filters
+is always used as the first filter in content capture. If not specified, 'text'
+will be used.
+
+Note the difference between content and array-capture: array-capture has an at-sign @.
+*/`,
+  },
+  {
+    name: 'tutorial-14',
+    html: simpleHtml3,
+    selector: `
+// content functions
+a {
+  match('Star Me on ', $website);
+}
+
+/* We can call content functions in content. Content function is an advanced method that
+can process match and capture at the same time.
+See file src/contentFunctions.ts for more information.
+*/`,
   },
   {
     name: 'tutorial-end',
@@ -242,8 +292,7 @@ See source file src/filters.ts to view all built-in filters.
     selector: `
 /*
 Thank you for reading this short tutorial.
-Now you could click next to see some real-world complex examples.
-Or exit example mode and use the playground.
+Click next to see some real-world complex examples.
 */`,
   },
   {

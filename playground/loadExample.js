@@ -55,7 +55,9 @@ export default async function loadExample(exampleName, htmlEditor, selectorEdito
       if (response.ok) {
         const html = await response.text()
         htmlEditor.setValue(html)
+        htmlEditor.getSession().selection.moveCursorFileStart()
         selectorEditor.setValue(example.selector.trim())
+        selectorEditor.getSession().selection.moveCursorFileStart()
       } else {
         throw new Error('server does not respond with 200')
       }
@@ -64,6 +66,8 @@ export default async function loadExample(exampleName, htmlEditor, selectorEdito
     }
   } else if (example.html) {
     htmlEditor.setValue(example.html.trim())
+    htmlEditor.getSession().selection.moveCursorFileStart()
     selectorEditor.setValue(example.selector.trim())
+    selectorEditor.getSession().selection.moveCursorFileStart()
   }
 }
