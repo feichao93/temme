@@ -48,7 +48,7 @@ export default [
     selector: `
 /*
 
-Thank you for using Temme. 
+Thank you for using Temme.
 
 Here is the editor for selector. You can edit here and see the result instantly.
 In this tutorial, I will explain temme grammars through several examples with comments.
@@ -58,23 +58,23 @@ If you are ready, click the next button on the top.
 */`,
   },
   {
-    name: 'tutorial-1',
+    name: 'tutorial-value-capture',
     html: simpleHtml1,
     selector: `
 // value-capture
 .link[href=$href]{$txt}
 
-/* Value-capture is a basic form of capture. It uses $foo syntax. Value-capture 
+/* Value-capture is a basic form of capture. It uses $foo syntax. Value-capture
 can be placed at attribute part (in square brackets) to capture attribute value,
  or at content part (in curly braces) to capture text/html.
 
 In this basic example, CSS selector that matches element a is '.link'
 '[href=$href]' is a attribute capture which means that "capture href attribute into .href".
-'{$txt}' is a content capture means that "capture text content of the element into .txt". 
+'{$txt}' is a content capture means that "capture text content of the element into .txt".
 */`,
   },
   {
-    name: 'tutorial-2',
+    name: 'tutorial-default-value-capture',
     html: simpleHtml1,
     selector: `
 // default-value-capture
@@ -84,15 +84,15 @@ In this basic example, CSS selector that matches element a is '.link'
 // capture text content as result
 // .link{$}; // uncomment this line to see the effects
 
-/* We can use a single $ to make a default value-capture, and 
-the result will be a single value. 
+/* We can use a single $ to make a default value-capture, and
+the result will be a single value.
 */`,
   },
   {
-    name: 'tutorial-3',
+    name: 'tutorial-array-capture',
     html: simpleHtml2,
     selector: `
-// array-capture 
+// array-capture
 li@fruits {
   span[data-color=$color]{$name};
 }
@@ -100,48 +100,48 @@ li@fruits {
 /* Array-Capture is useful when we want to capture an array of similar items.
 Place '@foo { ... }' after a css selector, and define several children selectors
 within the curly brackets. This means: for every node (called parent-node) that
-matches parent-selector, execute the children selectors one-by-one; every 
-parent-node corresponds an object as result, and the result of array-capture 
+matches parent-selector, execute the children selectors one-by-one; every
+parent-node corresponds an object as result, and the result of array-capture
 is the array composed of parent-node result. The array itself will be the foo
-field of the upper-level result. 
+field of the upper-level result.
 */
 `,
   },
   {
-    name: 'tutorial-4',
+    name: 'tutorial-default-array-capture',
     html: simpleHtml2,
     selector: `
-// default-array-capture 
+// default-array-capture
 li@ {
   span[data-color=$color]{$name};
 }
 
-/* Like default value-capture, we could just use a single at-sign to make a default 
+/* Like default value-capture, we could just use a single at-sign to make a default
 array-capture, and the array will be the result of upper-level result.
 */
 `,
   },
   {
-    name: 'tutorial-5',
+    name: 'tutorial-parent-reference',
     html: simpleHtml2,
     selector: `
-// Parent-Reference 
+// Parent-Reference
 li@ {
   &[data-fruit-id=$fid];
   span[data-color=$color]{$name};
 }
 
-/* & gives us the ability to capture data in the parent node. It has the same 
-semantic meaning as in sass, less or stylus. Parent-reference is useful in 
+/* & gives us the ability to capture data in the parent node. It has the same
+semantic meaning as in sass, less or stylus. Parent-reference is useful in
 array-capture when the data is stored in the parent node.
 */
 `,
   },
   {
-    name: 'tutorial-6',
+    name: 'tutorial-nested-array-capture',
     html: simpleHtml3,
     selector: `
-// Nested-Array-Captures
+// Nested-Array-Capture
 tr@ {
   &[data-row-id=$rowId];
   td@cells { &{$} };
@@ -152,7 +152,7 @@ tr@ {
 `,
   },
   {
-    name: 'tutorial-7',
+    name: 'tutorial-multiple-selectors-at-top-level',
     html: simpleHtml3,
     selector: `
 // Multiple Selectors at Top-Level
@@ -166,7 +166,7 @@ Do not forget to use the semicolon as the separator.
 `,
   },
   {
-    name: 'tutorial-8',
+    name: 'tutorial-assignments-at-top-level',
     html: simpleHtml3,
     selector: `
 // Assignments at top-level
@@ -182,7 +182,7 @@ $regx = /.*/gi; // JSON.stringify(regx) => empty object
 `,
   },
   {
-    name: 'tutorial-9',
+    name: 'tutorial-assignments-in-content',
     html: simpleHtml3,
     selector: `
 // Assignments in content
@@ -200,7 +200,7 @@ that satisfies the given selector, then we assign.
 `,
   },
   {
-    name: 'tutorial-10',
+    name: 'tutorial-assignments-in-children-selectors',
     html: simpleHtml3,
     selector: `
 // Assignments in children selectors
@@ -211,7 +211,7 @@ tr@ {
 `,
   },
   {
-    name: 'tutorial-11',
+    name: 'tutorial-filters',
     html: simpleHtml3,
     selector: `
 // filters
@@ -220,8 +220,8 @@ tr@ {
  td@cells|join(' ')|toLowerCase { &{$} };
 }
 
-/* When a value is captured, it is always a string. A filter is a 
-simple function that receive input as this context with several 
+/* When a value is captured, it is always a string. A filter is a
+simple function that receive input as this context with several
 arguments, and returns a single value. You could use filters to
 process the captured value.
 
@@ -232,12 +232,12 @@ In "@cells|join(' ')|toLowerCase", two filters are chained, and both filters
 are from its prototype. Every time @cells is captured, it will be processed like
 cells = cells.join(' ').toLowerCase()
 
-See source file src/filters.ts to view all built-in filters. 
+See source file src/filters.ts to view all built-in filters.
 
 */`,
   },
   {
-    name: 'tutorial-12',
+    name: 'tutorial-content',
     html: simpleHtml3,
     selector: `
 // content
@@ -248,12 +248,12 @@ a{
 };
 
 /* The part in the curly brackets is called "content". Content consists of
-several parts. Content part could be a capture, an assignment or a function call. 
+several parts. Content part could be a capture, an assignment or a function call.
 */
 `,
   },
   {
-    name: 'tutorial-13',
+    name: 'tutorial-special-filters-in-content',
     html: simpleHtml4,
     selector: `
 // special filters in content
@@ -273,7 +273,7 @@ Note the difference between content and array-capture: array-capture has an at-s
 */`,
   },
   {
-    name: 'tutorial-14',
+    name: 'tutorial-content-functions',
     html: simpleHtml3,
     selector: `
 // content functions

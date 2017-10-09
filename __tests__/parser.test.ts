@@ -341,3 +341,32 @@ test('use semicolon as selector seprator', () => {
   expect(temmeParser.parse('parent@p { div; li; .foo; }; another'))
     .toEqual(temmeParser.parse('parent@p { div, li, .foo, }, another'))
 })
+
+describe('snippet define and expand', () => {
+  test('snippet define', () => {
+    const selector = `
+      @snippet = {
+        $foo = 'bar';
+      };
+    `
+    const expectedResult: TemmeSelector[] = [{
+      type: 'snippet-define',
+      name: 'snippet',
+      selectors: [{
+        type: 'assignment',
+        capture: { name: 'foo', filterList: [] },
+        value: 'bar',
+      }],
+    }]
+    expect(temmeParser.parse(selector)).toEqual(expectedResult)
+  })
+
+  test('snippet expand', () => {
+    const selector = `@snippet`
+    const expectedResult: TemmeSelector[] = [{
+      type: 'snippet-expand',
+      name: 'snippet',
+    }]
+    expect(temmeParser.parse(selector)).toEqual(expectedResult)
+  })
+})

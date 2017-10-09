@@ -1,4 +1,5 @@
 import { default as temme, cheerio } from '../src/temme'
+import { errorMessages } from '../src/check'
 
 test('empty selector', () => {
   const html = `<p>A B C D</p>`
@@ -89,30 +90,26 @@ test('attr predicate and value capture without element in attribute', () => {
 })
 
 test('try to capture a non-existent attribute', () => {
-  const html = '<div color=red speed=fast power=great>TEXT</div>'
-  expect(temme(html, 'div[name=$name age=$age]')).toBeNull()
+  const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
+  expect(temme(html, 'div[data-name=$name data-age=$age]')).toBeNull()
 })
 
 test('using the special node filter', () => {
-  const html = '<div color=red speed=fast power=great>TEXT</div>'
+  const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
   const node: Cheerio = temme(html, 'div{$|node}')
   expect(node.text()).toBe('TEXT')
-  expect(node.attr('color')).toBe('red')
-  expect(node.attr('speed')).toBe('fast')
-  expect(node.attr('power')).toBe('great')
+  expect(node.attr('data-color')).toBe('red')
+  expect(node.attr('data-speed')).toBe('fast')
+  expect(node.attr('data-power')).toBe('great')
 })
 
-test('test pseudo-qualifier. pseudo-qualifer is not supported now and should be ignored', () => {
-  const html = '<div color=red speed=fast power=great>TEXT</div>'
-  expect(temme(html, 'div[color=$color speed=$speed]:first-child{$text}'))
-    .toEqual({
-      color: 'red',
-      speed: 'fast',
-      text: 'TEXT',
-    })
+test('test pseudo-qualifier. pseudo-qualifier is not supported now', () => {
+  const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
+  expect(() => temme(html, 'div[data-color=$color data-speed=$speed]:first-child{$text}'))
+    .toThrow(errorMessages.hasPseudoQualifier())
 })
 
-describe('assigments in different places', () => {
+describe('assignments in different places', () => {
   test('assignments at top level', () => {
     expect(temme('', "$str = '123'")).toEqual({
       str: '123',
@@ -198,7 +195,7 @@ describe('assigments in different places', () => {
   })
 })
 
-describe('using " ", "+", ">" and "~" as section seperators', () => {
+describe('using " ", "+", ">" and "~" as section separators', () => {
   const html = `
     <p>text-0</p>
     <div>
@@ -227,5 +224,74 @@ describe('using " ", "+", ">" and "~" as section seperators', () => {
 
   test('test "~"', () => {
     expect(temme(html, 'div ~p@{ &{$} }')).toEqual(['text-3', 'text-4', 'text-5'])
+  })
+})
+
+describe('using snippet', () => {
+  const html = `
+      <div>
+        <div class="hello">
+          <p class="name">Alice</p>
+          <p class="color">red</p>
+        </div>
+        <div class="world">
+          <p class="name">Bob</p>
+          <p class="color">blue</p>
+        </div>
+        <div class="world">
+          <p class="name">Mary</p>
+          <p class="color">pink</p>
+        </div>
+      </div>
+    `
+
+  test('basic', () => {
+    const selector = `
+      @foo = {
+        .name{$name};
+        .color{$color};
+      };
+
+      .hello@hello {
+        @foo;
+      };
+
+      .world@world {
+        @foo;
+      };`
+
+    expect(temme(html, selector)).toEqual({
+      hello: [{ name: 'Alice', color: 'red' }],
+      world: [{ name: 'Bob', color: 'blue' }, { name: 'Mary', color: 'pink' }],
+    })
+  })
+
+  test('recursive', () => {
+    const selector = `
+      @foo = {
+        .name{$name};
+        .color{$color};
+      };
+
+      @bar = {
+        $bar = 'bar';
+        @foo;
+      };
+
+      .hello@hello {
+        @bar;
+      };
+
+      .world@world {
+        @bar;
+      };`
+
+    expect(temme(html, selector)).toEqual({
+      hello: [{ bar: 'bar', name: 'Alice', color: 'red' }],
+      world: [
+        { bar: 'bar', name: 'Bob', color: 'blue' },
+        { bar: 'bar', name: 'Mary', color: 'pink' },
+      ],
+    })
   })
 })

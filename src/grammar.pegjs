@@ -21,14 +21,13 @@ Start
   / __ { return null }
 
 MultipleSelector
-  = head:NonSelfSelector tail:(__ SelectorSeparator __ selector:NonSelfSelector { return selector })*
+  = head:Selector tail:(__ SelectorSeparator __ selector:Selector { return selector })*
   OptionalExtraCommaOrSemicolon {
     return [head].concat(tail)
   }
 
-NonSelfSelector = NormalSelector / AssignmentSelector
 // 选择器
-Selector = SelfSelector / NormalSelector / AssignmentSelector
+Selector = SelfSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
 
 // 自身选择器, 以 & 为开头的选择器
 SelfSelector
@@ -76,6 +75,25 @@ AssignmentSelector
       type: 'assignment',
       capture: assignment.capture,
       value: assignment.value,
+    }
+  }
+
+// 片段的定义
+SnippetDefine
+  = '@' name:IdentifierName __ '=' __ selectors:ChildrenSelectors {
+    return {
+      type: 'snippet-define',
+      name,
+      selectors,
+    }
+  }
+
+// 片段的展开
+SnippetExpand
+  = '@' name:IdentifierName !(__ '=') {
+    return {
+      type: 'snippet-expand',
+      name,
     }
   }
 

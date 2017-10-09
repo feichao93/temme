@@ -14,7 +14,16 @@ export interface Filter {
   args: Literal[]
 }
 
-export type TemmeSelector = SelfSelector | NormalSelector | Assignment
+export type TemmeSelector = SelfSelector
+  | NormalSelector
+  | Assignment
+  | SnippetDefine
+  | SnippetExpand
+
+export type ExpandedTemmeSelector = SelfSelector
+  | NormalSelector
+  | Assignment
+  | SnippetDefine
 
 export interface NormalSelector {
   type: 'normal-selector'
@@ -32,6 +41,17 @@ export interface Assignment {
   type: 'assignment'
   capture: Capture
   value: Literal
+}
+
+export interface SnippetDefine {
+  type: 'snippet-define'
+  name: string
+  selectors: TemmeSelector[]
+}
+
+export interface SnippetExpand {
+  type: 'snippet-expand'
+  name: string
 }
 
 export interface Section {

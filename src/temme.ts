@@ -1,7 +1,8 @@
 import * as cheerio from 'cheerio'
+import * as invariant from 'invariant'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import contentFunctions from './contentFunctions'
-import check from './check'
+import check, { errorMessages } from './check'
 import CaptureResult from './CaptureResult'
 import { specialFilterNames } from './constants'
 import {
@@ -12,10 +13,12 @@ import {
 import {
   Dict,
   TemmeSelector,
+  ExpandedTemmeSelector,
   ContentPart,
   AttributeQualifier,
   NormalSelector,
   SelfSelector,
+  SnippetDefine,
 } from './interfaces'
 
 export interface TemmeParser {
@@ -63,14 +66,26 @@ export default function temme(
     return null
   }
 
-  const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   rootSelector.forEach(check)
+
+  const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
+  const snippetsMap = new Map<string, SnippetDefine>()
+
   return helper($.root(), rootSelector).get()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
+    // First pass: process SnippetDefine
     for (const selector of selectorArray) {
+      if (selector.type === 'snippet-define') {
+        invariant(!snippetsMap.has(selector.name), errorMessages.snippetAlreadyDefined(selector.name))
+        snippetsMap.set(selector.name, selector)
+      }
+    }
+
+    // Second pass: match & capture
+    for (const selector of expandSnippets(selectorArray)) {
       if (selector.type === 'normal-selector') {
         const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
@@ -92,9 +107,23 @@ export default function temme(
         if (cntCheerio.is(cssSelector)) {
           result.merge(capture(cntCheerio, selector), false)
         }
-      } else { // selector.type === 'assignment'
+      } else if (selector.type === 'assignment') {
         const { name, filterList } = selector.capture
         result.add(name, selector.value, filterList, true)
+      } // else selector.type === 'snippet-define'. Do nothing.
+    }
+    return result
+  }
+
+  function expandSnippets(selectorArray: TemmeSelector[]): ExpandedTemmeSelector[] {
+    const result: ExpandedTemmeSelector[] = []
+    for (const selector of selectorArray) {
+      if (selector.type === 'snippet-expand') {
+        invariant(snippetsMap.has(selector.name), errorMessages.snippetNotDefined(selector.name))
+        const sub = expandSnippets(snippetsMap.get(selector.name).selectors)
+        result.push(...sub)
+      } else {
+        result.push(selector)
       }
     }
     return result

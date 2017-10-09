@@ -1,5 +1,6 @@
 import * as invariant from 'invariant'
 import { Section, Qualifier, AttributeQualifier } from './interfaces'
+import { errorMessages } from './check'
 
 /** 根据sections构造标准的CSS selector */
 export function makeNormalCssSelector(sections: Section[]) {
@@ -22,7 +23,7 @@ export function makeNormalCssSelector(sections: Section[]) {
           result.push(`[${attribute}${operator}"${value}"]`)
         }
       } else { // pseudo-qualifier
-        console.warn('pseudo-qualifier is not supported.')
+        throw new Error(errorMessages.hasPseudoQualifier())
       }
     }
   }

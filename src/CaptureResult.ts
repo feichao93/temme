@@ -28,7 +28,7 @@ export default class CaptureResult {
     if (filterList) {
       value = this.applyFilters(value, filterList)
     }
-    if (value != null || force) {
+    if (!(value == null || isEmptyObject(value)) || force) {
       this.result[key] = value
     }
   }
