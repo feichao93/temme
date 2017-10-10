@@ -302,7 +302,7 @@ Click next to see some real-world complex examples.
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
 // capture linked questions of a stackoverflow question
 .linked .spacer@|compact {
-  .question-hyperlink[href=$url]{$question|words|join(' ')},
+  .question-hyperlink[href=$url]{$question|replace(/ +/g, ' ')},
   .answer-votes{$votes|Number},
 }`
   },
@@ -389,5 +389,27 @@ title{match($movieName, ' 短评')};
   .votes{$votes|Number};
   .comment > p{$commentText|trim|substring(0,20)|concat('...')};
 };`,
+  },
+  {
+    name: 'tmall-reviews(Chinese)',
+    htmlUrl: 'resources/tmall-reviews.html',
+    selector: `
+// 天猫商品评价数据抓取
+// 评论数据来自于 https://detail.tmall.com/item.htm?id=549049522944&skuId=3499764035487
+@titleTextImgs = {
+  .tm-rate-title{$title};
+  .tm-rate-fulltxt{$text};
+  .tm-m-photos ul>li@imgs{
+    &[data-src=$];
+  };
+};
+.rate-grid tr@{
+  .rate-user-info{$user};
+  .rate-user-grade{$userGrade};
+  .col-meta .rate-sku p@meta{ &[title=$] };
+  .tm-col-master >.tm-rate-content@premiere|pack { @titleTextImgs };
+  .tm-rate-premiere@premiere|pack { @titleTextImgs };
+  .tm-rate-append@append|pack { @titleTextImgs };
+}`,
   },
 ]
