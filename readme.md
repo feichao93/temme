@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg)](https://www.npmjs.org/package/temme) [![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg?style=flat-square)](https://greenkeeper.io/)
+[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg)](https://www.npmjs.org/package/temme) [![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg)](https://greenkeeper.io/)
 
 # Temme
 
@@ -82,7 +82,7 @@ Normal attribute match is like `[foo=bar]`. Attribute-capture is like `[foo=$bar
 
 The output of `temme()` is an object called capture-result. Capture-result contains  captured items at specific fields. We can use a single `$` to make a default value-capture, and the capture result will be a single value. [example][example-default-value-capture]
 
-## Array-capture `@` (TODO)
+## Array-capture `@`
 
 Syntax:
 * `@xxx`:  Starts with an at sign; xxx should be a valid JavaScript identifier.
@@ -166,18 +166,47 @@ temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 
 ## Content
 
-The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:
+The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
 1. Capture.  This will capture text/html of the node into the specified field;
 2. Assignment.  It is like a conditional assignment, if temme find that a node safisties the normal CSS selector, then the assignment is executed;
-3. Content Function Call **(experimental)**.  Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. (TODO explain content functions more specific.) For example, `match('before', $buzz, 'after')` is translated to `match(result, node, 'before', { name: 'buzz', filterList: [] }, 'after')`. [example][example-content-functions]
+3. Content Function Call **(experimental)**. See below for more detail.
 
 ### Capture in Content
 `text`, `html` and `node` are special filters in content. One of the three is always used as the first filter in content capture. If not specified explicitly, `text` will be used. `text` gets the text content of the mathcing nodes; `html` gets the  inner HTML of the matching nodes; `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to do manual capturing with cheerio APIs. [example][example-special-filters-in-content]
 
-### Content Functions (experimental) (TODO)
+### Content Functions (experimental)
 
-## Snippets (experimental) (TODO)
+Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source](/src/contentFunctions.ts) for more implementation detail. [example][example-content-functions]
 
+Currently, there is only one built-in content function `match`. `match` try to match args with trimed text of a node. Examples of `match`:
+* If content function is `match(result, node, $foo, 'world')` and text of node is `'hello world'`, then result will be `{ foo: 'hello ' } `
+* If content function is `match(result, node, 'before', $x, 'after')` and text of node is `'  before midmidmid  after'`, then the result will be `{ x: ' midmidmid  ' }`
+* If args and text of the node does not match, then `match` will set the state of the capture-result as *failed*. The value of a *failed* capture-result is assumed to be `null`.
+
+### Manage Customized Content Functions (experimental, DOC IS BUILDING)
+
+```JavaScript
+import { contentFunctions } from 'temme'
+
+// Get a content function
+contentFunctions.get('match')
+// Set a customized content function
+contentFunctions.set('myContentFn', myContentFn)
+// Remove a content function
+contentFunctions.remove('uselessContentFn')
+
+function myContentFn(result, node, capture1, string2) {
+  /* Your customized logic here */
+
+  // Call CaptureResult#add to add a field of result
+  result.add(capture1.name, node.attr('foo'), capture1.filterList)
+
+  // Call CaptureResult#setFailed to set the result to failed state
+  result.setFailed()
+}
+```
+
+## Snippets (experimental) (DOC IS BUILDING)
 
 
 [playground-tutorial]: http://shinima.pw/temme/?example=tutorial-start
