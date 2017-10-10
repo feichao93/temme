@@ -58,23 +58,13 @@ test('filter `flatten`', () => {
   ])
 })
 
-test('filter `words`', () => {
-  const html = `<p>Lorem   ipsum dolor sit amet  consectetur adipiscing elit</p>`
-  const selector = `p{$|words}`
-  expect(temme(html, selector)).toEqual([
-    'Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing', 'elit'
-  ])
-})
-
-test('filter `lines`', () => {
-  const html = `<p> A multi \n line \n paragraph \n for test</p>`
-  const selector = `p{$|lines}`
-  expect(temme(html, selector).map(s => s.trim())).toEqual([
-    'A multi',
-    'line',
-    'paragraph',
-    'for test',
-  ])
+test('filter `first`, `last`, `nth`', () => {
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|first}`)).toBe('0')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|last}`)).toBe('4')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(1)}`)).toBe('1')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(2)}`)).toBe('2')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(3)}`)).toBe('3')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(10)}`)).toBe(null)
 })
 
 test('filter `Number`, `String`, `Boolean`, `Date`', () => {

@@ -296,7 +296,7 @@ Click next to see some real-world complex examples.
 */`,
   },
   {
-    name: 'example-so-1',
+    name: 'so-linked-questions',
     htmlUrl: 'resources/stackoverflow-question.html',
     selector: `
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
@@ -307,7 +307,7 @@ Click next to see some real-world complex examples.
 }`
   },
   {
-    name: 'example-so-2',
+    name: 'so-all-answers-and-all-comments',
     htmlUrl: 'resources/stackoverflow-question.html',
     selector: `
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
@@ -315,24 +315,24 @@ Click next to see some real-world complex examples.
 .answer@ {
   .fw .user-info@users {
     .user-details@userDetail|pack {
-      a[href=$userlink]{$username|words|join(' ')};
+      a[href=$userlink]{$username|replace(/\\s+/g, ' ')};
       .reputation-score{$reputation};
     };
     .relativetime[title=$time];
-    .user-action-time{$userAction|words|join(' ')};
+    .user-action-time{$userAction|replace(/\\s+/g, ' ')};
   };
-  .post-text{$answerText|words|join(' ')};
+  .post-text{$answerText|replace(/\\s+/g, ' ')};
   .comments .comment@comments {
     &[id=$commentId];
     .comment-score{$commentScore|Number};
     .comment-text .comment-copy{$text};
-    .comment-user{$commentUser|words|join(' ')};
+    .comment-user{$commentUser|replace(/\\s+/g, ' ')};
     .comment-date span[title=$date];
   };
 }`,
   },
   {
-    name: 'github-1',
+    name: 'github-commits',
     htmlUrl: 'resources/github-commits.html',
     selector: `
 // https://github.com/shinima/temme/commits/v0.3.0
@@ -346,7 +346,7 @@ Click next to see some real-world complex examples.
 }`,
   },
   {
-    name: 'github-2',
+    name: 'github-issues',
     htmlUrl: 'resources/github-issues.html',
     selector: `
 // https://github.com/facebook/react/issues?q=
@@ -366,7 +366,7 @@ Click next to see some real-world complex examples.
 }`
   },
   {
-    name: 'douban-1',
+    name: 'douban-short-reviews(Chinese)',
     htmlUrl: 'resources/douban-reviews.html',
     selector: `// 豆瓣短评网页数据抓取
 // https://movie.douban.com/subject/1292052/comments?start=42&limit=20

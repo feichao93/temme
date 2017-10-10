@@ -16,11 +16,14 @@ export const defaultFilterMap: FilterFnMap = {
   flatten(this: any[][]) {
     return this.reduce((r, a) => r.concat(a))
   },
-  words(this: string) {
-    return this.split(/\s+/g)
+  first(this: any[]) {
+    return this[0]
   },
-  lines(this: string) {
-    return this.split(/\r?\n/g)
+  last(this: any[]) {
+    return this[this.length - 1]
+  },
+  nth(this: any[], i: number) {
+    return this[i]
   },
 
   Number() {
