@@ -26,7 +26,7 @@ temme(html, temmeSelector)
 
 # Examples
 
-[This example][example-github-commits] extracts commits information from GitHub commits page. [This example][example-github-issues] extract issues information from GitHub issues page.
+[This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
 [这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
 
@@ -211,7 +211,7 @@ function myContentFn(result, node, capture1, string2) {
 }
 ```
 
-## Snippets (experimental) (DOC IS BUILDING)
+## Snippets (experimental)
 
 Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when the parent-selectors vary but children selectors alike.
 
@@ -220,13 +220,13 @@ Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when
 * `@xxx = { /* selectors seperated by semicolon */ }`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
 * `@xxx`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
 
-Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: the expansion of `@snippetA` can contains `@snippetB`; But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
+Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `@snippetA -> @snippetB -> @snippetC`; But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
 
-The running semantics of snippet is relative simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
+The running semantics of snippet is simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
 
-For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: (Note: This example is made up and the selector does not work with StackOverflow in fact)
+(Note: This example is made up and the selector does not work with StackOverflow in fact) For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
 
-```CSS
+```
 .ask-info@asked|pack {
   .time[title=$actionTime];
   .username{$username};
@@ -241,7 +241,7 @@ For example, a stackoverflow question asked by *person-A* may be edited by *pers
 
 The children selectors in curly brace are duplicated. We can use snippet to deduplicate them:
 
-```CSS
+```
 @personInfo = {
   .time[title=$actionTime];
   .username{$username};
