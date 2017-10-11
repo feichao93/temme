@@ -24,31 +24,35 @@ temme(html, temmeSelector)
 // => { c: 'red', t: 'hello world' }
 ```
 
+# Examples
+
+[This example][example-github-commits] extracts commits information from GitHub commits page. [This example][example-github-issues] extract issues information from GitHub issues page.
+
+[这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
+
 # Inspiration
 
-Temme is inspired by [Emmet](https://emmet.io/). Emmet generates HTML according to a css-selector-like template. The behavior of `emmet` is like the following function:
+Temme is inspired by [Emmet](https://emmet.io/). Emmet generates HTML according to a css-selector-like template. The behavior of emmet is like the following function:
 ```JavaScript
 emmet('div[class=red]{text content}')
 // => <div class="red">text content</div>
-```
 
-If we extend this function to allow a second argument `data`. Then the function could look like:
-```JavaScript
+// Extend this function to allow a second argument `data`
 emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
 // => <div class="red">text content</div>
 ```
 
-As the name indicates, temme is the reverse of `emmet`. If we express temme as a function, then it looks like:
+As the name indicates, temme is the reverse of emmet. If we express temme as a function, then it looks like:
 ```JavaScript
 temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 // => { cls: 'red', content: 'text content' }
 ```
 
-Comparison between emmet and temme:
+Comparison between `emmet` and `temme`:
 * `emmet(selector, data) -> html`
 * `temme(html, selector) -> data`
 
-Given a selector, `emmet` expand this selector to HTML using data of the object, while `temme` capture data from HTML into an object according to the selector.
+Given a selector, `emmet` expand this selector to HTML using data, while `temme` capture data from HTML according to the selector.
 
 # Concepts
 
@@ -66,7 +70,7 @@ Temme defines a new selector syntax called temme-selector. Temme-selector contai
 
 # Grammar and Semantics
 
-Take a quick tour of grammar in [playground tutorial][playground-tutorial] by examples!
+**Take a quick tour of grammar in [playground tutorial][playground-tutorial] by examples!**
 
 ## Value-Capture `$`
 
@@ -178,12 +182,13 @@ The selectors in the curly brackets after normal CSS selector are called content
 
 Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source](/src/contentFunctions.ts) for more implementation detail. [example][example-content-functions]
 
-Currently, there is only one built-in content function `match`. `match` try to match args with trimed text of a node. Examples of `match`:
-* If content function is `match(result, node, $foo, 'world')` and text of node is `'hello world'`, then result will be `{ foo: 'hello ' } `
-* If content function is `match(result, node, 'before', $x, 'after')` and text of node is `'  before midmidmid  after'`, then the result will be `{ x: ' midmidmid  ' }`
+Currently, there is only one built-in content function `match`. `match` try to match args against trimed text of a node. Examples of `match`:
+
+* If we call `match($foo, 'world')` on a node with `'hello world'`, then result will be `{ foo: 'hello ' } `
+* If we call `match('before', $x, 'after')` on a node with text `'  before mmm  after'`, then the result will be `{ x: ' mmm  ' }`
 * If args and text of the node does not match, then `match` will set the state of the capture-result as *failed*. The value of a *failed* capture-result is assumed to be `null`.
 
-### Manage Customized Content Functions (experimental, DOC IS BUILDING)
+### Use Customized Content Functions (experimental)
 
 ```JavaScript
 import { contentFunctions } from 'temme'
@@ -208,6 +213,43 @@ function myContentFn(result, node, capture1, string2) {
 
 ## Snippets (experimental) (DOC IS BUILDING)
 
+Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when the parent-selectors vary but children selectors alike.
+
+### Syntax
+
+* `@xxx = { /* selectors seperated by semicolon */ }`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
+* `@xxx`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
+
+Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: the expansion of `@snippetA` can contains `@snippetB`; But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
+
+The running semantics of snippet is relative simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
+
+For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: (Note: This example is made up and the selector does not work with StackOverflow in fact)
+
+```CSS
+.ask-info@asked|pack {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+.edit-info@edited|pack {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+```
+
+The children selectors in curly brace are duplicated. We can use snippet to deduplicate them:
+
+```CSS
+@personInfo = {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+.ask-info@asked|pack { @personInfo };
+.edit-info@edited|pack { @personInfo };
+```
 
 [playground-tutorial]: http://shinima.pw/temme/?example=tutorial-start
 [example-value-capture]: http://shinima.pw/temme/?example=tutorial-value-capture
@@ -226,3 +268,7 @@ function myContentFn(result, node, capture1, string2) {
 [example-content-functions]: http://shinima.pw/temme/?example=tutorial-content-functions
 
 [example-so-all-answers-and-all-comments]: http://shinima.pw/temme/?example=so-all-answers-and-all-comments
+[example-github-commits]: http://shinima.pw/temme/?example=github-commits
+[example-github-issues]: http://shinima.pw/temme/?example=github-issues
+[example-douban-short-reviews]: http://shinima.pw/temme/?example=douban-short-reviews(Chinese)
+[example-tmall-reviews]: http://shinima.pw/temme/?example=tmall-reviews(Chinese)
