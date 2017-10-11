@@ -1,8 +1,8 @@
-import { Section, TemmeSelector, Qualifier } from './interfaces'
+import { Qualifier, Section, TemmeSelector } from './interfaces'
 
 // TODO enhance error reporting
 
-export const errorMessages = {
+export const msg = {
   invalidFilter(name: string) {
     return `${name} is not a valid filter.`
   },
@@ -13,19 +13,22 @@ export const errorMessages = {
     return 'Attr capturing and content matching/capturing are only allowed in the last css section. Capture in leading css-selectors will be omitted. Did you forget the semicolon?'
   },
   hasPseudoQualifier() {
-    return 'pseudo-qualifier is not supported.'
+    return 'Pseudo-qualifier is not supported.'
   },
   selfSelectorAtTopLevel() {
-    return 'selfSelectorAtTopLevel' // TODO
+    return `Self-selector should not be at top level.`
   },
   snippetAlreadyDefined(name: string) {
     return `Snippet ${name} is already define.`
   },
-  snippetDefineNotAtTopLevel() {
-    return 'snippetDefineNotAtTopLevel' // TODO
+  snippetDefineNotAtTopLevel(name: string) {
+    return `The definition of snippet ${name} should be at top level.`
   },
   snippetNotDefined(name: string) {
     return `Snippet ${name} is not defined.`
+  },
+  valueCaptureWithOtherOperator() {
+    return 'Value capture in attribute qualifier only works with `=` operator.'
   },
 }
 
@@ -42,10 +45,10 @@ function containsAnyCapture(sections: Section[]) {
   })
 }
 
-export default function check(selector: TemmeSelector) {
+export function check(selector: TemmeSelector) {
   commonCheck(selector)
   if (selector.type === 'self-selector') {
-    throw new Error(errorMessages.selfSelectorAtTopLevel())
+    throw new Error(msg.selfSelectorAtTopLevel())
   } else if (selector.type === 'normal-selector') {
     for (const child of selector.children) {
       checkChild(child)
@@ -63,7 +66,7 @@ function commonCheck(selector: TemmeSelector) {
     const leadingSections = selector.sections.slice(0, sectionCount - 1)
     const hasLeadingCapture = containsAnyCapture(leadingSections)
     if (hasLeadingCapture) {
-      throw new Error(errorMessages.hasLeadingCapture())
+      throw new Error(msg.hasLeadingCapture())
     }
   }
 }
@@ -71,7 +74,7 @@ function commonCheck(selector: TemmeSelector) {
 export function checkChild(selector: TemmeSelector) {
   commonCheck(selector)
   if (selector.type === 'snippet-define') {
-    throw new Error(errorMessages.snippetDefineNotAtTopLevel())
+    throw new Error(msg.snippetDefineNotAtTopLevel(selector.name))
   } else if (selector.type === 'normal-selector') {
     for (const child of selector.children) {
       checkChild(child)

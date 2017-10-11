@@ -1,5 +1,5 @@
 import { default as temme, cheerio } from '../src/temme'
-import { errorMessages } from '../src/check'
+import { msg } from '../src/check'
 
 test('empty selector', () => {
   const html = `<p>A B C D</p>`
@@ -106,7 +106,7 @@ test('using the special node filter', () => {
 test('test pseudo-qualifier. pseudo-qualifier is not supported now', () => {
   const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
   expect(() => temme(html, 'div[data-color=$color data-speed=$speed]:first-child{$text}'))
-    .toThrow(errorMessages.hasPseudoQualifier())
+    .toThrow(msg.hasPseudoQualifier())
 })
 
 describe('assignments in different places', () => {

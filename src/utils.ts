@@ -1,6 +1,6 @@
 import * as invariant from 'invariant'
 import { Section, Qualifier, AttributeQualifier } from './interfaces'
-import { errorMessages } from './check'
+import { msg } from './check'
 
 /** 根据sections构造标准的CSS selector */
 export function makeNormalCssSelector(sections: Section[]) {
@@ -18,12 +18,12 @@ export function makeNormalCssSelector(sections: Section[]) {
         if (operator == null && value == null) { // existence
           result.push(`[${attribute}]`)
         } else if (typeof value === 'object') { // capture
-          invariant(operator === '=', 'Value capture in attribute qualifier only works with `=` operator.')
+          invariant(operator === '=', msg.valueCaptureWithOtherOperator())
         } else { // normal qualifier
           result.push(`[${attribute}${operator}"${value}"]`)
         }
       } else { // pseudo-qualifier
-        throw new Error(errorMessages.hasPseudoQualifier())
+        throw new Error(msg.hasPseudoQualifier())
       }
     }
   }

@@ -1,6 +1,6 @@
 import { Capture } from './interfaces'
-import CaptureResult from './CaptureResult'
-import { errorMessages } from './check'
+import { CaptureResult } from './CaptureResult'
+import { msg } from './check'
 
 export interface ContentFn {
   (result: CaptureResult, node: Cheerio, ...args: any[]): void
@@ -11,7 +11,7 @@ export interface ContentFn {
 //  { foo: ' like apple' }
 // 如果匹配失败, 则返回null
 // 注意有的时候会有多种匹配结果, 该匹配算法是贪心的, 只会选取第一种匹配结果
-export function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
+function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
   const s = node.text().trim()
   // 标记正在进行的capture, null表示没有在捕获中
   let capturing: Capture = null
@@ -54,12 +54,12 @@ const defaultContentFunctions = {
 
 const map = new Map<string, ContentFn>()
 
-const contentFunctions = {
+export const contentFunctions = {
   get(name: string) {
     if (map.has(name)) {
       return map.get(name)
     } else {
-      throw new Error(errorMessages.invalidContentFunction(name))
+      throw new Error(msg.invalidContentFunction(name))
     }
   },
 
@@ -75,5 +75,3 @@ const contentFunctions = {
 for (const [name, fn] of Object.entries(defaultContentFunctions)) {
   contentFunctions.set(name, fn)
 }
-
-export default contentFunctions

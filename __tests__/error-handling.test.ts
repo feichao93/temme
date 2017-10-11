@@ -1,13 +1,19 @@
-import temme, { errorMessages } from '../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
+import temme, { msg } from '../src/index'
+import { contentFunctions } from '../src/contentFunctions'
 
 const html = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
 
 test('invalid filter name', () => {
   expect(() => temme(html, `
     #question-header .question-hyperlink[href=$url]{$title|foo}
-  `)).toThrowError(errorMessages.invalidFilter('foo'))
+  `)).toThrowError(msg.invalidFilter('foo'))
+})
+
+test('self-selector at top', () => {
+  expect(() => temme(html, `&[attr=$value]`))
+    .toThrowError(msg.selfSelectorAtTopLevel())
 })
 
 test('wrong syntax example 1', () => {
@@ -32,22 +38,30 @@ test('wrong syntax example 2', () => {
 })
 
 test('error in content part', () => {
-  // language=TEXT
-  const html = `
-  <div class="content">
-    <div class="article_head mingren">
-      <h1>张茵-东莞玖龙纸业有限公司董事长介绍</h1>
-      <div class="author">阅读：13015次</div>
-    </div>
-  </div>`
+  expect(() => temme(html, `div@|pack{
+    p{foo($name, '-', $_)},
+  }`)).toThrowError(msg.invalidContentFunction('foo'))
 
-  expect(() => temme(html, `.content@|pack{
-    .article_head h1{foo($name, '-', $_)},
-  }`)).toThrowError(errorMessages.invalidContentFunction('foo'))
+  expect(() => {
+    contentFunctions.remove('match')
+    temme(html, 'div{ match($foo) }')
+  }).toThrowError(msg.invalidContentFunction('match'))
 
   expect(() => temme(html, `.leading-css-part{$value} .content{$foo}`))
-    .toThrowError(errorMessages.hasLeadingCapture())
+    .toThrowError(msg.hasLeadingCapture())
 
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`))
-    .toThrowError(errorMessages.hasLeadingCapture())
+    .toThrowError(msg.hasLeadingCapture())
+})
+
+test('error in snippets', () => {
+  const html = `<div>test html</div>`
+  const selector = `
+div@ {
+  @xxx = {
+    $foo = 'bar';
+  };
+}`
+  expect(() => temme(html, selector))
+    .toThrowError(msg.snippetDefineNotAtTopLevel('xxx'))
 })

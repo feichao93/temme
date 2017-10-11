@@ -1,4 +1,4 @@
-import { errorMessages, CaptureResult, defaultFilterMap, } from '../src/index'
+import { msg, CaptureResult, defaultFilterMap, } from '../src/index'
 
 test('get null from empty CaptureResult instance', () => {
   const emptyCaptureResult = new CaptureResult({})
@@ -185,11 +185,11 @@ test('invalid filter', () => {
     .not.toThrow()
 
   expect(() => r.add('k2', 'value-2', [{ name: 'foo', args: [1, 2, 3] }]))
-    .toThrow(errorMessages.invalidFilter('foo'))
+    .toThrow(msg.invalidFilter('foo'))
 
   expect(() => r.add('k3', 'value-3', [{ name: 'trim', args: [] }]))
     .not.toThrow()
 
   expect(() => r.add('k4', 'value-4', [{ name: 'bar', args: [] }]))
-    .toThrow(errorMessages.invalidFilter('bar'))
+    .toThrow(msg.invalidFilter('bar'))
 })

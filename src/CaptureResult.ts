@@ -2,9 +2,9 @@ import { Filter } from './interfaces'
 import { FilterFnMap, FilterFn } from './filters'
 import { defaultCaptureKey } from './constants'
 import { isEmptyObject } from './utils'
-import { errorMessages } from './check'
+import { msg } from './check'
 
-export default class CaptureResult {
+export class CaptureResult {
   private filterFnMap: FilterFnMap
   private result: any = {}
   private failed = false
@@ -69,7 +69,7 @@ export default class CaptureResult {
         const filterFn: FilterFn = value[filter.name]
         return filterFn.apply(value, filter.args)
       } else {
-        throw new Error(errorMessages.invalidFilter(filter.name))
+        throw new Error(msg.invalidFilter(filter.name))
       }
     }, initValue)
   }
