@@ -366,7 +366,7 @@ Click next to see some real-world complex examples.
 }`
   },
   {
-    name: 'douban-short-reviews(Chinese)',
+    name: 'douban-short-reviews-Chinese',
     htmlUrl: 'resources/douban-reviews.html',
     selector: `// 豆瓣短评网页数据抓取
 // https://movie.douban.com/subject/1292052/comments?start=42&limit=20
@@ -391,7 +391,7 @@ title{match($movieName, ' 短评')};
 };`,
   },
   {
-    name: 'tmall-reviews(Chinese)',
+    name: 'tmall-reviews-Chinese',
     htmlUrl: 'resources/tmall-reviews.html',
     selector: `
 // 天猫商品评价数据抓取

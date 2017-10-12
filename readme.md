@@ -270,5 +270,5 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
 [example-so-all-answers-and-all-comments]: http://shinima.pw/temme/?example=so-all-answers-and-all-comments
 [example-github-commits]: http://shinima.pw/temme/?example=github-commits
 [example-github-issues]: http://shinima.pw/temme/?example=github-issues
-[example-douban-short-reviews]: http://shinima.pw/temme/?example=douban-short-reviews(Chinese)
-[example-tmall-reviews]: http://shinima.pw/temme/?example=tmall-reviews(Chinese)
+[example-douban-short-reviews]: http://shinima.pw/temme/?example=douban-short-reviews-Chinese
+[example-tmall-reviews]: http://shinima.pw/temme/?example=tmall-reviews-Chinese
