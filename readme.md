@@ -2,7 +2,7 @@
 
 # Temme
 
-Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammar to enable capturing data into result. Try temme in [playground](http://shinima.pw/temme/).
+Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammar to enable capturing data into result. Try temme in [playground](https://temme.js.org).
 
 # Install
 
@@ -251,24 +251,24 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
 .edit-info@edited|pack { @personInfo };
 ```
 
-[playground-tutorial]: http://shinima.pw/temme/?example=tutorial-start
-[example-value-capture]: http://shinima.pw/temme/?example=tutorial-value-capture
-[example-default-value-capture]: http://shinima.pw/temme/?example=tutorial-default-value-capture
-[example-array-capture]: http://shinima.pw/temme/?example=tutorial-array-capture
-[example-default-array-capture]: http://shinima.pw/temme/?example=tutorial-default-array-capture
-[example-parent-reference]: http://shinima.pw/temme/?example=tutorial-parent-reference
-[example-nested-array-capture]: http://shinima.pw/temme/?example=tutorial-nested-array-capture
-[example-multiple-selectors-at-top-level]: http://shinima.pw/temme/?example=tutorial-multiple-selectors-at-top-level
-[example-assignments-at-top-level]: http://shinima.pw/temme/?example=tutorial-assignments-at-top-level
-[example-assignments-in-content]: http://shinima.pw/temme/?example=tutorial-assignments-in-content
-[example-assignments-in-children-selectors]: http://shinima.pw/temme/?example=tutorial-assignments-in-children-selectors
-[example-filters]: http://shinima.pw/temme/?example=tutorial-filters
-[example-content]: http://shinima.pw/temme/?example=tutorial-content
-[example-special-filters-in-content]: http://shinima.pw/temme/?example=tutorial-special-filters-in-content
-[example-content-functions]: http://shinima.pw/temme/?example=tutorial-content-functions
+[playground-tutorial]: https://temme.js.org?example=tutorial-start
+[example-value-capture]: https://temme.js.org?example=tutorial-value-capture
+[example-default-value-capture]: https://temme.js.org?example=tutorial-default-value-capture
+[example-array-capture]: https://temme.js.org?example=tutorial-array-capture
+[example-default-array-capture]: https://temme.js.org?example=tutorial-default-array-capture
+[example-parent-reference]: https://temme.js.org?example=tutorial-parent-reference
+[example-nested-array-capture]: https://temme.js.org?example=tutorial-nested-array-capture
+[example-multiple-selectors-at-top-level]: https://temme.js.org?example=tutorial-multiple-selectors-at-top-level
+[example-assignments-at-top-level]: https://temme.js.org?example=tutorial-assignments-at-top-level
+[example-assignments-in-content]: https://temme.js.org?example=tutorial-assignments-in-content
+[example-assignments-in-children-selectors]: https://temme.js.org?example=tutorial-assignments-in-children-selectors
+[example-filters]: https://temme.js.org?example=tutorial-filters
+[example-content]: https://temme.js.org?example=tutorial-content
+[example-special-filters-in-content]: https://temme.js.org?example=tutorial-special-filters-in-content
+[example-content-functions]: https://temme.js.org?example=tutorial-content-functions
 
-[example-so-all-answers-and-all-comments]: http://shinima.pw/temme/?example=so-all-answers-and-all-comments
-[example-github-commits]: http://shinima.pw/temme/?example=github-commits
-[example-github-issues]: http://shinima.pw/temme/?example=github-issues
-[example-douban-short-reviews]: http://shinima.pw/temme/?example=douban-short-reviews-Chinese
-[example-tmall-reviews]: http://shinima.pw/temme/?example=tmall-reviews-Chinese
+[example-so-all-answers-and-all-comments]: https://temme.js.org?example=so-all-answers-and-all-comments
+[example-github-commits]: https://temme.js.org?example=github-commits
+[example-github-issues]: https://temme.js.org?example=github-issues
+[example-douban-short-reviews]: https://temme.js.org?example=douban-short-reviews-Chinese
+[example-tmall-reviews]: https://temme.js.org?example=tmall-reviews-Chinese
