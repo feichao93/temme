@@ -30,6 +30,9 @@ export const msg = {
   valueCaptureWithOtherOperator() {
     return 'Value capture in attribute qualifier only works with `=` operator.'
   },
+  circularSnippetExpansion(loop: string[]) {
+    return `Circular snippet expansion detected: ${loop.join(' -> ')}`
+  },
 }
 
 function isCaptureQualifier(qualifier: Qualifier) {

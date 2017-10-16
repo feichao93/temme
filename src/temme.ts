@@ -115,13 +115,16 @@ export default function temme(
     return result
   }
 
-  function expandSnippets(selectorArray: TemmeSelector[]): ExpandedTemmeSelector[] {
+  function expandSnippets(selectorArray: TemmeSelector[], expanded: string[] = []): ExpandedTemmeSelector[] {
     const result: ExpandedTemmeSelector[] = []
     for (const selector of selectorArray) {
       if (selector.type === 'snippet-expand') {
         invariant(snippetsMap.has(selector.name), msg.snippetNotDefined(selector.name))
-        const sub = expandSnippets(snippetsMap.get(selector.name).selectors)
-        result.push(...sub)
+        const snippet = snippetsMap.get(selector.name)
+        const nextExpanded = expanded.concat(snippet.name)
+        invariant(!expanded.includes(snippet.name), msg.circularSnippetExpansion(nextExpanded))
+        const slice = expandSnippets(snippet.selectors, nextExpanded)
+        result.push(...slice)
       } else {
         result.push(selector)
       }

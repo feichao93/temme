@@ -65,3 +65,48 @@ div@ {
   expect(() => temme(html, selector))
     .toThrowError(msg.snippetDefineNotAtTopLevel('xxx'))
 })
+
+test('circular snippet expansion dectection', () => {
+  const html = '<div>test html</div>'
+  const selector = `
+    @foo = {
+      @bar;
+      $inFoo = true;
+    };
+    @bar = {
+      @buzz;
+      $inBar = true;
+    };
+    @buzz = {
+      @foo;
+      $inBuzz = true;
+    };
+    @foo;
+  `
+  expect(() => temme(html, selector))
+    .toThrowError(msg.circularSnippetExpansion(['foo', 'bar', 'buzz', 'foo']))
+})
+
+test('circular snippet expansion dectection', () => {
+  const html = '<div>test html</div>'
+  const selector = `
+    @foo = {
+      @bar;
+      $inFoo = true;
+    };
+    @bar = {
+      @buzz;
+      $inBar = true;
+    };
+    @buzz = {
+      $inBuzz = true;
+      div.awesome@|pack {
+        // Place @foo in children selectors
+        // @foo is expanded only when elements that satisfy 'div.awesome' exist
+        @foo;
+      };
+    };
+    @foo;
+  `
+  expect(() => temme(html, selector)).not.toThrow()
+})
