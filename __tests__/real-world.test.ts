@@ -42,12 +42,12 @@ test('array capture', () => {
 
   expect(temme(stHtml, parseResult)).toEqual({
     answers: [
-      { upvote: '259', userName: 'CommunityRizwan Kassim' },
+      { upvote: '259', userName: 'Community' },
       { upvote: '111', userName: 'Brian' },
       { upvote: '58', userName: 'Antti Haapala' },
       { upvote: '18', userName: 'Jeremy Cantrell' },
       { upvote: '13', userName: 'brianray' },
-      { upvote: '6', userName: 'CommunityS.Lott' },
+      { upvote: '6', userName: 'Community' },
       { upvote: '5', userName: 'bobince' }],
   })
 })
@@ -75,7 +75,7 @@ test('complex example: recursive array capture, default capture, customized filt
         { content: '@Jonathan:', score: 2, userName: 'martineau', userUrl: '/users/355230/martineau' },
       ],
       upvote: '259',
-      userName: 'CommunityRizwan Kassim',
+      userName: 'Community',
     },
     { comments: [], upvote: '111', userName: 'Brian' },
     { comments: [], upvote: '58', userName: 'Antti Haapala' },
@@ -93,7 +93,7 @@ test('complex example: recursive array capture, default capture, customized filt
         { content: 'I\'m sorry,', score: 0, userName: 'Rizwan Kassim', userUrl: '/users/35335/rizwan-kassim' },
       ],
       upvote: '6',
-      userName: 'CommunityS.Lott',
+      userName: 'Community',
     },
     { comments: [], upvote: '5', userName: 'bobince' },
   ])

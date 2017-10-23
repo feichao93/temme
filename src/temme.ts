@@ -90,7 +90,7 @@ export default function temme(
         const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
-          result.merge(capture(subCheerio, selector), false)
+          result.merge(capture(subCheerio.first(), selector), false)
 
           if (selector.arrayCapture) {
             const { name, filterList } = selector.arrayCapture

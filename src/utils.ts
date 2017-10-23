@@ -1,14 +1,14 @@
 import * as invariant from 'invariant'
-import { Section, Qualifier, AttributeQualifier } from './interfaces'
+import { Section, Qualifier, AttributeQualifier, Capture } from './interfaces'
 import { msg } from './check'
 
-/** 根据sections构造标准的CSS selector */
+/** Generator standard css selector according to temme sections. */
 export function makeNormalCssSelector(sections: Section[]) {
   const result: string[] = []
-  for (const sec of sections) {
-    result.push(sec.combinator)
-    result.push(sec.element)
-    for (const qualifier of sec.qualifiers) {
+  for (const section of sections) {
+    result.push(section.combinator)
+    result.push(section.element)
+    for (const qualifier of section.qualifiers) {
       if (qualifier.type === 'id-qualifier') {
         result.push('#' + qualifier.id)
       } else if (qualifier.type === 'class-qulifier') {
@@ -42,4 +42,10 @@ export function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is Che
 
 export function isAttributeQualifier(qualifier: Qualifier): qualifier is AttributeQualifier {
   return qualifier.type === 'attribute-qualifier'
+}
+
+export function isCapture(x: any): x is Capture {
+  return typeof x === 'object'
+    && typeof x.name === 'string'
+    && Array.isArray(x.filterList)
 }
