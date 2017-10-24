@@ -23,7 +23,12 @@ export function makeNormalCssSelector(sections: Section[]) {
           result.push(`[${attribute}${operator}"${value}"]`)
         }
       } else { // pseudo-qualifier
-        throw new Error(msg.hasPseudoQualifier())
+        const { name, content } = qualifier
+        if (content) {
+          result.push(`:${name}(${content})`)
+        } else {
+          result.push(`:${name}`)
+        }
       }
     }
   }

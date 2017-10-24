@@ -84,10 +84,10 @@ export interface AttributeQualifier {
   value: string | Capture
 }
 
-// TODO currently pseudo qualifier is not supported
 export interface PseudoQualifier {
   type: 'pseudo-qualifier'
-  value: string
+  name: string
+  content: string
 }
 
 

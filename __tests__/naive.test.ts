@@ -1,5 +1,4 @@
 import { default as temme, cheerio } from '../src/temme'
-import { msg } from '../src/check'
 
 test('empty selector', () => {
   const html = `<p>A B C D</p>`
@@ -103,10 +102,29 @@ test('using the special node filter', () => {
   expect(node.attr('data-power')).toBe('great')
 })
 
-test('test pseudo-qualifier. pseudo-qualifier is not supported now', () => {
-  const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
-  expect(() => temme(html, 'div[data-color=$color data-speed=$speed]:first-child{$text}'))
-    .toThrow(msg.hasPseudoQualifier())
+test('test pseudo-qualifier', () => {
+  const html = `
+  <html><body>
+    <div>DIV1</div>
+    <div>DIV2</div>
+    <section>SECTION</section>
+    <div>DIV3</div>
+  </body></html>
+  `
+  expect(temme(html, 'body *:not(div){$}')).toBe('SECTION')
+  expect(temme(html, 'body *:contains(IV3){$}')).toBe('DIV3')
+  expect(temme(html, 'body *:icontains(Iv3){$}')).toBe('DIV3')
+  expect(temme(html, ':root{$|node}')[0].name).toBe('html')
+  expect(temme(html, 'body *:first-child{$}')).toBe('DIV1')
+  expect(temme(html, 'body *:nth-child(2){$}')).toBe('DIV2')
+  expect(temme(html, 'body *:nth-of-type(3){$}')).toBe('DIV3')
+  expect(temme(html, 'body *:nth-last-of-type(3){$}')).toBe('DIV1')
+  expect(temme(html, 'body *:nth-last-child(2){$}')).toBe('SECTION')
+  expect(temme(html, 'body *:last-child{$}')).toBe('DIV3')
+  expect(temme(html, 'body *:last-of-type{$}')).toBe('SECTION')
+  expect(temme(html, 'body *:only-of-type{$}')).toBe('SECTION')
+  expect(temme(html, 'body *:matches(section){$}')).toBe('SECTION')
+  // TODO :has
 })
 
 describe('assignments in different places', () => {
@@ -195,7 +213,7 @@ describe('assignments in different places', () => {
   })
 })
 
-describe('using " ", "+", ">" and "~" as section separators', () => {
+describe('using " ", "+", ">" and "~" as section combinator', () => {
   const html = `
     <p>text-0</p>
     <div>

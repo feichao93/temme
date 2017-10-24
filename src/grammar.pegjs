@@ -226,12 +226,20 @@ AttributeQualifierPart 'css-selector-attribute-qualifier-part'
   }
 
 PseudoQualifier 'css-selector-pseudo-qualifier'
-  = ':' value:CSSIdentifierName {
+  = ':' name:CSSIdentifierName '(' content:$([^)]*) ')' {
     return {
       type: 'pseudo-qualifier',
-      value,
+      name,
+      content,
     }
-  } // pseudo-qualifier has another function-like form
+  }
+  / ':' name:CSSIdentifierName {
+    return {
+      type: 'pseudo-qualifier',
+      name,
+      content: null,
+    }
+  }
 
 Content
   = '{' __ '}' {

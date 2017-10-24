@@ -12,9 +12,6 @@ export const msg = {
   hasLeadingCapture() {
     return 'Attr capturing and content matching/capturing are only allowed in the last css section. Capture in leading css-selectors will be omitted. Did you forget the semicolon?'
   },
-  hasPseudoQualifier() {
-    return 'Pseudo-qualifier is not supported.'
-  },
   selfSelectorAtTopLevel() {
     return `Self-selector should not be at top level.`
   },
