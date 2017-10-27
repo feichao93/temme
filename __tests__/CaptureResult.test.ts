@@ -32,15 +32,15 @@ test('when not force, it should ignore adding null or undefined', () => {
 
 test('force add', () => {
   const r = new CaptureResult({})
-  r.add('k1', null, null, false)
-  r.add('k2', null, null, true)
+  r.add('k1', null, null)
+  r.forceAdd('k2', null, null)
   expect(r.get()).toEqual({ k2: null })
 })
 
 test('fail a CaptureResult', () => {
   const r = new CaptureResult({})
   r.add('k1', null)
-  r.add('k2', null, null, true)
+  r.forceAdd('k2', null, null)
   r.add('k3', 'v3')
 
   expect(r.get()).toEqual({
@@ -73,7 +73,7 @@ test('merge CaptureResult', () => {
     a2: 'v2',
   })
 
-  a.merge(b, true)
+  a.mergeWithFailPropagation(b)
   expect(a.get()).toEqual({
     a1: 'v1',
     a2: 'v2',
@@ -82,7 +82,7 @@ test('merge CaptureResult', () => {
   })
 })
 
-test('merge propagrates capture-failure', () => {
+test('merge propagates capture-failure', () => {
   const a = new CaptureResult({})
   a.add('a1', 'v1')
   a.add('a2', 'v2')
@@ -95,7 +95,7 @@ test('merge propagrates capture-failure', () => {
     a2: 'v2',
   })
 
-  a.merge(b, true)
+  a.mergeWithFailPropagation(b)
   expect(a.isFailed()).toBe(true)
 })
 
@@ -114,7 +114,7 @@ test('merge without fail-propagation changes nothing', () => {
     a2: 'v2',
   })
 
-  a.merge(b, false)
+  a.merge(b)
   expect(a.get()).toEqual({
     a1: 'v1',
     a2: 'v2',

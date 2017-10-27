@@ -36,7 +36,8 @@ export function makeNormalCssSelector(sections: Section[]) {
 }
 
 export function isEmptyObject(x: any) {
-  return typeof x === 'object'
+  return x !== null
+    && typeof x === 'object'
     && Object.getPrototypeOf(x) === Object.prototype
     && Object.keys(x).length === 0
 }

@@ -90,7 +90,7 @@ export default function temme(
         const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
-          result.merge(capture(subCheerio.first(), selector), false)
+          result.merge(capture(subCheerio.first(), selector))
 
           if (selector.arrayCapture) {
             const { name, filterList } = selector.arrayCapture
@@ -105,11 +105,11 @@ export default function temme(
       } else if (selector.type === 'self-selector') {
         const cssSelector = makeNormalCssSelector([selector.section])
         if (cntCheerio.is(cssSelector)) {
-          result.merge(capture(cntCheerio, selector), false)
+          result.merge(capture(cntCheerio, selector))
         }
       } else if (selector.type === 'assignment') {
         const { name, filterList } = selector.capture
-        result.add(name, selector.value, filterList, true)
+        result.forceAdd(name, selector.value, filterList)
       } // else selector.type === 'snippet-define'. Do nothing.
     }
     return result
@@ -140,12 +140,12 @@ export default function temme(
       // Value-captures in the last section will be processed.
       // Preceding value-captures will be ignored.
       const { qualifiers, content } = sections[sections.length - 1]
-      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
-      result.merge(captureContent(node, content), true)
+      result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+      result.mergeWithFailPropagation(captureContent(node, content))
     } else { // selector.type === 'self-selector'
       const { section: { qualifiers, content } } = selector
-      result.merge(captureAttributes(node, qualifiers.filter(isAttributeQualifier)), true)
-      result.merge(captureContent(node, content), true)
+      result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+      result.mergeWithFailPropagation(captureContent(node, content))
     }
     return result
   }
@@ -185,7 +185,7 @@ export default function temme(
         result.add(name, initValue, normalFilterList)
       } else if (part.type === 'assignment') {
         const { capture: { name, filterList }, value } = part
-        result.add(name, value, filterList, true)
+        result.forceAdd(name, value, filterList)
       } else { // part.type === 'call'
         const { funcName, args } = part
         contentFunctions.get(funcName)(result, node, args)

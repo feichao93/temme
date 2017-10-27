@@ -21,28 +21,39 @@ export class CaptureResult {
     return this.failed
   }
 
-  add(key: string, value: any, filterList?: Filter[], force = false) {
+  add(key: string, value: any, filterList?: Filter[]) {
     if (this.failed) {
       return
     }
     if (filterList) {
       value = this.applyFilters(value, filterList)
     }
-    if (!(value == null || isEmptyObject(value)) || force) {
+    if (!(value == null || isEmptyObject(value))) {
       this.result[key] = value
     }
   }
 
-  merge(other: CaptureResult, failPropagation: boolean) {
-    if (other.isFailed()) { // fail propagation
-      if (failPropagation) {
-        this.setFailed()
-      } // else do nothing
+  forceAdd(key: string, value: any, filterList?: Filter[]) {
+    if (this.failed) {
+      return
+    }
+    if (filterList) {
+      value = this.applyFilters(value, filterList)
+    }
+    this.result[key] = value
+  }
+
+  merge(other: CaptureResult) {
+    if (!other.isFailed()) {
+      this.doMerge(other)
+    }
+  }
+
+  mergeWithFailPropagation(other: CaptureResult) {
+    if (other.isFailed()) {
+      this.setFailed()
     } else {
-      const source = other.result
-      for (const key in source) {
-        this.result[key] = source[key]
-      }
+      this.doMerge(other)
     }
   }
 
@@ -58,6 +69,13 @@ export class CaptureResult {
       returnVal = null
     }
     return returnVal
+  }
+
+  private doMerge(other: CaptureResult) {
+    const source = other.result
+    for (const key of Object.keys(source)) {
+      this.result[key] = source[key]
+    }
   }
 
   private applyFilters(initValue: any, filterList: Filter[]) {
