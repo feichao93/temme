@@ -107,7 +107,7 @@ describe('parse capture', () => {
         combinator: ' ',
         element: universalSelector,
         qualifiers: [{
-          type: 'class-qulifier',
+          type: 'class-qualifier',
           className: 'question-hyperlink',
         }, {
           type: 'attribute-qualifier',
@@ -144,7 +144,7 @@ describe('parse capture', () => {
         sections: [{
           combinator: ' ',
           element: universalSelector,
-          qualifiers: [{ type: 'class-qulifier', className: 'foo' }],
+          qualifiers: [{ type: 'class-qualifier', className: 'foo' }],
           content: [{
             type: 'capture',
             capture: { name: 'h', filterList: [{ name: 'html', args: [] }] },

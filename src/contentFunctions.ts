@@ -6,11 +6,7 @@ export interface ContentFn {
   (result: CaptureResult, node: Cheerio, ...args: any[]): void
 }
 
-// 对string进行多段匹配/捕获 下面的文档已经过时了
-// multisectionMatch('I like apple', ['I', $foo])的结果为
-//  { foo: ' like apple' }
-// 如果匹配失败, 则返回null
-// 注意有的时候会有多种匹配结果, 该匹配算法是贪心的, 只会选取第一种匹配结果
+/** @deprecated */
 function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
   const s = node.text().trim()
   // 标记正在进行的capture, null表示没有在捕获中

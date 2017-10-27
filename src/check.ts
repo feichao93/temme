@@ -1,7 +1,5 @@
 import { Qualifier, Section, TemmeSelector } from './interfaces'
 
-// TODO enhance error reporting
-
 export const msg = {
   invalidFilter(name: string) {
     return `${name} is not a valid filter.`

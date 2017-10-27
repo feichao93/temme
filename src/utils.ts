@@ -10,16 +10,17 @@ export function makeNormalCssSelector(sections: Section[]) {
     result.push(section.element)
     for (const qualifier of section.qualifiers) {
       if (qualifier.type === 'id-qualifier') {
-        result.push('#' + qualifier.id)
-      } else if (qualifier.type === 'class-qulifier') {
-        result.push('.' + qualifier.className)
+        result.push(`#${qualifier.id}`)
+      } else if (qualifier.type === 'class-qualifier') {
+        result.push(`.${qualifier.className}`)
       } else if (qualifier.type === 'attribute-qualifier') {
         const { attribute, operator, value } = qualifier
         if (operator == null && value == null) { // existence
           result.push(`[${attribute}]`)
-        } else if (typeof value === 'object') { // capture
+        } else if (isCapture(value)) {
+          // Here we does not handle captures, but simply check if the operator is `=`
           invariant(operator === '=', msg.valueCaptureWithOtherOperator())
-        } else { // normal qualifier
+        } else { // Normal css attribute qualifier
           result.push(`[${attribute}${operator}"${value}"]`)
         }
       } else { // pseudo-qualifier

@@ -55,6 +55,7 @@ test('fail a CaptureResult', () => {
 
   r.add('k4', 'v4')
   r.add('k5', 'v5')
+  r.forceAdd('k6', 'v6')
   expect(r.isFailed()).toBe(true)
   expect(r.get()).toBe(null)
 })

@@ -71,7 +71,7 @@ export interface IdQualifier {
 }
 
 export interface ClassQualifier {
-  type: 'class-qulifier'
+  type: 'class-qualifier'
   className: string
 }
 

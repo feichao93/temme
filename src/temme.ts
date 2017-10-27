@@ -25,10 +25,9 @@ export interface TemmeParser {
   parse(temmeSelectorString: string): TemmeSelector[]
 }
 
-/* 准备temmeParser.
-  在webpack build的时候, 用pegjs-loader来载入parser
-  在jest的时候, 使用fs来载入语法文件, 然后用pegjs程序生成parser
-*/
+/** Prepare the temme-parser.
+ * In the webpack building context, we use pegjs-loader to load parser from the grammar file.
+ * In other context (e.x. jest context), we use fs and pegjs node api to generate the parser. */
 declare const WEBPACK_BUILD: boolean
 let temmeParser: TemmeParser
 if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
@@ -84,12 +83,13 @@ export default function temme(
       }
     }
 
-    // Second pass: match & capture
+    // Second pass: expand snippets & match & capture
     for (const selector of expandSnippets(selectorArray)) {
       if (selector.type === 'normal-selector') {
         const cssSelector = makeNormalCssSelector(selector.sections)
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
+          // Only the first element will be captured.
           result.merge(capture(subCheerio.first(), selector))
 
           if (selector.arrayCapture) {
@@ -115,6 +115,9 @@ export default function temme(
     return result
   }
 
+  /** Expand snippets recursively.
+   * The returned selector array will not contain any `SnippetExpand`.
+   * `expanded` is used to detect circular expansion. */
   function expandSnippets(selectorArray: TemmeSelector[], expanded: string[] = []): ExpandedTemmeSelector[] {
     const result: ExpandedTemmeSelector[] = []
     for (const selector of selectorArray) {
@@ -132,6 +135,7 @@ export default function temme(
     return result
   }
 
+  /** Capture the node according to the selector. Returns an `CaptureResult`. */
   function capture(node: Cheerio, selector: NormalSelector | SelfSelector): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
@@ -169,16 +173,18 @@ export default function temme(
     for (const part of content) {
       if (part.type === 'capture') {
         const { capture: { name, filterList } } = part
-        // text, html, node这三个是内置的filter, 和普通的filter语法相同, 但是运行时行为不同
+        // `text`, `html` and `node` are three special filter names.
+        // They have the same syntax with the normal filters, but have different running semantics.
         const firstFilterName = filterList[0] && filterList[0].name
         let initValue: any
         if (firstFilterName === 'html') {
           initValue = node.html()
         } else if (firstFilterName === 'node') {
           initValue = cheerio(node)
-        } else { // 默认情况下使用节点内的文本来作为initValue
+        } else { // `text` is the default filter
           initValue = node.text()
         }
+        // Remove the first special filter.
         const normalFilterList = specialFilterNames.includes(firstFilterName)
           ? filterList.slice(1)
           : filterList

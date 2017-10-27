@@ -192,7 +192,7 @@ IdQualifier 'css-selector-id-qualifier'
 ClassQualifier 'css-selector-class-qualifier'
   = '.' className:CSSIdentifierName {
     return {
-      type: 'class-qulifier',
+      type: 'class-qualifier',
       className,
     }
   }
