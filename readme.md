@@ -6,8 +6,6 @@ Temme is a concise and convenient jQuery-like selector for node crawlers. Temme 
 
 # Install
 
-Install from npm:
-
 `npm install temme` or `yarn add temme`
 
 # Usage
@@ -182,11 +180,13 @@ The selectors in the curly brackets after normal CSS selector are called content
 
 Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source](/src/contentFunctions.ts) for more implementation detail. [example][example-content-functions]
 
-Currently, there is only one built-in content function `match`. `match` try to match args against trimed text of a node. Examples of `match`:
+Currently, there is only one built-in content function `find`. `find` try to capture a substring of the node text. Examples of `find`:
 
-* If we call `match($foo, 'world')` on a node with `'hello world'`, then result will be `{ foo: 'hello ' } `
-* If we call `match('before', $x, 'after')` on a node with text `'  before mmm  after'`, then the result will be `{ x: ' mmm  ' }`
-* If args and text of the node does not match, then `match` will set the state of the capture-result as *failed*. The value of a *failed* capture-result is assumed to be `null`.
+* `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
+* `find('hello', $x)` will try to capture the text **after** `'hello'`.
+* `find('hello', $x, 'world')` will try to capture the text **between** `'hello'` and `'world'`.
+
+`find` simply uses `String#indexOf` to get the index of a substring. If `find` cannot find the substring that should appear before/after the target substring, then it will set the capture-result as *failed*.
 
 ### Use Customized Content Functions (experimental)
 
@@ -194,7 +194,7 @@ Currently, there is only one built-in content function `match`. `match` try to m
 import { contentFunctions } from 'temme'
 
 // Get a content function
-contentFunctions.get('match')
+contentFunctions.get('find')
 // Set a customized content function
 contentFunctions.set('myContentFn', myContentFn)
 // Remove a content function
@@ -210,6 +210,8 @@ function myContentFn(result, node, capture1, string2) {
   result.setFailed()
 }
 ```
+
+Content function is a more powerful way than normal css selector. But in most scenarios, we do not need customized content functions. Temme supports pseudo-selector powered by [css-select](https://github.com/fb55/css-select#supported-selectors). Especially, `:contains`, `:not` and `:has` are useful pseudo-selectors which enhance the select ability a lot. Before using customized content functions, try to test whether pseudo-selectors can satisfy the requirements.
 
 ## Snippets (experimental)
 

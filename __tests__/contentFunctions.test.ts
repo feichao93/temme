@@ -1,17 +1,19 @@
 import temme from '../src/temme'
 
-test('contentFunction match', () => {
-  const html = '<div>  test text </div>'
+test('contentFunction find', () => {
+  const html = '<div>  test text</div>'
 
-  expect(temme(html, `div{match($)}`)).toEqual('test text')
-  expect(temme(html, `div{match('not-exist', $)}`)).toEqual(null)
-  expect(temme(html, `div{match($, 'not-exist')}`)).toEqual(null)
-  expect(temme(html, `div{match('test', $, 'x', 't')}`)).toEqual(' te')
-  // the last letter `t` has no match
-  expect(temme(html, `div{match('test', $, 'ex')}`)).toEqual(null)
-  expect(temme(html, `div{match('test', 'text')}`)).toEqual(null)
-  expect(temme(html, `div{match('te', $a, 'te', $b)}`)).toEqual({
-    a: 'st ',
-    b: 'xt',
-  })
+  expect(temme(html, `div{find('not-exist', $)}`)).toEqual(null)
+  expect(temme(html, `div{find($, 'not-exist')}`)).toEqual(null)
+  expect(temme(html, `div{find('not-exist', $, 'text')}`)).toEqual(null)
+  expect(temme(html, `div{find('test', $, 'not-exist')}`)).toEqual(null)
+  expect(temme(html, `div{find('test', $|trim)}`)).toEqual('text')
+  expect(temme(html, `div{find($|trim, 'text')}`)).toEqual('test')
+  expect(temme(html, `div{find('te', $, 'xt')}`)).toEqual('st te')
+
+  expect(() => temme(html, `div{find()}`)).toThrow()
+  expect(() => temme(html, `div{find($a)}`)).toThrow()
+  expect(() => temme(html, `div{find($a,$b)}`)).toThrow()
+  expect(() => temme(html, `div{find('abc', 'def')}`)).toThrow()
+  expect(() => temme(html, `div{find('abc', 'def')}`)).toThrow()
 })

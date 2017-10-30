@@ -1,51 +1,65 @@
+import * as invariant from 'invariant'
 import { Capture } from './interfaces'
 import { CaptureResult } from './CaptureResult'
 import { msg } from './check'
+import { isCapture } from './utils'
 
 export interface ContentFn {
   (result: CaptureResult, node: Cheerio, ...args: any[]): void
 }
 
-/** @deprecated */
-function match(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
-  const s = node.text().trim()
-  // 标记正在进行的capture, null表示没有在捕获中
-  let capturing: Capture = null
-  let charIndex = 0
-  for (const arg of args) {
-    if (typeof arg === 'string') {
-      if (capturing) {
-        const c = s.indexOf(arg, charIndex)
-        if (c === -1) {
-          result.setFailed()
-        } else {
-          result.add(capturing.name, s.substring(charIndex, c), capturing.filterList)
-          capturing = null
-          charIndex = c + arg.length
-        }
+/** Try to capture text within a node's text.
+ * This content function can have three forms:
+ * 1. find('before-string', $capture)   Try to capture the text after 'before-string'
+ * 2. find($capture, 'after-string')    Try to capture the text before 'after-string'
+ * 3. find('pre', $capture, 'post')     Try to capture the text between 'pre' and 'post'
+ * */
+function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
+  const invalidArgs = 'Invalid arguments received by match(...)'
+  const s = node.text()
+  if (args.length === 2) {
+    const [before, after] = args
+    invariant(
+      typeof before === 'string' && isCapture(after) || isCapture(before) && typeof after === 'string',
+      invalidArgs,
+    )
+    if (typeof before === 'string') {
+      const capture = after as Capture
+      const i = s.indexOf(before)
+      if (i === -1) {
+        result.setFailed()
       } else {
-        if (s.substring(charIndex).startsWith(arg)) {
-          charIndex += arg.length
-        } else {
-          result.setFailed()
-        }
+        result.add(capture.name, s.substring(i + before.length), capture.filterList)
       }
-    } else { // arg is value capture
-      capturing = arg
+    } else {
+      const capture = before as Capture
+      const i = s.indexOf(after as string)
+      if (i === -1) {
+        result.setFailed()
+      } else {
+        result.add(capture.name, s.substring(0, i), capture.filterList)
+      }
     }
-  }
-  if (capturing) {
-    result.add(capturing.name, s.substring(charIndex).trim(), capturing.filterList)
-    charIndex = s.length
-  }
-  if (charIndex !== s.length) {
-    // 字符串结尾处还有字符尚未匹配
-    result.setFailed()
+  } else {
+    invariant(args.length === 3, invalidArgs)
+    const [before, capture, after] = args as [string, Capture, string]
+    invariant(typeof before === 'string' && isCapture(capture) && typeof after === 'string', invalidArgs)
+    const i = s.indexOf(before)
+    if (i === -1) {
+      result.setFailed()
+    } else {
+      const j = s.indexOf(after, i + before.length)
+      if (j === -1) {
+        result.setFailed()
+      } else {
+        result.add(capture.name, s.substring(i + before.length, j), capture.filterList)
+      }
+    }
   }
 }
 
 const defaultContentFunctions = {
-  match,
+  find,
 }
 
 const map = new Map<string, ContentFn>()

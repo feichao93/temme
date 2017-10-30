@@ -7,8 +7,8 @@ const maigooHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/maigoo-br
 
 test('text matching', () => {
   const selector = `
-    .article_head h1{match($name, '-', $_)},
-    .author{match('阅读：', $count|Number, '次')}`
+    .article_head h1{find($name, '-')},
+    .author{find('阅读：', $count|Number, '次')}`
 
   // language=TEXT
   const html = `
@@ -101,10 +101,10 @@ test('complex example: recursive array capture, default capture, customized filt
 
 test('complex case: multiple parent-refs', () => {
   const selector = `.brandinfo .info >li@|pack{
-      &{match('电话：', $phone|split(','))};
-      &{match('品牌创立时间：', $foundTime)};
-      &{match('品牌发源地：', $origination)};
-      &{match('品牌广告词：', $adText)};
+      &{find('电话：', $phone|split(','))};
+      &{find('品牌创立时间：', $foundTime)};
+      &{find('品牌发源地：', $origination)};
+      &{find('品牌广告词：', $adText|trim)};
       &{$presidentUrl|html|extractPresidentUrl};
       script[language]{$officialWebsite|html|extractUrl};
     }`
