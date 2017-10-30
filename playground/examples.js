@@ -244,7 +244,7 @@ See source file src/filters.ts to view all built-in filters.
 a{
   $text;                           // capture
   $assignmentInContent = true;     // assignment
-  match('Star Me on ', $website);  // function call
+  find('Star Me on ', $website);   // function call
 };
 
 /* The part in the curly brackets is called "content". Content consists of
@@ -278,7 +278,7 @@ Note the difference between content and array-capture: array-capture has an at-s
     selector: `
 // content functions
 a {
-  match('Star Me on ', $website);
+  find('Star Me on ', $website);
 }
 
 /* We can call content functions in content. Content function is an advanced method that
@@ -370,16 +370,16 @@ Click next to see some real-world complex examples.
     htmlUrl: 'resources/douban-reviews.html',
     selector: `// 豆瓣短评网页数据抓取
 // https://movie.douban.com/subject/1292052/comments?start=42&limit=20
-title{match($movieName, ' 短评')};
+title{find($movieName, ' 短评')};
 
 .aside>p>a[href=$movieUrl];
 
 .movie-summary .attrs p@movieDetail|pack {
-  &{match('导演:', $director)};
-  &{match('主演:', $actors|split(/ *\\/ */)|slice(0,3))};
-  &{match('类型:', $movieType)};
-  &{match('片长:', $duration)};
-  &{match('上映:', $releaseTime)};
+  &{find('导演:', $director|trim)};
+  &{find('主演:', $actors|trim|split(/ *\\/ */)|slice(0,3))};
+  &{find('类型:', $movieType|trim)};
+  &{find('片长:', $duration|trim)};
+  &{find('上映:', $releaseTime|trim)};
 };
 .comment-item@comments {
   &[data-cid=$commentId];
@@ -398,7 +398,7 @@ title{match($movieName, ' 短评')};
 // 评论数据来自于 https://detail.tmall.com/item.htm?id=549049522944&skuId=3499764035487
 @reviewDetail = {
   .tm-rate-title{$title};
-  .tm-rate-fulltxt{$text};
+  .tm-rate-fulltxt{$text|trim};
   .tm-m-photos ul>li@imgs{
     &[data-src=$];
   };
