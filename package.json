@@ -1,10 +1,11 @@
 {
   "name": "temme",
-  "version": "0.5.0-SNAPSHOT",
+  "version": "0.4.1",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "repository": "https://github.com/shinima/temme.git",
+  "homepage": "https://temme.js.org",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "engines": {
