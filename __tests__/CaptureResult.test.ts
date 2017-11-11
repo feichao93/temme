@@ -123,18 +123,18 @@ test('merge without fail-propagation changes nothing', () => {
   expect(a.isFailed()).toBe(false)
 })
 
-test('applyFilters from  defaultFilterMap', () => {
+test('applyFilterList from  defaultFilterMap', () => {
   const r = new CaptureResult(defaultFilterMap)
-  r.add('k1', [0, 1, null, true, false], [{ name: 'compact', args: [] }])
+  r.add('k1', [0, 1, null, true, false], [{ isArrayFilter: false, name: 'compact', args: [] }])
   expect(r.get()).toEqual({ k1: [1, true] })
 
-  r.add('k2', [{ x: 1 }, { y: 2 }, { z: 3 }], [{ name: 'pack', args: [] }])
+  r.add('k2', [{ x: 1 }, { y: 2 }, { z: 3 }], [{ isArrayFilter: false, name: 'pack', args: [] }])
   expect(r.get()).toEqual({
     k1: [1, true],
     k2: { x: 1, y: 2, z: 3 },
   })
 
-  r.add('k3', '1234', [{ name: 'Number', args: [] }])
+  r.add('k3', '1234', [{ isArrayFilter: false, name: 'Number', args: [] }])
   expect(r.get()).toEqual({
     k1: [1, true],
     k2: { x: 1, y: 2, z: 3 },
@@ -142,14 +142,14 @@ test('applyFilters from  defaultFilterMap', () => {
   })
 })
 
-test('applyFilters from prototype chain', () => {
+test('applyFilterList from prototype chain', () => {
   const r = new CaptureResult({})
-  r.add('k1', 'lowercase', [{ name: 'toUpperCase', args: [] }])
+  r.add('k1', 'lowercase', [{ isArrayFilter: false, name: 'toUpperCase', args: [] }])
   expect(r.get()).toEqual({
     k1: 'LOWERCASE',
   })
 
-  r.add('k2', 'longlongstring', [{ name: 'substring', args: [0, 4] }])
+  r.add('k2', 'longlongstring', [{ isArrayFilter: false, name: 'substring', args: [0, 4] }])
   expect(r.get()).toEqual({
     k1: 'LOWERCASE',
     k2: 'long',
@@ -159,19 +159,19 @@ test('applyFilters from prototype chain', () => {
 test('apply multiple filters', () => {
   const r = new CaptureResult(defaultFilterMap)
   r.add('k1', '1234', [
-    { name: 'substring', args: [1, 3] },
-    { name: 'Number', args: [] },
+    { isArrayFilter: false, name: 'substring', args: [1, 3] },
+    { isArrayFilter: false, name: 'Number', args: [] },
   ])
   expect(r.get()).toEqual({
     k1: 23,
   })
 
   r.add('k2', [0, 'a', 'b', 'c', 'd', false], [
-    { name: 'compact', args: [] }, // [ 'a', 'b', 'c', 'd' ]
-    { name: 'join', args: [','] }, // 'a,b,c,d'
-    { name: 'substring', args: [0, 3] }, // 'a,b'
-    { name: 'split', args: [','] }, // [ 'a', 'b' ]
-    { name: 'slice', args: [1] }, // [ 'b' ]
+    { isArrayFilter: false, name: 'compact', args: [] }, // [ 'a', 'b', 'c', 'd' ]
+    { isArrayFilter: false, name: 'join', args: [','] }, // 'a,b,c,d'
+    { isArrayFilter: false, name: 'substring', args: [0, 3] }, // 'a,b'
+    { isArrayFilter: false, name: 'split', args: [','] }, // [ 'a', 'b' ]
+    { isArrayFilter: false, name: 'slice', args: [1] }, // [ 'b' ]
   ])
 
   expect(r.get()).toEqual({
@@ -182,15 +182,15 @@ test('apply multiple filters', () => {
 
 test('invalid filter', () => {
   const r = new CaptureResult(defaultFilterMap)
-  expect(() => r.add('k1', [], [{ name: 'compact', args: [] }]))
+  expect(() => r.add('k1', [], [{ isArrayFilter: false, name: 'compact', args: [] }]))
     .not.toThrow()
 
-  expect(() => r.add('k2', 'value-2', [{ name: 'foo', args: [1, 2, 3] }]))
+  expect(() => r.add('k2', 'value-2', [{ isArrayFilter: false, name: 'foo', args: [1, 2, 3] }]))
     .toThrow(msg.invalidFilter('foo'))
 
-  expect(() => r.add('k3', 'value-3', [{ name: 'trim', args: [] }]))
+  expect(() => r.add('k3', 'value-3', [{ isArrayFilter: false, name: 'trim', args: [] }]))
     .not.toThrow()
 
-  expect(() => r.add('k4', 'value-4', [{ name: 'bar', args: [] }]))
+  expect(() => r.add('k4', 'value-4', [{ isArrayFilter: false, name: 'bar', args: [] }]))
     .toThrow(msg.invalidFilter('bar'))
 })

@@ -1,3 +1,4 @@
+import * as invariant from 'invariant'
 import { Filter } from './interfaces'
 import { FilterFnMap, FilterFn } from './filters'
 import { defaultCaptureKey } from './constants'
@@ -26,7 +27,7 @@ export class CaptureResult {
       return
     }
     if (filterList) {
-      value = this.applyFilters(value, filterList)
+      value = this.applyFilterList(value, filterList)
     }
     if (!(value == null || isEmptyObject(value))) {
       this.result[key] = value
@@ -38,7 +39,7 @@ export class CaptureResult {
       return
     }
     if (filterList) {
-      value = this.applyFilters(value, filterList)
+      value = this.applyFilterList(value, filterList)
     }
     this.result[key] = value
   }
@@ -78,16 +79,25 @@ export class CaptureResult {
     }
   }
 
-  private applyFilters(initValue: any, filterList: Filter[]) {
+  private applyFilter(value: any, filter: Filter) {
+    if (filter.name in this.filterFnMap) {
+      const filterFn = this.filterFnMap[filter.name]
+      return filterFn.apply(value, filter.args)
+    } else if (typeof value[filter.name] === 'function') {
+      const filterFn: FilterFn = value[filter.name]
+      return filterFn.apply(value, filter.args)
+    } else {
+      throw new Error(msg.invalidFilter(filter.name))
+    }
+  }
+
+  private applyFilterList(initValue: any, filterList: Filter[]) {
     return filterList.reduce((value, filter) => {
-      if (filter.name in this.filterFnMap) {
-        const filterFn = this.filterFnMap[filter.name]
-        return filterFn.apply(value, filter.args)
-      } else if (typeof value[filter.name] === 'function') {
-        const filterFn: FilterFn = value[filter.name]
-        return filterFn.apply(value, filter.args)
+      if (filter.isArrayFilter) {
+        invariant(Array.isArray(value), msg.arrayFilterAppliedToNonArrayValue(filter.name))
+        return value.map((item: any) => this.applyFilter(item, filter))
       } else {
-        throw new Error(msg.invalidFilter(filter.name))
+        return this.applyFilter(value, filter)
       }
     }, initValue)
   }

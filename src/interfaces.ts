@@ -10,6 +10,7 @@ export interface Capture {
 }
 
 export interface Filter {
+  isArrayFilter: boolean
   name: string
   args: Literal[]
 }

@@ -130,8 +130,11 @@ ChildrenSelectors
   }
 
 Filter
-  = '|' name:IdentifierName args:FilterArgs? {
-    return { name, args: args || [] }
+  = '||' name:IdentifierName args:FilterArgs? {
+    return { isArrayFilter: true, name, args: args || [] }
+  }
+  / '|' name:IdentifierName args:FilterArgs? {
+    return { isArrayFilter: false, name, args: args || [] }
   }
 
 FilterArgs
@@ -253,7 +256,7 @@ Content
   }
 
 ContentPart
-  =  assignment:Assignment {
+  = assignment:Assignment {
     return {
       type: 'assignment',
       capture: assignment.capture,

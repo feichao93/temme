@@ -28,6 +28,9 @@ export const msg = {
   circularSnippetExpansion(loop: string[]) {
     return `Circular snippet expansion detected: ${loop.join(' -> ')}`
   },
+  arrayFilterAppliedToNonArrayValue(filterName: string) {
+    return `Array-filter ${filterName} can only be applied to an array.`
+  },
 }
 
 function isCaptureQualifier(qualifier: Qualifier) {

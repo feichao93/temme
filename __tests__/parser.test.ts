@@ -147,7 +147,7 @@ describe('parse capture', () => {
           qualifiers: [{ type: 'class-qualifier', className: 'foo' }],
           content: [{
             type: 'capture',
-            capture: { name: 'h', filterList: [{ name: 'html', args: [] }] },
+            capture: { name: 'h', filterList: [{ isArrayFilter: false, name: 'html', args: [] }] },
           }],
         }],
         children: [],
@@ -291,13 +291,13 @@ test('parse fitlers', () => {
   }
 
   expect(extractFilterList(temmeParser.parse('html{$h|f}')))
-    .toEqual([{ name: 'f', args: [] }])
+    .toEqual([{ isArrayFilter: false, name: 'f', args: [] }])
 
   expect(extractFilterList(temmeParser.parse(`html{$h|f(1,null,'3')|g()|h(false,true,'234')}`)))
     .toEqual([
-      { name: 'f', args: [1, null, '3'] },
-      { name: 'g', args: [] },
-      { name: 'h', args: [false, true, '234'] },
+      { isArrayFilter: false, name: 'f', args: [1, null, '3'] },
+      { isArrayFilter: false, name: 'g', args: [] },
+      { isArrayFilter: false, name: 'h', args: [false, true, '234'] },
     ])
 })
 
