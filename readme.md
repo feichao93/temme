@@ -166,6 +166,15 @@ const extraFilters = {
 temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 ```
 
+### Array-Filters `||`
+
+Use array-filter syntax `||`, temme will treat the value as an array, and apply the filter to every item of this array.
+
+```JavaScript
+temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
+// => [1, 22, 333, 4444]
+```
+
 ## Content
 
 The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
