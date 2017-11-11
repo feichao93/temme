@@ -215,24 +215,35 @@ tr@ {
     html: simpleHtml3,
     selector: `
 // filters
-tr@ {
- &[data-row-id=$rid|Number];
- td@cells|join(' ')|toLowerCase { &{$} };
-}
+tr[data-row-id=$firstRowId|Number];
+
+td@cells|join(' ')|toLowerCase { &{$} };
 
 /* When a value is captured, it is always a string. A filter is a
 simple function that receive input as this context with several
 arguments, and returns a single value. You could use filters to
 process the captured value.
 
-In the above example, '$rid|Number' means that every time $rid captures a value,
-it will be processed by 'Number' filter and it will be converted to a number.
+In the above example, '$firstRowId|Number' means that every time $firstRowId captures a value,
+it will be processed by 'Number' filter and as a result it will be converted to a number.
 
 In "@cells|join(' ')|toLowerCase", two filters are chained, and both filters
 are from its prototype. Every time @cells is captured, it will be processed like
 cells = cells.join(' ').toLowerCase()
 
 See source file src/filters.ts to view all built-in filters.
+
+*/`,
+  },
+  {
+    name: 'tutorial-array-filters',
+    html: simpleHtml3,
+    selector: `
+// array-filters
+td@cells||toLowerCase { &{$} };
+
+/* If the capture value is an array, we could use \`||\` and apply the filter to every 
+item of this array. 
 
 */`,
   },
@@ -376,10 +387,10 @@ title{find($movieName, ' 短评')};
 
 .movie-summary .attrs p@movieDetail|pack {
   &{find('导演:', $director|trim)};
-  &{find('主演:', $actors|trim|split(/ *\\/ */)|slice(0,3))};
-  &{find('类型:', $movieType|trim)};
+  &{find('主演:', $actors|trim|split('/')||trim|slice(0,3))};
+  &{find('类型:', $movieType|split(',')||trim)};
   &{find('片长:', $duration|trim)};
-  &{find('上映:', $releaseTime|trim)};
+  &{find('上映:', $releaseTime|split(',')||trim)};
 };
 .comment-item@comments {
   &[data-cid=$commentId];
