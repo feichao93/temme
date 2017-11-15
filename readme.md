@@ -17,7 +17,7 @@ import temme from 'temme'
 // const temme = require('temme').default
 
 const html = '<div color="red">hello world</div>'
-const temmeSelector = 'div[color=$c]{$t}'
+const temmeSelector = 'div[color=$c]{$t};'
 temme(html, temmeSelector)
 // => { c: 'red', t: 'hello world' }
 ```
@@ -32,17 +32,17 @@ temme(html, temmeSelector)
 
 Temme is inspired by [Emmet](https://emmet.io/). Emmet generates HTML according to a css-selector-like template. The behavior of emmet is like the following function:
 ```JavaScript
-emmet('div[class=red]{text content}')
+emmet('div[class=red]{text content};')
 // => <div class="red">text content</div>
 
 // Extend this function to allow a second argument `data`
-emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
+emmet('div[class=$cls]{$content};', { cls: 'red', content: 'text content' })
 // => <div class="red">text content</div>
 ```
 
 As the name indicates, temme is the reverse of emmet. If we express temme as a function, then it looks like:
 ```JavaScript
-temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
+temme('<div class="red">text content</div>', 'div[class=$cls]{$content};')
 // => { cls: 'red', content: 'text content' }
 ```
 
@@ -107,16 +107,15 @@ Array-capture can be nested. Just place a array-capture within another array-cap
 
 ## Multiple Selectors at Top-Level
 
-Temme supports multiple selectors at top-level like in children selectors.
-Do not forget to use the semicolon as the separator. [example][example-multiple-selectors-at-top-level]
+Temme supports multiple selectors at top-level like in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace  , then the semicolon is optional. [example][example-multiple-selectors-at-top-level]
 
 ## Assignments
 
 Syntax:
-* `$foo = bar`:  `foo` should be a valid JavaScript identifier; `bar` should be a JavaScript literal (string/number/null/boolean/RegExp).
+* `$foo = bar;`:  `foo` should be a valid JavaScript identifier; `bar` should be a JavaScript literal (string/number/null/boolean/RegExp).
 
 Assignments could appears in three places:
-1. At top level: `$foo = 'bar'` means that string `'bar'` will be in `.foo` of the final result; [example][example-assignments-at-top-level]
+1. At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result; [example][example-assignments-at-top-level]
 2. In content-capture: `div.foo{ $a = null }` is like a conditional capture, if there is a div that satisfies `.foo` qualifier, then the assignment is executed; [example][example-assignments-in-content]
 3. In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field. [example][example-assignments-in-children-selectors]
 
@@ -165,6 +164,8 @@ const extraFilters = {
 }
 temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 ```
+
+### Inline Filters (TODO)
 
 ### Array-Filters `||`
 

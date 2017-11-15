@@ -62,7 +62,7 @@ If you are ready, click the next button on the top.
     html: simpleHtml1,
     selector: `
 // value-capture
-.link[href=$href]{$txt}
+.link[href=$href]{$txt};
 
 /* Value-capture is a basic form of capture. It uses $foo syntax. Value-capture
 can be placed at attribute part (in square brackets) to capture attribute value,
@@ -71,6 +71,9 @@ can be placed at attribute part (in square brackets) to capture attribute value,
 In this basic example, CSS selector that matches element a is '.link'
 '[href=$href]' is a attribute capture which means that "capture href attribute into .href".
 '{$txt}' is a content capture means that "capture text content of the element into .txt".
+
+Use a semicolon to terminate a selector. But when the selector already ends with curly brace,
+the semicolon is optional.
 */`,
   },
   {
@@ -313,8 +316,8 @@ Click next to see some real-world complex examples.
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
 // capture linked questions of a stackoverflow question
 .linked .spacer@|compact {
-  .question-hyperlink[href=$url]{$question|replace(/ +/g, ' ')},
-  .answer-votes{$votes|Number},
+  .question-hyperlink[href=$url]{$question|replace(/ +/g, ' ')};
+  .answer-votes{$votes|Number};
 }`
   },
   {
@@ -323,21 +326,25 @@ Click next to see some real-world complex examples.
     selector: `
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
 // capture all answers and all comments
+function format() {
+  return this.replace(/\\s+/g, ' ')
+}
+
 .answer@ {
   .fw .user-info@users {
     .user-details@userDetail|pack {
-      a[href=$userlink]{$username|replace(/\\s+/g, ' ')};
+      a[href=$userlink]{$username|format};
       .reputation-score{$reputation};
     };
     .relativetime[title=$time];
-    .user-action-time{$userAction|replace(/\\s+/g, ' ')};
+    .user-action-time{$userAction|format};
   };
-  .post-text{$answerText|replace(/\\s+/g, ' ')};
+  .post-text{$answerText|format};
   .comments .comment@comments {
     &[id=$commentId];
     .comment-score{$commentScore|Number};
     .comment-text .comment-copy{$text};
-    .comment-user{$commentUser|replace(/\\s+/g, ' ')};
+    .comment-user{$commentUser|format};
     .comment-date span[title=$date];
   };
 }`,
@@ -349,11 +356,11 @@ Click next to see some real-world complex examples.
 // https://github.com/shinima/temme/commits/v0.3.0
 // Extract commits information from GitHub commits page
 .commits-listing .commit@ {
-  relative-time[datetime=$time],
-  .commit-author{$author},
-  .commit-title >a[title=$message],
-  .commit-links-group>a[href=$commitLink]{$shortHash|trim},
-  a[aria-label^="Browse the repository" href=$treeLink],
+  relative-time[datetime=$time];
+  .commit-author{$author};
+  .commit-title >a[title=$message];
+  .commit-links-group>a[href=$commitLink]{$shortHash|trim};
+  a[aria-label^="Browse the repository" href=$treeLink];
 }`,
   },
   {
@@ -362,11 +369,17 @@ Click next to see some real-world complex examples.
     selector: `
 // https://github.com/facebook/react/issues?q=
 // Extract issue information from GitHub issues page
+
+function url() {
+  const baseUrl = 'https://github.com/facebook/react/issues?q='
+  return new URL(this, baseUrl).href
+}
+
 .js-issue-row@{
   &[id=$issueId|slice(6)|Number];
 
   .float-left.pt-2.pl-3>span[aria-label=$type];
-  .float-left.col-9.p-2>a[href=$link]{$title|trim};
+  .float-left.col-9.p-2>a[href=$link|url]{$title|trim};
   relative-time[datetime=$time];
 
   $assignee = null;
@@ -414,13 +427,14 @@ title{find($movieName, ' 短评')};
     &[data-src=$];
   };
 };
+
 .rate-grid tr@{
   .rate-user-info{$user};
   .rate-user-grade{$userGrade};
-  .col-meta .rate-sku p@meta{ &[title=$] };
-  .tm-col-master >.tm-rate-content@premiere|pack { @reviewDetail };
-  .tm-rate-premiere@premiere|pack { @reviewDetail };
-  .tm-rate-append@append|pack { @reviewDetail };
+  .col-meta .rate-sku p@meta{ &[title=$]; };
+  .tm-col-master >.tm-rate-content@premiere|pack { @reviewDetail; };
+  .tm-rate-premiere@premiere|pack { @reviewDetail; };
+  .tm-rate-append@append|pack { @reviewDetail; };
 }`,
   },
 ]
