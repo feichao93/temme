@@ -7,8 +7,8 @@ const maigooHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/maigoo-br
 
 test('text matching', () => {
   const selector = `
-    .article_head h1{find($name, '-')},
-    .author{find('阅读：', $count|Number, '次')}`
+    .article_head h1{find($name, '-')};
+    .author{find('阅读：', $count|Number, '次')};`
 
   // language=TEXT
   const html = `
@@ -35,8 +35,8 @@ test('basic value capture', () => {
 
 test('array capture', () => {
   const selector = `.answer@answers {
-    .votecell .vote-count-post{$upvote},
-    .user-info .user-details>a{$userName},
+    .votecell .vote-count-post{$upvote};
+    .user-info .user-details>a{$userName};
   }`
   const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
@@ -52,7 +52,7 @@ test('array capture', () => {
   })
 })
 
-test('complex example: recursive array capture, default capture, customized filters', () => {
+test('complex example: recursive array capture, default capture', () => {
   const selector = `.answer@ {
     .votecell .vote-count-post{$upvote};
     .post-test{$postText};

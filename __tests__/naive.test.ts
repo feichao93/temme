@@ -43,10 +43,10 @@ test('multiple selectors at root level', () => {
   </ul>`
 
   const selector = `
-    .name{$name},
-    .country{$country},
-    .city{$city},
-    .university{$university},
+    .name{$name};
+    .country{$country};
+    .city{$city};
+    .university{$university};
   `
   expect(temme(html, selector)).toEqual({
     name: 'shinima',
@@ -79,8 +79,8 @@ test('attr predicate and value capture without element in attribute', () => {
   </ul>`
 
   const selector = `
-    [class=name][data-full-name=$fullName],
-    [class=country]{$country},
+    [class=name][data-full-name=$fullName];
+    [class=country]{$country};
   `
   expect(temme(html, selector)).toEqual({
     fullName: 'Shi Feichao',
@@ -90,7 +90,7 @@ test('attr predicate and value capture without element in attribute', () => {
 
 test('try to capture a non-existent attribute', () => {
   const html = '<div data-color=red data-speed=fast data-power=great>TEXT</div>'
-  expect(temme(html, 'div[data-name=$name data-age=$age]')).toBeNull()
+  expect(temme(html, 'div[data-name=$name data-age=$age];')).toBeNull()
 })
 
 test('using the special node filter', () => {
@@ -129,19 +129,19 @@ test('test pseudo-qualifier', () => {
 
 describe('assignments in different places', () => {
   test('assignments at top level', () => {
-    expect(temme('', "$str = '123'")).toEqual({
+    expect(temme('', "$str = '123';")).toEqual({
       str: '123',
     })
-    expect(temme('', '$str = "double-quote"')).toEqual({
+    expect(temme('', '$str = "double-quote";')).toEqual({
       str: 'double-quote',
     })
-    expect(temme('', '$num = 1234')).toEqual({
+    expect(temme('', '$num = 1234;')).toEqual({
       num: 1234,
     })
-    expect(temme('', '$nil = null')).toEqual({
+    expect(temme('', '$nil = null;')).toEqual({
       nil: null,
     })
-    expect(temme('', '$T = true, $F = false')).toEqual({
+    expect(temme('', '$T = true; $F = false;')).toEqual({
       T: true,
       F: false,
     })
@@ -159,8 +159,8 @@ describe('assignments in different places', () => {
   `
     const selector = `
     li@ {
-      $foo = 'bar',
-    },
+      $foo = 'bar';
+    }
   `
     expect(temme(html, selector)).toEqual([
       { foo: 'bar' },

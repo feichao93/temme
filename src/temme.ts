@@ -61,7 +61,7 @@ export default function temme(
   } else {
     rootSelector = selector
   }
-  if (rootSelector == null) {
+  if (rootSelector.length === 0) {
     return null
   }
 
@@ -75,11 +75,15 @@ export default function temme(
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
-    // First pass: process SnippetDefine
+    // First pass: process SnippetDefine & FilterDefine
     for (const selector of selectorArray) {
       if (selector.type === 'snippet-define') {
         invariant(!snippetsMap.has(selector.name), msg.snippetAlreadyDefined(selector.name))
         snippetsMap.set(selector.name, selector)
+      } else if (selector.type === 'filter-define') {
+        const { name, argNames, code } = selector
+        // invariant(!(name in filterFnMap), `Filter ${name} already exists.`)
+        filterFnMap[name] = new Function(...argNames, code) as FilterFn
       }
     }
 
@@ -110,7 +114,7 @@ export default function temme(
       } else if (selector.type === 'assignment') {
         const { name, filterList } = selector.capture
         result.forceAdd(name, selector.value, filterList)
-      } // else selector.type === 'snippet-define'. Do nothing.
+      } // else selector.type is 'snippet-define' or 'filter-define'. Do nothing.
     }
     return result
   }
@@ -140,14 +144,14 @@ export default function temme(
     const result = new CaptureResult(filterFnMap)
 
     if (selector.type === 'normal-selector') {
-      const { sections } = selector
+      const { sections, content } = selector
       // Value-captures in the last section will be processed.
       // Preceding value-captures will be ignored.
-      const { qualifiers, content } = sections[sections.length - 1]
+      const { qualifiers } = sections[sections.length - 1]
       result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
       result.mergeWithFailPropagation(captureContent(node, content))
     } else { // selector.type === 'self-selector'
-      const { section: { qualifiers, content } } = selector
+      const { section: { qualifiers }, content } = selector
       result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
       result.mergeWithFailPropagation(captureContent(node, content))
     }

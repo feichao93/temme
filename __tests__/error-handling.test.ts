@@ -12,7 +12,7 @@ test('invalid filter name', () => {
 })
 
 test('self-selector at top', () => {
-  expect(() => temme(html, `&[attr=$value]`))
+  expect(() => temme(html, `&[attr=$value];`))
     .toThrowError(msg.selfSelectorAtTopLevel())
 })
 
@@ -39,19 +39,16 @@ test('wrong syntax example 2', () => {
 
 test('error in content part', () => {
   expect(() => temme(html, `div@|pack{
-    p{foo($name, '-', $_)},
+    p{foo($name, '-', $_)};
   }`)).toThrowError(msg.invalidContentFunction('foo'))
 
   expect(() => {
     contentFunctions.remove('match')
-    temme(html, 'div{ match($foo) }')
+    console.log(temme(html, 'div{ match($foo) }'))
   }).toThrowError(msg.invalidContentFunction('match'))
 
-  expect(() => temme(html, `.leading-css-part{$value} .content{$foo}`))
-    .toThrowError(msg.hasLeadingCapture())
-
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`))
-    .toThrowError(msg.hasLeadingCapture())
+    .toThrowError(msg.hasLeadingAttributeCapture())
 })
 
 test('error in snippets', () => {

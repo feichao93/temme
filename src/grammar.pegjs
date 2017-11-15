@@ -2,6 +2,12 @@
   const defaultCaptureKey = '@@default-capture@@'
   const universalSelector = '*'
 
+  const defaultSection = {
+    combinator: ' ',
+    element: universalSelector,
+    qualifiers: [],
+  }
+
   function flatten(array) {
     const result = []
     for (const item of array) {
@@ -13,56 +19,74 @@
     }
     return result
   }
+
+  function extractList(list, index) {
+    return list.map(element => element[index])
+  }
+
+  function buildList(head, tail, index) {
+    return [head].concat(extractList(tail, index))
+  }
 }
 
 // 起始规则
 Start
-  = __ selectorList:MultipleSelector __ { return selectorList }
-  / __ { return null }
-
-MultipleSelector
-  = head:Selector tail:(__ SelectorSeparator __ selector:Selector { return selector })*
-  OptionalExtraCommaOrSemicolon {
-    return [head].concat(tail)
+  = __ head:Selector tail:(__ Selector)* __ {
+    return buildList(head, tail, 1)
+    return a
+  }
+  / __ {
+    return []
   }
 
 // 选择器
-Selector = SelfSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
+Selector = FilterDefine / SelfSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
 
 // 自身选择器, 以 & 为开头的选择器
 SelfSelector
-  = '&' section:Section {
+  = '&' section:Section? content:Content SelectorEnd? {
+    return {
+      type: 'self-selector',
+      section: section || defaultSection,
+      content,
+    }
+  }
+  / '&' section:Section SelectorEnd {
     return {
       type: 'self-selector',
       section,
-    }
-  }
-  / '&' content:Content {
-    return {
-      type: 'self-selector',
-      section: {
-        combinator: ' ',
-        element: universalSelector,
-        qualifiers: [],
-        content,
-      },
+      content: [],
     }
   }
 
 // 普通的选择器
 NormalSelector
-  = sections:Sections __ arrayCapture:ArrayCapture __ children:ChildrenSelectors {
+  = sections:SectionList
+    __ arrayCapture:ArrayCapture
+    __ children:ChildrenSelectors
+    SelectorEnd? {
     return {
       type: 'normal-selector',
       sections,
+      content: [],
       arrayCapture,
       children,
     }
   }
-  / sections:Sections {
+  / sections:SectionList __  content:Content SelectorEnd? {
     return {
       type: 'normal-selector',
       sections,
+      content,
+      arrayCapture: null,
+      children: [],
+    }
+  }
+  / sections:SectionList SelectorEnd {
+    return {
+      type: 'normal-selector',
+      sections,
+      content: [],
       arrayCapture: null,
       children: [],
     }
@@ -70,7 +94,7 @@ NormalSelector
 
 // 赋值选择器
 AssignmentSelector
-  = assignment:Assignment {
+  = assignment:Assignment SelectorEnd {
     return {
       type: 'assignment',
       capture: assignment.capture,
@@ -80,7 +104,10 @@ AssignmentSelector
 
 // 片段的定义
 SnippetDefine
-  = '@' name:IdentifierName __ '=' __ selectors:ChildrenSelectors {
+  = '@' name:IdentifierName
+    __ '='
+    __ selectors:ChildrenSelectors
+    SelectorEnd? {
     return {
       type: 'snippet-define',
       name,
@@ -90,11 +117,38 @@ SnippetDefine
 
 // 片段的展开
 SnippetExpand
-  = '@' name:IdentifierName !(__ '=') {
+  = '@' name:IdentifierName SelectorEnd {
     return {
       type: 'snippet-expand',
       name,
     }
+  }
+
+// 内联过滤器定义
+FilterDefine
+  = ('filter' / 'function')
+    __ name:IdentifierName
+    __ argNames:FilterDefineArgNames
+    __ code:CodeBlock
+    SelectorEnd? {
+    return {
+      type: 'filter-define',
+      name,
+      argNames,
+      code,
+    }
+  }
+
+FilterDefineArgNames
+  = '(' __ ')' {
+    return []
+  }
+  / '('
+    __ head:IdentifierName
+    tail:(__ ',' __ IdentifierName)*
+    OptionalExtraComma
+    __ ')' {
+    return buildList(head, tail, 3)
   }
 
 Assignment
@@ -102,9 +156,11 @@ Assignment
     return { capture, value }
   }
 
-Separator 'separator' = [,;]
-SelectorSeparator 'selector-separator' = Separator
-ContentPartSeparator 'content-part-separator' = Separator
+Separator = ';'
+SelectorEnd = __ ';'
+OptionalExtraComma = (__ ',')?
+OptionalExtraSeperator = (__ ';')?
+
 Combinator = [ >+~]
 AttributeOperator = '=' / '~=' / '|=' / '*=' / '^=' / '$='
 
@@ -122,11 +178,8 @@ ChildrenSelectors
   = '{' __ '}' {
     return []
   }
-  / '{'
-    __ head:Selector tail:(__ SelectorSeparator __ s:Selector { return s })*
-    OptionalExtraCommaOrSemicolon
-    __ '}' {
-    return [head].concat(tail)
+  / '{' __ head:Selector tail:(__ Selector)* __ '}' {
+    return buildList(head, tail, 1)
   }
 
 Filter
@@ -142,44 +195,40 @@ FilterArgs
     return []
   }
   / '('
-    __ head:Literal tail:(__ ',' __ arg:Literal { return arg })*
+    __ head:Literal tail:(__ ',' __ Literal)*
     OptionalExtraComma
     __ ')' {
-    return [head].concat(tail)
+    return buildList(head, tail, 3)
   }
 
 // 普通CSS选择器, 包含多个部分
-Sections 'normal css selector'
-  = head:Section tail:(SectionSep section:Section { return section })* {
-    return [head].concat(tail)
+SectionList 'normal css selector'
+  = head:Section tail:(SectionSep Section)* {
+    return buildList(head, tail, 1)
   }
 
 SectionSep 'css-selector-section-seperator'
   = __ &Combinator
   / (WhiteSpace / LineTerminatorSequence / Comment) __
 
-Section 'section of css selector'
+Section 'section'
   = combinator:(c:Combinator __ { return c })?
     element:(CSSIdentifierName / '*')
-    qualifiers:Qualifier*
-    content:(__ c:Content { return c })? {
+    qualifiers:Qualifier* {
     return {
       combinator: combinator || ' ',
       element,
       qualifiers: flatten(qualifiers),
-      content: content || [],
     }
   }
   / combinator:(c:Combinator __ { return c })?
     /* no element */
-    qualifiers:Qualifier+
-    content:(__ c:Content { return c })? {
-      return {
-        combinator: combinator || ' ',
-        element: '*',
-        qualifiers: flatten(qualifiers),
-        content: content || [],
-      }
+    qualifiers:Qualifier+ {
+    return {
+      combinator: combinator || ' ',
+      element: '*',
+      qualifiers: flatten(qualifiers),
+    }
   }
 
 Qualifier 'css-selector-qualifier' = IdQualifier / ClassQualifier / AttributeQualifier / PseudoQualifier
@@ -249,10 +298,10 @@ Content
     return []
   }
   / '{'
-    __ head:ContentPart tail:(__ ContentPartSeparator __ part:ContentPart { return part })*
-    OptionalExtraCommaOrSemicolon
+    __ head:ContentPart tail:(__ Separator __ ContentPart)*
+    OptionalExtraSeperator
     __ '}' {
-    return [head].concat(tail)
+    return buildList(head, tail, 3)
   }
 
 ContentPart
@@ -278,13 +327,14 @@ ContentPart
   }
   / funcName:IdentifierName
     __ '('
-    __ head:ContentPartArg tail:(__ ContentPartSeparator __ arg:ContentPartArg { return arg })*
-    OptionalExtraCommaOrSemicolon
+    __ head:ContentPartArg
+    tail:(__ ',' __ ContentPartArg)*
+    OptionalExtraComma
     __ ')' {
     return {
       type: 'call',
       funcName,
-      args: [head].concat(tail),
+      args: buildList(head, tail, 3),
     }
   }
 
@@ -309,12 +359,6 @@ CSSIdentifierNameChar
   / NonAscii
 
 NonAscii = [\x80-\uFFFF]
-
-OptionalExtraComma 'optional-extra-comma'
-  = (__ ',')?
-
-OptionalExtraCommaOrSemicolon 'optional-extra-comma-or-semicolon'
-  = (__ Separator)?
 
 IdentifierName "identifier"
   = head:IdentifierStart tail:IdentifierPart* {
@@ -507,6 +551,13 @@ EscapeCharacter
   / DecimalDigit
   / "x"
   / "u"
+
+CodeBlock "code block"
+  = "{" code:Code "}" { return code }
+  / "{" { error("Unbalanced brace.") }
+
+Code
+  = $((![{}] SourceCharacter)+ / "{" Code "}")*
 
 // Unicode Character Categories
 // copied from

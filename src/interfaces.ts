@@ -20,15 +20,18 @@ export type TemmeSelector = SelfSelector
   | Assignment
   | SnippetDefine
   | SnippetExpand
+  | FilterDefine
 
 export type ExpandedTemmeSelector = SelfSelector
   | NormalSelector
   | Assignment
   | SnippetDefine
+  | FilterDefine
 
 export interface NormalSelector {
   type: 'normal-selector'
   sections: Section[]
+  content: ContentPart[]
   arrayCapture: Capture
   children: TemmeSelector[]
 }
@@ -36,6 +39,7 @@ export interface NormalSelector {
 export interface SelfSelector {
   type: 'self-selector'
   section: Section
+  content: ContentPart[]
 }
 
 export interface Assignment {
@@ -55,11 +59,17 @@ export interface SnippetExpand {
   name: string
 }
 
+export interface FilterDefine {
+  type: 'filter-define'
+  name: string
+  argNames: string
+  code: string
+}
+
 export interface Section {
   combinator: Combinator
   element: string
   qualifiers: Qualifier[]
-  content: ContentPart[]
 }
 
 export type Combinator = ' ' | '>' | '+' | '~'
