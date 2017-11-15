@@ -49,6 +49,7 @@
     "node-fetch": "^1.7.1",
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.4",
+    "pretty": "^2.0.0",
     "ts-jest": "^21.0.1",
     "ts-node": "^3.3.0",
     "typescript": "^2.4.1",

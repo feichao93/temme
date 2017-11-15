@@ -10,6 +10,9 @@ function enterExampleMode(currentExampleName) {
   const exitLink = document.querySelector('#exit-example-mode')
   exitLink.textContent = 'Exit Example Mode'
 
+  const formatHtmlButton = document.querySelector('#format-html')
+  formatHtmlButton.style.display = 'none'
+
   const exampleSelectPart = document.querySelector('#example-select-part')
   exampleSelectPart.style.display = 'block'
 

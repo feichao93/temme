@@ -2,6 +2,7 @@ import temme, { temmeParser, cheerio } from '../src/temme'
 import debounce from 'lodash.debounce'
 import examples from './examples'
 import loadExamples from './loadExample'
+import pretty from 'pretty'
 
 /* example mode */
 const url = new URL(document.URL)
@@ -22,6 +23,7 @@ const copyResultButton = document.querySelector('#copy-result-button')
 const htmlPart = document.querySelector('#html-part')
 const selectorOutputPart = document.querySelector('#selector-output-part')
 const toggleWidthButton = document.querySelector('#toggle-width-button')
+const formatHtmlButton = document.querySelector('#format-html')
 
 /* functions and utilities */
 function onToggleWidth() {
@@ -33,6 +35,14 @@ function onToggleWidth() {
     htmlPart.style.width = '50%'
     selectorOutputPart.style.width = '50%'
     toggleWidthButton.textContent = '<'
+  }
+}
+
+function formatHtml() {
+  const html = htmlEditor.getValue()
+  const formated = pretty(html)
+  if (formated !== html) {
+    htmlEditor.setValue(formated)
   }
 }
 
@@ -209,6 +219,7 @@ copyResultButton.onclick = () => {
 }
 
 toggleWidthButton.addEventListener('click', onToggleWidth)
+formatHtmlButton.addEventListener('click', formatHtml)
 
 onChange()
 

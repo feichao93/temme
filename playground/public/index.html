@@ -2,8 +2,8 @@
 <html lang=zh-cn>
 <head>
   <meta charset=utf-8>
-  <link rel=stylesheet href="https://unpkg.com/normalize.css@7.0.0/normalize.css">
-  <script src="https://unpkg.com/ace-builds@1.2.8/src-min/ace.js"></script>
+  <link rel=stylesheet href="//unpkg.com/normalize.css@7.0.0/normalize.css">
+  <script src="//unpkg.com/ace-builds@1.2.8/src-min/ace.js"></script>
   <title>Temme Playground</title>
   <style>
     h2 {
@@ -77,13 +77,17 @@
     }
 
     #toggle-width-button {
+      width: 50px;
+      font-weight: bold;
+    }
+
+    .flat-button {
+      height: 24px;
       border: none;
       background: #374a68;
       color: white;
-      width: 50px;
-      height: 24px;
       outline: none;
-      font-weight: bold;
+      cursor: pointer;
     }
 
     .editor {
@@ -121,13 +125,15 @@
     </div>
   </header>
   <div class="flex-grow-1" style="display: flex">
-    <div id="html-part" class="d-flex flex-column transition-width" style="width: 50%; margin-right: 8px">
+    <div id="html-part" class="d-flex flex-column transition-width"
+         style="width: 50%; margin-right: 8px">
       <h2 class="d-flex flex-align-center flex-space-between" style="margin-left: 8px;">
         <span>1: HTML
+          <button id=format-html class=flat-button>Format</button>
           <span id=example-mode-hint></span>
           <a id=exit-example-mode href="?"></a>
         </span>
-        <button id=toggle-width-button>&lt;</button>
+        <button id=toggle-width-button class=flat-button>&lt;</button>
       </h2>
       <div id=html-input class="editor"></div>
     </div>
