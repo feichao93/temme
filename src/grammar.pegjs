@@ -33,7 +33,6 @@
 Start
   = __ head:Selector tail:(__ Selector)* __ {
     return buildList(head, tail, 1)
-    return a
   }
   / __ {
     return []
