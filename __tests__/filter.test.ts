@@ -113,8 +113,8 @@ test('inline filter `wrap`', () => {
       <li>watermelon</li>
     </ul>`
   const selector = `
-    function wrap(tag) {
-      return '<' + tag + '>' + this + '</' + tag + '>' 
+    filter wrap(tag) {
+      return '<' + tag + '>' + this + '</' + tag + '>'
     }
     li@{&{$|wrap('fruit')}};
   `
@@ -124,5 +124,25 @@ test('inline filter `wrap`', () => {
     '<fruit>cherry</fruit>',
     '<fruit>pear</fruit>',
     '<fruit>watermelon</fruit>'
+  ])
+})
+
+test('inline filter `append`', () => {
+  const html = `
+  <ul>
+    <li>apple</li>
+    <li>banana</li>
+  </ul>`
+  const selector =  `
+  filter append(...items) {
+    return this.concat(items)
+  }
+  li@|append('pear', 'watermelon'){ &{$} };
+  `
+  expect(temme(html, selector)).toEqual([
+    'apple',
+    'banana',
+    'pear',
+    'watermelon',
   ])
 })

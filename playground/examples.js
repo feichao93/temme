@@ -245,8 +245,8 @@ See source file src/filters.ts to view all built-in filters.
 // array-filters
 td@cells||toLowerCase { &{$} };
 
-/* If the capture value is an array, we could use \`||\` and apply the filter to every 
-item of this array. 
+/* If the capture value is an array, we could use \`||\` and apply the filter to every
+item of this array.
 
 */`,
   },
@@ -326,7 +326,7 @@ Click next to see some real-world complex examples.
     selector: `
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
 // capture all answers and all comments
-function format() {
+filter format() {
   return this.replace(/\\s+/g, ' ')
 }
 
@@ -370,7 +370,7 @@ function format() {
 // https://github.com/facebook/react/issues?q=
 // Extract issue information from GitHub issues page
 
-function url() {
+filter url() {
   const baseUrl = 'https://github.com/facebook/react/issues?q='
   return new URL(this, baseUrl).href
 }

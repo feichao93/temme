@@ -125,9 +125,9 @@ SnippetExpand
 
 // 内联过滤器定义
 FilterDefine
-  = ('filter' / 'function')
+  = 'filter'
     __ name:IdentifierName
-    __ argNames:FilterDefineArgNames
+    __ argNames:FunctionDefineArgNames
     __ code:CodeBlock
     SelectorEnd? {
     return {
@@ -138,17 +138,20 @@ FilterDefine
     }
   }
 
-FilterDefineArgNames
+FunctionDefineArgNames
   = '(' __ ')' {
     return []
   }
   / '('
-    __ head:IdentifierName
-    tail:(__ ',' __ IdentifierName)*
+    __ head:RestIdentifierName
+    tail:(__ ',' __ RestIdentifierName)*
     OptionalExtraComma
     __ ')' {
     return buildList(head, tail, 3)
   }
+
+RestIdentifierName
+  = $(('...' __)? IdentifierName)
 
 Assignment
   = capture:ValueCapture __ '=' __ value:Literal {

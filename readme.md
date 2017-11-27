@@ -107,7 +107,7 @@ Array-capture can be nested. Just place a array-capture within another array-cap
 
 ## Multiple Selectors at Top-Level
 
-Temme supports multiple selectors at top-level like in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace  , then the semicolon is optional. [example][example-multiple-selectors-at-top-level]
+Temme supports multiple selectors at top-level like in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace, then the semicolon is optional. [example][example-multiple-selectors-at-top-level]
 
 ## Assignments
 
@@ -165,7 +165,17 @@ const extraFilters = {
 temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 ```
 
-### Inline Filters (TODO)
+### Inline Filters
+
+Inline filter has the same syntax as JavaScript-style function definition. The only difference is that temme use `filter` as the keyword instead of `function`.
+
+```
+filter inlineFilter(arg1, arg2, arg3) {
+  /* Filter Logic Here. */
+  /* The code here will be executed as in a JavaScript function. */
+  /* Note that the curly braces must be balanced here. */
+}
+```
 
 ### Array-Filters `||`
 
