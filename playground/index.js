@@ -127,6 +127,7 @@ function computeResultAndDisplay(html, selectorString, outputEditor) {
 function initHtmlEditor() {
   const editor = ace.edit(htmlInputDiv)
   const session = editor.getSession()
+  editor.setTheme('ace/theme/textmate')
   session.setMode('ace/mode/html')
   session.setUseSoftTabs(true)
   session.setTabSize(2)
@@ -145,7 +146,8 @@ function initHtmlEditor() {
 function initSelectorEditor() {
   const editor = ace.edit(selectorInputDiv)
   const session = editor.getSession()
-  // session.setMode('ace/mode/temme')
+  editor.setTheme('ace/theme/chrome')
+  session.setMode('ace/mode/temme')
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
@@ -161,6 +163,7 @@ function initSelectorEditor() {
 function initOutputEditor() {
   const editor = ace.edit(outputDiv)
   const session = editor.getSession()
+  editor.setTheme('ace/theme/chrome')
   session.setMode('ace/mode/json')
   session.setUseSoftTabs(true)
   session.setTabSize(2)
