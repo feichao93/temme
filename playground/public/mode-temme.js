@@ -238,6 +238,11 @@ define(
               push: 'attrState',
             },
             {
+              token: ['variable.parameter'],
+              regex: `\\$(?:${identifierReg})?`,
+              push: filters(),
+            },
+            {
               // snippet definition
               token: ['keyword', 'text', 'keyword.operator'],
               regex: `(@(?:${identifierReg})?)(\\s*)(=)`,
@@ -245,8 +250,8 @@ define(
             },
             {
               // snippet expansion
-              token: ['keyword', 'text', 'text'],
-              regex: `(@(?:${identifierReg})?)(\\s*)(;)`,
+              token: ['keyword', 'text'],
+              regex: `(@(?:${identifierReg})?)(\\s*;)`,
             },
             {
               // children selectors
@@ -361,7 +366,6 @@ define(
     }
 
     Mode.prototype.type = 'temme'
-    // Mode.prototype.$id = 'ace/mode/temme'
 
     exports.TemmeHighlightRules = TemmeHighlightRules
     exports.Mode = Mode

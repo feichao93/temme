@@ -4,6 +4,8 @@ import examples from './examples'
 import loadExamples from './loadExample'
 import pretty from 'pretty'
 
+const Range = ace.require('ace/range').Range
+
 /* example mode */
 const url = new URL(document.URL)
 const exampleName = url.searchParams.get('example')
@@ -40,14 +42,27 @@ function onToggleWidth() {
 
 function formatHtml() {
   const html = htmlEditor.getValue()
-  const formated = pretty(html)
+  const formated = pretty(html, { ocd: true })
   if (formated !== html) {
     htmlEditor.setValue(formated)
   }
 }
 
+const errorLines = new Set()
+function clearGutterDecorations() {
+  const session = selectorEditor.getSession()
+  for (const line of errorLines) {
+    session.removeGutterDecoration(line, 'ace_error')
+  }
+  errorLines.clear()
+}
+
 const syntaxError = {
   show(e) {
+    const session = selectorEditor.getSession()
+    const line = e.location.start.line - 1
+    errorLines.add(line)
+    session.addGutterDecoration(line, 'ace_error')
     errorIndicator.textContent = e.message
   },
   hide() {
@@ -103,6 +118,7 @@ function measureExecutionTime(fn) {
 }
 
 function computeResultAndDisplay(html, selectorString, outputEditor) {
+  clearGutterDecorations()
   if (selectorString) {
     try {
       const selector = parseSelector(selectorString)
