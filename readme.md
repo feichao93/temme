@@ -1,8 +1,10 @@
 [![Build Status](https://img.shields.io/travis/shinima/temme/master.svg)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg)](https://www.npmjs.org/package/temme) [![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg)](https://greenkeeper.io/)
 
+[中文文档](./readme-zh.md)
+
 # Temme
 
-Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme add some extra grammar to enable capturing data into result. Try temme in [playground](https://temme.js.org).
+Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme adds some extra grammar to enable capturing structured data from HTML document. Try temme in [playground](https://temme.js.org).
 
 # Install
 
@@ -26,7 +28,7 @@ temme(html, temmeSelector)
 
 [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
-[这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
+Chinese examples: [这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
 
 # Inspiration
 
@@ -67,6 +69,8 @@ Given a node and a temme-selector, and returns an object containing the specifie
 Temme defines a new selector syntax called temme-selector. Temme-selector contains both match information and capture information. Match part is just like CSS selector; Capture part is described below.
 
 # Grammar and Semantics
+
+Before learning temme, you need to understand CSS selectors first.
 
 **Take a quick tour of grammar in [playground tutorial][playground-tutorial] by examples!**
 
@@ -143,7 +147,7 @@ When a value is captured, it is always a string. A filter is a simple function t
 Temme provides a few filters out of box. Built-in filters could be divided into three categories:
 1. Structure Manipulation Filters: this category includes `pack`, `flatten`, `compact`, `first`, `last`, `nth`. These functions are short but powerful. [See source for more detail](/src/filters.ts).
 2. Type Coercion Filters: this category includes `String`, `Number`, `Date`, `Boolean`. These filters converts the captured value to specific type.
-3. Prototype Filters: We can use methods on prototype chain as filters. For example, if we can ensure that `x` is always a string, then we can safely use `$x|substring(0, 20)` or `$x|toUpperCase`.
+3. Prototype Filters: We can use methods on prototype chain as filters (This is why the input is supplied as `this`). For example, if we can ensure that `x` is always a string, then we can safely use `$x|substring(0, 20)` or `$x|toUpperCase`.
 
 ### Using Customized Filters
 
@@ -165,9 +169,9 @@ const extraFilters = {
 temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 ```
 
-### Inline Filters
+### Inline Filters Definition
 
-Inline filter has the same syntax as JavaScript-style function definition. The only difference is that temme use `filter` as the keyword instead of `function`.
+Inline filters definition has the same syntax as JavaScript-style function definition. The only difference is that temme use `filter` as the keyword instead of `function`.
 
 ```
 filter inlineFilter(arg1, arg2, arg3) {
@@ -177,9 +181,9 @@ filter inlineFilter(arg1, arg2, arg3) {
 }
 ```
 
-### Array-Filters `||`
+### Array-Filters Syntax `||`
 
-Use array-filter syntax `||`, temme will treat the value as an array, and apply the filter to every item of this array.
+Use array-filter syntax `||`, temme will treat the captured value as an array, and apply the filter to every item of this array.
 
 ```JavaScript
 temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
@@ -239,14 +243,14 @@ Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when
 
 ### Syntax
 
-* `@xxx = { /* selectors seperated by semicolon */ }`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
-* `@xxx`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
+* `@xxx = { /* selectors */ };`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
+* `@xxx;`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
 
-Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `@snippetA -> @snippetB -> @snippetC`; But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
+Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `@snippetA -> @snippetB -> @snippetC` (snippetA uses snippetB, snippetB uses snippetC); But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
 
 The running semantics of snippet is simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
 
-(Note: This example is made up and the selector does not work with StackOverflow in fact) For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
+(Note: This example is made up and the selector does not work with the real StackOverflow html) For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
 
 ```
 .ask-info@asked|pack {

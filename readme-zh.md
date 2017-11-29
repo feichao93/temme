@@ -1,8 +1,6 @@
-文档以英文为准. 中文文档可能没有及时更新.
-
 # Temme
 
-Temme是一个类jQuery的选择器, 用于从HTML文档中提取所需的JSON数据. 如果你在用Node写爬虫, 并使用[cheerio](https://github.com/cheeriojs/cheerio)来处理HTML文档, 那么Temme很可能很有用. Temme在CSS选择器语法中加入了额外的捕获语法, 用于从HTML文档中抓取想要的数据. 在[playground](https://temme.js.org)中进行尝试.
+Temme是一个类jQuery的选择器, 用于从HTML文档中提取所需的JSON数据. 如果你在用Node写爬虫, 并使用[cheerio](https://github.com/cheeriojs/cheerio)来处理HTML文档, 那么Temme很可能很有用. Temme在CSS选择器语法的基础上加入了额外的语法, 用于从HTML文档中抓取结构化的JSON数据. 在[playground](https://temme.js.org)中进行尝试.
 
 # 安装
 
@@ -24,7 +22,7 @@ temme(html, temmeSelector)
 
 # 例子
 
-[This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
+英文例子: [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
 [这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
 
@@ -120,8 +118,167 @@ Temme支持在顶层放置多个选择器(就和在子选择器中一样). 每�
 
 ## 赋值
 
-TODO
+语法:
+* `$foo = bar;`:  `foo`是一个合法JavaScript标识符; `bar`是一个JavaScript字面量(string/number/null/boolean/RegExp).
 
+赋值语法可以出现三个地方:
+1. 顶层: `$foo = 'bar';` 将字符串`'bar'`放到最终结果的`.bar`字段 [example][example-assignments-at-top-level]
+2. 在content中, `div.foo{ $a = null }`像是条件赋值, 如果有一个元素满足选择器`div.foo`, 那么就执行该赋值操作; [example][example-assignments-in-content]
+3. 在子选择器中, `li@list { $x = 123 }` `list`中的每个对象的`.x`字段的值都为数字`123`. [example][example-assignments-in-children-selectors]
+
+## JavaScript风格的注释
+
+Temme支持单行注释`// ......`与块状注释`/* ...... */`.
+
+## 过滤器 `|`
+
+### 语法:
+* `$foo|xxx` / `@bar|xxx`:  放在值捕获或是数组捕获的右边; `xxx`是过滤函数的名字.
+* `$foo|xxx(arg1, arg2, ...)`:  过滤器可以接受若干个参数; 每一个参数都是一个JavaScript字面量.
+* `$foo|f1(a,b)|f2`: 过滤器可以进行串联.
+
+每当一个值被捕获时, 该值的类型总是字符串. 一个过滤器就是一个简单的函数, 接受一个输入(也就是捕获的值, 会放在`this`中)与若干参数, 然后返回一个输出. 我们可以使用过滤器来处理捕获的值. [example][example-filters]
+
+### 运行时的行为
+
+* `li.good{$x|foo}`:  每当`x`被捕获的时候, 它就会像这样被处理: `x = foo.apply(x)`;
+* `div.bad{$x|foo(1, false)}`:  每当`x`被捕获的时候, 它就会像这样被处理: `x = foo.apply(x, [1, false])`;
+* `div.hello{$x|foo|bar(0, 20)}`: 被捕获的值首先被`foo`处理, 然后会被`bar`处理. 整个过程相当于: `x = foo.apply(x); x = bar.apply(x, [0, 20]);`.
+
+### 内建的过滤器
+
+Temme提供了一些内建的过滤器. 这些过滤器分为下面三个部分:
+1. Structure Manipulation Filters: 该部分包括`pack`, `flatten`, `compact`, `first`, `last`, `nth`. 这些过滤器简单又实用, 看[源代码](/src/filters.ts)以了解更多.
+2. Type Coercion Filters: 该部分包括`String`, `Number`, `Date`, `Boolean`. 这些过滤器用于将输入转换为指定的类型.
+3. Prototype Filters: 我们可以使用来自原型链的方法(这也是为什么输入放在`this`的原因). 举个例子, 如果我们可以保证`x`每次被捕获的时候其类型总是字符串, 那么我们可以安全地使用`$x|substring(0, 20)` 或是 `$x|toUpperCase`.
+
+### 使用自定义的过滤器
+
+使用`defineFilter`来添加全局过滤器. 也可以在调用`temme`函数时提供第三个参数: 一个自定义的过滤器字典(JavaScript对象).
+
+```JavaScript
+import { defineFilter } from 'temme'
+
+// 定义全局过滤器
+defineFilter('myFilter', function myFilter(arg1, arg2) { /* ... */ })
+
+// 额外的过滤器
+const extraFilters = {
+  secondItem() {
+    return this[1]
+  },
+  // ...
+}
+temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
+```
+
+### 内联定义的过滤器
+
+也可以在选择器字符串中直接定义过滤器. 过滤器定义语法和JavaScript函数定义语法一样, 唯一的区别在于将关键字*function*换成了*filter*.
+
+```
+filter inlineFilter(arg1, arg2, arg3) {
+  /* Filter Logic Here. */
+  /* The code here will be executed as in a JavaScript function. */
+  /* Note that the curly braces must be balanced here. */
+}
+```
+
+### 数组过滤器语法 `||`
+
+使用数组过滤器语法`||`, temme将会认为捕获的值是一个数组, 然后对数组中每个元素应用该过滤器.
+
+```JavaScript
+temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
+// => [1, 22, 333, 4444]
+```
+
+## Content TODO
+
+The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
+1. Capture.  This will capture text/html of the node into the specified field;
+2. Assignment.  It is like a conditional assignment, if temme find that a node safisties the normal CSS selector, then the assignment is executed;
+3. Content Function Call **(experimental)**. See below for more detail.
+
+### Capture in Content
+`text`, `html` and `node` are special filters in content. One of the three is always used as the first filter in content capture. If not specified explicitly, `text` will be used. `text` gets the text content of the mathcing nodes; `html` gets the  inner HTML of the matching nodes; `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to do manual capturing with cheerio APIs. [example][example-special-filters-in-content]
+
+### Content Functions (experimental)
+
+Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source](/src/contentFunctions.ts) for more implementation detail. [example][example-content-functions]
+
+Currently, there is only one built-in content function `find`. `find` try to capture a substring of the node text. Examples of `find`:
+
+* `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
+* `find('hello', $x)` will try to capture the text **after** `'hello'`.
+* `find('hello', $x, 'world')` will try to capture the text **between** `'hello'` and `'world'`.
+
+`find` simply uses `String#indexOf` to get the index of a substring. If `find` cannot find the substring that should appear before/after the target substring, then it will set the capture-result as *failed*.
+
+### Use Customized Content Functions (experimental)
+
+```JavaScript
+import { contentFunctions } from 'temme'
+
+// Get a content function
+contentFunctions.get('find')
+// Set a customized content function
+contentFunctions.set('myContentFn', myContentFn)
+// Remove a content function
+contentFunctions.remove('uselessContentFn')
+
+function myContentFn(result, node, capture1, string2) {
+  /* Your customized logic here */
+
+  // Call CaptureResult#add to add a field of result
+  result.add(capture1.name, node.attr('foo'), capture1.filterList)
+
+  // Call CaptureResult#setFailed to set the result to failed state
+  result.setFailed()
+}
+```
+
+Content function is a more powerful way than normal css selector. But in most scenarios, we do not need customized content functions. Temme supports pseudo-selector powered by [css-select](https://github.com/fb55/css-select#supported-selectors). Especially, `:contains`, `:not` and `:has` are useful pseudo-selectors which enhance the select ability a lot. Before using customized content functions, try to test whether pseudo-selectors can satisfy the requirements.
+
+## Snippets (experimental)
+
+Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when the parent-selectors vary but children selectors alike.
+
+### Syntax
+
+* `@xxx = { /* selectors */ };`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
+* `@xxx;`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
+
+Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `@snippetA -> @snippetB -> @snippetC` (snippetA uses snippetB, snippetB uses snippetC); But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
+
+The running semantics of snippet is simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
+
+(Note: This example is made up and the selector does not work with the real StackOverflow html) For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
+
+```
+.ask-info@asked|pack {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+.edit-info@edited|pack {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+```
+
+The children selectors in curly brace are duplicated. We can use snippet to deduplicate them:
+
+```
+@personInfo = {
+  .time[title=$actionTime];
+  .username{$username};
+  .reputation{$reputation};
+};
+.ask-info@asked|pack { @personInfo };
+.edit-info@edited|pack { @personInfo };
+```
 
 [playground-tutorial]: https://temme.js.org?example=tutorial-start
 [example-value-capture]: https://temme.js.org?example=tutorial-value-capture
