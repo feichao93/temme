@@ -49,6 +49,7 @@ function formatHtml() {
 }
 
 const errorLines = new Set()
+
 function clearGutterDecorations() {
   const session = selectorEditor.getSession()
   for (const line of errorLines) {
@@ -60,9 +61,11 @@ function clearGutterDecorations() {
 const syntaxError = {
   show(e) {
     const session = selectorEditor.getSession()
-    const line = e.location.start.line - 1
-    errorLines.add(line)
-    session.addGutterDecoration(line, 'ace_error')
+    if (e.name === 'SyntaxError') {
+      const line = e.location.start.line - 1
+      errorLines.add(line)
+      session.addGutterDecoration(line, 'ace_error')
+    }
     errorIndicator.textContent = e.message
   },
   hide() {
