@@ -151,9 +151,7 @@ function initHtmlEditor() {
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
-  if (EXAMPLE_MODE) {
-    editor.setReadOnly(true)
-  } else {
+  if (!EXAMPLE_MODE) {
     const html = localStorage.getItem(lsKeyHtml)
     if (html) {
       editor.setValue(html)

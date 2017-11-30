@@ -27,7 +27,7 @@ export interface TemmeParser {
 
 /** Prepare the temme-parser.
  * In the webpack building context, we use pegjs-loader to load parser from the grammar file.
- * In other context (e.x. jest context), we use fs and pegjs node api to generate the parser. */
+ * In other context (e.x. jest context), we use fs and pegjs to generate the parser. */
 declare const WEBPACK_BUILD: boolean
 let temmeParser: TemmeParser
 if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
@@ -75,7 +75,7 @@ export default function temme(
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
-    // First pass: process SnippetDefine & FilterDefine
+    // First pass: process SnippetDefine and FilterDefine
     for (const selector of selectorArray) {
       if (selector.type === 'snippet-define') {
         invariant(!snippetsMap.has(selector.name), msg.snippetAlreadyDefined(selector.name))
@@ -87,7 +87,7 @@ export default function temme(
       }
     }
 
-    // Second pass: expand snippets & match & capture
+    // Second pass: process match and capture
     for (const selector of expandSnippets(selectorArray)) {
       if (selector.type === 'normal-selector') {
         const cssSelector = makeNormalCssSelector(selector.sections)

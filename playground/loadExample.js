@@ -5,10 +5,11 @@ function gotoExample(name) {
 }
 
 function enterExampleMode(currentExampleName) {
-  const exampleModeHint = document.querySelector('#example-mode-hint')
-  exampleModeHint.textContent = '(Readonly in Example Mode)'
-  const exitLink = document.querySelector('#exit-example-mode')
-  exitLink.textContent = 'Exit Example Mode'
+  const exitExampleModeLink = document.querySelector('#exit-example-mode')
+  exitExampleModeLink.textContent = 'Exit Example Mode'
+  const url = new URL(document.URL)
+  url.search = ''
+  exitExampleModeLink.href = url.href
 
   const formatHtmlButton = document.querySelector('#format-html')
   formatHtmlButton.style.display = 'none'
