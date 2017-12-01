@@ -273,8 +273,8 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
   .username{$username};
   .reputation{$reputation};
 };
-.ask-info@asked|pack { @personInfo };
-.edit-info@edited|pack { @personInfo };
+.ask-info@asked|pack { @personInfo; };
+.edit-info@edited|pack { @personInfo; };
 ```
 
 [playground-tutorial]: https://temme.js.org?example=tutorial-start
