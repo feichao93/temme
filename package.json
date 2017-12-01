@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
