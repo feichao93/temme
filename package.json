@@ -8,6 +8,7 @@
   "homepage": "https://temme.js.org",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
+  "bin": "./bin/temme.js",
   "engines": {
     "node": ">= 7.6.0"
   },
@@ -32,8 +33,10 @@
   },
   "dependencies": {
     "@types/cheerio": "^0.22.1",
+    "@types/commander": "^2.11.0",
     "@types/invariant": "^2.2.29",
     "cheerio": "^1.0.0-rc.1",
+    "commander": "^2.12.2",
     "invariant": "^2.2.2"
   },
   "devDependencies": {

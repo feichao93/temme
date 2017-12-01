@@ -6,6 +6,12 @@
   version "0.22.2"
   resolved "http://registry.npm.taobao.org/@types/cheerio/download/@types/cheerio-0.22.2.tgz#539625874bc856086ad491c2fdc9b10c05ae308e"
 
+"@types/commander@^2.11.0":
+  version "2.11.0"
+  resolved "http://registry.npm.taobao.org/@types/commander/download/@types/commander-2.11.0.tgz#7fc765ccad14827e2babd6a99583359ff3e40563"
+  dependencies:
+    "@types/node" "*"
+
 "@types/invariant@^2.2.29":
   version "2.2.29"
   resolved "http://registry.npm.taobao.org/@types/invariant/download/@types/invariant-2.2.29.tgz#aa845204cd0a289f65d47e0de63a6a815e30cc66"
@@ -933,6 +939,10 @@ combined-stream@^1.0.5, combined-stream@~1.0.5:
   resolved "http://registry.npm.taobao.org/combined-stream/download/combined-stream-1.0.5.tgz#938370a57b4a51dea2c77c15d5c5fdf895164009"
   dependencies:
     delayed-stream "~1.0.0"
+
+commander@^2.12.2:
+  version "2.12.2"
+  resolved "http://registry.npm.taobao.org/commander/download/commander-2.12.2.tgz#0f5946c427ed9ec0d91a46bb9def53e54650e555"
 
 commander@^2.9.0:
   version "2.11.0"
