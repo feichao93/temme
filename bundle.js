@@ -280,7 +280,36 @@ filter url() {
 
   $commentCount = 0;
   .float-right.col-5 a span{$commentCount|Number};
-}`},{name:'douban-short-reviews-Chinese',htmlUrl:'resources/douban-reviews.html',selector:`// 豆瓣短评网页数据抓取
+}`},{name:'douban-movie-summary-Chinese',htmlUrl:'resources/douban-movie-summary.html',selector:`// 豆瓣电影介绍页面数据抓取
+// https://movie.douban.com/subject/26930504/
+
+// 电影的名称
+[property="v:itemreviewed"]{$title};
+// 电影上映年份
+.year{$year|substring(1, 5)|Number};
+// 电影导演
+[rel="v:directedBy"]@directedBy { &{$} };
+// 电影编剧
+:contains('编剧') + span{$storyFrom|split('/')||trim};
+// 电影主演(前三位)
+[rel="v:starring"]@starring|slice(0, 3){&{$}}
+
+// 平均评分
+[property="v:average"]{$avgRating|Number};
+// 具体的评分情况
+.ratings-on-weight .item@ratingInfo{
+  span[title=$title];
+  .rating_per{$percentage};
+};
+
+// 电影剧情简介
+[property="v:summary"]{$summary|trim};
+
+// 喜欢这部电影的人也喜欢
+.recommendations-bd dl@recommendations{
+  img[alt=$name src=$imgUrl];
+  a[href=$url];
+};`},{name:'douban-short-reviews-Chinese',htmlUrl:'resources/douban-reviews.html',selector:`// 豆瓣短评网页数据抓取
 // https://movie.douban.com/subject/1292052/comments?start=42&limit=20
 title{find($movieName, ' 短评')};
 
