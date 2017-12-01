@@ -18,7 +18,7 @@ if (program.file) {
 
 function outputResult(result) {
   if (program.format) {
-    process.stdout.write(console.log(JSON.stringify(result, null, 2)))
+    process.stdout.write(JSON.stringify(result, null, 2))
   } else {
     process.stdout.write(JSON.stringify(result))
   }
