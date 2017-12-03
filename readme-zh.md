@@ -1,3 +1,5 @@
+[豆瓣爬虫示例](https://github.com/shinima/temme-showcase)
+
 # Temme
 
 Temme是一个类jQuery的选择器, 用于从HTML文档中提取所需的JSON数据. 如果你在用Node写爬虫, 并使用[cheerio](https://github.com/cheeriojs/cheerio)来处理HTML文档, 那么Temme很可能很有用. Temme在CSS选择器语法的基础上加入了额外的语法, 用于从HTML文档中抓取结构化的JSON数据. 在[playground](https://temme.js.org)中进行尝试.
@@ -193,29 +195,30 @@ temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
 // => [1, 22, 333, 4444]
 ```
 
-## Content TODO
+## Content
 
-The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
-1. Capture.  This will capture text/html of the node into the specified field;
-2. Assignment.  It is like a conditional assignment, if temme find that a node safisties the normal CSS selector, then the assignment is executed;
-3. Content Function Call **(experimental)**. See below for more detail.
+Content, 也就是常规选择器后面花括号中的部分. Content用于抓取结点的文本或是html. Content由多个content-part组成, 多个content-part之间用分号进行分隔. 每一个content-part的形式可以为下面列举的形式之一: [example][example-content]
+1. 捕获.  会抓取将结点的text/html到指定的字段;
+2. 赋值.  该形式类似条件赋值, 当temme找到一个满足常规选择器的结点时, 会执行该赋值;
+3. 内容函数调用**(experimental)**.  具体见下方.
 
-### Capture in Content
-`text`, `html` and `node` are special filters in content. One of the three is always used as the first filter in content capture. If not specified explicitly, `text` will be used. `text` gets the text content of the mathcing nodes; `html` gets the  inner HTML of the matching nodes; `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to do manual capturing with cheerio APIs. [example][example-special-filters-in-content]
+### Content中的捕获
 
-### Content Functions (experimental)
+`text`, `html`和`node`在content中是特殊的过滤器. 在content中进行捕获时, 这三个特殊过滤器中一定会有一个会被作为捕获的第一个过滤器. 如果没有显式的提供, 那么`text`就会使用. `text`用于获取结点的文本信息; `html`用于获取结点的innerHTML; `node`获取结点本身, 当temme无法满足数据处理的需求时, 我们可以用`node`过滤器来获取对应的cheerio结点, 然后手动调用cheerio的API. [example][example-special-filters-in-content]
 
-Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source](/src/contentFunctions.ts) for more implementation detail. [example][example-content-functions]
+### 内容函数 Content Functions (experimental)
 
-Currently, there is only one built-in content function `find`. `find` try to capture a substring of the node text. Examples of `find`:
+调用一个内容函数, 参数依次为: 将捕获结果对象, 结点, 以及圆括号中的参数. 内容函数可以同时进行匹配和捕获, 详情请看[源代码](/src/contentFunctions.ts). [example][example-content-functions]
 
-* `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
-* `find('hello', $x)` will try to capture the text **after** `'hello'`.
-* `find('hello', $x, 'world')` will try to capture the text **between** `'hello'` and `'world'`.
+目前, 内置的内容函数只有`find`. `find`会尝试去捕获一个结点文本的字串. `find`的用法如下:
 
-`find` simply uses `String#indexOf` to get the index of a substring. If `find` cannot find the substring that should appear before/after the target substring, then it will set the capture-result as *failed*.
+* `find($x, 'world')`会尝试去抓取`'world'`**之前**的字串. 例如结点的文本是`'hello world'`, 那么结果将会是`{ x: 'hello' }`
+* `find('hello', $x)`会尝试去抓取`'hello'`**之后**的字串
+* `find('hello', $x, 'world')`会尝试去抓取`'hello'`和`'world'`之间的字串
 
-### Use Customized Content Functions (experimental)
+`find`使用`String#indexOf`来搜索子串. 如果`find`找不到应当在之前/之后出现的子串, 那么`find`会将捕获结果设置为*failed*.
+
+### 使用自定义的内容函数 (experimental)
 
 ```JavaScript
 import { contentFunctions } from 'temme'
@@ -238,22 +241,21 @@ function myContentFn(result, node, capture1, string2) {
 }
 ```
 
-Content function is a more powerful way than normal css selector. But in most scenarios, we do not need customized content functions. Temme supports pseudo-selector powered by [css-select](https://github.com/fb55/css-select#supported-selectors). Especially, `:contains`, `:not` and `:has` are useful pseudo-selectors which enhance the select ability a lot. Before using customized content functions, try to test whether pseudo-selectors can satisfy the requirements.
+内容函数是一个功能强大的机制. 不过在大部分场景中, 我们都是不需要使用该机制的. Temme支持伪类选择器(由[css-select](https://github.com/fb55/css-select#supported-selectors)实现).
+尤其是`:contains`, `:not`和`:has`这三个伪类选择器, 大大提升了选择器的能力. 在使用自定义的内容函数之前, 先尝试一下伪类选择器是否满足需求.
 
-## Snippets (experimental)
+## 片段 (experimental)
 
-Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when the parent-selectors vary but children selectors alike.
+片段用于复用选择器. 当父选择器不同而子选择器非常类似的时候, 片段可用于消除重复.
 
-### Syntax
+### 语法
 
-* `@xxx = { /* selectors */ };`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
-* `@xxx;`  Expand the snippet named xxx. It is like that we insert the content of snippet xxx in place.
+* `@xxx = { /* selectors */ };`  定义一个新的片段, 片段的名称为xxx. xxx必须是一个合法的JavaScript标识符.
+* `@xxx;`  展开名称为xx的片段
 
-Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `@snippetA -> @snippetB -> @snippetC` (snippetA uses snippetB, snippetB uses snippetC); But snippets should not be circled: `@snippetA -> @snippetB -> @snippetA`.
+片段定义只能放在顶层. 而片段的展开可以放在顶层或是子选择器中. 片段可以嵌套: 片段A使用片段B, 片段B使用片段C (A -> B -> C); 但片段不能循环展开. 片段的运行含义非常简单: 当temme遇到片段展开的时候, temme将会用片段的内容替换`@xxx;`.
 
-The running semantics of snippet is simple: when temme encounters a snippet-expand, temme will replace the `@xxx` with its content.
-
-(Note: This example is made up and the selector does not work with the real StackOverflow html) For example, a stackoverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
+(注意: 这个例子是我编造出来的, 无法运行在真实的StackOverflow) 举个例子, 一个stackoverflow的问题, 由用户A提问, 然后可以被用户B修改. 现在我们需要选取两位用户的信息, temme选择器如下:
 
 ```
 .ask-info@asked|pack {
@@ -268,7 +270,7 @@ The running semantics of snippet is simple: when temme encounters a snippet-expa
 };
 ```
 
-The children selectors in curly brace are duplicated. We can use snippet to deduplicate them:
+上面的选择器有部分是重复的. 我们可以使用片段来去除重复:
 
 ```
 @personInfo = {
@@ -276,8 +278,8 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
   .username{$username};
   .reputation{$reputation};
 };
-.ask-info@asked|pack { @personInfo };
-.edit-info@edited|pack { @personInfo };
+.ask-info@asked|pack { @personInfo; };
+.edit-info@edited|pack { @personInfo; };
 ```
 
 [playground-tutorial]: https://temme.js.org?example=tutorial-start
