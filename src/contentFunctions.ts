@@ -58,10 +58,6 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
   }
 }
 
-const defaultContentFunctions = {
-  find,
-}
-
 const map = new Map<string, ContentFn>()
 
 export const contentFunctions = {
@@ -82,6 +78,5 @@ export const contentFunctions = {
   },
 }
 
-for (const [name, fn] of Object.entries(defaultContentFunctions)) {
-  contentFunctions.set(name, fn)
-}
+// Default content functions
+contentFunctions.set('find', find)
