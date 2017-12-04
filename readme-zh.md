@@ -8,7 +8,21 @@ Temme是一个类jQuery的选择器, 用于从HTML文档中提取所需的JSON�
 
 `npm install temme` or `yarn add temme`
 
-# 用法
+# 终端命令行API
+
+```bash
+yarn global add temme # 全局安装temme
+
+temme <selector> <html>
+temme <selector> <html> --format # `--format`参数用于格式化输出
+temme <selector> # 从标准输入得到html
+temme <path-to-a-selector-file> # 使用选择器文件
+
+# 和curl命令配合使用
+curl -s https://movie.douban.com/ | temme '.ui-slide-item[data-title] @|slice(0,3) { &[data-title=$]; }' --format
+```
+
+# Node API
 
 ```typescript
 // es-module

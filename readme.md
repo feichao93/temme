@@ -10,7 +10,21 @@ Temme is a concise and convenient jQuery-like selector for node crawlers. Temme 
 
 `npm install temme` or `yarn add temme`
 
-# Usage
+# Command Line API
+
+```bash
+yarn global add temme # Command line tool prefers global installation
+
+temme <selector> <html>
+temme <selector> <html> --format # `--format` to format the output
+temme <selector> # Use html from stdin
+temme <path-to-a-selector-file> # Use a selector file
+
+# Pipe html from `curl` to `temme`
+curl -s https://stackoverflow.com/ | temme '.question-hyperlink@|slice(0,3){ &{$} }' --format
+```
+
+# Node API
 
 ```typescript
 // es-module
