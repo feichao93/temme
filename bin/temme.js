@@ -5,15 +5,13 @@ const fs = require('fs')
 
 program
   .usage('[options] [selector] [html]')
-  .option('-f, --file <path>', 'use a selector file')
-  .option('--format', 'output formated JSON')
+  .option('-f, --format', 'output formatted JSON')
   .parse(process.argv)
 
 let [selector, html] = program.args
 
-if (program.file) {
-  html = selector
-  selector = fs.readFileSync(program.file, 'utf8')
+if (fs.existsSync(selector)) {
+  selector = fs.readFileSync(selector, 'utf8')
 }
 
 function outputResult(result) {
