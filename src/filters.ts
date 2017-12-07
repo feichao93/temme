@@ -25,6 +25,9 @@ export const defaultFilterMap: FilterFnMap = {
   nth(this: any[], i: number) {
     return this[i]
   },
+  get(this: any[], key: number) {
+    return this[key]
+  },
 
   Number() {
     return Number(this)

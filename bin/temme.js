@@ -4,6 +4,7 @@ const temme = require('..').default
 const fs = require('fs')
 
 program
+  .version('0.5.1')
   .usage('[options] [selector] [html]')
   .option('-f, --format', 'output formatted JSON')
   .parse(process.argv)

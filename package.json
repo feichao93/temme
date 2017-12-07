@@ -10,7 +10,7 @@
   "license": "MIT",
   "bin": "./bin/temme.js",
   "engines": {
-    "node": ">= 7.6.0"
+    "node": ">= 6"
   },
   "scripts": {
     "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
