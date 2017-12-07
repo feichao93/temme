@@ -1,4 +1,4 @@
-import { msg, CaptureResult, defaultFilterMap, } from '../src/index'
+import { msg, CaptureResult, defaultFilterMap, } from '../src'
 
 test('get null from empty CaptureResult instance', () => {
   const emptyCaptureResult = new CaptureResult({})

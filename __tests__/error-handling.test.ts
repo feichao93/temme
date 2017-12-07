@@ -1,7 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import temme, { msg } from '../src/index'
-import { contentFunctions } from '../src/contentFunctions'
+import temme, { msg, contentFunctions } from '../src'
 
 const html = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
 

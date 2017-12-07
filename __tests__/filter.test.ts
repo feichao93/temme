@@ -58,13 +58,19 @@ test('filter `flatten`', () => {
   ])
 })
 
-test('filter `first`, `last`, `nth`', () => {
+test('filter `first`, `last`, `nth`, `get`', () => {
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|first}`)).toBe('0')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|last}`)).toBe('4')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(1)}`)).toBe('1')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(2)}`)).toBe('2')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(3)}`)).toBe('3')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(10)}`)).toBe(null)
+
+  const html = '<p title="TITLE" style="STYLE">TEXT</p>'
+  const makeSelector = (key:string) => `p@|pack|get('${key}'){&[title=$title style=$style]{$text}}`
+  expect(temme(html, makeSelector('text'))).toBe('TEXT')
+  expect(temme(html, makeSelector('title'))).toBe('TITLE')
+  expect(temme(html, makeSelector('style'))).toBe('STYLE')
 })
 
 test('filter `Number`, `String`, `Boolean`, `Date`', () => {
@@ -133,7 +139,7 @@ test('inline filter `append`', () => {
     <li>apple</li>
     <li>banana</li>
   </ul>`
-  const selector =  `
+  const selector = `
   filter append(...items) {
     return this.concat(items)
   }

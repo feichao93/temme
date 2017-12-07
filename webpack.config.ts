@@ -1,4 +1,3 @@
-const MinifyPlugin = require('babel-minify-webpack-plugin')
 import * as webpack from 'webpack'
 import * as path from 'path'
 
@@ -36,7 +35,6 @@ const config: webpack.Configuration = {
     new webpack.DefinePlugin({
       WEBPACK_BUILD: JSON.stringify(true),
     }),
-    new MinifyPlugin(),
   ],
   externals: ['cheerio', 'pegjs'],
 }
