@@ -1,0 +1,6 @@
+// 每一个电影都对应一个 .ui-slide-item
+.ui-slide-item[data-title] @recentMovies { // 这里的@符号表示形成一个列表
+  // &符号用来引用自身
+  &[data-title=$title data-rate=$rate|Number];
+  a[href=$url];
+}
