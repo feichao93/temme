@@ -1,6 +1,6 @@
 [![Build Status](https://img.shields.io/travis/shinima/temme/master.svg)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg)](https://www.npmjs.org/package/temme) [![Greenkeeper badge](https://badges.greenkeeper.io/shinima/temme.svg)](https://greenkeeper.io/)
 
-[中文文档](./readme-zh.md)  [豆瓣爬虫示例](https://github.com/shinima/temme-showcase)
+[中文文档](./readme-zh.md)  [豆瓣爬虫示例](/examples/douban-movie)
 
 # Temme
 
