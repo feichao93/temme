@@ -4,24 +4,29 @@
 
 # Temme
 
-Temme is a concise and convenient jQuery-like selector for node crawlers. Temme is built on top of [cheerio](https://github.com/cheeriojs/cheerio). While keeping the CSS selector syntax untouched, temme adds some extra grammar to enable capturing structured data from HTML document. Try temme in [playground](https://temme.js.org).
+Temme is a concise and convenient jQuery-like selector to extract JSON from HTML documents. Try temme in [playground](https://temme.js.org).
 
 # Install
 
-`npm install temme` or `yarn add temme`
+`yarn add temme` or `npm install temme`
 
 # Command Line API
 
 ```bash
-yarn global add temme # Command line tool prefers global installation
+# Command line tool prefers global installation
+yarn global add temme
 
+# Basic usage
 temme <selector> <html>
-temme <selector> <html> --format # `--format` to format the output
-temme <selector> # Use html from stdin
-temme <path-to-a-selector-file> # Use a selector file
+
+# Use html from stdin; --format to format the output
+temme <selector> --format
+
+# Use selector from a file
+temme <path-to-a-selector-file>
 
 # Pipe html from `curl` to `temme`
-curl -s https://stackoverflow.com/ | temme '.question-hyperlink@|slice(0,3){ &{$} }' --format
+curl -s <url> | temme <selector>
 ```
 
 # Node API
@@ -40,9 +45,9 @@ temme(html, temmeSelector)
 
 # Examples
 
-[This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
+Full examples are avaiable under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [douban-movie example](/examples/douban-movie) or [github example (coming soon)](/examples/github).
 
-Chinese examples: [这个例子][example-douban-short-reviews]从豆瓣短评网页中抓取了页面中的信息, 主要包括电影的基本信息和短评列表. [这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表, 包括用户的基本信息(匿名), 初次评价和追加评价, 以及晒的照片的链接.
+There are several short examples on the playground. [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
 # Inspiration
 
@@ -62,80 +67,148 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content};')
 // => { cls: 'red', content: 'text content' }
 ```
 
-Comparison between `emmet` and `temme`:
+List the signatures of `emmet` and `temme`, and we get:
 * `emmet(selector, data) -> html`
 * `temme(html, selector) -> data`
 
 Given a selector, `emmet` expand this selector to HTML using data, while `temme` capture data from HTML according to the selector.
 
-# Concepts
+# Match & Capture & Temme-selector
 
-## Match
+Before extracting JSON from HTML, we need to answer two questions:
 
-Given a root node (DOM node or cheerio node) and a selector, find the nodes that satisfies the selector. Frequently, we use `querySelectorAll(selector)` or `$(selector)` with jQuery to find the nodes that we want. CSS selectors contains only match information.
+1. How to find the nodes that contains the data we want?
+2. After finding the nodes, which attributes of the node should be extracted, and which fields should be used to store the extracted data?
 
-## Capture
+The answer to the first question is simple: we use CSS selector. CSS selectors are widely used in various aspects. In web standards, CSS selectors define the elements to which a set of CSS rules apply. JQuery and cheerio uses CSS selectors to select elements/nodes in HTML documents. Puppeteer also uses CSS selectors to select an element in the page. In temme, we use CSS selectors too.
 
-Given a node and a temme-selector, and returns an object containing the specified items. Item can be value of attribute, text or html. Which fields contains which item are designated by the temme-selector.
+But CSS selectors only contain *match* information and they can only answer the first question. To answer the second question, we need to extend the CSS selectors syntax so that the new syntax (called temme-selector) can contain *capture* information. Capture information is mainly about which items are stored into which fields in result (result is an JavaScript object). Item can be value of attributes, text or html of nodes. Temme-selector `'div[class=$cls]'` captures attribute `class` into `.cls` of the result; Temme-selector `'p{$content}'` captures text content of the p element into field `.content` of the result.
 
-## Match and Capture
-
-Temme defines a new selector syntax called temme-selector. Temme-selector contains both match information and capture information. Match part is just like CSS selector; Capture part is described below.
+The extended syntax is inspired by several tools. Temme supports JavaScript-style comments, JavaScript literals (string/number/null/boolean/RegExp), assignments, parent-reference as in stylus, and attributes/content capture inspired by Emmet. The grammar and the runninng semantics of the extended syntax are listed below.
 
 # Grammar and Semantics
 
-Before learning temme, you need to understand CSS selectors first.
-
-**Take a quick tour of grammar in [playground tutorial][playground-tutorial] by examples!**
-
 ## Value-Capture `$`
 
-Syntax:
-* `$xxx`:  Starts with a dollar sign; xxx should be a valid JavaScript identifier. 
-* `[foo=$xxx]`:  Place in attribute part to catpure attribute value.
-* `{$xxx}`:  Place in content part to capture html/text.
+**Syntax:**
+
+* `[foo=$xxx]`  Place in CSS attribute qualifiers to catpure attribute value.
+* `{$xxx}`  Place in content part to capture html/text.
 * `[foo=$]` / `{$}`:  Omit xxx and make a default-value-capture.
 
-Value-capture is a basic form of capture. Value-capture can be placed in attribute part (in square brackets) to capture attribute value, or in content part (in curly braces) to capture text/html. [example][example-value-capture]
+Value-capture is a basic form of capture. Value-capture can be placed in attribute part (in square brackets) to capture attribute value, or in content part (in curly braces) to capture text/html. 
 
-Normal attribute match is like `[foo=bar]`. Attribute-capture is like `[foo=$bar]`, which means put the value of attribute `foo` into `.bar` of the capture result. In emmet, `div{foo}` expands to `<div>foo</div>`; In temme, content caputre `{$buzz}` means capture text of a node into `.buzz` of the capture result.
+**Running semantics:**
 
-The output of `temme()` is an object called capture-result. Capture-result contains  captured items at specific fields. We can use a single `$` to make a default value-capture, and the capture result will be a single value. [example][example-default-value-capture]
+Normal attribute qualifier is like `[foo=bar]`. Attribute-capture is like `[foo=$bar]`, which means put the value of attribute `foo` into `.bar` of the capture result. In emmet, `div{foo}` expands to `<div>foo</div>`; In temme, content caputre `{$buzz}` means capture text of a node into `.buzz` of the capture result.
+
+The output of `temme()` is an object called capture-result. Capture-result contains captured items at specific fields. We can use a single `$` to make a default value-capture, and the capture result will be a single value.
+
+**Example:**
+
+```JavaScript
+temme('<div class="red">text content</div>', 'div[class=$cls]{$content};')
+// => { cls: 'red', content: 'text content' }
+
+temme('<div class="red">text content</div>', 'div[class=$]')
+// => 'red'
+```
 
 ## Array-capture `@`
 
-Syntax:
-* `@xxx`:  Starts with an at sign; xxx should be a valid JavaScript identifier.
-* `div.foo@xxx { /* children-selectors */ }`:  Can only be placed after a normal CSS selector; A pair of curly brackets is required after xxx; Put children selectors within the curly brackets.
-* `div.foo@ { /* children-selector */ }`: Omit xxx and make a default-array-capture.
+**Syntax:**
+* `div.foo@xxx { /* children-selectors */ }`  Can only be placed after a normal CSS selector; `@` is the mark of an array-capture; A pair of curly brackets is required after @xxx; Children selectors are put within the curly brackets.
+* `div.foo@ { /* children-selectors */ }` Omit xxx and make a default-array-capture.
 
-Array-capture is another form of capture. It is useful when we want to capture an array of similar items. We need place `@xxx` after normal CSS selector (called parent-selector), and define several children selectors within a trailing curly brackets. This means: for every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds an object as result, and the result of array-capture is the array composed of parent-node result. The array itself will be the `.xxx` field of the upper-level result. Like default-value-capture, we could just use a single at-sign to make a default array-capture, and the array will be the result of upper-level result. [example][example-array-capture]
+Array-capture is another form of capture. It is useful when we want to capture an array of similar items. We need place `@xxx` after normal CSS selector (called parent-selector), and define several children selectors within a trailing curly brackets.
 
-Like default-value-capture, we can omit xxx and make a default array-capture. [example][example-default-array-capture]
+**Running Semantics:**
+
+For every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds an object as result, and the result of array-capture is the array composed of parent-node result. The array itself will be the `.xxx` field of the upper-level result. 
+
+Like default-value-capture, we could just use a single at-sign to make a default array-capture, and the array will be the result of upper-level result.
+
+**Examples:**
+
+```JavaScript
+const html = `
+<ul>
+  <li data-fruit-id="1">
+    <span data-color="red">apple</span>
+  </li>
+  <li data-fruit-id="2">
+    <span data-color="white">pear</span>
+  </li>
+  <li data-fruit-id="3">
+    <span data-color="purple">grape</span>
+  </li>
+</ul>`
+
+temme(html, 'li@fruits { span[data-color=$color]{$name}; }')
+// { 
+//   "fruits": [
+//     { "color": "red", "name": "apple" },
+//     { "color": "white", "name": "pear"  },
+//     { "color": "purple", "name": "grape" }
+//   ]
+// }
+
+// Default value capture
+temme(html, 'li@ { span[data-color=$color]{$name}; }')
+// [
+//   { "color": "red", "name": "apple" },
+//   { "color": "white", "name": "pear"  },
+//   { "color": "purple", "name": "grape" }
+// ]
+```
 
 ## Nested Array-Captures
 
-Array-capture can be nested. Just place a array-capture within another array-capture. [basic example][example-nested-array-capture]
-
-[In this stackoverflow example][example-so-all-answers-and-all-comments], one question has several answers and each answer has several comments. We could use the nested array-captures to capture an array of arrays of comments.
+Array-capture can be nested. Just place a array-capture within another array-capture. [In this StackOverflow example][example-so-all-answers-and-all-comments], one question has several answers and each answer has several comments. We could use the nested array-captures to capture an array of arrays of comments.
 
 ## Parent Reference `&`
 
-`&` gives us the ability to capture data in the parent node. It has the same semantic meaning as in sass, less or stylus. Parent-reference is useful in array-capture when the data is stored in the parent node. [example][example-parent-reference]
+`&` gives us the ability to capture data in the parent node. It has the same semantic meaning as in sass, less or stylus. Parent-reference is useful in array-capture when the data is stored in the parent node.
 
-## Multiple Selectors at Top-Level
+**Examples:**
 
-Temme supports multiple selectors at top-level like in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace, then the semicolon is optional. [example][example-multiple-selectors-at-top-level]
+```JavaScript
+// html is the same as in array-capture example
+temme(html, 'li@ { &[data-fruit-id=$fid]; }')
+//=> [ { "fid": "1" }, { "fid": "2" }, { "fid": "3" } ]
+```
+
+## Multiple Selectors
+
+Temme supports multiple selectors at top-level and in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace, then the semicolon is optional.
+
+**Examples:**
+
+```JavaScript
+// html is the same as in array-capture example
+temme(html, ` [data-color=red]{$name};
+              [data-fruit-id="3"] [data-color=$color]; `)
+//=> { "name": "apple", "color": "purple" }
+```
 
 ## Assignments
 
-Syntax:
-* `$foo = bar;`:  `foo` should be a valid JavaScript identifier; `bar` should be a JavaScript literal (string/number/null/boolean/RegExp).
+**Syntax:**
+* `$foo = bar;`  foo should be a valid JavaScript identifier; bar should be a JavaScript literal (string/number/null/boolean/RegExp).
+
+**Running Semantics:**
 
 Assignments could appears in three places:
-1. At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result; [example][example-assignments-at-top-level]
-2. In content-capture: `div.foo{ $a = null }` is like a conditional capture, if there is a div that satisfies `.foo` qualifier, then the assignment is executed; [example][example-assignments-in-content]
-3. In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field. [example][example-assignments-in-children-selectors]
+
+1. At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result;
+2. In content-capture: `div.foo{ $a = null }` is like a conditional capture, if there is a div that satisfies `.foo` qualifier, then the assignment is executed;
+3. In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field.
+
+**Examples:**
+
+```JavaScript
+// TODO LAST EDIT HERE
+```
 
 ## JavaScript Style Comments
 
