@@ -206,13 +206,13 @@ temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
 
 ## Content
 
-The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, seperated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
+The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, separated by semicolons. Each content-part can be in one of the following forms:  [example][example-content]
 1. Capture.  This will capture text/html of the node into the specified field;
-2. Assignment.  It is like a conditional assignment, if temme find that a node safisties the normal CSS selector, then the assignment is executed;
+2. Assignment.  It is like a conditional assignment, if temme find that a node satisfies the normal CSS selector, then the assignment is executed;
 3. Content Function Call **(experimental)**. See below for more detail.
 
 ### Capture in Content
-`text`, `html` and `node` are special filters in content. One of the three is always used as the first filter in content capture. If not specified explicitly, `text` will be used. `text` gets the text content of the mathcing nodes; `html` gets the  inner HTML of the matching nodes; `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to do manual capturing with cheerio APIs. [example][example-special-filters-in-content]
+`text`, `html`, `outerHTML` and `node` are special filters in content. One of these is always used as the first filter in content capture. If not specified explicitly, `text` will be used. `text` gets the text content of the matching nodes; `html` gets the inner HTML of the matching nodes; `outerHTML` gets the outer HTML of the matching nodes; `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to call cheerio APIs manually. [example][example-special-filters-in-content]
 
 ### Content Functions (experimental)
 

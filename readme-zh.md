@@ -86,7 +86,7 @@ temme 定义了一个新的语法，叫做 temme-selector。temme-selector 同�
 
 **在 [playground tutorial][playground-tutorial] 照着例子学习一下语法**
 
-## 值捕获 `## 
+## 值捕获 `$`
 
 语法:
 * `$xxx`  以美元符作为起始字符；xxx是一个合法的JavaScript标识符；

@@ -183,6 +183,8 @@ export default function temme(
         let initValue: any
         if (firstFilterName === 'html') {
           initValue = node.html()
+        } else if (firstFilterName === 'outerHTML') {
+          initValue = $.html(node)
         } else if (firstFilterName === 'node') {
           initValue = cheerio(node)
         } else { // `text` is the default filter

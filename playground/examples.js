@@ -275,11 +275,12 @@ div.outer{
   $a;
   $b|text;
   $c|html;
-  $d|node|attr('class');
-  $e|toLowerCase;
+  $d|outerHTML;
+  $e|node|attr('class');
+  $f|toLowerCase;
 }
 
-/* 'text', 'html' and 'node' are special filters in content. One of the three filters
+/* 'text', 'html', 'outerHTML' and 'node' are special filters in content. One of the three filters
 is always used as the first filter in content capture. If not specified, 'text'
 will be used.
 

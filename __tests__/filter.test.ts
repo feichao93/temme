@@ -67,7 +67,7 @@ test('filter `first`, `last`, `nth`, `get`', () => {
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(10)}`)).toBe(null)
 
   const html = '<p title="TITLE" style="STYLE">TEXT</p>'
-  const makeSelector = (key:string) => `p@|pack|get('${key}'){&[title=$title style=$style]{$text}}`
+  const makeSelector = (key: string) => `p@|pack|get('${key}'){&[title=$title style=$style]{$text}}`
   expect(temme(html, makeSelector('text'))).toBe('TEXT')
   expect(temme(html, makeSelector('title'))).toBe('TITLE')
   expect(temme(html, makeSelector('style'))).toBe('STYLE')
@@ -84,6 +84,23 @@ test('filter `Number`, `String`, `Boolean`, `Date`', () => {
 
   expect(temme(`<p title="2017-09-28T16:00Z"></p>`, 'p[title=$|Date];').valueOf()).toBe(1506614400000)
   expect(temme(`<p title="abc"></p>`, 'p[title=$|Date|String];')).toBe('Invalid Date')
+})
+
+test('special filters', () => {
+  const html = `<ul> <li>apple</li> <li>banana</li> <li>cherry</li> </ul>`
+  const expected = {
+    innerHTML: ` <li>apple</li> <li>banana</li> <li>cherry</li> `,
+    text: ' apple banana cherry ',
+  }
+
+  expect(temme(html, `ul{$}`)).toEqual(expected.text)
+  expect(temme(html, `ul{$|text}`)).toEqual(expected.text)
+  expect(temme(html, `ul{$|html}`)).toEqual(expected.innerHTML)
+  expect(temme(html, `ul{$|outerHTML}`)).toEqual(html)
+
+  const node: Cheerio = temme(html, `ul{$|node}`)
+  expect(node.html()).toEqual(expected.innerHTML)
+  expect(node.text()).toEqual(expected.text)
 })
 
 test('customized filter `wrap`', () => {
