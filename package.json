@@ -54,7 +54,7 @@
     "pegjs-loader": "^0.5.4",
     "pretty": "^2.0.0",
     "ts-jest": "^21.0.1",
-    "ts-node": "^3.3.0",
+    "ts-node": "^4.0.0",
     "typescript": "^2.4.1",
     "webpack": "^3.6.0"
   }
