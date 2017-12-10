@@ -4,7 +4,7 @@
 
 # Temme
 
-Temme is a concise and convenient jQuery-like selector to extract JSON from HTML documents. Try temme in [playground](https://temme.js.org).
+Temme is a concise and convenient selector to extract JSON from HTML documents. Try temme in the [playground](https://temme.js.org).
 
 # Install
 
@@ -38,14 +38,14 @@ import temme from 'temme'
 // const temme = require('temme').default
 
 const html = '<div color="red">hello world</div>'
-const temmeSelector = 'div[color=$c]{$t};'
-temme(html, temmeSelector)
+const selector = 'div[color=$c]{$t};'
+temme(html, selector)
 //=> { c: 'red', t: 'hello world' }
 ```
 
 # Examples
 
-Full examples are avaiable under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example](/examples/douban-movie) or [this github example (coming soon)](/examples/github).
+Full examples are available under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example (Chinese)](/examples/douban-movie) or [this github example (coming soon)](/examples/github).
 
 There are several short examples on the playground. [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
@@ -61,7 +61,7 @@ emmet('div[class=$cls]{$content};', { cls: 'red', content: 'text content' })
 //=> <div class="red">text content</div>
 ```
 
-As the name indicates, temme is the reverse of emmet. If we express temme as a function, then it looks like:
+As the name indicates, temme is the reverse of emmet. If we abstract temme as a function, then it looks like:
 ```JavaScript
 temme('<div class="red">text content</div>', 'div[class=$cls]{$content};')
 //=> { cls: 'red', content: 'text content' }
@@ -80,11 +80,11 @@ Before extracting JSON from HTML, we need to answer two questions:
 1. How to find the nodes that contains the data we want?
 2. After finding the nodes, which attributes of the node should be extracted, and which fields should be used to store the extracted data?
 
-The answer to the first question is simple: we use CSS selector. CSS selectors are widely used in various aspects. In web standards, CSS selectors define the elements to which a set of CSS rules apply. JQuery/cheerio uses CSS selectors to select elements/nodes in HTML documents. Puppeteer also uses CSS selectors to select an element in the page. In temme, we use CSS selectors too.
+The answer to the first question is simple: we use CSS selector. CSS selectors are widely used in various aspects. In web standards, CSS selectors define the elements to which a set of CSS rules apply. JQuery/cheerio uses CSS selectors to select elements/nodes in HTML documents. In temme, we use CSS selectors too.
 
 But CSS selectors only contain *match* information and they can only answer the first question. To answer the second question, we need to extend the CSS selectors syntax so that the new syntax (called temme-selector) can contain *capture* information. Capture information is mainly about which items are stored into which fields in result (result is an JavaScript object). Item can be value of attributes, text or html of nodes. Temme-selector `'div[class=$cls]'` captures attribute `class` into `.cls` of the result; Temme-selector `'p{$content}'` captures text content of the p element into field `.content` of the result.
 
-The extended syntax is inspired by several tools that I have used a lot. Temme supports JavaScript-style comments, JavaScript literals (string/number/null/boolean/RegExp), assignments, parent-reference as in [stylus](http://stylus-lang.com/docs/selectors.html#parent-reference), attributes/content capture inspired by Emmet, filters like in [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) and many other templates. The grammar and the running semantics of the extended syntax are listed below.
+The extended syntax is inspired by several other tools. Temme supports JavaScript-style comments, JavaScript literals (string/number/null/boolean/RegExp), assignments, parent-reference as in [stylus](http://stylus-lang.com/docs/selectors.html#parent-reference), attributes/content capture inspired by Emmet, filters like in [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) and many other templates. The grammar and the running semantics of the extended syntax are listed below.
 
 # Grammar and Semantics
 
@@ -100,7 +100,7 @@ Value-capture is a basic form of capture. Value-capture can be placed in attribu
 
 #### Running semantics
 
-Normal attribute qualifier is in form `[foo=bar]`. Attribute-capture is in form `[foo=$bar]`, which means put the value of attribute `foo` into `.bar` of the capture result. Content capture `{$buzz}` means capture text of a node into `.buzz` of the capture result.
+Normal attribute qualifier is in form `[foo=bar]`. Attribute-capture is in form `[foo=$bar]`, which means putting the value of attribute `foo` into `.bar` of the capture result. Content capture `{$buzz}` means capturing text of a node into `.buzz` of the capture result.
 
 The output of `temme()` is an object called capture-result. Capture-result contains captured items at specific fields. We can use a single `$` to make a default-value-capture, and the capture result will be a single value.
 

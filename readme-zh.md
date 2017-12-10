@@ -36,8 +36,8 @@ import temme from 'temme'
 // const temme = require('temme').default
 
 const html = '<div color="red">hello world</div>'
-const temmeSelector = 'div[color=$c]{$t}'
-temme(html, temmeSelector)
+const selector = 'div[color=$c]{$t}'
+temme(html, selector)
 // => { c: 'red', t: 'hello world' }
 ```
 
@@ -45,8 +45,7 @@ temme(html, temmeSelector)
 
 完整的例子可以在 [*examples*](/examples) 文件夹中查看。如果对 temme 还不熟悉，那么可以从 [豆瓣电影的例子](/examples/douban-movie) 或 [这个 GitHub 的例子 (coming soon)](/examples/github) 开始。
 
-
-[这个例子][example-douban-movie-summary]从豆瓣电影页面中抓取了若干信息，主要包括电影的基本信息和评分信息。[这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表，包括用户的基本信息，初次评价和追加评价, 以及晒的照片的链接.
+在线版本中也包含了一些其他较短的例子。比如[这个例子][example-douban-movie-summary]从豆瓣电影页面中抓取了电影的基本信息和评分信息。[这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表，包括用户的基本信息，初次评价和追加评价, 以及晒的照片的链接.
 
 # 灵感
 
@@ -79,13 +78,13 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 从 HTML 文档中选取 JSON 数据之前，我们需要回答两个问题：
 
 1. 如何找到存放了数据的结点？
-2. 找到结点之后，应该提取结点的哪个属性？提取的数据应该放在结果的什么字段？
+2. 找到结点之后，应该提取结点的哪个特性？提取的数据应该放在结果的什么字段？
 
 第一个问题的答案简单：我们使用 CSS 选择器。CSS 选择器被广泛使用在前端开发中：Web 标准中 CSS 选择器用于指定 CSS 规则所应用的元素；JQuery/cheerio 使用 CSS 选择器来选择文档中的元素/结点；puppeteer 中很多函数都接受一个 CSS 选择器作为参数。同样的，temme 也使用 CSS 选择器。
 
-不过 CSS 选择器只包含了 *匹配* 信息，只能回答第一个问题。为了回答第二个问题，我们需要去拓展 CSS 选择器的语法，使得新的语法（叫做 temme-selector）可以包含 *捕获* 信息。捕获信息一般包含了「哪些数据需要被提取，并存放到结果的哪个字段」；这里的数据可以是结点属性的值，或是结点的文本 / HTML。选择器 `'div[class=$cls]'` 将属性 `class` 捕获到结果的 `.cls` 字段；选择器pp `'p{$content}'` 将结点的文本内容捕获到结果的 `.content` 字段。
+不过 CSS 选择器只包含了 *匹配* 信息，只能回答第一个问题。为了回答第二个问题，我们需要去拓展 CSS 选择器的语法，使得新的语法（叫做 temme-selector）可以包含 *捕获* 信息。捕获信息一般包含了「哪些数据需要被提取，并存放到结果的哪个字段」；这里的数据可以是结点特性的值，或是结点的文本 / HTML。选择器 `'div[class=$cls]'` 将特性 `class` 捕获到结果的 `.cls` 字段；选择器 `'p{$content}'` 将结点的文本内容捕获到结果的 `.content` 字段。
 
-拓展的语法部分参考了我以前用过的一些工具。Temme 支持 JavaScript 风格的注释，JavaScript 字面量（string/number/null/boolean/RegExp），赋值语句，父结点引用（参考了[stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)），属性/内容捕获（受 Emmet 的启发），以及过滤器（参考了 [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) 以及一些其他模板语法）。本文档的下方列出了这些语法的规则和对应的运行时行为。
+拓展的语法部分参考了我以前用过的一些工具。Temme 支持 JavaScript 风格的注释，JavaScript 字面量（string/number/null/boolean/RegExp），赋值语句，父结点引用（参考了[stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)），特性/内容捕获（受 Emmet 的启发），以及过滤器（参考了 [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) 以及一些其他模板语法）。本文档的下方列出了这些语法的规则和对应的运行时行为。
 
 # 语法及其运行时行为
 
@@ -93,8 +92,8 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 
 #### 语法
 * `[foo=$xxx]`  放在特性匹配部分，来捕获该特性的值；
-* `{$xxx}`  放在内容部分来捕获元素的HTML或文本内容；
-* `[foo=$]` / `{$}`  省略xxx，以进行「默认值捕获」。
+* `{$xxx}`  放在内容部分来捕获元素的 HTML 或文本内容；
+* `[foo=$]` / `{$}`  省略 xxx，以进行「默认值捕获」。
 
 值捕获是捕获的基本方式。把值捕获放在特性部分（也就是方括号内）用于捕获特性的值；也可以放在内容部分（花括号内）用于捕获节点的 HTML 或文本。
 
@@ -102,7 +101,7 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 
 CSS 选择器中，特性匹配的语法是这样的：`[foo=bar]`；而特性捕获的语法是这样的：`[foo=$bar]`。该捕获语法的含义：将特性 `foo` 的值放到结果的 `.bar` 字段中。内容捕获 `{$buzz}` 表示：将节点的文本内容放到结果的 `.buzz` 字段中。
 
-`temme()` 的输出是一个对象, 叫做捕获结果。捕获结果在特定的字段中包含了捕获的元素. 我们可以使用一个 `$` 符号来进行默认值捕获, 此时捕获结果将会为单个值。
+`temme()` 的输出是一个对象, 叫做捕获结果。捕获结果在特定的字段中包含了捕获的元素。我们可以使用一个 `$` 符号来进行默认值捕获, 此时捕获结果将会为单个值。
 
 #### 例子
 
@@ -205,7 +204,7 @@ temme(html, ` [data-color=red]{$name};
 赋值的含义取决于该语法结构所在的上下文：
 
 * 在顶层中，`$foo = 'bar';` 表示将字符串 bar 放到最终结果的 foo 字段
-* 在content中，`div.foo{ $a = null }` 像是一个条件赋值，如果有一个元素满足选择器`div.foo`，那么就执行该赋值操作；
+* 在 content 中，`div.foo{ $a = null }` 像是一个条件赋值，如果有一个元素满足选择器 `div.foo`，那么就执行该赋值操作；
 * 在数组匹配的子选择器中，`li@list { $x = 123 }` 意味着数组匹配结果中每个数组元素的 x 字段的值都为数字 `123`。
 
 #### 例子
@@ -317,16 +316,15 @@ div{$txt|myFilter(x, y, z)};
 
 ## Content
 
-Content，也就是常规选择器后面花括号中的部分。Content 用于抓取结点的文本或是 html。Content 由多个content-part 组成，多个 content-part 之间用分号进行分隔。每一个 content-part 的形式可以为下面列举的形式之一：
-1. 捕获.  会抓取将结点的text/html到指定的字段；
+Content，也就是常规选择器后面花括号中的部分。Content 用于抓取结点的文本或是 HTML。Content 由多个 content-part 组成，多个 content-part 之间用分号进行分隔。每一个 content-part 的形式可以为下面的形式之一：
+
+1. 捕获.  会抓取将结点的文本内容或是 HTML 到指定的字段；
 2. 赋值.  该形式类似条件赋值，当 temme 找到一个满足常规选择器的结点时，会执行该赋值；
-3. 内容函数调用**(experimental)**.  具体见下方。
+3. 内容函数调用 **(experimental)**  具体见下方。
 
 ### Content 中的捕获
 
-`text`，`html`，`outerHTML` 和 `node` 在 content 中是特殊的过滤器。
-
-在 content 中进行捕获时，这四个特殊过滤器中一定会有一个会作为捕获的第一个过滤器。如果没有显式的指定，那么 `text` 就会被使用。
+`text`，`html`，`outerHTML` 和 `node` 在 content 中是特殊的过滤器。在 content 中进行捕获时，这四个特殊过滤器中一定会有一个作为捕获的第一个过滤器。如果没有显式的指定，那么 `text` 就会被使用。
 
 * `text` 用于获取结点的文本信息；
 * `html` 用于获取结点的 innerHTML；
@@ -358,7 +356,7 @@ temme(html, selector)
 // }
 ```
 
-### 内容函数 Content Functions (experimental)
+### 内容函数 (experimental)
 
 调用一个内容函数，参数依次为：将捕获结果对象，结点，以及圆括号中的参数。内容函数可以同时进行匹配和捕获，详情请看[源代码](/src/contentFunctions.ts)。
 
@@ -404,7 +402,7 @@ function myContentFn(result, node, capture1, string2) {
 // 当 myContentFn() 被调用的时候, $x 会传递给参数 capture1，'yyy' 会传递给参数 string2
 ```
 
-内容函数是一个功能强大的机制。不过在大部分场景中，我们都是不需要使用该机制的。temme 支持伪类选择器（由[css-select](https://github.com/fb55/css-select#supported-selectors)实现）。尤其是 `:contains`， `:not` 和 `:has` 这三个伪类选择器，大大提升了选择器的能力。在使用自定义的内容函数之前，先尝试一下伪类选择器是否满足需求。
+内容函数是一个功能强大的机制。不过在大部分场景中，我们都是不需要使用该机制的。temme 支持伪类选择器（由 [css-select](https://github.com/fb55/css-select#supported-selectors) 实现）。尤其是 `:contains`， `:not` 和 `:has` 这三个伪类选择器，大大提升了选择器的能力。在使用自定义的内容函数之前，先尝试一下伪类选择器是否满足需求。
 
 ## 片段 (experimental)
 
@@ -412,10 +410,10 @@ function myContentFn(result, node, capture1, string2) {
 
 #### 语法
 
-* `@xxx = { /* selectors */ };`  定义一个新的片段，片段的名称为 xxx。 xxx 必须是一个合法的 JavaScript 标识符；
+* `@xxx = { /* selectors */ };`  定义一个新的片段，片段的名称为 xxx。xxx 必须是一个合法的 JavaScript 标识符；
 * `@xxx;`  展开名称为 xxx 的片段。
 
-片段定义只能放在顶层。而片段的展开可以放在顶层或是子选择器中。片段可以嵌套：A 使用 B，B 使用 C (A -> B -> C)；但片段不能循环展开。
+片段定义只能放在顶层。而片段的展开可以放在顶层或是子选择器中。片段可以嵌套：A 使用 B，B 使用 C ( A -> B -> C )；但片段不能循环展开。
 
 #### 运行时的行为
 
@@ -423,7 +421,7 @@ function myContentFn(result, node, capture1, string2) {
 
 #### 例子
 
-注意：这个例子是我编造出来的, 无法运行在真实的 StackOverflow。一个 StackOverflow 的问题，由用户A提问，然后可以被用户B修改。现在我们需要选取两位用户的信息，temme选择器如下：
+注意：这个例子是我编造出来的, 无法运行在真实的 StackOverflow。一个 StackOverflow 的问题，由用户A提问，然后可以被用户B修改。现在我们需要选取两位用户的信息，选择器如下：
 
 ```
 .ask-info@asked|pack {
