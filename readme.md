@@ -124,7 +124,7 @@ Array-capture is another form of capture. It is useful when we want to capture a
 
 #### Running Semantics
 
-For every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds an object as result, and the result of array-capture is the array composed of parent-node result. The array itself will be the `.xxx` field of the upper-level result. 
+For every node (called parent-node) that matches parent-selector, execute the children selectors one-by-one; every parent-node corresponds to a sub-result. These sub-results are gathered into an array. The array is the result of this array-capture. And the array will be the `.xxx` field of the upper-level result.
 
 Like default-value-capture, we could just use a single at-sign to make a default array-capture, and the array will be the result of upper-level result.
 
@@ -263,6 +263,11 @@ Temme provides a few filters out of box. Built-in filters could be divided into 
 
 Using array-filter syntax `||`, temme will treat the captured value as an array, and apply the filter to every item of this array.
 
+```JavaScript
+temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
+//=> [1, 22, 333, 4444]
+```
+
 ## Customized Filters
 
 Temme supports defining customized filter in several ways.
@@ -297,22 +302,15 @@ temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 
 Define filters in selector. Inline filters definition has the same syntax as JavaScript-style function definition. The difference is that temme use *filter* as the keyword instead of *function*.
 
-```JavaScript
-const selector = `
+```
 filter myFilter(arg1, arg2, arg3) {
   /* Filter Logic Here. */
   /* The code here will be executed as in a JavaScript function. */
   /* Note that the curly braces must be balanced here. */
 }
 
+// We can use `myFilter` like this:
 div{$txt|myFilter(x, y, z)};
-`
-temme(html, selector)
-```
-
-```JavaScript
-temme('<div>1 22 333 4444</div>', `div{ $|split(' ')||Number }`)
-//=> [1, 22, 333, 4444]
 ```
 
 ## Content
@@ -324,6 +322,7 @@ The selectors in the curly brackets after normal CSS selector are called content
 3. Content Function Call **(experimental)**. See below for more detail.
 
 ### Capture in Content
+
 `text`, `html`, `outerHTML` and `node` are special filters in content. One of these is always used as the first filter in content capture. If not specified explicitly, `text` will be used.
 
 * `text` gets the text content of the matching nodes;
@@ -332,6 +331,7 @@ The selectors in the curly brackets after normal CSS selector are called content
 * `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to call cheerio APIs manually. 
 
 Examples:
+
 ```JavaScript
 const html = '<div class="outer"> <p>TEXT-1</p> <div class="inner">TEXT-2</div> </div>'
 const selector = `
@@ -448,10 +448,6 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
 .edit-info@edited|pack { @personInfo; };
 ```
 
-[playground-tutorial]: https://temme.js.org?example=tutorial-start
-
 [example-so-all-answers-and-all-comments]: https://temme.js.org?example=so-all-answers-and-all-comments
 [example-github-commits]: https://temme.js.org?example=github-commits
 [example-github-issues]: https://temme.js.org?example=github-issues
-[example-douban-short-reviews]: https://temme.js.org?example=douban-short-reviews-Chinese
-[example-tmall-reviews]: https://temme.js.org?example=tmall-reviews-Chinese
