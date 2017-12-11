@@ -1,4 +1,5 @@
 const MinifyPlugin = require('babel-minify-webpack-plugin')
+import * as HtmlWebpackPlugin from 'html-webpack-plugin'
 import * as webpack from 'webpack'
 import * as path from 'path'
 
@@ -33,6 +34,9 @@ const config: (env: any) => webpack.Configuration = (env: any) => ({
   plugins: [
     new webpack.DefinePlugin({
       WEBPACK_BUILD: JSON.stringify(true),
+    }),
+    new HtmlWebpackPlugin({
+      template: 'playground/index.html',
     }),
   ].concat((env && env.production) ? [
     new MinifyPlugin(),
