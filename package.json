@@ -32,19 +32,18 @@
     "mapCoverage": true
   },
   "dependencies": {
-    "@types/cheerio": "^0.22.1",
-    "@types/commander": "^2.11.0",
+    "@types/cheerio": "^0.22.6",
     "@types/invariant": "^2.2.29",
     "cheerio": "^1.0.0-rc.1",
     "commander": "^2.12.2",
     "invariant": "^2.2.2"
   },
   "devDependencies": {
-    "@types/jest": "^21.1.1",
-    "@types/node": "^8.0.31",
+    "@types/jest": "^21.1.8",
+    "@types/node": "^8.0.57",
     "@types/pegjs": "^0.10.0",
-    "@types/webpack": "^3.0.12",
-    "awesome-typescript-loader": "^3.2.3",
+    "@types/webpack": "^3.8.1",
+    "awesome-typescript-loader": "^3.4.1",
     "babel-minify-webpack-plugin": "^0.2.0",
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
@@ -53,9 +52,9 @@
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.4",
     "pretty": "^2.0.0",
-    "ts-jest": "^21.0.1",
-    "ts-node": "^3.3.0",
-    "typescript": "^2.4.1",
-    "webpack": "^3.6.0"
+    "ts-jest": "^21.2.4",
+    "ts-node": "^4.0.1",
+    "typescript": "^2.6.2",
+    "webpack": "^3.10.0"
   }
 }

@@ -9,7 +9,7 @@ const config: (env: any) => webpack.Configuration = (env: any) => ({
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'playground-build'),
-    filename: 'bundle.js',
+    filename: '[chunkhash].bundle.js',
   },
 
   resolve: {
