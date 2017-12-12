@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie)
+[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie) [![Example Douban Movie](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/douban-movie)
 
 # Temme
 
@@ -43,7 +43,7 @@ temme(html, selector)
 
 # Examples
 
-Full examples are available under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example (Chinese)](/examples/douban-movie) or [this github example (coming soon)](/examples/github).
+Full examples are available under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example (Chinese)](/examples/douban-movie/readme.md) or [this StackOverflow example](/examples/stackoverflow/readme.md).
 
 There are several short examples on the playground. [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 

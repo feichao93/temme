@@ -1,4 +1,4 @@
-[![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie)
+[![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie) [![Example Douban Movie](https://img.shields.io/badge/示例-StackOverflow-2196F3.svg?style=flat-square)](/examples/douban-movie)
 
 # temme
 
@@ -43,7 +43,7 @@ temme(html, selector)
 
 # 例子
 
-完整的例子可以在 [*examples*](/examples) 文件夹中查看。如果对 temme 还不熟悉，那么可以从 [豆瓣电影的例子](/examples/douban-movie) 或 [这个 GitHub 的例子 (coming soon)](/examples/github) 开始。
+完整的例子可以在 [*examples*](/examples) 文件夹中查看。如果对 temme 还不熟悉，那么可以从 [豆瓣电影的例子](/examples/douban-movie/readme.md) 或 [这个 StackOverflow 的例子](/examples/stackoverflow/readme.md) 开始。
 
 在线版本中也包含了一些其他较短的例子。比如[这个例子][example-douban-movie-summary]从豆瓣电影页面中抓取了电影的基本信息和评分信息。[这个例子][example-tmall-reviews]从天猫的商品详情页面中抓取了评论列表，包括用户的基本信息，初次评价和追加评价, 以及晒的照片的链接.
 

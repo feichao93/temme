@@ -1,0 +1,8 @@
+.question-summary@questions|slice(0, 3) {
+  .question-hyperlink[href=$link]{$title};
+  .votes span[title=$votes];
+  .status span[title=$answers];
+  .views span[title=$views];
+  .started .relativetime[title=$time];
+  .started .reputation-score{$score};
+}
