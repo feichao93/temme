@@ -192,7 +192,7 @@ curl -s https://movie.douban.com/subject/26930504/ | temme douban-movie.temme --
 
 - 开发语言 [TypeScript](https://www.typescriptlang.org/)
 - 自定义语法解析 [PEG.js](https://pegjs.org/)
-- HTML解析 [cheerio](https://cheerio.js.org/)
+- HTML解析 [cheerio](https://github.com/cheeriojs/cheerio)
 - 编译工具 [webpack](https://webpack.js.org/)
 - 自动化测试 [Jest](https://facebook.github.io/jest/)
 - 在线版本编辑器 [ace](https://ace.c9.io/)

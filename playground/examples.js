@@ -57,22 +57,36 @@ a{
 }`
   },
   {
-    name: 'so-all-answers-and-all-comments',
+    name: 'so-question-detail',
     htmlUrl: 'resources/stackoverflow-question.html',
     selector: `
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
-// Capture all answers and all comments
+// Capture detail of the question
 filter format() {
   return this.replace(/\\s+/g, ' ')
 }
 
-.answer@ {
-  .user-details a{$username|format};
-  .post-text{$answerText|format|trim};
-  .comment@comments {
-    .comment-user{$commentUser|format};
-    .comment-text .comment-copy{$text};
-  };
+#question-header a[href=$link]{$title};
+
+.question .vote-count-post{$upvoteCount|Number};
+.question .post-text{$postText|html|trim|format};
+.question .post-tag@tagList{ &{$} };
+.question .post-signature:last-child .user-details a{$askedBy|format};
+
+.answer@answers {
+  &[data-answerid=$answerid];
+  $accepted = false;
+  &.accepted-answer{$accepted = true};
+  .vote-count-post{$upvoteCount|Number};
+
+  .post-text{$postText|html|trim|format};
+  .post-signature:last-child .user-details a{$answeredBy|format};
+  .user-action-time{$action|trim|format}
+
+  .comment@comments{
+    .comment-user{$commentedBy|format};
+    .comment-copy{$text};
+  }
 }`,
   },
   {

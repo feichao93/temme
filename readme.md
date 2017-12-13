@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie) [![Example Douban Movie](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow)
+[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example Douban Movie](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
 
 # Temme
 
@@ -164,7 +164,7 @@ temme(html, 'li@ { span[data-color=$color]{$name}; }')
 
 ## Nested Array-Captures
 
-Array-capture can be nested. Just place a array-capture within another array-capture. [In this StackOverflow example][example-so-all-answers-and-all-comments], one question has several answers and each answer has several comments. We could use the nested array-captures to capture an array of arrays of comments.
+Array-capture can be nested. Just place a array-capture within another array-capture. [In this StackOverflow example][example-so-question-detail], one question has several answers and each answer has several comments. We could use the nested array-captures to capture an array of arrays of comments.
 
 ## Parent Reference `&`
 
@@ -446,6 +446,6 @@ The children selectors in curly brace are duplicated. We can use snippet to dedu
 .edit-info@edited|pack { @personInfo; };
 ```
 
-[example-so-all-answers-and-all-comments]: https://temme.js.org?example=so-all-answers-and-all-comments
+[example-so-question-detail]: https://temme.js.org?example=so-question-detail
 [example-github-commits]: https://temme.js.org?example=github-commits
 [example-github-issues]: https://temme.js.org?example=github-issues

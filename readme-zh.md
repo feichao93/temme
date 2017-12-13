@@ -1,4 +1,4 @@
-[![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie) [![Example Douban Movie](https://img.shields.io/badge/示例-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow)
+[![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example Douban Movie](https://img.shields.io/badge/示例-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
 
 # temme
 
@@ -166,7 +166,7 @@ temme(html, 'li@ { span[data-color=$color]{$name}; }')
 
 ## 嵌套的数组捕获
 
-数组捕获可以嵌套使用，将一个数组捕获放在另外一个数组捕获中就可以完成嵌套数组的捕获。[在这个 StackOverflow 的例子中][example-so-all-answers-and-all-comments]，一个问题有多个回答，每个回答有多个评论。我们使用嵌套的数组捕获可以捕获一个评论的二维数组。
+数组捕获可以嵌套使用，将一个数组捕获放在另外一个数组捕获中就可以完成嵌套数组的捕获。[在这个 StackOverflow 的例子中][example-so-question-detail]，一个问题有多个回答，每个回答有多个评论。我们使用嵌套的数组捕获可以捕获一个评论的二维数组。
 
 ## 父结点引用 `&`
 
@@ -448,6 +448,6 @@ function myContentFn(result, node, capture1, string2) {
 .edit-info@edited|pack { @personInfo; };
 ```
 
-[example-so-all-answers-and-all-comments]: https://temme.js.org?example=so-all-answers-and-all-comments
+[example-so-question-detail]: https://temme.js.org?example=so-question-detail
 [example-douban-movie-summary]: https://temme.js.org?example=douban-movie-summary-Chinese
 [example-tmall-reviews]: https://temme.js.org?example=tmall-reviews-Chinese
