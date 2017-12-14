@@ -132,7 +132,7 @@ After getting a list of top questions, we can follow the link of each question t
 
 ![Question Detail Selector](./imgs/question-detail-selector.jpg)
 
-The temme-selector is so long that we need to save it to a file namely *question-detail.temme*. We then use the filename to refer to the selector. [This example is also available on the playground](https://temme.js.org?example=so-question-detail).
+The temme-selector is so long that we need to save it to a file namely *question-detail.temme*. We then use the filename to refer to the selector. [This example is also available on the playground (with a little difference).](https://temme.js.org?example=so-question-detail)
 
 ```bash
 curl -s https://stackoverflow.com/questions/47772015/toggle-between-two-stylesheets | temme question-detail.temme --format
