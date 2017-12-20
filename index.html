@@ -109,10 +109,10 @@
 <body>
 
 <div id="app" class="d-flex flex-column" style="height: 100vh; min-width: 900px">
-  <header style="background-color: #1d2a3f; color: white">
+  <header style="background-color: #1d2a3f; color: white; display: flex">
     <p style="margin: 8px">
       <span style="font-size: 125%;">Temme</span>
-      <span>is a concise and convenient jQuery-like selector for node crawlers.</span>
+      <span>is a concise selector to extract JSON from HTML.</span>
       <span style="padding-left: 8px;">
         <a style="color: inherit" href="https://github.com/shinima/temme" target=_blank>GitHub</a>
       </span>
@@ -120,12 +120,11 @@
         <a id=browse-example-link style="color: inherit" href="#">Examples</a>
       </span>
     </p>
-    <div id=example-select-part style="display: none; margin: 8px; margin-top: 12px">
-      Example:
-      <select id=example-select title="Select an example" style="width: 350px">
-      </select>
+    <div id=example-select-part style="display: none; margin: 8px 8px 0;">
+      <select id=example-select title="Select an example" style="width: 350px"></select>
       <button id=prev-example-button class="nav-button">Prev</button>
       <button id=next-example-button class="nav-button">Next</button>
+      <button id=exit-example-mode class=nav-button style="background: #b93309">Exit</button>
     </div>
   </header>
   <div class="flex-grow-1" style="display: flex">
@@ -134,7 +133,6 @@
       <h2 class="d-flex flex-align-center flex-space-between" style="margin-left: 8px;">
         <span>1: HTML
           <button id=format-html class=flat-button>Format</button>
-          <a id=exit-example-mode></a>
         </span>
         <button id=toggle-width-button class=flat-button>&lt;</button>
       </h2>
@@ -162,5 +160,5 @@
   </div>
 </div>
 
-<script type="text/javascript" src="83d9cd1530fa50a2a948.bundle.js"></script></body>
+<script type="text/javascript" src="bc8d6ebe6e5c37b3f7e6.bundle.js"></script></body>
 </html>
