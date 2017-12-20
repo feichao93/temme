@@ -58,7 +58,7 @@ function clearGutterDecorations() {
 const syntaxError = {
   show(e) {
     const session = selectorEditor.getSession()
-    if (e.name === 'SyntaxError') {
+    if (e.name === 'SyntaxError' && e.location) {
       const line = e.location.start.line - 1
       errorLines.add(line)
       session.addGutterDecoration(line, 'ace_error')
