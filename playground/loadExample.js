@@ -6,13 +6,9 @@ function gotoExample(name) {
 
 function enterExampleMode(currentExampleName) {
   const exitExampleModeLink = document.querySelector('#exit-example-mode')
-  exitExampleModeLink.textContent = 'Exit Example Mode'
   const url = new URL(document.URL)
   url.search = ''
-  exitExampleModeLink.href = url.href
-
-  const formatHtmlButton = document.querySelector('#format-html')
-  formatHtmlButton.style.display = 'none'
+  exitExampleModeLink.onclick = () => location.assign(url)
 
   const exampleSelectPart = document.querySelector('#example-select-part')
   exampleSelectPart.style.display = 'block'
