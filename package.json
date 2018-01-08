@@ -47,7 +47,7 @@
   "devDependencies": {
     "@types/html-webpack-plugin": "^2.30.1",
     "@types/jest": "^22.0.0",
-    "@types/node": "^8.0.57",
+    "@types/node": "^9.3.0",
     "@types/pegjs": "^0.10.0",
     "@types/webpack": "^3.8.1",
     "awesome-typescript-loader": "^3.4.1",
