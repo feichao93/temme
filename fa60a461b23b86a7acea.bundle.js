@@ -19,13 +19,7 @@ a{
   $text;                           // capture
   $assignmentInContent = true;     // assignment
   find('Star Me on ', $website);   // function call
-};`},{name:'so-linked-questions',htmlUrl:'resources/stackoverflow-question.html',selector:`
-// https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
-// capture linked questions of a stackoverflow question
-.linked .spacer@|compact {
-  .question-hyperlink[href=$url]{$question|replace(/ +/g, ' ')};
-  .answer-votes{$votes|Number};
-}`},{name:'so-question-detail',htmlUrl:'resources/stackoverflow-question.html',selector:`
+};`},{name:'so-question-detail',htmlUrl:'resources/stackoverflow-question.html',selector:`
 // https://stackoverflow.com/questions/291978/short-description-of-the-scoping-rules
 // Capture detail of the question
 filter format() {
