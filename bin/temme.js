@@ -27,7 +27,10 @@ if (selector == null) {
   throw new Error('No temme selector specified.')
 }
 
-if (html != null) {
+if (html != null && html !== '-') {
+  if (fs.existsSync(html)) {
+    html = fs.readFileSync(html, 'utf8')
+  }
   outputResult(temme(html, selector))
   process.exit(0)
 } else {

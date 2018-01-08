@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -12,6 +12,12 @@
   "engines": {
     "node": ">= 6"
   },
+  "files": [
+    "LICENSE",
+    "readme.md",
+    "bin/",
+    "build/"
+  ],
   "scripts": {
     "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "build": "webpack",

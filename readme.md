@@ -15,7 +15,7 @@ Temme is a concise and convenient selector to extract JSON from HTML documents. 
 yarn global add temme
 
 # Basic usage
-temme <selector> <html>
+temme <selector> <html-or-path-to-a-html-file>
 
 # Use html from stdin; --format to format the output
 temme <selector> --format
