@@ -1,4 +1,4 @@
-[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example StackOverflow](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
+[![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) ![Node Version Requirement](https://img.shields.io/badge/node-%3E=6-f37c43.svg?style=flat-square) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example StackOverflow](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
 
 # Temme
 
@@ -90,7 +90,7 @@ The extended syntax is inspired by several other tools. Temme supports JavaScrip
 
 #### Syntax
 
-* `[foo=$xxx]`  Place in CSS attribute qualifiers to catpure attribute value.
+* `[foo=$xxx]`  Place in CSS attribute qualifiers to capture attribute value.
 * `{$xxx}`  Place in content part to capture html/text.
 * `[foo=$]` / `{$}`:  Omit xxx and make a default-value-capture.
 
@@ -238,7 +238,7 @@ Temme selector supports both single line comments `// ......` and block comments
 ## Capture Filters `|`
 
 #### Syntax
-* `$foo|xxx` / `@bar|xxx`  Place right after a value-capture or array-capture; xxx is the filter functions name and shoule be a valid JavaScript identifier.
+* `$foo|xxx` / `@bar|xxx`  Place right after a value-capture or array-capture; xxx is the filter functions name and should be a valid JavaScript identifier.
 * `$foo|xxx(arg1, arg2, ...)`  Filter can accept arguments. Every argument should be a JavaScript literal.
 * `$foo|f1(a,b)|f2`  Filters can be chained.
 
@@ -317,7 +317,7 @@ The selectors in the curly brackets after normal CSS selector are called content
 
 1. Capture.  This will capture text/html of the node into the specified field;
 2. Assignment.  It is like a conditional assignment, if temme find that a node satisfies the normal CSS selector, then the assignment is executed;
-3. Content Function Call **(experimental)**. See below for more detail.
+3. Content Function Call. See below for more detail.
 
 ### Capture in Content
 
@@ -353,11 +353,11 @@ temme(html, selector)
 // }
 ```
 
-### Content Functions (experimental)
+### Content Functions
 
 Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source codes](/src/contentFunctions.ts) for more implementation detail.
 
-Currently, this feature is experimental and there is only one built-in content function `find`. `find` try to capture a substring of the node text.
+Currently, there is only one built-in content function `find`. `find` try to capture a substring of the node text.
 
 * `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
 * `find('hello', $x)` will try to capture the text **after** `'hello'`.
@@ -376,7 +376,7 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 //=> null
 ```
 
-### Use Customized Content Functions (experimental)
+### Use Customized Content Functions
 
 ```JavaScript
 import { contentFunctions } from 'temme'
@@ -402,7 +402,7 @@ function myContentFn(result, node, capture1, string2) {
 
 Content function is a more powerful way than normal css selector. But in most scenarios, we do not need customized content functions. Temme supports pseudo-selector powered by [css-select](https://github.com/fb55/css-select#supported-selectors). Especially, `:contains`, `:not` and `:has` are useful pseudo-selectors which enhance the select ability a lot. Before using customized content functions, try to test whether pseudo-selectors can satisfy the requirements.
 
-## Snippets (experimental)
+## Snippets
 
 Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when the parent-selectors vary but children selectors alike.
 

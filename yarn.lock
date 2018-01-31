@@ -59,9 +59,13 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^8.0.27", "@types/node@^8.0.57":
+"@types/node@*", "@types/node@^8.0.27":
   version "8.0.57"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-8.0.57.tgz#e5d8b4dc112763e35cfc51988f4f38da3c486d99"
+
+"@types/node@^9.3.0":
+  version "9.4.0"
+  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-9.4.0.tgz#b85a0bcf1e1cc84eb4901b7e96966aedc6f078d1"
 
 "@types/pegjs@^0.10.0":
   version "0.10.0"

@@ -1,8 +1,8 @@
-# [WIP] Temme: A Concise and Convenient Way to Extract JSON from HTML
+# Temme: A Concise and Convenient Way to Extract JSON from HTML
 
 This article introduces a tool that extracts JSON from HTML. We will use the HTML from StackOverflow to illustrate how to use temme. Temme is based on [cheerio](https://github.com/cheeriojs/cheerio) and uses CSS selectors extensively, so [MDN](https://developer.mozilla.org/en-US/docs/Learn/CSS/Introduction_to_CSS/Selectors) may be helpful.
 
-The term *node* in this article refers to an `HTMLElement` in DOM or a `CheerioNode` in cheerio. And the term *item* in this articel refers to data entries in elements/nodes which can be extracted. For example, items can be `href` attributes in anchor elements, or `class` attributes in any HTML element, or text content of any HTML element.
+The term *node* in this article refers to an `HTMLElement` in DOM or a `CheerioNode` in cheerio. And the term *item* in this article refers to data entries in elements/nodes which can be extracted. For example, items can be `href` attributes in anchor elements, or `class` attributes in any HTML element, or text content of any HTML element.
 
 Recent days, I spend a lot of time on coding web crawlers. I use [cheerio](https://github.com/cheeriojs/cheerio) (server-side jQuery) to parse HTML. Cheerio implements various functions from core jQuery and provides a lot of APIs that manipulate the HTML document. However, as more and more HTML documents are crawled, the code using cheerio becomes complex and intractable. Web crawlers have some common patterns to extract data from HTML which do not fit well with cheerio. Here are some typical cases:
 
@@ -128,7 +128,7 @@ curl -s https://stackoverflow.com/questions/1014861/is-there-a-css-parent-select
 
 ![Question Detail](./imgs/question-detail.jpg)
 
-After getting a list of top questions, we can follow the link of each question to get the detail of the question. Here, we select [this question](https://stackoverflow.com/questions/47772015/toggle-between-two-stylesheets) as our exmaple in the above image. We use the following temme-selector to extract various items about the question:
+After getting a list of top questions, we can follow the link of each question to get the detail of the question. Here, we select [this question](https://stackoverflow.com/questions/47772015/toggle-between-two-stylesheets) as our example in the above image. We use the following temme-selector to extract various items about the question:
 
 ![Question Detail Selector](./imgs/question-detail-selector.jpg)
 
@@ -163,12 +163,12 @@ curl -s https://stackoverflow.com/questions/47772015/toggle-between-two-styleshe
 # }
 ```
 
-This selector uses value-capture/array-catpure extensitively and extracts lots of items while remains clear and readable. The output has a similar structure as the temme-selector, which makes understanding the selector more easily.
+This selector uses value-capture/array-capture extensively and extracts lots of items while remains clear and readable. The output has a similar structure as the temme-selector, which makes understanding the selector more easily.
 
-There are some other syntax constructs and their meanings are as follows: The `&` (line 9, 11) means referrence to the parent node (like in less, sass or [stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)); In line 10, temme first sets `$accept` to `false`, then if temme finds that the parent node matches `.accepted-answer` (line 11), temme sets `$accept` to `true`.
+There are some other syntax constructs and their meanings are as follows: The `&` (line 9, 11) means reference to the parent node (like in less, sass or [stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)); In line 10, temme first sets `$accept` to `false`, then if temme finds that the parent node matches `.accepted-answer` (line 11), temme sets `$accept` to `true`.
 
 When implementing a web crawler, we first analyze the structure of the web page, then write down the temme-selector on the playground for every kind of page, and then save the selector to a file. When the crawler have downloaded the HTML document, we use the corresponding selector to extract JSON from HTML.
 
 ## Conclusion
 
-The examples have covered most of the temme. In practice, most websites have a clear HTML structure which is easy to analyze, and temme fits well in such situations. In my experience coding the crawlers, temme turns out to be a concise and convenient tool to extract structured JSON from HTML. You can goto [the GitHub repository](https://github.com/shinima/temme) for the full documentation.
+The examples have covered most of the temme. In practice, most websites have a clear HTML structure which is easy to analyze, and temme fits well in such situations. In my experience coding the crawlers, temme turns out to be a concise and convenient tool to extract structured JSON from HTML. You can go to [the GitHub repository](https://github.com/shinima/temme) for the full documentation.

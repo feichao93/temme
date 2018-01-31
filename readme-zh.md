@@ -320,7 +320,7 @@ Content，也就是常规选择器后面花括号中的部分。Content 用于�
 
 1. 捕获.  会抓取将结点的文本内容或是 HTML 到指定的字段；
 2. 赋值.  该形式类似条件赋值，当 temme 找到一个满足常规选择器的结点时，会执行该赋值；
-3. 内容函数调用 **(experimental)**  具体见下方。
+3. 内容函数调用.  具体见下方。
 
 ### Content 中的捕获
 
@@ -356,7 +356,7 @@ temme(html, selector)
 // }
 ```
 
-### 内容函数 (experimental)
+### 内容函数
 
 调用一个内容函数，参数依次为：将捕获结果对象，结点，以及圆括号中的参数。内容函数可以同时进行匹配和捕获，详情请看[源代码](/src/contentFunctions.ts)。
 
@@ -379,7 +379,7 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 //=> null
 ```
 
-### 使用自定义的内容函数 (experimental)
+### 使用自定义的内容函数
 
 ```JavaScript
 import { contentFunctions } from 'temme'
@@ -404,7 +404,7 @@ function myContentFn(result, node, capture1, string2) {
 
 内容函数是一个功能强大的机制。不过在大部分场景中，我们都是不需要使用该机制的。temme 支持伪类选择器（由 [css-select](https://github.com/fb55/css-select#supported-selectors) 实现）。尤其是 `:contains`， `:not` 和 `:has` 这三个伪类选择器，大大提升了选择器的能力。在使用自定义的内容函数之前，先尝试一下伪类选择器是否满足需求。
 
-## 片段 (experimental)
+## 片段
 
 片段用于复用选择器。当父选择器不同而子选择器非常类似的时候，片段可用于消除重复。
 
