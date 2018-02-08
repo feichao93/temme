@@ -56,7 +56,7 @@
     "html-webpack-plugin": "^2.30.1",
     "jest": "^22.0.3",
     "lodash.debounce": "^4.0.8",
-    "node-fetch": "^1.7.1",
+    "node-fetch": "^2.0.0",
     "pegjs": "^0.10.0",
     "pegjs-loader": "^0.5.4",
     "pretty": "^2.0.0",
