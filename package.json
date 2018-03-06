@@ -50,7 +50,7 @@
     "@types/node": "^9.3.0",
     "@types/pegjs": "^0.10.0",
     "@types/webpack": "^3.8.1",
-    "awesome-typescript-loader": "^3.4.1",
+    "awesome-typescript-loader": "^4.0.0",
     "babel-minify-webpack-plugin": "^0.3.0",
     "coveralls": "^3.0.0",
     "html-webpack-plugin": "^2.30.1",
