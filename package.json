@@ -49,7 +49,7 @@
     "@types/jest": "^22.0.0",
     "@types/node": "^9.3.0",
     "@types/pegjs": "^0.10.0",
-    "@types/webpack": "^3.8.1",
+    "@types/webpack": "^4.0.0",
     "awesome-typescript-loader": "^3.4.1",
     "babel-minify-webpack-plugin": "^0.3.0",
     "coveralls": "^3.0.0",
