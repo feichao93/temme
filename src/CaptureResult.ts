@@ -1,4 +1,4 @@
-import * as invariant from 'invariant'
+import invariant from 'invariant'
 import { Filter } from './interfaces'
 import { FilterFnMap, FilterFn } from './filters'
 import { defaultCaptureKey } from './constants'

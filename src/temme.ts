@@ -1,5 +1,5 @@
-import * as cheerio from 'cheerio'
-import * as invariant from 'invariant'
+import cheerio from 'cheerio'
+import invariant from 'invariant'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import { contentFunctions } from './contentFunctions'
 import { check, msg } from './check'

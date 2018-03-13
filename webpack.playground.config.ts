@@ -1,9 +1,8 @@
-const MinifyPlugin = require('babel-minify-webpack-plugin')
-import * as HtmlWebpackPlugin from 'html-webpack-plugin'
-import * as webpack from 'webpack'
-import * as path from 'path'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import webpack from 'webpack'
+import path from 'path'
 
-const config: (env: any) => webpack.Configuration = (env: any) => ({
+const config: webpack.Configuration = {
   context: __dirname,
   entry: './playground/index.js',
   devtool: false,
@@ -38,9 +37,7 @@ const config: (env: any) => webpack.Configuration = (env: any) => ({
     new HtmlWebpackPlugin({
       template: 'playground/index.html',
     }),
-  ].concat((env && env.production) ? [
-    new MinifyPlugin(),
-  ] : []),
+  ],
 
   devServer: {
     contentBase: [
@@ -48,6 +45,6 @@ const config: (env: any) => webpack.Configuration = (env: any) => ({
       path.resolve(__dirname, 'playground/public'),
     ],
   },
-})
+}
 
 export default config

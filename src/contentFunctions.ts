@@ -1,4 +1,4 @@
-import * as invariant from 'invariant'
+import invariant from 'invariant'
 import { Capture } from './interfaces'
 import { CaptureResult } from './CaptureResult'
 import { msg } from './check'

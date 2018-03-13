@@ -2,9 +2,12 @@ import * as webpack from 'webpack'
 import * as path from 'path'
 
 const config: webpack.Configuration = {
+  mode: 'production',
   context: __dirname,
   entry: './src/index.ts',
-  devtool: false,
+  optimization: {
+    minimize: false,
+  },
   target: 'node',
   output: {
     path: path.resolve(__dirname, 'build'),

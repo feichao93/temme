@@ -1,4 +1,4 @@
-import * as invariant from 'invariant'
+import invariant from 'invariant'
 import { Section, Qualifier, AttributeQualifier, Capture } from './interfaces'
 import { msg } from './check'
 
