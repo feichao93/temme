@@ -1,0 +1,37 @@
+{
+  "name": "temme-vscode-extension",
+  "private": true,
+  "displayName": "temme-vscode-extension",
+  "description": "",
+  "version": "0.0.1",
+  "publisher": "feichao",
+  "engines": {
+    "vscode": "^1.22.0"
+  },
+  "categories": ["Languages"],
+  "scripts": {
+    "start":
+      "supervisor --no-restart-on exit --watch temme.tmLanguage.yaml -e yaml -- compile.js"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "temme",
+        "aliases": ["temme", "temme"],
+        "extensions": [".temme"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "temme",
+        "scopeName": "source.temme",
+        "path": "./output/temme.tmLanguage.json"
+      }
+    ]
+  },
+  "devDependencies": {
+    "js-yaml": "^3.11.0",
+    "supervisor": "^0.12.0"
+  }
+}
