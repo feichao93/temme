@@ -13,7 +13,7 @@ import {
   ContentPart,
   AttributeQualifier,
   NormalSelector,
-  SelfSelector,
+  ParentRefSelector,
   SnippetDefine,
 } from './interfaces'
 
@@ -63,7 +63,6 @@ export default function temme(
 
   rootSelectorArray.forEach(checkRootSelector)
 
-  // TODO 转换为 Map
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   const snippetsMap = new Map<string, SnippetDefine>()
 
@@ -105,7 +104,7 @@ export default function temme(
           const { name, filterList } = selector.arrayCapture
           result.add(name, [], filterList)
         }
-      } else if (selector.type === 'self-selector') {
+      } else if (selector.type === 'parent-ref-selector') {
         const cssSelector = makeNormalCssSelector([selector.section])
         if (cntCheerio.is(cssSelector)) {
           result.merge(capture(cntCheerio, selector))
@@ -142,7 +141,7 @@ export default function temme(
   }
 
   /** Capture the node according to the selector. Returns an `CaptureResult`. */
-  function capture(node: Cheerio, selector: NormalSelector | SelfSelector): CaptureResult {
+  function capture(node: Cheerio, selector: NormalSelector | ParentRefSelector): CaptureResult {
     const result = new CaptureResult(filterFnMap)
 
     if (selector.type === 'normal-selector') {
@@ -155,7 +154,7 @@ export default function temme(
       )
       result.mergeWithFailPropagation(captureContent(node, content))
     } else {
-      // selector.type === 'self-selector'
+      // selector.type === 'parent-ref-selector'
       const {
         section: { qualifiers },
         content,

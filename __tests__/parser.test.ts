@@ -113,6 +113,8 @@ describe('parse JavaScript literals', () => {
     expect(temmeParser.parse(`$value = 0x1234;`)).toEqual(getExpected(0x1234))
     expect(temmeParser.parse(`$value = 0b1010;`)).toEqual(getExpected(0b1010))
     expect(temmeParser.parse(`$value = -0xabcd;`)).toEqual(getExpected(-0xabcd))
+    expect(temmeParser.parse(`$value = +0b1010;`)).toEqual(getExpected(+0b1010))
+    expect(temmeParser.parse(`$value = - 0b1111;`)).toEqual(getExpected(-0b1111))
   })
 
   test('boolean and null', () => {
@@ -380,7 +382,7 @@ test('test parent-reference', () => {
       sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
       children: [
         {
-          type: 'self-selector',
+          type: 'parent-ref-selector',
           section: { combinator: ' ', element: '*', qualifiers: [] },
           content: [{ capture: { filterList: [], name: 'value' }, type: 'capture' }],
         },

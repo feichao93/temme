@@ -8,46 +8,63 @@ const html = fs.readFileSync(
 )
 
 test('invalid filter name', () => {
-  // prettier-ignore
-  expect(() => temme(html, `
-    #question-header .question-hyperlink[href=$url]{$title|foo}
-  `)).toThrowError(msg.invalidFilter('foo'))
+  expect(() =>
+    temme(html, `#question-header .question-hyperlink[href=$url]{$title|foo}`),
+  ).toThrowError(msg.invalidFilter('foo'))
 })
 
-test('self-selector at top', () => {
-  // prettier-ignore
-  expect(() => temme(html, `&[attr=$value];`))
-    .toThrowError(msg.selfSelectorAtTopLevel())
+test('define filter in children selector', () => {
+  expect(() =>
+    temme('<div>test-html</div>', `div@ { filter myFilter() { return this } }`),
+  ).toThrowError(msg.filterDefineNotAtTopLevel('myFilter'))
 })
 
-// prettier-ignore
+test('define the same filter twice', () => {
+  expect(() =>
+    temme(
+      '<div>test-html</div>',
+      `filter myFilter() { return this }
+      filter myFilter() { return this }`,
+    ),
+  ).toThrowError(msg.filterAlreadyDefined('myFilter'))
+})
+
+test('parent-ref-selector at top', () => {
+  expect(() => temme(html, `&[attr=$value];`)).toThrowError(msg.parentRefSelectorAtTopLevel())
+})
+
 test('wrong syntax example 1', () => {
-  expect(() => temme(html, `
-    #question-header .question-hyperlink @
-  `)).toThrowError()
+  expect(() => temme(html, `#question-header .question-hyperlink @`)).toThrowError()
 })
 
 test('wrong syntax example 2', () => {
-  // prettier-ignore
-  expect(() => temme(html, `.answer@ (
-    .votecell .vote-count-post{$upvote},
-    .post-test{$postText},
-    .user-info .user-details>a{$userName},
-    .comment@comments [error here] (
-      .comment-score{$score},
-      .comment-copy{$content|substring10},
-      .comment-user[href=$userUrl]{$userName},
-      .comment-data span[title=$data],
+  expect(() =>
+    temme(
+      html,
+      `.answer@ (
+        .votecell .vote-count-post{$upvote},
+        .post-test{$postText},
+        .user-info .user-details>a{$userName},
+        .comment@comments [error here] (
+          .comment-score{$score},
+          .comment-copy{$content|substring10},
+          .comment-user[href=$userUrl]{$userName},
+          .comment-data span[title=$data],
+        ),
+      )`,
     ),
-  )
-  `)).toThrowError()
+  ).toThrowError()
 })
 
-test('error in content part', () => {
-  // prettier-ignore
-  expect(() => temme(html, `div@|pack{
-    p{foo($name, '-', $_)};
-  }`)).toThrowError(msg.invalidContentFunction('foo'))
+test('some tests', () => {
+  expect(() =>
+    temme(
+      html,
+      `div@|pack{
+        p{foo($name, '-', $_)};
+      }`,
+    ),
+  ).toThrowError(msg.invalidContentFunction('foo'))
 
   expect(() => {
     contentFunctions.remove('match')
@@ -57,10 +74,15 @@ test('error in content part', () => {
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`)).toThrowError(
     msg.hasLeadingAttributeCapture(),
   )
+
+  expect(() => temme(html, `div[class^=$value];`)).toThrowError(msg.valueCaptureWithOtherOperator())
+
+  expect(() => temme('<li class="abc"></li>', `li[class=$||trim];`)).toThrowError(
+    msg.arrayFilterAppliedToNonArrayValue('trim'),
+  )
 })
 
-// prettier-ignore
-test('error in snippets', () => {
+test('define snippet in children selector', () => {
   const html = `<div>test html</div>`
   const selector = `
 div@ {
@@ -68,11 +90,25 @@ div@ {
     $foo = 'bar';
   };
 }`
-  expect(() => temme(html, selector))
-    .toThrowError(msg.snippetDefineNotAtTopLevel('xxx'))
+  expect(() => temme(html, selector)).toThrowError(msg.snippetDefineNotAtTopLevel('xxx'))
 })
 
-test('circular snippet expansion dectection', () => {
+test('use an undefined snippet', () => {
+  expect(() => temme('<div>test-html</div>', `div@ { @mySnippet; }`)).toThrowError(
+    msg.snippetNotDefined('mySnippet'),
+  )
+})
+
+test('snippet is already defined', () => {
+  const html = `<div>test html</div>`
+  const selector = `
+@foo = { div{$text}; };
+@foo = { li@list { &{$text} } };
+`
+  expect(() => temme(html, selector)).toThrowError(msg.snippetAlreadyDefined('foo'))
+})
+
+test('circular snippet expansion detection', () => {
   const html = '<div>test html</div>'
   const selector = `
     @foo = {
@@ -94,7 +130,7 @@ test('circular snippet expansion dectection', () => {
   )
 })
 
-test('circular snippet expansion dectection', () => {
+test('circular snippet expansion detection', () => {
   const html = '<div>test html</div>'
   const selector = `
     @foo = {

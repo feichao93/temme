@@ -2,8 +2,14 @@ import temme, { TemmeSelector, temmeParser } from '../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
 
-const stHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
-const maigooHtml = fs.readFileSync(path.resolve(__dirname, './testHtml/maigoo-brand-page.html'), 'utf8')
+const stHtml = fs.readFileSync(
+  path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'),
+  'utf8',
+)
+const maigooHtml = fs.readFileSync(
+  path.resolve(__dirname, './testHtml/maigoo-brand-page.html'),
+  'utf8',
+)
 
 test('text matching', () => {
   const selector = `
@@ -48,7 +54,8 @@ test('array capture', () => {
       { upvote: '18', userName: 'Jeremy Cantrell' },
       { upvote: '13', userName: 'brianray' },
       { upvote: '6', userName: 'Community' },
-      { upvote: '5', userName: 'bobince' }],
+      { upvote: '5', userName: 'bobince' },
+    ],
   })
 })
 
@@ -68,11 +75,36 @@ test('complex example: recursive array capture, default capture', () => {
   expect(temme(stHtml, selector)).toEqual([
     {
       comments: [
-        { content: 'U did not ', score: 1, userName: 'Lakshman Prasad', userUrl: '/users/55562/lakshman-prasad' },
-        { content: 'my intuiti', score: 1, userName: 'Conrad.Dean', userUrl: '/users/656833/conrad-dean' },
-        { content: 'As a cavea', score: 22, userName: 'Peter Gibson', userUrl: '/users/66349/peter-gibson' },
-        { content: 'Actually @', score: 7, userName: 'martineau', userUrl: '/users/355230/martineau' },
-        { content: '@Jonathan:', score: 2, userName: 'martineau', userUrl: '/users/355230/martineau' },
+        {
+          content: 'U did not ',
+          score: 1,
+          userName: 'Lakshman Prasad',
+          userUrl: '/users/55562/lakshman-prasad',
+        },
+        {
+          content: 'my intuiti',
+          score: 1,
+          userName: 'Conrad.Dean',
+          userUrl: '/users/656833/conrad-dean',
+        },
+        {
+          content: 'As a cavea',
+          score: 22,
+          userName: 'Peter Gibson',
+          userUrl: '/users/66349/peter-gibson',
+        },
+        {
+          content: 'Actually @',
+          score: 7,
+          userName: 'martineau',
+          userUrl: '/users/355230/martineau',
+        },
+        {
+          content: '@Jonathan:',
+          score: 2,
+          userName: 'martineau',
+          userUrl: '/users/355230/martineau',
+        },
       ],
       upvote: '259',
       userName: 'Community',
@@ -90,7 +122,12 @@ test('complex example: recursive array capture, default capture', () => {
     {
       comments: [
         { content: 'This is ou', score: 4, userName: 'Brian', userUrl: '/users/9493/brian' },
-        { content: 'I\'m sorry,', score: 0, userName: 'Rizwan Kassim', userUrl: '/users/35335/rizwan-kassim' },
+        {
+          content: "I'm sorry,",
+          score: 0,
+          userName: 'Rizwan Kassim',
+          userUrl: '/users/35335/rizwan-kassim',
+        },
       ],
       upvote: '6',
       userName: 'Community',
@@ -117,23 +154,24 @@ test('complex case: multiple parent-refs', () => {
     },
 
     extractPresidentUrl(this: string) {
-      if (this.indexOf('首席执行官') !== -1
-        || this.indexOf('总裁') !== -1
-        || this.indexOf('董事长') !== -1
-        || this.indexOf('CEO') !== -1) {
+      if (
+        this.indexOf('首席执行官') !== -1 ||
+        this.indexOf('总裁') !== -1 ||
+        this.indexOf('董事长') !== -1 ||
+        this.indexOf('CEO') !== -1
+      ) {
         const [_, presidentUrl]: string[] = this.match(/href="(.*)"/) || []
         return presidentUrl
       }
-    }
+    },
   }
 
-  expect(temme(maigooHtml, selector, filters))
-    .toEqual({
-      phone: ['400-100-5678'],
-      foundTime: '2010年',
-      officialWebsite: 'http://www.mi.com/',
-      origination: '北京市',
-      presidentUrl: 'http://www.maigoo.com/mingren/848.html',
-      adText: '小米，为发烧而生',
-    })
+  expect(temme(maigooHtml, selector, filters)).toEqual({
+    phone: ['400-100-5678'],
+    foundTime: '2010年',
+    officialWebsite: 'http://www.mi.com/',
+    origination: '北京市',
+    presidentUrl: 'http://www.maigoo.com/mingren/848.html',
+    adText: '小米，为发烧而生',
+  })
 })

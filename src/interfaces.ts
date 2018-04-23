@@ -16,7 +16,7 @@ export interface Filter {
 }
 
 export type TemmeSelector =
-  | SelfSelector
+  | ParentRefSelector
   | NormalSelector
   | Assignment
   | SnippetDefine
@@ -24,7 +24,7 @@ export type TemmeSelector =
   | FilterDefine
 
 export type ExpandedTemmeSelector =
-  | SelfSelector
+  | ParentRefSelector
   | NormalSelector
   | Assignment
   | SnippetDefine
@@ -38,8 +38,8 @@ export interface NormalSelector {
   children: TemmeSelector[]
 }
 
-export interface SelfSelector {
-  type: 'self-selector'
+export interface ParentRefSelector {
+  type: 'parent-ref-selector'
   section: Section
   content: ContentPart[]
 }

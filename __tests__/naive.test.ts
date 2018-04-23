@@ -25,11 +25,7 @@ describe('test filters', () => {
   </ul>
   `
     const selector = 'li@|slice(1,4){ &{$} }'
-    expect(temme(cheerio.load(html), selector)).toEqual([
-      'banana',
-      'cherry',
-      'pear',
-    ])
+    expect(temme(cheerio.load(html), selector)).toEqual(['banana', 'cherry', 'pear'])
   })
 })
 

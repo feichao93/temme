@@ -1,4 +1,4 @@
-import { msg, CaptureResult, defaultFilterMap, } from '../src'
+import { msg, CaptureResult, defaultFilterMap } from '../src'
 
 test('get null from empty CaptureResult instance', () => {
   const emptyCaptureResult = new CaptureResult({})
@@ -166,13 +166,17 @@ test('apply multiple filters', () => {
     k1: 23,
   })
 
-  r.add('k2', [0, 'a', 'b', 'c', 'd', false], [
-    { isArrayFilter: false, name: 'compact', args: [] }, // [ 'a', 'b', 'c', 'd' ]
-    { isArrayFilter: false, name: 'join', args: [','] }, // 'a,b,c,d'
-    { isArrayFilter: false, name: 'substring', args: [0, 3] }, // 'a,b'
-    { isArrayFilter: false, name: 'split', args: [','] }, // [ 'a', 'b' ]
-    { isArrayFilter: false, name: 'slice', args: [1] }, // [ 'b' ]
-  ])
+  r.add(
+    'k2',
+    [0, 'a', 'b', 'c', 'd', false],
+    [
+      { isArrayFilter: false, name: 'compact', args: [] }, // [ 'a', 'b', 'c', 'd' ]
+      { isArrayFilter: false, name: 'join', args: [','] }, // 'a,b,c,d'
+      { isArrayFilter: false, name: 'substring', args: [0, 3] }, // 'a,b'
+      { isArrayFilter: false, name: 'split', args: [','] }, // [ 'a', 'b' ]
+      { isArrayFilter: false, name: 'slice', args: [1] }, // [ 'b' ]
+    ],
+  )
 
   expect(r.get()).toEqual({
     k1: 23,
@@ -182,15 +186,17 @@ test('apply multiple filters', () => {
 
 test('invalid filter', () => {
   const r = new CaptureResult(defaultFilterMap)
-  expect(() => r.add('k1', [], [{ isArrayFilter: false, name: 'compact', args: [] }]))
-    .not.toThrow()
+  expect(() => r.add('k1', [], [{ isArrayFilter: false, name: 'compact', args: [] }])).not.toThrow()
 
-  expect(() => r.add('k2', 'value-2', [{ isArrayFilter: false, name: 'foo', args: [1, 2, 3] }]))
-    .toThrow(msg.invalidFilter('foo'))
+  expect(() =>
+    r.add('k2', 'value-2', [{ isArrayFilter: false, name: 'foo', args: [1, 2, 3] }]),
+  ).toThrow(msg.invalidFilter('foo'))
 
-  expect(() => r.add('k3', 'value-3', [{ isArrayFilter: false, name: 'trim', args: [] }]))
-    .not.toThrow()
+  expect(() =>
+    r.add('k3', 'value-3', [{ isArrayFilter: false, name: 'trim', args: [] }]),
+  ).not.toThrow()
 
-  expect(() => r.add('k4', 'value-4', [{ isArrayFilter: false, name: 'bar', args: [] }]))
-    .toThrow(msg.invalidFilter('bar'))
+  expect(() => r.add('k4', 'value-4', [{ isArrayFilter: false, name: 'bar', args: [] }])).toThrow(
+    msg.invalidFilter('bar'),
+  )
 })

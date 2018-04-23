@@ -39,20 +39,20 @@ Start
   }
 
 // 选择器
-Selector = FilterDefine / SelfSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
+Selector = FilterDefine / ParentRefSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
 
 // 自身选择器, 以 & 为开头的选择器
-SelfSelector
+ParentRefSelector
   = '&' __ section:Section? __ content:Content SelectorEnd? {
     return {
-      type: 'self-selector',
+      type: 'parent-ref-selector',
       section: section || defaultSection,
       content,
     }
   }
   / '&' __ section:Section SelectorEnd {
     return {
-      type: 'self-selector',
+      type: 'parent-ref-selector',
       section,
       content: [],
     }

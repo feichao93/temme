@@ -10,24 +10,23 @@ export const msg = {
   hasLeadingAttributeCapture() {
     return 'Attribute capturing is only allowed in the last css section. Capture in leading css-selectors will be omitted.'
   },
-  selfSelectorAtTopLevel() {
-    // TODO change to: Parent-reference must not be at top level.
-    return `Self-selector should not be at top level.`
+  parentRefSelectorAtTopLevel() {
+    return `Parent-reference must not be at top level.`
   },
   snippetAlreadyDefined(name: string) {
-    return `Snippet ${name} is already defined.`
+    return `Snippet \`${name}\` is already defined.`
   },
   snippetDefineNotAtTopLevel(name: string) {
-    return `The definition of snippet ${name} must be at top level.`
+    return `The definition of snippet \`${name}\` must be at top level.`
   },
   filterDefineNotAtTopLevel(name: string) {
-    return `The definition of inline filter ${name} must be at top level.`
+    return `The definition of inline filter \`${name}\` must be at top level.`
   },
   filterAlreadyDefined(name: string) {
-    return `Filter ${name} is already defined.`
+    return `Filter \`${name}\` is already defined.`
   },
   snippetNotDefined(name: string) {
-    return `Snippet ${name} is not defined.`
+    return `Snippet \`${name}\` is not defined.`
   },
   valueCaptureWithOtherOperator() {
     return 'Value capture in attribute qualifier only works with `=` operator.'
@@ -36,7 +35,7 @@ export const msg = {
     return `Circular snippet expansion detected: ${loop.join(' -> ')}`
   },
   arrayFilterAppliedToNonArrayValue(filterName: string) {
-    return `Array-filter ${filterName} can only be applied to an array.`
+    return `Array-filter \`${filterName}\` can only be applied to an array.`
   },
 }
 
@@ -54,8 +53,8 @@ function containsAnyCapture(sections: Section[]) {
 
 export function checkRootSelector(selector: TemmeSelector) {
   commonCheck(selector)
-  if (selector.type === 'self-selector') {
-    throw new Error(msg.selfSelectorAtTopLevel())
+  if (selector.type === 'parent-ref-selector') {
+    throw new Error(msg.parentRefSelectorAtTopLevel())
   } else if (selector.type === 'normal-selector') {
     for (const child of selector.children) {
       checkChild(child)
