@@ -1,8 +1,9 @@
-import temme, { temmeParser, cheerio } from '../src/temme'
 import debounce from 'lodash.debounce'
 import examples from './examples'
 import loadExamples from './loadExample'
 import pretty from 'pretty'
+
+const { default: temme, temmeParser, cheerio } = Temme
 
 /* example mode */
 const url = new URL(document.URL)
@@ -98,7 +99,7 @@ const resultHint = {
 function cacheSingleParamFn(fn) {
   let lastArg = null
   let lastResult = null
-  return function (arg) {
+  return function(arg) {
     if (arg !== lastArg) {
       lastResult = fn(arg)
     }
@@ -202,7 +203,6 @@ window.addEventListener('beforeunload', () => {
     }
   }
 })
-
 
 /* kick start! */
 browseExampleLink.href = `?example=${examples[0].name}`
