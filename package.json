@@ -12,11 +12,11 @@
   "engines": {
     "node": ">= 6"
   },
-  "files": ["LICENSE", "readme.md", "bin/", "build/"],
+  "files": ["LICENSE", "readme.md", "bin/", "build/", "browser/"],
   "scripts": {
     "test":
       "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "build": "webpack",
+    "build": "webpack --env.node --env.web",
     "build-playground":
       "webpack --config webpack.playground.config.ts --mode production && cp -r playground/public/* playground-build"
   },

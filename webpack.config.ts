@@ -1,20 +1,35 @@
 import * as webpack from 'webpack'
 import * as path from 'path'
 
-const config: webpack.Configuration = {
-  mode: 'production',
-  context: __dirname,
-  entry: './src/index.ts',
+const webConfig: webpack.Configuration = {
+  target: 'web',
+  output: {
+    path: path.resolve(__dirname, 'browser'),
+    filename: 'index.js',
+    library: 'Temme',
+    libraryTarget: 'var',
+  },
+  externals: ['pegjs'],
+}
+
+const nodeConfig: webpack.Configuration = {
+  target: 'node',
   optimization: {
     minimize: false,
   },
-  target: 'node',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'index.js',
     library: 'temme',
-    libraryTarget: 'umd',
+    libraryTarget: 'commonjs2',
   },
+  externals: ['cheerio', 'pegjs'],
+}
+
+const baseConfig: webpack.Configuration = {
+  mode: 'production',
+  context: __dirname,
+  entry: './src/index.ts',
 
   resolve: {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -24,14 +39,14 @@ const config: webpack.Configuration = {
     rules: [
       {
         test: /\.pegjs$/,
-        loader: 'pegjs-loader'
+        loader: 'pegjs-loader',
       },
       {
         test: /\.tsx?$/,
         loader: 'awesome-typescript-loader',
         exclude: /node_modules/,
       },
-    ]
+    ],
   },
 
   plugins: [
@@ -39,7 +54,15 @@ const config: webpack.Configuration = {
       WEBPACK_BUILD: JSON.stringify(true),
     }),
   ],
-  externals: ['cheerio', 'pegjs'],
 }
 
-export default config
+export default (env: any) => {
+  const result = []
+  if (Boolean(env && env.node)) {
+    result.push(Object.assign({}, baseConfig, nodeConfig))
+  }
+  if (Boolean(env && env.web)) {
+    result.push(Object.assign({}, baseConfig, webConfig))
+  }
+  return result
+}
