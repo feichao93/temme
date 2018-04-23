@@ -15,14 +15,16 @@ export interface Filter {
   args: Literal[]
 }
 
-export type TemmeSelector = SelfSelector
+export type TemmeSelector =
+  | SelfSelector
   | NormalSelector
   | Assignment
   | SnippetDefine
   | SnippetExpand
   | FilterDefine
 
-export type ExpandedTemmeSelector = SelfSelector
+export type ExpandedTemmeSelector =
+  | SelfSelector
   | NormalSelector
   | Assignment
   | SnippetDefine
@@ -62,7 +64,7 @@ export interface SnippetExpand {
 export interface FilterDefine {
   type: 'filter-define'
   name: string
-  argNames: string
+  argsPart: string
   code: string
 }
 
@@ -100,7 +102,6 @@ export interface PseudoQualifier {
   name: string
   content: string
 }
-
 
 export type ContentPart = ContentPartCapture | Assignment | ContentPartCall
 

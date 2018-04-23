@@ -43,14 +43,14 @@ Selector = FilterDefine / SelfSelector / NormalSelector / AssignmentSelector / S
 
 // 自身选择器, 以 & 为开头的选择器
 SelfSelector
-  = '&' section:Section? content:Content SelectorEnd? {
+  = '&' __ section:Section? __ content:Content SelectorEnd? {
     return {
       type: 'self-selector',
       section: section || defaultSection,
       content,
     }
   }
-  / '&' section:Section SelectorEnd {
+  / '&' __ section:Section SelectorEnd {
     return {
       type: 'self-selector',
       section,
@@ -127,31 +127,23 @@ SnippetExpand
 FilterDefine
   = 'filter'
     __ name:IdentifierName
-    __ argNames:FunctionDefineArgNames
+    __ argsPart:FilterArgsPart
     __ code:CodeBlock
     SelectorEnd? {
     return {
       type: 'filter-define',
       name,
-      argNames,
+      argsPart,
       code,
     }
   }
 
-FunctionDefineArgNames
-  = '(' __ ')' {
-    return []
-  }
-  / '('
-    __ head:RestIdentifierName
-    tail:(__ ',' __ RestIdentifierName)*
-    OptionalExtraComma
-    __ ')' {
-    return buildList(head, tail, 3)
-  }
+FilterArgsPart
+  = '(' str:FilterArgsString ')' { return str }
+  / '(' { error('Unbalanced parenthesis.') }
 
-RestIdentifierName
-  = $(('...' __)? IdentifierName)
+FilterArgsString
+  = $((![()] SourceCharacter)+ / '(' FilterArgsString ')')*
 
 Assignment
   = capture:ValueCapture __ '=' __ value:Literal {
@@ -382,8 +374,24 @@ BooleanLiteral
   / FalseToken { return false }
 
 NumericLiteral "number"
-  = literal:DecimalLiteral !(IdentifierStart / DecimalDigit) {
-    return literal
+  = sign:[+-]? __
+    literal:(HexIntegerLiteral / BinaryIntegerLiteral / DecimalLiteral)
+    !(IdentifierStart / DecimalDigit) {
+    if (sign === '-') {
+      return -literal
+    } else {
+      return literal
+    }
+  }
+
+HexIntegerLiteral
+  = "0x"i digits:$HexDigit+ {
+    return Number(text())
+  }
+
+BinaryIntegerLiteral
+  = "0b"i digits:$[01]+ {
+    return Number(text())
   }
 
 DecimalLiteral

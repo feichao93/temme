@@ -2,14 +2,10 @@ import cheerio from 'cheerio'
 import invariant from 'invariant'
 import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import { contentFunctions } from './contentFunctions'
-import { check, msg } from './check'
+import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
 import { specialFilterNames } from './constants'
-import {
-  makeNormalCssSelector,
-  isCheerioStatic,
-  isAttributeQualifier,
-} from './utils'
+import { makeNormalCssSelector, isCheerioStatic, isAttributeQualifier } from './utils'
 import {
   Dict,
   TemmeSelector,
@@ -55,22 +51,23 @@ export default function temme(
     $ = cheerio.load(html)
   }
 
-  let rootSelector: TemmeSelector[]
+  let rootSelectorArray: TemmeSelector[]
   if (typeof selector === 'string') {
-    rootSelector = temmeParser.parse(selector)
+    rootSelectorArray = temmeParser.parse(selector)
   } else {
-    rootSelector = selector
+    rootSelectorArray = selector
   }
-  if (rootSelector.length === 0) {
+  if (rootSelectorArray.length === 0) {
     return null
   }
 
-  rootSelector.forEach(check)
+  rootSelectorArray.forEach(checkRootSelector)
 
+  // TODO 转换为 Map
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   const snippetsMap = new Map<string, SnippetDefine>()
 
-  return helper($.root(), rootSelector).get()
+  return helper($.root(), rootSelectorArray).get()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
@@ -81,9 +78,10 @@ export default function temme(
         invariant(!snippetsMap.has(selector.name), msg.snippetAlreadyDefined(selector.name))
         snippetsMap.set(selector.name, selector)
       } else if (selector.type === 'filter-define') {
-        const { name, argNames, code } = selector
-        // invariant(!(name in filterFnMap), `Filter ${name} already exists.`)
-        filterFnMap[name] = new Function(...argNames, code) as FilterFn
+        const { name, argsPart, code } = selector
+        invariant(!(name in filterFnMap), msg.filterAlreadyDefined(name))
+        const funcString = `(function (${argsPart}) { ${code} })`
+        filterFnMap[name] = eval(funcString)
       }
     }
 
@@ -98,7 +96,8 @@ export default function temme(
 
           if (selector.arrayCapture) {
             const { name, filterList } = selector.arrayCapture
-            const beforeValue = subCheerio.toArray()
+            const beforeValue = subCheerio
+              .toArray()
               .map(sub => helper($(sub), selector.children).get())
             result.add(name, beforeValue, filterList)
           }
@@ -122,7 +121,10 @@ export default function temme(
   /** Expand snippets recursively.
    * The returned selector array will not contain any `SnippetExpand`.
    * `expanded` is used to detect circular expansion. */
-  function expandSnippets(selectorArray: TemmeSelector[], expanded: string[] = []): ExpandedTemmeSelector[] {
+  function expandSnippets(
+    selectorArray: TemmeSelector[],
+    expanded: string[] = [],
+  ): ExpandedTemmeSelector[] {
     const result: ExpandedTemmeSelector[] = []
     for (const selector of selectorArray) {
       if (selector.type === 'snippet-expand') {
@@ -148,11 +150,19 @@ export default function temme(
       // Value-captures in the last section will be processed.
       // Preceding value-captures will be ignored.
       const { qualifiers } = sections[sections.length - 1]
-      result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+      result.mergeWithFailPropagation(
+        captureAttributes(node, qualifiers.filter(isAttributeQualifier)),
+      )
       result.mergeWithFailPropagation(captureContent(node, content))
-    } else { // selector.type === 'self-selector'
-      const { section: { qualifiers }, content } = selector
-      result.mergeWithFailPropagation(captureAttributes(node, qualifiers.filter(isAttributeQualifier)))
+    } else {
+      // selector.type === 'self-selector'
+      const {
+        section: { qualifiers },
+        content,
+      } = selector
+      result.mergeWithFailPropagation(
+        captureAttributes(node, qualifiers.filter(isAttributeQualifier)),
+      )
       result.mergeWithFailPropagation(captureContent(node, content))
     }
     return result
@@ -161,10 +171,15 @@ export default function temme(
   function captureAttributes(node: Cheerio, attributeQualifiers: AttributeQualifier[]) {
     const result = new CaptureResult(filterFnMap)
     for (const qualifier of attributeQualifiers) {
-      if (qualifier.value != null && typeof qualifier.value === 'object') { // value-capture
-        const { attribute, value: { name, filterList } } = qualifier
+      if (qualifier.value != null && typeof qualifier.value === 'object') {
+        // value-capture
+        const {
+          attribute,
+          value: { name, filterList },
+        } = qualifier
         const attributeValue = node.attr(attribute)
-        if (attributeValue !== undefined) { // capture only when attribute exists
+        if (attributeValue !== undefined) {
+          // capture only when attribute exists
           result.add(name, attributeValue, filterList)
         }
       }
@@ -176,7 +191,9 @@ export default function temme(
     const result = new CaptureResult(filterFnMap)
     for (const part of content) {
       if (part.type === 'capture') {
-        const { capture: { name, filterList } } = part
+        const {
+          capture: { name, filterList },
+        } = part
         // `text`, `html` and `node` are three special filter names.
         // They have the same syntax with the normal filters, but have different running semantics.
         const firstFilterName = filterList[0] && filterList[0].name
@@ -187,7 +204,8 @@ export default function temme(
           initValue = $.html(node)
         } else if (firstFilterName === 'node') {
           initValue = cheerio(node)
-        } else { // `text` is the default filter
+        } else {
+          // `text` is the default filter
           initValue = node.text()
         }
         // Remove the first special filter.
@@ -196,9 +214,13 @@ export default function temme(
           : filterList
         result.add(name, initValue, normalFilterList)
       } else if (part.type === 'assignment') {
-        const { capture: { name, filterList }, value } = part
+        const {
+          capture: { name, filterList },
+          value,
+        } = part
         result.forceAdd(name, value, filterList)
-      } else { // part.type === 'call'
+      } else {
+        // part.type === 'call'
         const { funcName, args } = part
         contentFunctions.get(funcName)(result, node, args)
       }

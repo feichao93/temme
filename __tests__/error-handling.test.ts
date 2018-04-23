@@ -2,19 +2,25 @@ import * as path from 'path'
 import * as fs from 'fs'
 import temme, { msg, contentFunctions } from '../src'
 
-const html = fs.readFileSync(path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'), 'utf8')
+const html = fs.readFileSync(
+  path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'),
+  'utf8',
+)
 
 test('invalid filter name', () => {
+  // prettier-ignore
   expect(() => temme(html, `
     #question-header .question-hyperlink[href=$url]{$title|foo}
   `)).toThrowError(msg.invalidFilter('foo'))
 })
 
 test('self-selector at top', () => {
+  // prettier-ignore
   expect(() => temme(html, `&[attr=$value];`))
     .toThrowError(msg.selfSelectorAtTopLevel())
 })
 
+// prettier-ignore
 test('wrong syntax example 1', () => {
   expect(() => temme(html, `
     #question-header .question-hyperlink @
@@ -22,6 +28,7 @@ test('wrong syntax example 1', () => {
 })
 
 test('wrong syntax example 2', () => {
+  // prettier-ignore
   expect(() => temme(html, `.answer@ (
     .votecell .vote-count-post{$upvote},
     .post-test{$postText},
@@ -37,6 +44,7 @@ test('wrong syntax example 2', () => {
 })
 
 test('error in content part', () => {
+  // prettier-ignore
   expect(() => temme(html, `div@|pack{
     p{foo($name, '-', $_)};
   }`)).toThrowError(msg.invalidContentFunction('foo'))
@@ -46,10 +54,12 @@ test('error in content part', () => {
     console.log(temme(html, 'div{ match($foo) }'))
   }).toThrowError(msg.invalidContentFunction('match'))
 
-  expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`))
-    .toThrowError(msg.hasLeadingAttributeCapture())
+  expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`)).toThrowError(
+    msg.hasLeadingAttributeCapture(),
+  )
 })
 
+// prettier-ignore
 test('error in snippets', () => {
   const html = `<div>test html</div>`
   const selector = `
@@ -79,8 +89,9 @@ test('circular snippet expansion dectection', () => {
     };
     @foo;
   `
-  expect(() => temme(html, selector))
-    .toThrowError(msg.circularSnippetExpansion(['foo', 'bar', 'buzz', 'foo']))
+  expect(() => temme(html, selector)).toThrowError(
+    msg.circularSnippetExpansion(['foo', 'bar', 'buzz', 'foo']),
+  )
 })
 
 test('circular snippet expansion dectection', () => {

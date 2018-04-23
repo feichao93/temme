@@ -34,9 +34,7 @@ test('filter `compact`', () => {
       <li data-color="">watermelon</li>
     </ul>`
   const selector = `ul li@|compact{ &[data-color=$]; }`
-  expect(temme(html, selector)).toEqual([
-    'red', 'yellow', 'white'
-  ])
+  expect(temme(html, selector)).toEqual(['red', 'yellow', 'white'])
 })
 
 test('filter `flatten`', () => {
@@ -53,9 +51,7 @@ test('filter `flatten`', () => {
     </table>
     `
   const selector = `tr@|flatten{ td@{ &{$} } }`
-  expect(temme(html, selector)).toEqual([
-    '0-0', '0-1', '1-0', '1-1',
-  ])
+  expect(temme(html, selector)).toEqual(['0-0', '0-1', '1-0', '1-1'])
 })
 
 test('filter `first`, `last`, `nth`, `get`', () => {
@@ -82,7 +78,9 @@ test('filter `Number`, `String`, `Boolean`, `Date`', () => {
   expect(temme(`<p>1234</p>`, 'p{$|Boolean}')).toBe(true)
   expect(temme(`<p></p>`, 'p{$|Boolean}')).toBe(false)
 
-  expect(temme(`<p title="2017-09-28T16:00Z"></p>`, 'p[title=$|Date];').valueOf()).toBe(1506614400000)
+  expect(temme(`<p title="2017-09-28T16:00Z"></p>`, 'p[title=$|Date];').valueOf()).toBe(
+    1506614400000,
+  )
   expect(temme(`<p title="abc"></p>`, 'p[title=$|Date|String];')).toBe('Invalid Date')
 })
 
@@ -122,11 +120,11 @@ test('customized filter `wrap`', () => {
     '<fruit>banana</fruit>',
     '<fruit>cherry</fruit>',
     '<fruit>pear</fruit>',
-    '<fruit>watermelon</fruit>'
+    '<fruit>watermelon</fruit>',
   ])
 })
 
-test('inline filter `wrap`', () => {
+test('inline filter `wrap2`', () => {
   const html = `
     <ul>
       <li>apple</li>
@@ -136,17 +134,17 @@ test('inline filter `wrap`', () => {
       <li>watermelon</li>
     </ul>`
   const selector = `
-    filter wrap(tag) {
+    filter wrap2(tag) {
       return '<' + tag + '>' + this + '</' + tag + '>'
     }
-    li@{&{$|wrap('fruit')}};
+    li@{&{$|wrap2('fruit')}};
   `
   expect(temme(html, selector)).toEqual([
     '<fruit>apple</fruit>',
     '<fruit>banana</fruit>',
     '<fruit>cherry</fruit>',
     '<fruit>pear</fruit>',
-    '<fruit>watermelon</fruit>'
+    '<fruit>watermelon</fruit>',
   ])
 })
 
@@ -162,10 +160,45 @@ test('inline filter `append`', () => {
   }
   li@|append('pear', 'watermelon'){ &{$} };
   `
-  expect(temme(html, selector)).toEqual([
-    'apple',
-    'banana',
-    'pear',
-    'watermelon',
-  ])
+  expect(temme(html, selector)).toEqual(['apple', 'banana', 'pear', 'watermelon'])
+})
+
+test('filter with default parameters', () => {
+  const html = '<div>1</div>'
+  const selector = `
+  filter add(n = 0) {
+    return this + n
+  };
+  div{$x|add; $y|Number|add(2); $z|Number|add(-1)};
+  `
+  expect(temme(html, selector)).toEqual({
+    x: '10',
+    y: 3,
+    z: 0,
+  })
+})
+
+test('filter with spread operator', () => {
+  const html = '<div>1</div>'
+  const selector = `
+  filter addAll(...nums) {
+    return this + nums.reduce((a, b) => a + b, 0)
+  };
+  div{ $x|Number|addAll; $y|Number|addAll(1,2,3); };
+  `
+  expect(temme(html, selector)).toEqual({
+    x: 1,
+    y: 7,
+  })
+})
+
+test('use require in custom filter', () => {
+  const html = '<div>1</div>'
+  const selector = `
+  filter foo() {
+    return require('url').URL
+  };
+  div{$|foo};
+  `
+  expect(temme(html, selector)).toBe(require('url').URL)
 })

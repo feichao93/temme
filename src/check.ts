@@ -11,13 +11,20 @@ export const msg = {
     return 'Attribute capturing is only allowed in the last css section. Capture in leading css-selectors will be omitted.'
   },
   selfSelectorAtTopLevel() {
+    // TODO change to: Parent-reference must not be at top level.
     return `Self-selector should not be at top level.`
   },
   snippetAlreadyDefined(name: string) {
-    return `Snippet ${name} is already define.`
+    return `Snippet ${name} is already defined.`
   },
   snippetDefineNotAtTopLevel(name: string) {
-    return `The definition of snippet ${name} should be at top level.`
+    return `The definition of snippet ${name} must be at top level.`
+  },
+  filterDefineNotAtTopLevel(name: string) {
+    return `The definition of inline filter ${name} must be at top level.`
+  },
+  filterAlreadyDefined(name: string) {
+    return `Filter ${name} is already defined.`
   },
   snippetNotDefined(name: string) {
     return `Snippet ${name} is not defined.`
@@ -34,16 +41,18 @@ export const msg = {
 }
 
 function isCaptureQualifier(qualifier: Qualifier) {
-  return qualifier.type === 'attribute-qualifier'
-    && qualifier.value
-    && typeof qualifier.value === 'object'
+  return (
+    qualifier.type === 'attribute-qualifier' &&
+    qualifier.value &&
+    typeof qualifier.value === 'object'
+  )
 }
 
 function containsAnyCapture(sections: Section[]) {
   return sections.some(section => section.qualifiers.some(isCaptureQualifier))
 }
 
-export function check(selector: TemmeSelector) {
+export function checkRootSelector(selector: TemmeSelector) {
   commonCheck(selector)
   if (selector.type === 'self-selector') {
     throw new Error(msg.selfSelectorAtTopLevel())
@@ -73,6 +82,8 @@ export function checkChild(selector: TemmeSelector) {
   commonCheck(selector)
   if (selector.type === 'snippet-define') {
     throw new Error(msg.snippetDefineNotAtTopLevel(selector.name))
+  } else if (selector.type === 'filter-define') {
+    throw new Error(msg.filterDefineNotAtTopLevel(selector.name))
   } else if (selector.type === 'normal-selector') {
     for (const child of selector.children) {
       checkChild(child)

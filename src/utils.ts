@@ -15,15 +15,18 @@ export function makeNormalCssSelector(sections: Section[]) {
         result.push(`.${qualifier.className}`)
       } else if (qualifier.type === 'attribute-qualifier') {
         const { attribute, operator, value } = qualifier
-        if (operator == null && value == null) { // existence
+        if (operator == null && value == null) {
+          // existence
           result.push(`[${attribute}]`)
         } else if (isCapture(value)) {
           // Here we does not handle captures, but simply check if the operator is `=`
           invariant(operator === '=', msg.valueCaptureWithOtherOperator())
-        } else { // Normal css attribute qualifier
+        } else {
+          // Normal css attribute qualifier
           result.push(`[${attribute}${operator}"${value}"]`)
         }
-      } else { // pseudo-qualifier
+      } else {
+        // pseudo-qualifier
         const { name, content } = qualifier
         if (content) {
           result.push(`:${name}(${content})`)
@@ -37,10 +40,12 @@ export function makeNormalCssSelector(sections: Section[]) {
 }
 
 export function isEmptyObject(x: any) {
-  return x !== null
-    && typeof x === 'object'
-    && Object.getPrototypeOf(x) === Object.prototype
-    && Object.keys(x).length === 0
+  return (
+    x !== null &&
+    typeof x === 'object' &&
+    Object.getPrototypeOf(x) === Object.prototype &&
+    Object.keys(x).length === 0
+  )
 }
 
 export function isCheerioStatic(arg: CheerioStatic | CheerioElement): arg is CheerioStatic {
@@ -52,7 +57,5 @@ export function isAttributeQualifier(qualifier: Qualifier): qualifier is Attribu
 }
 
 export function isCapture(x: any): x is Capture {
-  return typeof x === 'object'
-    && typeof x.name === 'string'
-    && Array.isArray(x.filterList)
+  return typeof x === 'object' && typeof x.name === 'string' && Array.isArray(x.filterList)
 }

@@ -20,7 +20,8 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
   if (args.length === 2) {
     const [before, after] = args
     invariant(
-      typeof before === 'string' && isCapture(after) || isCapture(before) && typeof after === 'string',
+      (typeof before === 'string' && isCapture(after)) ||
+        (isCapture(before) && typeof after === 'string'),
       invalidArgs,
     )
     if (typeof before === 'string') {
@@ -43,7 +44,10 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
   } else {
     invariant(args.length === 3, invalidArgs)
     const [before, capture, after] = args as [string, Capture, string]
-    invariant(typeof before === 'string' && isCapture(capture) && typeof after === 'string', invalidArgs)
+    invariant(
+      typeof before === 'string' && isCapture(capture) && typeof after === 'string',
+      invalidArgs,
+    )
     const i = s.indexOf(before)
     if (i === -1) {
       result.setFailed()
