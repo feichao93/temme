@@ -1,8 +1,8 @@
-[![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example StackOverflow](https://img.shields.io/badge/示例-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
+[![VSCode Extension](https://img.shields.io/badge/vscode-插件-green.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme) [![Example Fangwen](https://img.shields.io/badge/示例-芳文社-2196F3.svg?style=flat-square)](https://zhuanlan.zhihu.com/p/36036616) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example StackOverflow](https://img.shields.io/badge/示例-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
 
 # temme
 
-temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取所需的 JSON 数据。[打开在线版本以进行尝试](https://temme.js.org)
+temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取所需的 JSON 数据。打开[在线版本](https://temme.js.org)以进行尝试。如果你使用的是 VSCode 编辑器，欢迎安装 [vscode-temme 插件](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme)。
 
 # 安装
 
