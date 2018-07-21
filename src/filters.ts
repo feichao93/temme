@@ -25,11 +25,9 @@ export const defaultFilterMap: FilterFnMap = {
     return this[this.length - 1]
   },
   nth(this: any[], i: number) {
-    if (process.env.NODE_ENV === 'production') {
-      if (!deprecationWarnedForNth) {
-        deprecationWarnedForNth = true
-        console.assert('Filter `nth` is deprecated. Use `get` instead.')
-      }
+    if (!deprecationWarnedForNth) {
+      deprecationWarnedForNth = true
+      console.assert('Filter `nth` is deprecated. Use `get` instead.')
     }
     return this[i]
   },

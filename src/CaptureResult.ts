@@ -1,7 +1,7 @@
 import invariant from 'invariant'
 import { Filter } from './interfaces'
 import { FilterFnMap, FilterFn } from './filters'
-import { defaultCaptureKey } from './constants'
+import { DEFAULT_CAPTURE_KEY } from './constants'
 import { isEmptyObject } from './utils'
 import { msg } from './check'
 
@@ -70,8 +70,8 @@ export class CaptureResult {
       return null
     }
     let returnVal = this.result
-    if (returnVal.hasOwnProperty(defaultCaptureKey)) {
-      returnVal = this.result[defaultCaptureKey]
+    if (returnVal.hasOwnProperty(DEFAULT_CAPTURE_KEY)) {
+      returnVal = this.result[DEFAULT_CAPTURE_KEY]
     }
     if (isEmptyObject(returnVal)) {
       returnVal = null

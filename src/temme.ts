@@ -4,7 +4,7 @@ import { defaultFilterMap, FilterFn, FilterFnMap } from './filters'
 import { contentFunctions } from './contentFunctions'
 import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
-import { specialFilterNames } from './constants'
+import { SPECIAL_FILTER_NAMES } from './constants'
 import { makeNormalCssSelector, isCheerioStatic, isAttributeQualifier } from './utils'
 import {
   Dict,
@@ -208,7 +208,7 @@ export default function temme(
           initValue = node.text()
         }
         // Remove the first special filter.
-        const normalFilterList = specialFilterNames.includes(firstFilterName)
+        const normalFilterList = SPECIAL_FILTER_NAMES.includes(firstFilterName)
           ? filterList.slice(1)
           : filterList
         result.add(name, initValue, normalFilterList)

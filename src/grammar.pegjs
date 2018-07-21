@@ -1,10 +1,10 @@
 {
-  const defaultCaptureKey = '@@default-capture@@'
-  const universalSelector = '*'
+  const DEFAULT_CAPTURE_KEY = '@@default-capture@@'
+  const UNIVERSAL_SELECTOR = '*'
 
   const defaultSection = {
     combinator: ' ',
-    element: universalSelector,
+    element: UNIVERSAL_SELECTOR,
     qualifiers: [],
   }
 
@@ -165,7 +165,7 @@ ArrayCapture
 
 ArrayCaptureName
   = '@' captureKey:IdentifierName? {
-    return captureKey || defaultCaptureKey
+    return captureKey || DEFAULT_CAPTURE_KEY
   }
 
 ChildrenSelectors
@@ -339,7 +339,7 @@ ValueCapture
     return { name, filterList }
   }
   / '$' filterList:Filter* {
-    return { name: defaultCaptureKey, filterList }
+    return { name: DEFAULT_CAPTURE_KEY, filterList }
   }
 
 CSSIdentifierName = $('-'? CSSIdentifierNameStart CSSIdentifierNameChar*)

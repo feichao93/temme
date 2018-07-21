@@ -1,13 +1,13 @@
 import {
   temmeParser,
   TemmeSelector,
-  universalSelector,
+  UNIVERSAL_SELECTOR,
   NormalSelector,
   ContentPartCapture,
   AttributeOperator,
   Combinator,
   Assignment,
-  defaultCaptureKey,
+  DEFAULT_CAPTURE_KEY,
 } from '../src'
 
 test('parse empty selector', () => {
@@ -166,7 +166,7 @@ describe('parse capture', () => {
         sections: [
           {
             combinator: ' ',
-            element: universalSelector,
+            element: UNIVERSAL_SELECTOR,
             qualifiers: [
               {
                 type: 'id-qualifier',
@@ -176,7 +176,7 @@ describe('parse capture', () => {
           },
           {
             combinator: ' ',
-            element: universalSelector,
+            element: UNIVERSAL_SELECTOR,
             qualifiers: [
               {
                 type: 'class-qualifier',
@@ -225,7 +225,7 @@ describe('parse capture', () => {
             sections: [
               {
                 combinator: ' ',
-                element: universalSelector,
+                element: UNIVERSAL_SELECTOR,
                 qualifiers: [{ type: 'class-qualifier', className: 'foo' }],
               },
             ],
@@ -321,7 +321,7 @@ test('using string literal in attribute qualifiers', () => {
       sections: [
         {
           combinator: ' ',
-          element: universalSelector,
+          element: UNIVERSAL_SELECTOR,
           qualifiers: [
             {
               type: 'attribute-qualifier',
@@ -378,7 +378,7 @@ test('test parent-reference', () => {
   const expected: TemmeSelector[] = [
     {
       type: 'normal-selector',
-      arrayCapture: { filterList: [], name: defaultCaptureKey },
+      arrayCapture: { filterList: [], name: DEFAULT_CAPTURE_KEY },
       sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
       children: [
         {
