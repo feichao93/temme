@@ -6,8 +6,8 @@ import { isEmptyObject } from './utils'
 import { msg } from './check'
 
 export class CaptureResult {
-  private filterFnMap: FilterFnMap
-  private result: any = {}
+  private readonly filterFnMap: FilterFnMap
+  private readonly result: any = {}
   private failed = false
 
   constructor(filterFnMap: FilterFnMap) {
@@ -22,6 +22,13 @@ export class CaptureResult {
     return this.failed
   }
 
+  get(key: string) {
+    if (this.failed) {
+      return null
+    }
+    return this.result[key]
+  }
+
   add(key: string, value: any, filterList?: Filter[]) {
     if (this.failed) {
       return
@@ -29,7 +36,7 @@ export class CaptureResult {
     if (filterList) {
       value = this.applyFilterList(value, filterList)
     }
-    if (!(value == null || isEmptyObject(value))) {
+    if (value != null && !isEmptyObject(value)) {
       this.result[key] = value
     }
   }
@@ -58,7 +65,7 @@ export class CaptureResult {
     }
   }
 
-  get() {
+  getResult() {
     if (this.failed) {
       return null
     }

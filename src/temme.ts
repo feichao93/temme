@@ -66,7 +66,7 @@ export default function temme(
   const filterFnMap: FilterFnMap = Object.assign({}, defaultFilterMap, extraFilters)
   const snippetsMap = new Map<string, SnippetDefine>()
 
-  return helper($.root(), rootSelectorArray).get()
+  return helper($.root(), rootSelectorArray).getResult()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterFnMap)
@@ -97,7 +97,7 @@ export default function temme(
             const { name, filterList } = selector.arrayCapture
             const beforeValue = subCheerio
               .toArray()
-              .map(sub => helper($(sub), selector.children).get())
+              .map(sub => helper($(sub), selector.children).getResult())
             result.add(name, beforeValue, filterList)
           }
         } else if (selector.arrayCapture) {

@@ -2,7 +2,7 @@ import { msg, CaptureResult, defaultFilterMap } from '../src'
 
 test('get null from empty CaptureResult instance', () => {
   const emptyCaptureResult = new CaptureResult({})
-  expect(emptyCaptureResult.get()).toBe(null)
+  expect(emptyCaptureResult.getResult()).toBe(null)
 })
 
 test('get values from a simple CaptureResult instance', () => {
@@ -10,7 +10,10 @@ test('get values from a simple CaptureResult instance', () => {
   r.add('key-1', 'value-1')
   r.add('key-2', 'value-2')
   r.add('key-3', 'value-3')
-  expect(r.get()).toEqual({
+  expect(r.get('key-1')).toEqual('value-1')
+  expect(r.get('key-2')).toEqual('value-2')
+  expect(r.get('key-3')).toEqual('value-3')
+  expect(r.getResult()).toEqual({
     'key-1': 'value-1',
     'key-2': 'value-2',
     'key-3': 'value-3',
@@ -21,20 +24,20 @@ test('when not force, it should ignore adding null or undefined', () => {
   const r = new CaptureResult({})
   r.add('k1', null)
   r.add('k2', undefined)
-  expect(r.get()).toEqual(null)
+  expect(r.getResult()).toEqual(null)
 
   r.add('k3', 111)
-  expect(r.get()).toEqual({ k3: 111 })
+  expect(r.getResult()).toEqual({ k3: 111 })
 
   r.add('k4', null)
-  expect(r.get()).toEqual({ k3: 111 })
+  expect(r.getResult()).toEqual({ k3: 111 })
 })
 
 test('force add', () => {
   const r = new CaptureResult({})
   r.add('k1', null, null)
   r.forceAdd('k2', null, null)
-  expect(r.get()).toEqual({ k2: null })
+  expect(r.getResult()).toEqual({ k2: null })
 })
 
 test('fail a CaptureResult', () => {
@@ -43,21 +46,23 @@ test('fail a CaptureResult', () => {
   r.forceAdd('k2', null, null)
   r.add('k3', 'v3')
 
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k2: null,
     k3: 'v3',
   })
 
   expect(r.isFailed()).toBe(false)
+  expect(r.get('k3')).toBe('v3')
   r.setFailed()
   expect(r.isFailed()).toBe(true)
-  expect(r.get()).toBe(null)
+  expect(r.getResult()).toBe(null)
+  expect(r.get('k3')).toBe(null)
 
   r.add('k4', 'v4')
   r.add('k5', 'v5')
   r.forceAdd('k6', 'v6')
   expect(r.isFailed()).toBe(true)
-  expect(r.get()).toBe(null)
+  expect(r.getResult()).toBe(null)
 })
 
 test('merge CaptureResult', () => {
@@ -69,13 +74,13 @@ test('merge CaptureResult', () => {
   b.add('b1', 'w1')
   b.add('b2', 'w2')
 
-  expect(a.get()).toEqual({
+  expect(a.getResult()).toEqual({
     a1: 'v1',
     a2: 'v2',
   })
 
   a.mergeWithFailPropagation(b)
-  expect(a.get()).toEqual({
+  expect(a.getResult()).toEqual({
     a1: 'v1',
     a2: 'v2',
     b1: 'w1',
@@ -91,7 +96,7 @@ test('merge propagates capture-failure', () => {
   const b = new CaptureResult({})
   b.setFailed()
 
-  expect(a.get()).toEqual({
+  expect(a.getResult()).toEqual({
     a1: 'v1',
     a2: 'v2',
   })
@@ -110,13 +115,13 @@ test('merge without fail-propagation changes nothing', () => {
   b.add('b2', 'w2')
   b.setFailed()
 
-  expect(a.get()).toEqual({
+  expect(a.getResult()).toEqual({
     a1: 'v1',
     a2: 'v2',
   })
 
   a.merge(b)
-  expect(a.get()).toEqual({
+  expect(a.getResult()).toEqual({
     a1: 'v1',
     a2: 'v2',
   })
@@ -126,16 +131,16 @@ test('merge without fail-propagation changes nothing', () => {
 test('applyFilterList from  defaultFilterMap', () => {
   const r = new CaptureResult(defaultFilterMap)
   r.add('k1', [0, 1, null, true, false], [{ isArrayFilter: false, name: 'compact', args: [] }])
-  expect(r.get()).toEqual({ k1: [1, true] })
+  expect(r.getResult()).toEqual({ k1: [1, true] })
 
   r.add('k2', [{ x: 1 }, { y: 2 }, { z: 3 }], [{ isArrayFilter: false, name: 'pack', args: [] }])
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: [1, true],
     k2: { x: 1, y: 2, z: 3 },
   })
 
   r.add('k3', '1234', [{ isArrayFilter: false, name: 'Number', args: [] }])
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: [1, true],
     k2: { x: 1, y: 2, z: 3 },
     k3: 1234,
@@ -145,12 +150,12 @@ test('applyFilterList from  defaultFilterMap', () => {
 test('applyFilterList from prototype chain', () => {
   const r = new CaptureResult({})
   r.add('k1', 'lowercase', [{ isArrayFilter: false, name: 'toUpperCase', args: [] }])
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: 'LOWERCASE',
   })
 
   r.add('k2', 'longlongstring', [{ isArrayFilter: false, name: 'substring', args: [0, 4] }])
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: 'LOWERCASE',
     k2: 'long',
   })
@@ -162,7 +167,7 @@ test('apply multiple filters', () => {
     { isArrayFilter: false, name: 'substring', args: [1, 3] },
     { isArrayFilter: false, name: 'Number', args: [] },
   ])
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: 23,
   })
 
@@ -178,7 +183,7 @@ test('apply multiple filters', () => {
     ],
   )
 
-  expect(r.get()).toEqual({
+  expect(r.getResult()).toEqual({
     k1: 23,
     k2: ['b'],
   })
