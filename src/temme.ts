@@ -8,7 +8,7 @@ import { SPECIAL_FILTER_NAMES } from './constants'
 import { isAttributeQualifier, isCheerioStatic, makeNormalCssSelector } from './utils'
 import {
   AttributeQualifier,
-  ContentPart,
+  Content,
   Dict,
   ExpandedTemmeSelector,
   NormalSelector,
@@ -67,13 +67,12 @@ export default function temme(
 
   const filterFnMap: Dict<FilterFn> = Object.assign({}, defaultFilterMap, extraFilters)
   const modifierFnMap: Dict<ModifierFn> = Object.assign({}, defaultModifierMap, extraModifiers)
-  const createCaptureResult = () => new CaptureResult(filterFnMap, modifierFnMap)
   const snippetsMap = new Map<string, SnippetDefine>()
 
   return helper($.root(), rootSelectorArray).getResult()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
-    const result = createCaptureResult()
+    const result = new CaptureResult(filterFnMap, modifierFnMap)
 
     // First pass: process SnippetDefine and FilterDefine
     for (const selector of selectorArray) {
@@ -95,7 +94,7 @@ export default function temme(
         const subCheerio = cntCheerio.find(cssSelector)
         if (subCheerio.length > 0) {
           // Only the first element will be captured.
-          result.merge(capture(subCheerio.first(), selector))
+          capture(result, subCheerio.first(), selector)
         }
         if (selector.arrayCapture) {
           result.add(
@@ -106,7 +105,7 @@ export default function temme(
       } else if (selector.type === 'parent-ref-selector') {
         const cssSelector = makeNormalCssSelector([selector.section])
         if (cntCheerio.is(cssSelector)) {
-          result.merge(capture(cntCheerio, selector))
+          capture(result, cntCheerio, selector)
         }
       } else if (selector.type === 'assignment') {
         result.forceAdd(selector.capture, selector.value)
@@ -139,34 +138,30 @@ export default function temme(
   }
 
   /** Capture the node according to the selector. Returns an `CaptureResult`. */
-  function capture(node: Cheerio, selector: NormalSelector | ParentRefSelector): CaptureResult {
-    const result = createCaptureResult()
-
+  function capture(
+    result: CaptureResult,
+    node: Cheerio,
+    selector: NormalSelector | ParentRefSelector,
+  ) {
     if (selector.type === 'normal-selector') {
       const { sections, content } = selector
-      // Value-captures in the last section will be processed.
-      // Preceding value-captures will be ignored.
-      const { qualifiers } = sections[sections.length - 1]
-      result.mergeWithFailPropagation(
-        captureAttributes(node, qualifiers.filter(isAttributeQualifier)),
-      )
-      result.mergeWithFailPropagation(captureContent(node, content))
+      // Value-captures not in the last section will be ignored
+      const lastSection = sections[sections.length - 1]
+      captureAttributes(result, node, lastSection.qualifiers.filter(isAttributeQualifier))
+      captureContent(result, node, content)
     } else {
       // selector.type === 'parent-ref-selector'
-      const {
-        section: { qualifiers },
-        content,
-      } = selector
-      result.mergeWithFailPropagation(
-        captureAttributes(node, qualifiers.filter(isAttributeQualifier)),
-      )
-      result.mergeWithFailPropagation(captureContent(node, content))
+      const { section, content } = selector
+      captureAttributes(result, node, section.qualifiers.filter(isAttributeQualifier))
+      captureContent(result, node, content)
     }
-    return result
   }
 
-  function captureAttributes(node: Cheerio, attributeQualifiers: AttributeQualifier[]) {
-    const result = createCaptureResult()
+  function captureAttributes(
+    result: CaptureResult,
+    node: Cheerio,
+    attributeQualifiers: AttributeQualifier[],
+  ) {
     for (const qualifier of attributeQualifiers) {
       if (qualifier.value != null && typeof qualifier.value === 'object') {
         const { attribute, value: capture } = qualifier
@@ -177,44 +172,41 @@ export default function temme(
         }
       }
     }
-    return result
   }
 
-  function captureContent(node: Cheerio, content: ContentPart[]): CaptureResult {
-    const result = createCaptureResult()
-    for (const part of content) {
-      if (part.type === 'capture') {
-        const {
-          capture: { name, filterList, modifier },
-        } = part
-        // `text`, `html` and `node` are three special filter names.
-        // They have the same syntax with the normal filters, but have different running semantics.
-        const firstFilterName = filterList[0] && filterList[0].name
-        let value: any
-        if (firstFilterName === 'html') {
-          value = node.html()
-        } else if (firstFilterName === 'outerHTML') {
-          value = $.html(node)
-        } else if (firstFilterName === 'node') {
-          value = cheerio(node)
-        } else {
-          // `text` is the default filter
-          value = node.text()
-        }
-        // Remove the first special filter.
-        const normalFilterList = SPECIAL_FILTER_NAMES.includes(firstFilterName)
-          ? filterList.slice(1)
-          : filterList
-        result.add({ name, filterList: normalFilterList, modifier }, value)
-      } else if (part.type === 'assignment') {
-        const { capture, value } = part
-        result.add(capture, value)
-      } else {
-        // part.type === 'call'
-        const { funcName, args } = part
-        contentFunctions.get(funcName)(result, node, args)
-      }
+  function captureContent(result: CaptureResult, node: Cheerio, content: Content) {
+    if (content == null) {
+      return
     }
-    return result
+    if (content.type === 'capture') {
+      const { name, filterList, modifier } = content.capture
+      // `text`, `html` and `node` are three special filter names.
+      // They have the same syntax with the normal filters, but have different running semantics.
+      const firstFilterName = filterList[0] && filterList[0].name
+      let value: any
+      if (firstFilterName === 'html') {
+        value = node.html()
+      } else if (firstFilterName === 'outerHTML') {
+        value = $.html(node)
+      } else if (firstFilterName === 'node') {
+        value = cheerio(node)
+      } else {
+        // `text` is the default filter
+        value = node.text()
+      }
+      // Remove the first special filter.
+      const normalFilterList = SPECIAL_FILTER_NAMES.includes(firstFilterName)
+        ? filterList.slice(1)
+        : filterList
+      result.add({ name, filterList: normalFilterList, modifier }, value)
+    } else if (content.type === 'assignment') {
+      const { capture, value } = content
+      result.add(capture, value)
+    } else {
+      // content.type === 'call'
+      const { funcName, args } = content
+      const fn = contentFunctions.get(funcName)
+      fn(result, node, ...args)
+    }
   }
 }

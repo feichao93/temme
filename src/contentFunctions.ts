@@ -14,7 +14,7 @@ export interface ContentFn {
  * 2. find($capture, 'after-string')    Try to capture the text before 'after-string'
  * 3. find('pre', $capture, 'post')     Try to capture the text between 'pre' and 'post'
  * */
-function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]): void {
+function find(result: CaptureResult, node: Cheerio, ...args: (string | Capture)[]): void {
   const invalidArgs = 'Invalid arguments received by match(...)'
   const s = node.text()
   if (args.length === 2) {
@@ -28,18 +28,16 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
       const capture = after as Capture
       const i = s.indexOf(before)
       if (i === -1) {
-        result.setFailed()
-      } else {
-        result.add(capture, s.substring(i + before.length))
+        return
       }
+      result.add(capture, s.substring(i + before.length))
     } else {
       const capture = before as Capture
       const i = s.indexOf(after as string)
       if (i === -1) {
-        result.setFailed()
-      } else {
-        result.add(capture, s.substring(0, i))
+        return
       }
+      result.add(capture, s.substring(0, i))
     }
   } else {
     invariant(args.length === 3, invalidArgs)
@@ -50,15 +48,13 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
     )
     const i = s.indexOf(before)
     if (i === -1) {
-      result.setFailed()
-    } else {
-      const j = s.indexOf(after, i + before.length)
-      if (j === -1) {
-        result.setFailed()
-      } else {
-        result.add(capture, s.substring(i + before.length, j))
-      }
+      return
     }
+    const j = s.indexOf(after, i + before.length)
+    if (j === -1) {
+      return
+    }
+    result.add(capture, s.substring(i + before.length, j))
   }
 }
 

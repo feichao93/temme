@@ -54,7 +54,7 @@ ParentRefSelector
     return {
       type: 'parent-ref-selector',
       section,
-      content: [],
+      content: null,
     }
   }
 
@@ -67,7 +67,7 @@ NormalSelector
     return {
       type: 'normal-selector',
       sections,
-      content: [],
+      content: null,
       arrayCapture,
       children,
     }
@@ -85,7 +85,7 @@ NormalSelector
     return {
       type: 'normal-selector',
       sections,
-      content: [],
+      content: null,
       arrayCapture: null,
       children: [],
     }
@@ -294,17 +294,11 @@ PseudoQualifier 'css-selector-pseudo-qualifier'
   }
 
 Content
-  = '{' __ '}' {
-    return []
-  }
-  / '{'
-    __ head:ContentPart tail:(__ Separator __ ContentPart)*
-    OptionalExtraSeperator
-    __ '}' {
-    return buildList(head, tail, 3)
+  = '{' __ detail:ContentDetail OptionalExtraSeperator __'}' {
+    return detail
   }
 
-ContentPart
+ContentDetail
   = assignment:Assignment {
     return {
       type: 'assignment',
@@ -327,8 +321,8 @@ ContentPart
   }
   / funcName:IdentifierName
     __ '('
-    __ head:ContentPartArg
-    tail:(__ ',' __ ContentPartArg)*
+    __ head:ContentCallArg
+    tail:(__ ',' __ ContentCallArg)*
     OptionalExtraComma
     __ ')' {
     return {
@@ -338,7 +332,7 @@ ContentPart
     }
   }
 
-ContentPartArg = Literal / ValueCapture
+ContentCallArg = Literal / ValueCapture
 
 ValueCapture
   = '$' name:IdentifierName filterList:Filter* modifier:Modifier? {

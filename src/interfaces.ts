@@ -40,7 +40,7 @@ export type ExpandedTemmeSelector =
 export interface NormalSelector {
   type: 'normal-selector'
   sections: Section[]
-  content: ContentPart[]
+  content: Content
   arrayCapture: Capture
   children: TemmeSelector[]
 }
@@ -48,7 +48,7 @@ export interface NormalSelector {
 export interface ParentRefSelector {
   type: 'parent-ref-selector'
   section: Section
-  content: ContentPart[]
+  content: Content
 }
 
 export interface Assignment {
@@ -110,9 +110,9 @@ export interface PseudoQualifier {
   content: string
 }
 
-export type ContentPart = ContentPartCapture | Assignment | ContentPartCall
+export type Content = ContentCapture | Assignment | ContentPartCall | null
 
-export interface ContentPartCapture {
+export interface ContentCapture {
   type: 'capture'
   capture: Capture
 }

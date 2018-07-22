@@ -169,7 +169,9 @@ test('filter with default parameters', () => {
   filter add(n = 0) {
     return this + n
   };
-  div{$x|add; $y|Number|add(2); $z|Number|add(-1)};
+  div{ $x|add };
+  div{ $z|Number|add(-1) };
+  div{ $y|Number|add(2) };
   `
   expect(temme(html, selector)).toEqual({
     x: '10',
@@ -184,7 +186,8 @@ test('filter with spread operator', () => {
   filter addAll(...nums) {
     return this + nums.reduce((a, b) => a + b, 0)
   };
-  div{ $x|Number|addAll; $y|Number|addAll(1,2,3); };
+  div{ $x|Number|addAll };
+  div{ $y|Number|addAll(1,2,3) };
   `
   expect(temme(html, selector)).toEqual({
     x: 1,

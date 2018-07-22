@@ -3,7 +3,7 @@ import {
   TemmeSelector,
   UNIVERSAL_SELECTOR,
   NormalSelector,
-  ContentPartCapture,
+  ContentCapture,
   AttributeOperator,
   Combinator,
   Assignment,
@@ -42,7 +42,7 @@ describe('parse value assignment', () => {
       {
         type: 'normal-selector',
         arrayCapture: { name: 'list', filterList: [], modifier: null },
-        content: [],
+        content: null,
         sections: [
           {
             combinator: ' ',
@@ -75,13 +75,11 @@ describe('parse value assignment', () => {
             qualifiers: [],
           },
         ],
-        content: [
-          {
-            type: 'assignment',
-            capture: { name: 'foo', filterList: [], modifier: null },
-            value: true,
-          },
-        ],
+        content: {
+          type: 'assignment',
+          capture: { name: 'foo', filterList: [], modifier: null },
+          value: true,
+        },
         children: [],
       },
     ]
@@ -147,7 +145,7 @@ test('parse simple selector: `div`', () => {
           qualifiers: [],
         },
       ],
-      content: [],
+      content: null,
       children: [],
     },
   ]
@@ -191,12 +189,10 @@ describe('parse capture', () => {
             ],
           },
         ],
-        content: [
-          {
-            type: 'capture',
-            capture: { name: 'title', filterList: [], modifier: null },
-          },
-        ],
+        content: {
+          type: 'capture',
+          capture: { name: 'title', filterList: [], modifier: null },
+        },
         children: [],
       },
     ]
@@ -217,7 +213,7 @@ describe('parse capture', () => {
         type: 'normal-selector',
         arrayCapture: { name: 'list', filterList: [], modifier: null },
         sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
-        content: [],
+        content: null,
         children: [
           {
             type: 'normal-selector',
@@ -229,16 +225,14 @@ describe('parse capture', () => {
                 qualifiers: [{ type: 'class-qualifier', className: 'foo' }],
               },
             ],
-            content: [
-              {
-                type: 'capture',
-                capture: {
-                  name: 'h',
-                  filterList: [{ isArrayFilter: false, name: 'html', args: [] }],
-                  modifier: null,
-                },
+            content: {
+              type: 'capture',
+              capture: {
+                name: 'h',
+                filterList: [{ isArrayFilter: false, name: 'html', args: [] }],
+                modifier: null,
               },
-            ],
+            },
             children: [],
           },
         ],
@@ -274,7 +268,7 @@ describe('parse capture', () => {
             ],
           },
         ],
-        content: [],
+        content: null,
         arrayCapture: null,
         children: [],
       },
@@ -304,7 +298,7 @@ describe('parse capture', () => {
               ],
             },
           ],
-          content: [],
+          content: null,
           arrayCapture: null,
           children: [],
         },
@@ -333,7 +327,7 @@ test('using string literal in attribute qualifiers', () => {
           ],
         },
       ],
-      content: [],
+      content: null,
       arrayCapture: null,
       children: [],
     },
@@ -360,7 +354,7 @@ describe('test different section combinator', () => {
             qualifiers: [],
           },
         ],
-        content: [],
+        content: null,
         arrayCapture: null,
         children: [],
       },
@@ -385,12 +379,10 @@ test('test parent-reference', () => {
         {
           type: 'parent-ref-selector',
           section: { combinator: ' ', element: '*', qualifiers: [] },
-          content: [
-            { capture: { filterList: [], name: 'value', modifier: null }, type: 'capture' },
-          ],
+          content: { capture: { filterList: [], name: 'value', modifier: null }, type: 'capture' },
         },
       ],
-      content: [],
+      content: null,
     },
   ]
 
@@ -422,7 +414,7 @@ test('test JavaScript comments', () => {
 
 test('parse filters', () => {
   function extractFilterList(selectors: TemmeSelector[]) {
-    return ((selectors[0] as NormalSelector).content[0] as ContentPartCapture).capture.filterList
+    return ((selectors[0] as NormalSelector).content as ContentCapture).capture.filterList
   }
 
   expect(extractFilterList(temmeParser.parse('html{$h|f}'))).toEqual([

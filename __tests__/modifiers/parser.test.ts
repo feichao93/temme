@@ -1,8 +1,8 @@
-import { ContentPartCapture, NormalSelector, temmeParser, TemmeSelector } from '../../src'
+import { ContentCapture, NormalSelector, temmeParser, TemmeSelector } from '../../src'
 
 test('parse modifiers', () => {
   function extractModifier(selectors: TemmeSelector[]) {
-    return ((selectors[0] as NormalSelector).content[0] as ContentPartCapture).capture.modifier
+    return ((selectors[0] as NormalSelector).content as ContentCapture).capture.modifier
   }
 
   expect(extractModifier(temmeParser.parse('html{$foo}'))).toEqual(null)

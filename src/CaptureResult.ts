@@ -11,29 +11,14 @@ const forceAddModifier: Modifier = { name: 'forceAdd', args: [] }
 
 export class CaptureResult {
   private readonly result: any = {}
-  private failed = false
 
   constructor(readonly filterFnMap: Dict<FilterFn>, readonly modifierFnMap: Dict<ModifierFn>) {}
 
-  setFailed() {
-    this.failed = true
-  }
-
-  isFailed() {
-    return this.failed
-  }
-
   get(key: string) {
-    if (this.failed) {
-      return null
-    }
     return this.result[key]
   }
 
   set(key: string, value: any) {
-    if (this.failed) {
-      return
-    }
     this.result[key] = value
   }
 
@@ -46,9 +31,6 @@ export class CaptureResult {
   }
 
   private exec(capture: Capture, value: any, defaultModifier: Modifier) {
-    if (this.failed) {
-      return
-    }
     const modifier = capture.modifier || defaultModifier
     const modifierFn = this.modifierFnMap[modifier.name]
     invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
@@ -60,24 +42,7 @@ export class CaptureResult {
     )
   }
 
-  merge(other: CaptureResult) {
-    if (!other.isFailed()) {
-      this.doMerge(other)
-    }
-  }
-
-  mergeWithFailPropagation(other: CaptureResult) {
-    if (other.isFailed()) {
-      this.setFailed()
-    } else {
-      this.doMerge(other)
-    }
-  }
-
   getResult() {
-    if (this.failed) {
-      return null
-    }
     let returnVal = this.result
     if (returnVal.hasOwnProperty(DEFAULT_CAPTURE_KEY)) {
       returnVal = this.result[DEFAULT_CAPTURE_KEY]
@@ -86,13 +51,6 @@ export class CaptureResult {
       returnVal = null
     }
     return returnVal
-  }
-
-  private doMerge(other: CaptureResult) {
-    const source = other.result
-    for (const key of Object.keys(source)) {
-      this.result[key] = source[key]
-    }
   }
 
   private applyFilter(value: any, filter: Filter) {
