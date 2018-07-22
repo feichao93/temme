@@ -7,6 +7,7 @@ export type Literal = string | number | boolean | null | RegExp
 export interface Capture {
   name: string
   filterList: Filter[]
+  modifier: string
 }
 
 export interface Filter {

@@ -1,14 +1,12 @@
+import { Dict } from './interfaces'
+
 export interface FilterFn {
   (this: any, ...args: any[]): any
 }
 
-export interface FilterFnMap {
-  [key: string]: FilterFn
-}
-
 let deprecationWarnedForNth = false
 
-export const defaultFilterMap: FilterFnMap = {
+export const defaultFilterMap: Dict<FilterFn> = {
   pack(this: any[]) {
     return Object.assign({}, ...this)
   },

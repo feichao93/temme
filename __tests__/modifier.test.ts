@@ -1,13 +1,6 @@
-import temme, { CaptureResult } from '../src'
+import temme from '../src'
 
-function modifierOr(result: CaptureResult, key: string, value: any) {
-  const oldValue = result.get(key)
-  if (!Boolean(oldValue)) {
-    result.set(key, value)
-  }
-}
-
-test('custom modifier `or`', () => {
+test('custom modifier `candidate`', () => {
   const html = `
       <ul>
         <li class="option-1"></li>
@@ -15,11 +8,11 @@ test('custom modifier `or`', () => {
         <li class="option-3">option-3-value</li>
       </ul>`
   const selector = `
-    .option-1{$value!or};
-    .option-2{$value!or};
-    .option-3{$value!or};
+    .option-1{$value!candidate};
+    .option-2{$value!candidate};
+    .option-3{$value!candidate};
     `
-  expect(temme(html, selector, {}, { or: modifierOr })).toEqual({
+  expect(temme(html, selector)).toEqual({
     value: 'option-2-value',
   })
 })

@@ -1,18 +1,19 @@
 import invariant from 'invariant'
-import { Filter } from './interfaces'
-import { FilterFnMap, FilterFn } from './filters'
+import { Capture, Dict, Filter } from './interfaces'
+import { FilterFn } from './filters'
 import { DEFAULT_CAPTURE_KEY } from './constants'
 import { isEmptyObject } from './utils'
 import { msg } from './check'
+import { ModifierFn } from './modifier'
 
 export class CaptureResult {
-  private readonly filterFnMap: FilterFnMap
   private readonly result: any = {}
   private failed = false
 
-  constructor(filterFnMap: FilterFnMap) {
-    this.filterFnMap = filterFnMap
-  }
+  constructor(
+    readonly filterFnMap: Dict<FilterFn> = {},
+    readonly modifierFnMap: Dict<ModifierFn> = {},
+  ) {}
 
   setFailed() {
     this.failed = true
@@ -29,26 +30,28 @@ export class CaptureResult {
     return this.result[key]
   }
 
-  add(key: string, value: any, filterList?: Filter[]) {
+  set(key: string, value: any) {
     if (this.failed) {
       return
-    }
-    if (filterList) {
-      value = this.applyFilterList(value, filterList)
-    }
-    if (value != null && !isEmptyObject(value)) {
-      this.result[key] = value
-    }
-  }
-
-  forceAdd(key: string, value: any, filterList?: Filter[]) {
-    if (this.failed) {
-      return
-    }
-    if (filterList) {
-      value = this.applyFilterList(value, filterList)
     }
     this.result[key] = value
+  }
+
+  add(capture: Capture, value: any) {
+    this.exec(capture, value, 'add')
+  }
+
+  forceAdd(capture: Capture, value: any) {
+    this.exec(capture, value, 'forceAdd')
+  }
+
+  private exec(capture: Capture, value: any, defaultModifier: string) {
+    if (this.failed) {
+      return
+    }
+    const modifierFn = this.modifierFnMap[capture.modifier || defaultModifier]
+    invariant(typeof modifierFn === 'function', `unknown modifier ${capture.modifier}`)
+    modifierFn(this, capture.name, this.applyFilterList(value, capture.filterList))
   }
 
   merge(other: CaptureResult) {

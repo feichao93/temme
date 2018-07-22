@@ -30,7 +30,7 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
       if (i === -1) {
         result.setFailed()
       } else {
-        result.add(capture.name, s.substring(i + before.length), capture.filterList)
+        result.add(capture, s.substring(i + before.length))
       }
     } else {
       const capture = before as Capture
@@ -38,7 +38,7 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
       if (i === -1) {
         result.setFailed()
       } else {
-        result.add(capture.name, s.substring(0, i), capture.filterList)
+        result.add(capture, s.substring(0, i))
       }
     }
   } else {
@@ -56,7 +56,7 @@ function find(result: CaptureResult, node: Cheerio, args: (string | Capture)[]):
       if (j === -1) {
         result.setFailed()
       } else {
-        result.add(capture.name, s.substring(i + before.length, j), capture.filterList)
+        result.add(capture, s.substring(i + before.length, j))
       }
     }
   }
