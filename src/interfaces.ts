@@ -7,10 +7,17 @@ export type Literal = string | number | boolean | null | RegExp
 export interface Capture {
   name: string
   filterList: Filter[]
+  // 当用户没有提供 modifier 时，解析结果中该字段为 null
+  modifier: Modifier
 }
 
 export interface Filter {
   isArrayFilter: boolean
+  name: string
+  args: Literal[]
+}
+
+export interface Modifier {
   name: string
   args: Literal[]
 }
@@ -33,7 +40,7 @@ export type ExpandedTemmeSelector =
 export interface NormalSelector {
   type: 'normal-selector'
   sections: Section[]
-  content: ContentPart[]
+  content: Content
   arrayCapture: Capture
   children: TemmeSelector[]
 }
@@ -41,7 +48,7 @@ export interface NormalSelector {
 export interface ParentRefSelector {
   type: 'parent-ref-selector'
   section: Section
-  content: ContentPart[]
+  content: Content
 }
 
 export interface Assignment {
@@ -103,9 +110,9 @@ export interface PseudoQualifier {
   content: string
 }
 
-export type ContentPart = ContentPartCapture | Assignment | ContentPartCall
+export type Content = ContentCapture | Assignment | ContentPartCall | null
 
-export interface ContentPartCapture {
+export interface ContentCapture {
   type: 'capture'
   capture: Capture
 }

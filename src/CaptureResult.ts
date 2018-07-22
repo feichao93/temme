@@ -1,74 +1,48 @@
 import invariant from 'invariant'
-import { Filter } from './interfaces'
-import { FilterFnMap, FilterFn } from './filters'
+import { Capture, Dict, Filter, Modifier } from './interfaces'
+import { FilterFn } from './filters'
 import { DEFAULT_CAPTURE_KEY } from './constants'
 import { isEmptyObject } from './utils'
 import { msg } from './check'
+import { ModifierFn } from './modifier'
+
+const addModifier: Modifier = { name: 'add', args: [] }
+const forceAddModifier: Modifier = { name: 'forceAdd', args: [] }
 
 export class CaptureResult {
-  private readonly filterFnMap: FilterFnMap
   private readonly result: any = {}
-  private failed = false
 
-  constructor(filterFnMap: FilterFnMap) {
-    this.filterFnMap = filterFnMap
-  }
-
-  setFailed() {
-    this.failed = true
-  }
-
-  isFailed() {
-    return this.failed
-  }
+  constructor(readonly filterFnMap: Dict<FilterFn>, readonly modifierFnMap: Dict<ModifierFn>) {}
 
   get(key: string) {
-    if (this.failed) {
-      return null
-    }
     return this.result[key]
   }
 
-  add(key: string, value: any, filterList?: Filter[]) {
-    if (this.failed) {
-      return
-    }
-    if (filterList) {
-      value = this.applyFilterList(value, filterList)
-    }
-    if (value != null && !isEmptyObject(value)) {
-      this.result[key] = value
-    }
-  }
-
-  forceAdd(key: string, value: any, filterList?: Filter[]) {
-    if (this.failed) {
-      return
-    }
-    if (filterList) {
-      value = this.applyFilterList(value, filterList)
-    }
+  set(key: string, value: any) {
     this.result[key] = value
   }
 
-  merge(other: CaptureResult) {
-    if (!other.isFailed()) {
-      this.doMerge(other)
-    }
+  add(capture: Capture, value: any) {
+    this.exec(capture, value, addModifier)
   }
 
-  mergeWithFailPropagation(other: CaptureResult) {
-    if (other.isFailed()) {
-      this.setFailed()
-    } else {
-      this.doMerge(other)
-    }
+  forceAdd(capture: Capture, value: any) {
+    this.exec(capture, value, forceAddModifier)
+  }
+
+  private exec(capture: Capture, value: any, defaultModifier: Modifier) {
+    const modifier = capture.modifier || defaultModifier
+    const modifierFn = this.modifierFnMap[modifier.name]
+    invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
+    modifierFn(
+      this,
+      capture.name,
+      this.applyFilterList(value, capture.filterList),
+      ...modifier.args,
+    )
   }
 
   getResult() {
-    if (this.failed) {
-      return null
-    }
     let returnVal = this.result
     if (returnVal.hasOwnProperty(DEFAULT_CAPTURE_KEY)) {
       returnVal = this.result[DEFAULT_CAPTURE_KEY]
@@ -77,13 +51,6 @@ export class CaptureResult {
       returnVal = null
     }
     return returnVal
-  }
-
-  private doMerge(other: CaptureResult) {
-    const source = other.result
-    for (const key of Object.keys(source)) {
-      this.result[key] = source[key]
-    }
   }
 
   private applyFilter(value: any, filter: Filter) {
