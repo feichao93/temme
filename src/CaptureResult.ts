@@ -1,10 +1,13 @@
 import invariant from 'invariant'
-import { Capture, Dict, Filter } from './interfaces'
+import { Capture, Dict, Filter, Modifier } from './interfaces'
 import { FilterFn } from './filters'
 import { DEFAULT_CAPTURE_KEY } from './constants'
 import { isEmptyObject } from './utils'
 import { msg } from './check'
 import { ModifierFn } from './modifier'
+
+const addModifier: Modifier = { name: 'add', args: [] }
+const forceAddModifier: Modifier = { name: 'forceAdd', args: [] }
 
 export class CaptureResult {
   private readonly result: any = {}
@@ -35,21 +38,26 @@ export class CaptureResult {
   }
 
   add(capture: Capture, value: any) {
-    this.exec(capture, value, 'add')
+    this.exec(capture, value, addModifier)
   }
 
   forceAdd(capture: Capture, value: any) {
-    this.exec(capture, value, 'forceAdd')
+    this.exec(capture, value, forceAddModifier)
   }
 
-  private exec(capture: Capture, value: any, defaultModifier: string) {
+  private exec(capture: Capture, value: any, defaultModifier: Modifier) {
     if (this.failed) {
       return
     }
     const modifier = capture.modifier || defaultModifier
-    const modifierFn = this.modifierFnMap[modifier]
+    const modifierFn = this.modifierFnMap[modifier.name]
     invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
-    modifierFn(this, capture.name, this.applyFilterList(value, capture.filterList))
+    modifierFn(
+      this,
+      capture.name,
+      this.applyFilterList(value, capture.filterList),
+      ...modifier.args,
+    )
   }
 
   merge(other: CaptureResult) {

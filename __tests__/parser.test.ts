@@ -23,7 +23,7 @@ describe('parse value assignment', () => {
     const expected: TemmeSelector[] = [
       {
         type: 'assignment',
-        capture: { name: 'a', filterList: [] },
+        capture: { name: 'a', filterList: [], modifier: null },
         value: '123',
       },
     ]
@@ -41,7 +41,7 @@ describe('parse value assignment', () => {
     const expected: TemmeSelector[] = [
       {
         type: 'normal-selector',
-        arrayCapture: { name: 'list', filterList: [] },
+        arrayCapture: { name: 'list', filterList: [], modifier: null },
         content: [],
         sections: [
           {
@@ -53,7 +53,7 @@ describe('parse value assignment', () => {
         children: [
           {
             type: 'assignment',
-            capture: { name: 'a', filterList: [] },
+            capture: { name: 'a', filterList: [], modifier: null },
             value: null,
           },
         ],
@@ -78,7 +78,7 @@ describe('parse value assignment', () => {
         content: [
           {
             type: 'assignment',
-            capture: { name: 'foo', filterList: [] },
+            capture: { name: 'foo', filterList: [], modifier: null },
             value: true,
           },
         ],
@@ -93,7 +93,7 @@ describe('parse JavaScript literals', () => {
   function getExpected(value: any) {
     const assignment: Assignment = {
       type: 'assignment',
-      capture: { name: 'value', filterList: [] },
+      capture: { name: 'value', filterList: [], modifier: null },
       value,
     }
     return [assignment]
@@ -186,7 +186,7 @@ describe('parse capture', () => {
                 type: 'attribute-qualifier',
                 attribute: 'href',
                 operator: '=',
-                value: { name: 'url', filterList: [] },
+                value: { name: 'url', filterList: [], modifier: null },
               },
             ],
           },
@@ -194,7 +194,7 @@ describe('parse capture', () => {
         content: [
           {
             type: 'capture',
-            capture: { name: 'title', filterList: [] },
+            capture: { name: 'title', filterList: [], modifier: null },
           },
         ],
         children: [],
@@ -215,7 +215,7 @@ describe('parse capture', () => {
     const expectedResult: TemmeSelector[] = [
       {
         type: 'normal-selector',
-        arrayCapture: { name: 'list', filterList: [] },
+        arrayCapture: { name: 'list', filterList: [], modifier: null },
         sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
         content: [],
         children: [
@@ -235,6 +235,7 @@ describe('parse capture', () => {
                 capture: {
                   name: 'h',
                   filterList: [{ isArrayFilter: false, name: 'html', args: [] }],
+                  modifier: null,
                 },
               },
             ],
@@ -262,13 +263,13 @@ describe('parse capture', () => {
                 type: 'attribute-qualifier',
                 attribute: 'foo',
                 operator: '=',
-                value: { name: 'x', filterList: [] },
+                value: { name: 'x', filterList: [], modifier: null },
               },
               {
                 type: 'attribute-qualifier',
                 attribute: 'bar',
                 operator: '=',
-                value: { name: 'y', filterList: [] },
+                value: { name: 'y', filterList: [], modifier: null },
               },
             ],
           },
@@ -298,7 +299,7 @@ describe('parse capture', () => {
                   type: 'attribute-qualifier',
                   attribute: 'foo',
                   operator,
-                  value: { name: 'x', filterList: [] },
+                  value: { name: 'x', filterList: [], modifier: null },
                 },
               ],
             },
@@ -378,13 +379,15 @@ test('test parent-reference', () => {
   const expected: TemmeSelector[] = [
     {
       type: 'normal-selector',
-      arrayCapture: { filterList: [], name: DEFAULT_CAPTURE_KEY },
+      arrayCapture: { filterList: [], name: DEFAULT_CAPTURE_KEY, modifier: null },
       sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
       children: [
         {
           type: 'parent-ref-selector',
           section: { combinator: ' ', element: '*', qualifiers: [] },
-          content: [{ capture: { filterList: [], name: 'value' }, type: 'capture' }],
+          content: [
+            { capture: { filterList: [], name: 'value', modifier: null }, type: 'capture' },
+          ],
         },
       ],
       content: [],
@@ -449,7 +452,7 @@ describe('snippet define and expand', () => {
         selectors: [
           {
             type: 'assignment',
-            capture: { name: 'foo', filterList: [] },
+            capture: { name: 'foo', filterList: [], modifier: null },
             value: 'bar',
           },
         ],

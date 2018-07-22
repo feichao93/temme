@@ -7,11 +7,17 @@ export type Literal = string | number | boolean | null | RegExp
 export interface Capture {
   name: string
   filterList: Filter[]
-  modifier: string
+  // 当用户没有提供 modifier 时，解析结果中该字段为 null
+  modifier: Modifier
 }
 
 export interface Filter {
   isArrayFilter: boolean
+  name: string
+  args: Literal[]
+}
+
+export interface Modifier {
   name: string
   args: Literal[]
 }
