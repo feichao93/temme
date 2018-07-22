@@ -127,7 +127,7 @@ SnippetExpand
 FilterDefine
   = 'filter'
     __ name:IdentifierName
-    __ argsPart:FilterArgsPart
+    __ argsPart:FilterDefineArgsPart
     __ code:CodeBlock
     SelectorEnd? {
     return {
@@ -138,12 +138,12 @@ FilterDefine
     }
   }
 
-FilterArgsPart
-  = '(' str:FilterArgsString ')' { return str }
+FilterDefineArgsPart
+  = '(' str:FilterDefineArgsString ')' { return str }
   / '(' { error('Unbalanced parenthesis.') }
 
-FilterArgsString
-  = $((![()] SourceCharacter)+ / '(' FilterArgsString ')')*
+FilterDefineArgsString
+  = $((![()] SourceCharacter)+ / '(' FilterDefineArgsString ')')*
 
 Assignment
   = capture:ValueCapture __ '=' __ value:Literal {
@@ -159,8 +159,8 @@ Combinator = [ >+~]
 AttributeOperator = '=' / '~=' / '|=' / '*=' / '^=' / '$='
 
 ArrayCapture
-  = name:ArrayCaptureName filterList:Filter* {
-    return { name, filterList }
+  = name:ArrayCaptureName filterList:Filter* modifier:Modifier? {
+    return { name, filterList, modifier }
   }
 
 ArrayCaptureName
@@ -184,6 +184,7 @@ Filter
     return { isArrayFilter: false, name, args: args || [] }
   }
 
+// TODO FilterArgs 不只是 filter 的参数，同时也是 modifier 的参数
 FilterArgs
   = '(' __ ')' {
     return []
@@ -193,6 +194,11 @@ FilterArgs
     OptionalExtraComma
     __ ')' {
     return buildList(head, tail, 3)
+  }
+
+Modifier
+  = '!' name:IdentifierName args:FilterArgs? {
+    return { name, args: args || [] }
   }
 
 // 普通CSS选择器, 包含多个部分
@@ -335,11 +341,11 @@ ContentPart
 ContentPartArg = Literal / ValueCapture
 
 ValueCapture
-  = '$' name:IdentifierName filterList:Filter* {
-    return { name, filterList }
+  = '$' name:IdentifierName filterList:Filter* modifier:Modifier? {
+    return { name, filterList, modifier }
   }
-  / '$' filterList:Filter* {
-    return { name: DEFAULT_CAPTURE_KEY, filterList }
+  / '$' filterList:Filter* modifier:Modifier? {
+    return { name: DEFAULT_CAPTURE_KEY, filterList, modifier }
   }
 
 CSSIdentifierName = $('-'? CSSIdentifierNameStart CSSIdentifierNameChar*)
