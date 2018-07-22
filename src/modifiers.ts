@@ -6,7 +6,7 @@ export interface ModifierFn {
   (result: CaptureResult, key: string, value: any, ...args: any[]): void
 }
 
-export const defaultModifierMap: Dict<ModifierFn> = {
+export const defaultModifierDict: Dict<ModifierFn> = {
   add(result, key, value) {
     if (value != null && !isEmptyObject(value)) {
       result.set(key, value)
@@ -29,5 +29,5 @@ export const defaultModifierMap: Dict<ModifierFn> = {
 }
 
 export function defineModifier(name: string, modifier: ModifierFn) {
-  defaultModifierMap[name] = modifier
+  defaultModifierDict[name] = modifier
 }

@@ -4,7 +4,7 @@ import { FilterFn } from './filters'
 import { DEFAULT_CAPTURE_KEY } from './constants'
 import { isEmptyObject } from './utils'
 import { msg } from './check'
-import { ModifierFn } from './modifier'
+import { ModifierFn } from './modifiers'
 
 const addModifier: Modifier = { name: 'add', args: [] }
 const forceAddModifier: Modifier = { name: 'forceAdd', args: [] }

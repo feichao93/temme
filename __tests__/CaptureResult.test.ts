@@ -1,5 +1,5 @@
-import { CaptureResult, defaultFilterMap, Modifier, msg } from '../src'
-import { defaultModifierMap } from '../src/modifier'
+import { CaptureResult, defaultFilterDict, Modifier, msg } from '../src'
+import { defaultModifierDict } from '../src/modifiers'
 
 // TODO 需要添加 modifier 的测试
 
@@ -12,7 +12,7 @@ function forceAdd(result: CaptureResult, key: string, value: any) {
 }
 
 function makeCaptureResult() {
-  return new CaptureResult(defaultFilterMap, defaultModifierMap)
+  return new CaptureResult(defaultFilterDict, defaultModifierDict)
 }
 
 test('get null from empty CaptureResult instance', () => {
@@ -44,7 +44,7 @@ test('force add', () => {
   expect(r.getResult()).toEqual({ k2: null })
 })
 
-test('applyFilterList from defaultFilterMap', () => {
+test('applyFilterList from defaultFilterDict', () => {
   const r = makeCaptureResult()
   r.add(
     {
