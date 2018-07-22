@@ -4,6 +4,9 @@ export const msg = {
   invalidFilter(name: string) {
     return `${name} is not a valid filter.`
   },
+  invalidModifier(name: string) {
+    return `${name} is not a valid modifier`
+  },
   invalidContentFunction(name: string) {
     return `${name} is not a valid content function.`
   },

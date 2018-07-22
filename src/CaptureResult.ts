@@ -10,10 +10,7 @@ export class CaptureResult {
   private readonly result: any = {}
   private failed = false
 
-  constructor(
-    readonly filterFnMap: Dict<FilterFn> = {},
-    readonly modifierFnMap: Dict<ModifierFn> = {},
-  ) {}
+  constructor(readonly filterFnMap: Dict<FilterFn>, readonly modifierFnMap: Dict<ModifierFn>) {}
 
   setFailed() {
     this.failed = true
@@ -49,8 +46,9 @@ export class CaptureResult {
     if (this.failed) {
       return
     }
-    const modifierFn = this.modifierFnMap[capture.modifier || defaultModifier]
-    invariant(typeof modifierFn === 'function', `unknown modifier ${capture.modifier}`)
+    const modifier = capture.modifier || defaultModifier
+    const modifierFn = this.modifierFnMap[modifier]
+    invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
     modifierFn(this, capture.name, this.applyFilterList(value, capture.filterList))
   }
 
