@@ -1,7 +1,7 @@
 import cheerio from 'cheerio'
 import invariant from 'invariant'
-import { defaultFilterMap, FilterFn } from './filters'
-import { contentFunctions } from './contentFunctions'
+import { defaultFilterDict, FilterFn } from './filters'
+import { contentFunctionDict } from './contentFunctions'
 import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
 import { SPECIAL_FILTER_NAMES } from './constants'
@@ -16,7 +16,7 @@ import {
   SnippetDefine,
   TemmeSelector,
 } from './interfaces'
-import { defaultModifierMap, ModifierFn } from './modifier'
+import { defaultModifierDict, ModifierFn } from './modifiers'
 
 export interface TemmeParser {
   parse(temmeSelectorString: string): TemmeSelector[]
@@ -65,8 +65,8 @@ export default function temme(
 
   rootSelectorArray.forEach(checkRootSelector)
 
-  const filterFnMap: Dict<FilterFn> = Object.assign({}, defaultFilterMap, extraFilters)
-  const modifierFnMap: Dict<ModifierFn> = Object.assign({}, defaultModifierMap, extraModifiers)
+  const filterFnMap: Dict<FilterFn> = Object.assign({}, defaultFilterDict, extraFilters)
+  const modifierFnMap: Dict<ModifierFn> = Object.assign({}, defaultModifierDict, extraModifiers)
   const snippetsMap = new Map<string, SnippetDefine>()
 
   return helper($.root(), rootSelectorArray).getResult()
@@ -205,7 +205,8 @@ export default function temme(
     } else {
       // content.type === 'call'
       const { funcName, args } = content
-      const fn = contentFunctions.get(funcName)
+      const fn = contentFunctionDict[funcName]
+      invariant(typeof fn === 'function', msg.invalidContentFunction(funcName))
       fn(result, node, ...args)
     }
   }

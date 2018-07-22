@@ -6,7 +6,7 @@ export interface FilterFn {
 
 let deprecationWarnedForNth = false
 
-export const defaultFilterMap: Dict<FilterFn> = {
+export const defaultFilterDict: Dict<FilterFn> = {
   pack(this: any[]) {
     return Object.assign({}, ...this)
   },
@@ -48,5 +48,5 @@ export const defaultFilterMap: Dict<FilterFn> = {
 }
 
 export function defineFilter(name: string, filter: FilterFn) {
-  defaultFilterMap[name] = filter
+  defaultFilterDict[name] = filter
 }

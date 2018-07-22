@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as fs from 'fs'
-import temme, { msg, contentFunctions } from '../src'
+import temme, { msg } from '../src'
 
 const html = fs.readFileSync(
   path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'),
@@ -57,19 +57,9 @@ test('wrong syntax example 2', () => {
 })
 
 test('some tests', () => {
-  expect(() =>
-    temme(
-      html,
-      `div@|pack{
-        p{foo($name, '-', $_)};
-      }`,
-    ),
-  ).toThrowError(msg.invalidContentFunction('foo'))
-
   expect(() => {
-    contentFunctions.remove('match')
-    console.log(temme(html, 'div{ match($foo) }'))
-  }).toThrowError(msg.invalidContentFunction('match'))
+    console.log(temme(html, 'div{ foo($bar) }'))
+  }).toThrowError(msg.invalidContentFunction('foo'))
 
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`)).toThrowError(
     msg.hasLeadingAttributeCapture(),

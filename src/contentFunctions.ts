@@ -1,7 +1,6 @@
 import invariant from 'invariant'
-import { Capture } from './interfaces'
+import { Capture, Dict } from './interfaces'
 import { CaptureResult } from './CaptureResult'
-import { msg } from './check'
 import { isCapture } from './utils'
 
 export interface ContentFn {
@@ -58,25 +57,10 @@ function find(result: CaptureResult, node: Cheerio, ...args: (string | Capture)[
   }
 }
 
-const map = new Map<string, ContentFn>()
-
-export const contentFunctions = {
-  get(name: string) {
-    if (map.has(name)) {
-      return map.get(name)
-    } else {
-      throw new Error(msg.invalidContentFunction(name))
-    }
-  },
-
-  set(name: string, fn: ContentFn) {
-    map.set(name, fn)
-  },
-
-  remove(name: string) {
-    map.delete(name)
-  },
+export const contentFunctionDict: Dict<ContentFn> = {
+  find,
 }
 
-// Default content functions
-contentFunctions.set('find', find)
+export function defineContentFunction(name: string, contentFunction: ContentFn) {
+  contentFunctionDict[name] = contentFunction
+}
