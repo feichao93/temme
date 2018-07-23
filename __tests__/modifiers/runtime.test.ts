@@ -1,5 +1,4 @@
-import temme from '../../src'
-import { defineModifier, ModifierFn } from '../../src/modifiers'
+import temme, { defineModifier, ModifierFn } from '../../src'
 
 const html1 = `
 <ul>

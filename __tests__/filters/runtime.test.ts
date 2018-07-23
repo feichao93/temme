@@ -1,4 +1,23 @@
-import { default as temme, defineFilter } from '../src/index'
+import temme, { cheerio, defineFilter } from '../../src'
+
+test('prototype filter: String#split', () => {
+  const html = `<p>A B C D</p>`
+  const selector = `p{$|split(' ')}`
+  expect(temme(html, selector)).toEqual(['A', 'B', 'C', 'D'])
+})
+
+test('prototype filter: Array#slice', () => {
+  const html = `
+  <ul>
+    <li>apple</li>
+    <li>banana</li>
+    <li>cherry</li>
+    <li>pear</li>
+  </ul>
+  `
+  const selector = 'li@|slice(1,3){ &{$} }'
+  expect(temme(cheerio.load(html), selector)).toEqual(['banana', 'cherry'])
+})
 
 test('filter `pack`', () => {
   const html = `

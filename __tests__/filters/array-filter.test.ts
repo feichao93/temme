@@ -1,4 +1,4 @@
-import temme from '../src/index'
+import temme from '../../src'
 
 test('use trim as array-filter', () => {
   const html = `

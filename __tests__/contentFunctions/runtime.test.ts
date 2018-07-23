@@ -1,4 +1,4 @@
-import temme from '../src/temme'
+import temme from '../../src'
 
 test('contentFunction find', () => {
   const html = '<div>  test text</div>'

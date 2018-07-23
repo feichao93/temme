@@ -1,5 +1,4 @@
-import { CaptureResult, defaultFilterDict, Modifier, msg } from '../src'
-import { defaultModifierDict } from '../src/modifiers'
+import { CaptureResult, defaultFilterDict, defaultModifierDict, Modifier, msg } from '../../src/index'
 
 // TODO 需要添加 modifier 的测试
 

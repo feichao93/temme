@@ -1,28 +1,21 @@
-import * as path from 'path'
-import * as fs from 'fs'
-import temme, { msg } from '../src'
+import temme, { msg } from '../../src'
 
-const html = fs.readFileSync(
-  path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'),
-  'utf8',
-)
+const html = `<div class="foo">test html</div>`
 
 test('invalid filter name', () => {
-  expect(() =>
-    temme(html, `#question-header .question-hyperlink[href=$url]{$title|foo}`),
-  ).toThrowError(msg.invalidFilter('foo'))
+  expect(() => temme(html, `div{$text|foo}`)).toThrowError(msg.invalidFilter('foo'))
 })
 
 test('define filter in children selector', () => {
-  expect(() =>
-    temme('<div>test-html</div>', `div@ { filter myFilter() { return this } }`),
-  ).toThrowError(msg.filterDefineNotAtTopLevel('myFilter'))
+  expect(() => temme(html, `div@ { filter myFilter() { return this } }`)).toThrowError(
+    msg.filterDefineNotAtTopLevel('myFilter'),
+  )
 })
 
 test('define the same filter twice', () => {
   expect(() =>
     temme(
-      '<div>test-html</div>',
+      html,
       `filter myFilter() { return this }
       filter myFilter() { return this }`,
     ),
@@ -33,30 +26,7 @@ test('parent-ref-selector at top', () => {
   expect(() => temme(html, `&[attr=$value];`)).toThrowError(msg.parentRefSelectorAtTopLevel())
 })
 
-test('wrong syntax example 1', () => {
-  expect(() => temme(html, `#question-header .question-hyperlink @`)).toThrowError()
-})
-
-test('wrong syntax example 2', () => {
-  expect(() =>
-    temme(
-      html,
-      `.answer@ (
-        .votecell .vote-count-post{$upvote},
-        .post-test{$postText},
-        .user-info .user-details>a{$userName},
-        .comment@comments [error here] (
-          .comment-score{$score},
-          .comment-copy{$content|substring10},
-          .comment-user[href=$userUrl]{$userName},
-          .comment-data span[title=$data],
-        ),
-      )`,
-    ),
-  ).toThrowError()
-})
-
-test('some tests', () => {
+test('other error handling', () => {
   expect(() => {
     console.log(temme(html, 'div{ foo($bar) }'))
   }).toThrowError(msg.invalidContentFunction('foo'))
@@ -73,7 +43,6 @@ test('some tests', () => {
 })
 
 test('define snippet in children selector', () => {
-  const html = `<div>test html</div>`
   const selector = `
 div@ {
   @xxx = {
@@ -90,7 +59,6 @@ test('use an undefined snippet', () => {
 })
 
 test('snippet is already defined', () => {
-  const html = `<div>test html</div>`
   const selector = `
 @foo = { div{$text}; };
 @foo = { li@list { &{$text} } };

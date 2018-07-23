@@ -1,14 +1,12 @@
 import {
+  Assignment,
+  AttributeOperator,
+  Combinator,
+  DEFAULT_CAPTURE_KEY,
   temmeParser,
   TemmeSelector,
   UNIVERSAL_SELECTOR,
-  NormalSelector,
-  ContentCapture,
-  AttributeOperator,
-  Combinator,
-  Assignment,
-  DEFAULT_CAPTURE_KEY,
-} from '../src'
+} from '../../src'
 
 test('parse empty selector', () => {
   expect(temmeParser.parse('')).toEqual([])
@@ -16,75 +14,6 @@ test('parse empty selector', () => {
   expect(temmeParser.parse('\t\t  \n\n')).toEqual([])
   expect(temmeParser.parse('// only comments')).toEqual([])
   expect(temmeParser.parse('/* only comments */')).toEqual([])
-})
-
-describe('parse value assignment', () => {
-  test('at top-level', () => {
-    const expected: TemmeSelector[] = [
-      {
-        type: 'assignment',
-        capture: { name: 'a', filterList: [], modifier: null },
-        value: '123',
-      },
-    ]
-    expect(temmeParser.parse(`$a="123";`)).toEqual(expected)
-    expect(temmeParser.parse(`$a = '123';`)).toEqual(expected)
-    expect(temmeParser.parse(`$a   \t\n= '123';`)).toEqual(expected)
-  })
-
-  test('in children selectors', () => {
-    const selector = `
-      div@list {
-        $a = null;
-      };
-    `
-    const expected: TemmeSelector[] = [
-      {
-        type: 'normal-selector',
-        arrayCapture: { name: 'list', filterList: [], modifier: null },
-        content: null,
-        sections: [
-          {
-            combinator: ' ',
-            element: 'div',
-            qualifiers: [],
-          },
-        ],
-        children: [
-          {
-            type: 'assignment',
-            capture: { name: 'a', filterList: [], modifier: null },
-            value: null,
-          },
-        ],
-      },
-    ]
-    expect(temmeParser.parse(selector)).toEqual(expected)
-  })
-
-  test('in content', () => {
-    const selector = 'div{$foo = true}'
-    const expected: TemmeSelector[] = [
-      {
-        type: 'normal-selector',
-        arrayCapture: null,
-        sections: [
-          {
-            combinator: ' ',
-            element: 'div',
-            qualifiers: [],
-          },
-        ],
-        content: {
-          type: 'assignment',
-          capture: { name: 'foo', filterList: [], modifier: null },
-          value: true,
-        },
-        children: [],
-      },
-    ]
-    expect(temmeParser.parse(selector)).toEqual(expected)
-  })
 })
 
 describe('parse JavaScript literals', () => {
@@ -200,7 +129,7 @@ describe('parse capture', () => {
     expect(parseResult).toEqual(expectedResult)
   })
 
-  test('array capture and content capture in children selectors', () => {
+  test('array capture and content capture in children basic-selectors', () => {
     const selector = `
       div@list {
         .foo{$h|html};
@@ -410,57 +339,4 @@ test('test JavaScript comments', () => {
   `
   const s4 = 'div[foo=$bar]{html($foo)}'
   expect(temmeParser.parse(s3)).toEqual(temmeParser.parse(s4))
-})
-
-test('parse filters', () => {
-  function extractFilterList(selectors: TemmeSelector[]) {
-    return ((selectors[0] as NormalSelector).content as ContentCapture).capture.filterList
-  }
-
-  expect(extractFilterList(temmeParser.parse('html{$h|f}'))).toEqual([
-    { isArrayFilter: false, name: 'f', args: [] },
-  ])
-
-  expect(
-    extractFilterList(temmeParser.parse(`html{$h|f(1,null,'3')|g()|h(false,true,'234')}`)),
-  ).toEqual([
-    { isArrayFilter: false, name: 'f', args: [1, null, '3'] },
-    { isArrayFilter: false, name: 'g', args: [] },
-    { isArrayFilter: false, name: 'h', args: [false, true, '234'] },
-  ])
-})
-
-describe('snippet define and expand', () => {
-  test('snippet define', () => {
-    const selector = `
-      @snippet = {
-        $foo = 'bar';
-      };
-    `
-    const expectedResult: TemmeSelector[] = [
-      {
-        type: 'snippet-define',
-        name: 'snippet',
-        selectors: [
-          {
-            type: 'assignment',
-            capture: { name: 'foo', filterList: [], modifier: null },
-            value: 'bar',
-          },
-        ],
-      },
-    ]
-    expect(temmeParser.parse(selector)).toEqual(expectedResult)
-  })
-
-  test('snippet expand', () => {
-    const selector = `@snippet;`
-    const expectedResult: TemmeSelector[] = [
-      {
-        type: 'snippet-expand',
-        name: 'snippet',
-      },
-    ]
-    expect(temmeParser.parse(selector)).toEqual(expectedResult)
-  })
 })

@@ -110,14 +110,14 @@ export interface PseudoQualifier {
   content: string
 }
 
-export type Content = ContentCapture | Assignment | ContentPartCall | null
+export type Content = ContentCapture | Assignment | ContentCall | null
 
 export interface ContentCapture {
   type: 'capture'
   capture: Capture
 }
 
-export interface ContentPartCall {
+export interface ContentCall {
   type: 'call'
   funcName: string
   args: (Literal | Capture)[]

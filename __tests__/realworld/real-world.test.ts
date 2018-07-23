@@ -1,15 +1,12 @@
-import temme, { TemmeSelector, temmeParser } from '../src/index'
+import temme, { temmeParser, TemmeSelector } from '../../src/index'
 import * as path from 'path'
 import * as fs from 'fs'
 
-const stHtml = fs.readFileSync(
-  path.resolve(__dirname, './testHtml/question-page-of-stackoverflow.html'),
+const stackOverflowHtml = fs.readFileSync(
+  path.resolve(__dirname, './html/question-page-of-stackoverflow.html'),
   'utf8',
 )
-const maigooHtml = fs.readFileSync(
-  path.resolve(__dirname, './testHtml/maigoo-brand-page.html'),
-  'utf8',
-)
+const maigooHtml = fs.readFileSync(path.resolve(__dirname, './html/maigoo-brand-page.html'), 'utf8')
 
 test('text matching', () => {
   const selector = `
@@ -33,7 +30,7 @@ test('text matching', () => {
 test('basic value capture', () => {
   const selector = `#question-header .question-hyperlink[href=$url]{$title}`
 
-  expect(temme(stHtml, selector)).toEqual({
+  expect(temme(stackOverflowHtml, selector)).toEqual({
     url: '/questions/291978/short-description-of-the-scoping-rules',
     title: 'Short Description of the Scoping Rules?',
   })
@@ -46,7 +43,7 @@ test('array capture', () => {
   }`
   const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
-  expect(temme(stHtml, parseResult)).toEqual({
+  expect(temme(stackOverflowHtml, parseResult)).toEqual({
     answers: [
       { upvote: '259', userName: 'Community' },
       { upvote: '111', userName: 'Brian' },
@@ -72,7 +69,7 @@ test('complex example: recursive array capture, default capture', () => {
     };
   }`
 
-  expect(temme(stHtml, selector)).toEqual([
+  expect(temme(stackOverflowHtml, selector)).toEqual([
     {
       comments: [
         {
