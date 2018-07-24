@@ -38,11 +38,12 @@
     "@types/relateurl" "*"
     "@types/uglify-js" "*"
 
-"@types/html-webpack-plugin@^2.30.3":
-  version "2.30.3"
-  resolved "http://registry.npm.taobao.org/@types/html-webpack-plugin/download/@types/html-webpack-plugin-2.30.3.tgz#848baba8e35010c6ef6d36b04174820b9d884583"
+"@types/html-webpack-plugin@^3.2.0":
+  version "3.2.0"
+  resolved "http://registry.npm.taobao.org/@types/html-webpack-plugin/download/@types/html-webpack-plugin-3.2.0.tgz#26b20854124bbcccbc22ccec715a1ba74583526c"
   dependencies:
     "@types/html-minifier" "*"
+    "@types/tapable" "*"
     "@types/webpack" "*"
 
 "@types/invariant@^2.2.29":
