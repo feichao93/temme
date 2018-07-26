@@ -1,4 +1,2 @@
-__tests__/testHtml/* linguist-vendored
+__tests__/realworld/html/* linguist-vendored
 playground/public/resources/**/* linguist-vendored
-assets/**/* linguist-documentation
-build/**/* linguist-generated
