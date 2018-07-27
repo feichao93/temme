@@ -311,9 +311,9 @@ filter myFilter(arg1, arg2, arg3) {
 div{$txt|myFilter(x, y, z)};
 ```
 
-## Content
+## Content (TODO rename to a better name)
 
-The selectors in the curly brackets after normal CSS selector are called content. Content is used to capture text or html of a node. Content consists of several content-parts, separated by semicolons. Each content-part can be in one of the following forms:
+The selectors in the curly brackets after normal CSS selector are called content. Content can be in one of the following forms:
 
 1. Capture.  This will capture text/html of the node into the specified field;
 2. Assignment.  It is like a conditional assignment, if temme find that a node satisfies the normal CSS selector, then the assignment is executed;
@@ -333,14 +333,13 @@ Examples:
 ```JavaScript
 const html = '<div class="outer"> <p>TEXT-1</p> <div class="inner">TEXT-2</div> </div>'
 const selector = `
-div.outer{
-  $a;
-  $b|text;
-  $c|html;
-  $d|outerHTML;
-  $e|node|attr('class');
-  $f|toLowerCase;
-}`
+div.outer{ $a };
+div.outer{ $b|text };
+div.outer{ $c|html };
+div.outer{ $d|outerHTML };
+div.outer{ $e|node|attr('class') };
+div.outer{ $f|toLowerCase };
+`
 temme(html, selector)
 //=>
 // {
