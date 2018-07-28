@@ -1,3 +1,9 @@
+## [unreleased]
+
+* Remove *content*, and introduce *procedure*
+* Introduce *modifier*
+* Remove `nth` filter, use `get` instead
+
 ## 0.7.0
 
 * Add browser build

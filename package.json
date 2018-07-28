@@ -25,20 +25,6 @@
     "playground:start": "webpack-dev-server --config webpack.playground.config.ts --mode development",
     "playground:build": "webpack --config webpack.playground.config.ts --mode production && cp -r playground/public/* playground-build"
   },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(tsx?|jsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "json",
-      "jsx"
-    ],
-    "collectCoverage": true
-  },
   "dependencies": {
     "@types/cheerio": "^0.22.8",
     "@types/invariant": "^2.2.29",
