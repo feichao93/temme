@@ -40,7 +40,9 @@ export type ExpandedTemmeSelector =
 export interface NormalSelector {
   type: 'normal-selector'
   sections: Section[]
-  content: Content
+  // 当用户没有提供 procedure 时，该字段为 null
+  procedure: Procedure
+  // 当用户没有提供 arrayCapture 时，该字段为 null
   arrayCapture: Capture
   children: TemmeSelector[]
 }
@@ -48,7 +50,13 @@ export interface NormalSelector {
 export interface ParentRefSelector {
   type: 'parent-ref-selector'
   section: Section
-  content: Content
+  // 当用户没有提供 procedure 时，该字段为 null
+  procedure: Procedure
+}
+
+export interface Procedure {
+  name: string
+  args: (Literal | Capture)[]
 }
 
 export interface Assignment {
@@ -109,20 +117,3 @@ export interface PseudoQualifier {
   name: string
   content: string
 }
-
-export type Content = ContentCapture | Assignment | ContentCall | null
-
-export interface ContentCapture {
-  type: 'capture'
-  capture: Capture
-}
-
-export interface ContentCall {
-  type: 'call'
-  funcName: string
-  args: (Literal | Capture)[]
-}
-
-// The following line is related to
-// https://github.com/s-panferov/awesome-typescript-loader/issues/501
-export const DummyValue325353 = '242gascdfe'

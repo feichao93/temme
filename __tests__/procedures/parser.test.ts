@@ -1,15 +1,14 @@
 import { temmeParser, TemmeSelector } from '../../src'
 
-test('parse content function', () => {
+test('parse procedure', () => {
   const actual = temmeParser.parse(`div{ fn($c, 100) }`)
 
   const expected: TemmeSelector[] = [
     {
       type: 'normal-selector',
       sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
-      content: {
-        type: 'call',
-        funcName: 'fn',
+      procedure: {
+        name: 'fn',
         args: [{ name: 'c', filterList: [], modifier: null }, 100],
       },
       arrayCapture: null,

@@ -1,22 +1,22 @@
 import cheerio from 'cheerio'
 import invariant from 'invariant'
 import { defaultFilterDict, FilterFn } from './filters'
-import { contentFunctionDict } from './contentFunctions'
+import { defaultProcedureDict, ProcedureFn } from './procedures'
+import { defaultModifierDict, ModifierFn } from './modifiers'
 import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
-import { SPECIAL_FILTER_NAMES } from './constants'
+import { DEFAULT_PROCEDURE_NAME } from './constants'
 import { isAttributeQualifier, isCheerioStatic, makeNormalCssSelector } from './utils'
 import {
   AttributeQualifier,
-  Content,
   Dict,
   ExpandedTemmeSelector,
   NormalSelector,
   ParentRefSelector,
+  Procedure,
   SnippetDefine,
   TemmeSelector,
 } from './interfaces'
-import { defaultModifierDict, ModifierFn } from './modifiers'
 
 export interface TemmeParser {
   parse(temmeSelectorString: string): TemmeSelector[]
@@ -43,6 +43,7 @@ export default function temme(
   selector: string | TemmeSelector[],
   extraFilters: Dict<FilterFn> = {},
   extraModifiers: Dict<ModifierFn> = {},
+  extraProcedures: Dict<ProcedureFn> = {},
 ) {
   let $: CheerioStatic
   if (typeof html === 'string') {
@@ -65,14 +66,15 @@ export default function temme(
 
   rootSelectorArray.forEach(checkRootSelector)
 
-  const filterFnMap: Dict<FilterFn> = Object.assign({}, defaultFilterDict, extraFilters)
-  const modifierFnMap: Dict<ModifierFn> = Object.assign({}, defaultModifierDict, extraModifiers)
+  const filterDict: Dict<FilterFn> = Object.assign({}, defaultFilterDict, extraFilters)
+  const modifierDict: Dict<ModifierFn> = Object.assign({}, defaultModifierDict, extraModifiers)
+  const procedureDict: Dict<ProcedureFn> = Object.assign({}, defaultProcedureDict, extraProcedures)
   const snippetsMap = new Map<string, SnippetDefine>()
 
   return helper($.root(), rootSelectorArray).getResult()
 
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
-    const result = new CaptureResult(filterFnMap, modifierFnMap)
+    const result = new CaptureResult(filterDict, modifierDict)
 
     // First pass: process SnippetDefine and FilterDefine
     for (const selector of selectorArray) {
@@ -81,9 +83,9 @@ export default function temme(
         snippetsMap.set(selector.name, selector)
       } else if (selector.type === 'filter-define') {
         const { name, argsPart, code } = selector
-        invariant(!(name in filterFnMap), msg.filterAlreadyDefined(name))
+        invariant(!(name in filterDict), msg.filterAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        filterFnMap[name] = eval(funcString)
+        filterDict[name] = eval(funcString)
       }
     }
 
@@ -144,16 +146,16 @@ export default function temme(
     selector: NormalSelector | ParentRefSelector,
   ) {
     if (selector.type === 'normal-selector') {
-      const { sections, content } = selector
+      const { sections, procedure } = selector
       // Value-captures not in the last section will be ignored
       const lastSection = sections[sections.length - 1]
       captureAttributes(result, node, lastSection.qualifiers.filter(isAttributeQualifier))
-      captureContent(result, node, content)
+      executeProcedure(result, node, procedure)
     } else {
       // selector.type === 'parent-ref-selector'
-      const { section, content } = selector
+      const { section, procedure } = selector
       captureAttributes(result, node, section.qualifiers.filter(isAttributeQualifier))
-      captureContent(result, node, content)
+      executeProcedure(result, node, procedure)
     }
   }
 
@@ -174,40 +176,14 @@ export default function temme(
     }
   }
 
-  function captureContent(result: CaptureResult, node: Cheerio, content: Content) {
-    if (content == null) {
+  function executeProcedure(result: CaptureResult, node: Cheerio, procedure: Procedure) {
+    if (procedure == null) {
       return
     }
-    if (content.type === 'capture') {
-      const { name, filterList, modifier } = content.capture
-      // `text`, `html` and `node` are three special filter names.
-      // They have the same syntax with the normal filters, but have different running semantics.
-      const firstFilterName = filterList[0] && filterList[0].name
-      let value: any
-      if (firstFilterName === 'html') {
-        value = node.html()
-      } else if (firstFilterName === 'outerHTML') {
-        value = $.html(node)
-      } else if (firstFilterName === 'node') {
-        value = cheerio(node)
-      } else {
-        // `text` is the default filter
-        value = node.text()
-      }
-      // Remove the first special filter.
-      const normalFilterList = SPECIAL_FILTER_NAMES.includes(firstFilterName)
-        ? filterList.slice(1)
-        : filterList
-      result.add({ name, filterList: normalFilterList, modifier }, value)
-    } else if (content.type === 'assignment') {
-      const { capture, value } = content
-      result.add(capture, value)
-    } else {
-      // content.type === 'call'
-      const { funcName, args } = content
-      const fn = contentFunctionDict[funcName]
-      invariant(typeof fn === 'function', msg.invalidContentFunction(funcName))
-      fn(result, node, ...args)
-    }
+    const { name, args } = procedure
+    const procedureName = name === DEFAULT_PROCEDURE_NAME ? 'text' : name
+    const fn = procedureDict[procedureName]
+    invariant(typeof fn === 'function', msg.invalidContentFunction(name))
+    fn(result, node, ...args)
   }
 }

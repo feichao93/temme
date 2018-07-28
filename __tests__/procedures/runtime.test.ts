@@ -1,6 +1,6 @@
 import temme from '../../src'
 
-test('contentFunction find', () => {
+test('procedure find', () => {
   const html = '<div>  test text</div>'
 
   expect(temme(html, `div{find('not-exist', $)}`)).toEqual(null)

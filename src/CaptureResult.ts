@@ -12,7 +12,7 @@ const forceAddModifier: Modifier = { name: 'forceAdd', args: [] }
 export class CaptureResult {
   private readonly result: any = {}
 
-  constructor(readonly filterFnMap: Dict<FilterFn>, readonly modifierFnMap: Dict<ModifierFn>) {}
+  constructor(readonly filterDict: Dict<FilterFn>, readonly modifierDict: Dict<ModifierFn>) {}
 
   get(key: string) {
     return this.result[key]
@@ -32,7 +32,7 @@ export class CaptureResult {
 
   private exec(capture: Capture, value: any, defaultModifier: Modifier) {
     const modifier = capture.modifier || defaultModifier
-    const modifierFn = this.modifierFnMap[modifier.name]
+    const modifierFn = this.modifierDict[modifier.name]
     invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
     modifierFn(
       this,
@@ -54,8 +54,8 @@ export class CaptureResult {
   }
 
   private applyFilter(value: any, filter: Filter) {
-    if (filter.name in this.filterFnMap) {
-      const filterFn = this.filterFnMap[filter.name]
+    if (filter.name in this.filterDict) {
+      const filterFn = this.filterDict[filter.name]
       return filterFn.apply(value, filter.args)
     } else if (typeof value[filter.name] === 'function') {
       const filterFn: FilterFn = value[filter.name]

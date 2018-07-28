@@ -1,10 +1,22 @@
 import invariant from 'invariant'
-import { Capture, Dict } from './interfaces'
+import { Capture, Dict, Literal } from './interfaces'
 import { CaptureResult } from './CaptureResult'
 import { isCapture } from './utils'
 
-export interface ContentFn {
+export interface ProcedureFn {
   (result: CaptureResult, node: Cheerio, ...args: any[]): void
+}
+
+function text(result: CaptureResult, node: Cheerio, capture: Capture) {
+  result.add(capture, node.text())
+}
+
+function html(result: CaptureResult, node: Cheerio, capture: Capture) {
+  result.add(capture, node.html())
+}
+
+function node(result: CaptureResult, node: Cheerio, capture: Capture) {
+  result.add(capture, cheerio(node))
 }
 
 /** Try to capture text within a node's text.
@@ -13,7 +25,7 @@ export interface ContentFn {
  * 2. find($capture, 'after-string')    Try to capture the text before 'after-string'
  * 3. find('pre', $capture, 'post')     Try to capture the text between 'pre' and 'post'
  * */
-function find(result: CaptureResult, node: Cheerio, ...args: (string | Capture)[]): void {
+function find(result: CaptureResult, node: Cheerio, ...args: (string | Capture)[]) {
   const invalidArgs = 'Invalid arguments received by match(...)'
   const s = node.text()
   if (args.length === 2) {
@@ -57,10 +69,18 @@ function find(result: CaptureResult, node: Cheerio, ...args: (string | Capture)[
   }
 }
 
-export const contentFunctionDict: Dict<ContentFn> = {
-  find,
+function assign(result: CaptureResult, node: Cheerio, capture: Capture, value: Literal) {
+  result.forceAdd(capture, value)
 }
 
-export function defineContentFunction(name: string, contentFunction: ContentFn) {
-  contentFunctionDict[name] = contentFunction
+export const defaultProcedureDict: Dict<ProcedureFn> = {
+  text,
+  html,
+  node,
+  find,
+  assign,
+}
+
+export function defineProcedure(name: string, fn: ProcedureFn) {
+  defaultProcedureDict[name] = fn
 }
