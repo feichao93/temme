@@ -2,7 +2,7 @@ import {
   Assignment,
   AttributeOperator,
   Combinator,
-  DEFAULT_CAPTURE_KEY,
+  DEFAULT_PROCEDURE_NAME,
   temmeParser,
   TemmeSelector,
   UNIVERSAL_SELECTOR,
@@ -74,7 +74,7 @@ test('parse simple selector: `div`', () => {
           qualifiers: [],
         },
       ],
-      content: null,
+      procedure: null,
       children: [],
     },
   ]
@@ -82,7 +82,7 @@ test('parse simple selector: `div`', () => {
 })
 
 describe('parse capture', () => {
-  test('attribute capture and content capture at top level', () => {
+  test('attribute capture and procedure at top level', () => {
     const selector = `#question-header .question-hyperlink[href=$url]{$title}`
     const parseResult: TemmeSelector[] = temmeParser.parse(selector)
 
@@ -118,9 +118,9 @@ describe('parse capture', () => {
             ],
           },
         ],
-        content: {
-          type: 'capture',
-          capture: { name: 'title', filterList: [], modifier: null },
+        procedure: {
+          name: DEFAULT_PROCEDURE_NAME,
+          args: [{ name: 'title', filterList: [], modifier: null }],
         },
         children: [],
       },
@@ -129,7 +129,7 @@ describe('parse capture', () => {
     expect(parseResult).toEqual(expectedResult)
   })
 
-  test('array capture and content capture in children basic-selectors', () => {
+  test('array capture and procedure in children basic-selectors', () => {
     const selector = `
       div@list {
         .foo{$h|html};
@@ -142,7 +142,7 @@ describe('parse capture', () => {
         type: 'normal-selector',
         arrayCapture: { name: 'list', filterList: [], modifier: null },
         sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
-        content: null,
+        procedure: null,
         children: [
           {
             type: 'normal-selector',
@@ -154,13 +154,15 @@ describe('parse capture', () => {
                 qualifiers: [{ type: 'class-qualifier', className: 'foo' }],
               },
             ],
-            content: {
-              type: 'capture',
-              capture: {
-                name: 'h',
-                filterList: [{ isArrayFilter: false, name: 'html', args: [] }],
-                modifier: null,
-              },
+            procedure: {
+              name: DEFAULT_PROCEDURE_NAME,
+              args: [
+                {
+                  name: 'h',
+                  filterList: [{ isArrayFilter: false, name: 'html', args: [] }],
+                  modifier: null,
+                },
+              ],
             },
             children: [],
           },
@@ -197,7 +199,7 @@ describe('parse capture', () => {
             ],
           },
         ],
-        content: null,
+        procedure: null,
         arrayCapture: null,
         children: [],
       },
@@ -227,7 +229,7 @@ describe('parse capture', () => {
               ],
             },
           ],
-          content: null,
+          procedure: null,
           arrayCapture: null,
           children: [],
         },
@@ -256,7 +258,7 @@ test('using string literal in attribute qualifiers', () => {
           ],
         },
       ],
-      content: null,
+      procedure: null,
       arrayCapture: null,
       children: [],
     },
@@ -283,7 +285,7 @@ describe('test different section combinator', () => {
             qualifiers: [],
           },
         ],
-        content: null,
+        procedure: null,
         arrayCapture: null,
         children: [],
       },
@@ -296,28 +298,6 @@ describe('test different section combinator', () => {
       expect(parseResult).toEqual(getExpectedResult(combinator))
     })
   }
-})
-
-test('test parent-reference', () => {
-  const expected: TemmeSelector[] = [
-    {
-      type: 'normal-selector',
-      arrayCapture: { filterList: [], name: DEFAULT_CAPTURE_KEY, modifier: null },
-      sections: [{ combinator: ' ', element: 'div', qualifiers: [] }],
-      children: [
-        {
-          type: 'parent-ref-selector',
-          section: { combinator: ' ', element: '*', qualifiers: [] },
-          content: { capture: { filterList: [], name: 'value', modifier: null }, type: 'capture' },
-        },
-      ],
-      content: null,
-    },
-  ]
-
-  expect(temmeParser.parse(`div@ { &{$value} };`)).toEqual(expected)
-  expect(temmeParser.parse(`div@ { & {$value} };`)).toEqual(expected)
-  expect(temmeParser.parse(`div@ { & /* comment here */ {$value} };`)).toEqual(expected)
 })
 
 test('test JavaScript comments', () => {
