@@ -10,4 +10,7 @@ export * from './utils'
 
 import temme from './temme'
 
+declare const TEMME_VERSION: string
+export const version = TEMME_VERSION
+
 export default temme

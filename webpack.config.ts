@@ -1,5 +1,6 @@
 import * as webpack from 'webpack'
 import * as path from 'path'
+const packageInfo = require('./package.json')
 
 const webConfig: webpack.Configuration = {
   target: 'web',
@@ -52,6 +53,7 @@ const baseConfig: webpack.Configuration = {
   plugins: [
     new webpack.DefinePlugin({
       WEBPACK_BUILD: JSON.stringify(true),
+      TEMME_VERSION: JSON.stringify(packageInfo.version),
     }),
   ],
 }
