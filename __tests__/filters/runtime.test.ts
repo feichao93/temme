@@ -73,13 +73,12 @@ test('filter `flatten`', () => {
   expect(temme(html, selector)).toEqual(['0-0', '0-1', '1-0', '1-1'])
 })
 
-test('filter `first`, `last`, `nth`, `get`', () => {
+test('filter `first`, `last`, `get`', () => {
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|first}`)).toBe('0')
   expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|last}`)).toBe('4')
-  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(1)}`)).toBe('1')
-  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(2)}`)).toBe('2')
-  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(3)}`)).toBe('3')
-  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|nth(10)}`)).toBe(null)
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|get(1)}`)).toBe('1')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|get(2)}`)).toBe('2')
+  expect(temme('<p>0 1 2 3 4</p>', `p{$|split(' ')|get(10)}`)).toBe(null)
 
   const html = '<p title="TITLE" style="STYLE">TEXT</p>'
   const makeSelector = (key: string) => `p@|pack|get('${key}'){&[title=$title style=$style]{$text}}`
@@ -110,12 +109,11 @@ test('special filters', () => {
     text: ' apple banana cherry ',
   }
 
-  expect(temme(html, `ul{$}`)).toEqual(expected.text)
-  expect(temme(html, `ul{$|text}`)).toEqual(expected.text)
-  expect(temme(html, `ul{$|html}`)).toEqual(expected.innerHTML)
-  expect(temme(html, `ul{$|outerHTML}`)).toEqual(html)
+  expect(temme(html, `ul{ $ }`)).toEqual(expected.text)
+  expect(temme(html, `ul{ text($) }`)).toEqual(expected.text)
+  expect(temme(html, `ul{ html($) }`)).toEqual(expected.innerHTML)
 
-  const node: Cheerio = temme(html, `ul{$|node}`)
+  const node: Cheerio = temme(html, `ul{ node($) }`)
   expect(node.html()).toEqual(expected.innerHTML)
   expect(node.text()).toEqual(expected.text)
 })

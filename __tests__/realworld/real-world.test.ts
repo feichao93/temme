@@ -135,12 +135,12 @@ test('complex example: recursive array capture, default capture', () => {
 
 test('complex case: multiple parent-refs', () => {
   const selector = `.brandinfo .info >li@|pack{
-      &{find('电话：', $phone|split(','))};
-      &{find('品牌创立时间：', $foundTime)};
-      &{find('品牌发源地：', $origination)};
-      &{find('品牌广告词：', $adText|trim)};
-      &{$presidentUrl|html|extractPresidentUrl};
-      script[language]{$officialWebsite|html|extractUrl};
+      &{ find('电话：', $phone|split(',')) };
+      &{ find('品牌创立时间：', $foundTime) };
+      &{ find('品牌发源地：', $origination) };
+      &{ find('品牌广告词：', $adText|trim) };
+      &{ html($presidentUrl|extractPresidentUrl) };
+      script[language]{ html($officialWebsite|extractUrl) };
     }`
 
   const filters = {

@@ -1,3 +1,4 @@
+import cheerio from 'cheerio'
 import invariant from 'invariant'
 import { Capture, Dict, Literal } from './interfaces'
 import { CaptureResult } from './CaptureResult'

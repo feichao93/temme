@@ -20,7 +20,7 @@ test('multiple selectors at root level', () => {
     .name{$name};
     .country{$country};
     .city{$city};
-    .university{$university};
+    li[class=university]{$university};
   `
   expect(temme(html, selector)).toEqual({
     name: 'shinima',
@@ -56,7 +56,7 @@ test('test pseudo-qualifier', () => {
   expect(temme(html, 'body *:not(div){$}')).toBe('SECTION')
   expect(temme(html, 'body *:contains(IV3){$}')).toBe('DIV3')
   expect(temme(html, 'body *:icontains(Iv3){$}')).toBe('DIV3')
-  expect(temme(html, ':root{$|node}')[0].name).toBe('html')
+  expect(temme(html, ':root{ node($) }')[0].name).toBe('html')
   expect(temme(html, 'body *:first-child{$}')).toBe('DIV1')
   expect(temme(html, 'body *:nth-child(2){$}')).toBe('DIV2')
   expect(temme(html, 'body *:nth-of-type(3){$}')).toBe('DIV3')

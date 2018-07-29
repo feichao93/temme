@@ -1,7 +1,7 @@
-import { ContentCapture, NormalSelector, temmeParser, TemmeSelector } from '../../src'
+import { Capture, NormalSelector, temmeParser, TemmeSelector } from '../../src'
 
 function extractFilterList(selectors: TemmeSelector[]) {
-  return ((selectors[0] as NormalSelector).content as ContentCapture).capture.filterList
+  return ((selectors[0] as NormalSelector).procedure.args[0] as Capture).filterList
 }
 
 test('parse filters', () => {

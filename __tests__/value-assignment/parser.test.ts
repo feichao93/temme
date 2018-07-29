@@ -23,7 +23,7 @@ test('value-assignment in children basic-selectors', () => {
     {
       type: 'normal-selector',
       arrayCapture: { name: 'list', filterList: [], modifier: null },
-      content: null,
+      procedure: null,
       sections: [
         {
           combinator: ' ',
@@ -44,7 +44,7 @@ test('value-assignment in children basic-selectors', () => {
 })
 
 test('value-assignment in content', () => {
-  const selector = 'div{$foo = true}'
+  const selector = 'div{ assign($foo, true) }'
   const expected: TemmeSelector[] = [
     {
       type: 'normal-selector',
@@ -56,10 +56,9 @@ test('value-assignment in content', () => {
           qualifiers: [],
         },
       ],
-      content: {
-        type: 'assignment',
-        capture: { name: 'foo', filterList: [], modifier: null },
-        value: true,
+      procedure: {
+        name: 'assign',
+        args: [{ name: 'foo', filterList: [], modifier: null }, true],
       },
       children: [],
     },

@@ -1,11 +1,19 @@
 {
   const DEFAULT_CAPTURE_KEY = '@@default-capture@@'
+  const DEFAULT_PROCEDURE_NAME = '@@default-procedure@@'
   const UNIVERSAL_SELECTOR = '*'
 
   const defaultSection = {
     combinator: ' ',
     element: UNIVERSAL_SELECTOR,
     qualifiers: [],
+  }
+
+  function defaultProcedure(capture) {
+    return {
+      name: DEFAULT_PROCEDURE_NAME,
+      args: [capture],
+    }
   }
 
   function flatten(array) {
@@ -43,18 +51,18 @@ Selector = FilterDefine / ParentRefSelector / NormalSelector / AssignmentSelecto
 
 // 自身选择器, 以 & 为开头的选择器
 ParentRefSelector
-  = '&' __ section:Section? __ content:Content SelectorEnd? {
+  = '&' __ section:Section? __ procedure:Procedure SelectorEnd? {
     return {
       type: 'parent-ref-selector',
       section: section || defaultSection,
-      content,
+      procedure,
     }
   }
   / '&' __ section:Section SelectorEnd {
     return {
       type: 'parent-ref-selector',
       section,
-      content: null,
+      procedure: null,
     }
   }
 
@@ -67,16 +75,16 @@ NormalSelector
     return {
       type: 'normal-selector',
       sections,
-      content: null,
+      procedure: null,
       arrayCapture,
       children,
     }
   }
-  / sections:SectionList __  content:Content SelectorEnd? {
+  / sections:SectionList __  procedure:Procedure SelectorEnd? {
     return {
       type: 'normal-selector',
       sections,
-      content,
+      procedure,
       arrayCapture: null,
       children: [],
     }
@@ -85,7 +93,7 @@ NormalSelector
     return {
       type: 'normal-selector',
       sections,
-      content: null,
+      procedure: null,
       arrayCapture: null,
       children: [],
     }
@@ -127,7 +135,7 @@ SnippetExpand
 FilterDefine
   = 'filter'
     __ name:IdentifierName
-    __ argsPart:FilterDefineArgsPart
+    __ argsPart:JSFunctionArgsPart
     __ code:CodeBlock
     SelectorEnd? {
     return {
@@ -138,7 +146,7 @@ FilterDefine
     }
   }
 
-FilterDefineArgsPart
+JSFunctionArgsPart
   = '(' str:FilterDefineArgsString ')' { return str }
   / '(' { error('Unbalanced parenthesis.') }
 
@@ -177,15 +185,14 @@ ChildrenSelectors
   }
 
 Filter
-  = '||' name:IdentifierName args:FilterArgs? {
+  = '||' name:IdentifierName args:LiteralArgs? {
     return { isArrayFilter: true, name, args: args || [] }
   }
-  / '|' name:IdentifierName args:FilterArgs? {
+  / '|' name:IdentifierName args:LiteralArgs? {
     return { isArrayFilter: false, name, args: args || [] }
   }
 
-// TODO FilterArgs 不只是 filter 的参数，同时也是 modifier 的参数
-FilterArgs
+LiteralArgs
   = '(' __ ')' {
     return []
   }
@@ -197,7 +204,7 @@ FilterArgs
   }
 
 Modifier
-  = '!' name:IdentifierName args:FilterArgs? {
+  = '!' name:IdentifierName args:LiteralArgs? {
     return { name, args: args || [] }
   }
 
@@ -293,46 +300,31 @@ PseudoQualifier 'css-selector-pseudo-qualifier'
     }
   }
 
-Content
-  = '{' __ detail:ContentDetail OptionalExtraSeperator __'}' {
+Procedure
+  = '{' __ detail:ProcedureDetail OptionalExtraSeperator __'}' {
     return detail
   }
 
-ContentDetail
-  = assignment:Assignment {
-    return {
-      type: 'assignment',
-      capture: assignment.capture,
-      value: assignment.value,
-    }
+ProcedureDetail
+  = capture:ValueCapture {
+    return defaultProcedure(capture)
   }
-  / capture:ValueCapture {
-    return {
-      type: 'capture',
-      capture,
-    }
+  / name:IdentifierName __ '(' __ ')' {
+    return { name, args: [] }
   }
-  / funcName:IdentifierName __ '(' __ ')' {
-    return {
-      type: 'call',
-      funcName,
-      args: [],
-    }
-  }
-  / funcName:IdentifierName
+  / name:IdentifierName
     __ '('
-    __ head:ContentCallArg
-    tail:(__ ',' __ ContentCallArg)*
+    __ head:ProcedureArg
+    tail:(__ ',' __ ProcedureArg)*
     OptionalExtraComma
     __ ')' {
     return {
-      type: 'call',
-      funcName,
+      name,
       args: buildList(head, tail, 3),
     }
   }
 
-ContentCallArg = Literal / ValueCapture
+ProcedureArg = Literal / ValueCapture
 
 ValueCapture
   = '$' name:IdentifierName filterList:Filter* modifier:Modifier? {
