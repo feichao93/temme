@@ -5,8 +5,7 @@ import { defaultProcedureDict, ProcedureFn } from './procedures'
 import { defaultModifierDict, ModifierFn } from './modifiers'
 import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
-import { DEFAULT_PROCEDURE_NAME } from './constants'
-import { isAttributeQualifier, isCheerioStatic, makeNormalCssSelector } from './utils'
+import { isAttributeQualifier, isCheerioStatic, makeNormalCssSelector, last } from './utils'
 import {
   AttributeQualifier,
   Dict,
@@ -145,18 +144,10 @@ export default function temme(
     node: Cheerio,
     selector: NormalSelector | ParentRefSelector,
   ) {
-    if (selector.type === 'normal-selector') {
-      const { sections, procedure } = selector
-      // Value-captures not in the last section will be ignored
-      const lastSection = sections[sections.length - 1]
-      captureAttributes(result, node, lastSection.qualifiers.filter(isAttributeQualifier))
-      executeProcedure(result, node, procedure)
-    } else {
-      // selector.type === 'parent-ref-selector'
-      const { section, procedure } = selector
-      captureAttributes(result, node, section.qualifiers.filter(isAttributeQualifier))
-      executeProcedure(result, node, procedure)
-    }
+    const procedure = selector.procedure
+    const section = selector.type === 'normal-selector' ? last(selector.sections) : selector.section
+    captureAttributes(result, node, section.qualifiers.filter(isAttributeQualifier))
+    executeProcedure(result, node, procedure)
   }
 
   function captureAttributes(
@@ -181,8 +172,7 @@ export default function temme(
       return
     }
     const { name, args } = procedure
-    const procedureName = name === DEFAULT_PROCEDURE_NAME ? 'text' : name
-    const fn = procedureDict[procedureName]
+    const fn = procedureDict[name]
     invariant(typeof fn === 'function', msg.invalidContentFunction(name))
     fn(result, node, ...args)
   }

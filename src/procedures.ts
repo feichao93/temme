@@ -3,6 +3,7 @@ import invariant from 'invariant'
 import { Capture, Dict, Literal } from './interfaces'
 import { CaptureResult } from './CaptureResult'
 import { isCapture } from './utils'
+import { ASSIGN_PROCEDURE_NAME, DEFAULT_PROCEDURE_NAME } from './constants'
 
 export interface ProcedureFn {
   (result: CaptureResult, node: Cheerio, ...args: any[]): void
@@ -75,11 +76,11 @@ function assign(result: CaptureResult, node: Cheerio, capture: Capture, value: L
 }
 
 export const defaultProcedureDict: Dict<ProcedureFn> = {
-  text,
+  [DEFAULT_PROCEDURE_NAME]: text,
+  [ASSIGN_PROCEDURE_NAME]: assign,
   html,
   node,
   find,
-  assign,
 }
 
 export function defineProcedure(name: string, fn: ProcedureFn) {

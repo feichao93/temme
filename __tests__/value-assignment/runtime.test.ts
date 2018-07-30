@@ -25,8 +25,6 @@ test('assignments in array capture', () => {
     <li>apple</li>
     <li>banana</li>
     <li>cherry</li>
-    <li>pear</li>
-    <li>watermelon</li>
   </ul>
   `
   const selector = `
@@ -38,37 +36,27 @@ test('assignments in array capture', () => {
     { foo: 'bar' },
     { foo: 'bar' },
     { foo: 'bar' },
-    { foo: 'bar' },
-    { foo: 'bar' },
   ])
 })
 
-// test('assignments at top level and in content part', () => {
-//   const html = `
-//     <div>
-//       <ul>
-//         <li></li>
-//         <li></li>
-//       </ul>
-//     </div>
-//   `
-//   const selector = `
-//     $div = false;
-//     $ul = false;
-//     $li = false;
-//     $table = false;
-//     $a = false;
-//     div { $div = true };
-//     ul { $ul = true };
-//     li { $li = true };
-//     table { $table = true };
-//     a { $a = true };
-//   `
-//   expect(temme(html, selector)).toEqual({
-//     div: true,
-//     ul: true,
-//     li: true,
-//     table: false,
-//     a: false,
-//   })
-// })
+test('assignments at top level and in content part', () => {
+  const html = `
+    <div>
+      <ul>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+  `
+  const selector = `
+    $div = false;
+    div { $div = true };
+
+    $table = false;
+    table { $table = true };
+  `
+  expect(temme(html, selector)).toEqual({
+    div: true,
+    table: false,
+  })
+})

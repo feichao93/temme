@@ -1,19 +1,13 @@
 {
   const DEFAULT_CAPTURE_KEY = '@@default-capture@@'
-  const DEFAULT_PROCEDURE_NAME = '@@default-procedure@@'
+  const DEFAULT_PROCEDURE_NAME = 'text'
+  const ASSIGN_PROCEDURE_NAME = 'assign'
   const UNIVERSAL_SELECTOR = '*'
 
   const defaultSection = {
     combinator: ' ',
     element: UNIVERSAL_SELECTOR,
     qualifiers: [],
-  }
-
-  function defaultProcedure(capture) {
-    return {
-      name: DEFAULT_PROCEDURE_NAME,
-      args: [capture],
-    }
   }
 
   function flatten(array) {
@@ -306,8 +300,17 @@ Procedure
   }
 
 ProcedureDetail
-  = capture:ValueCapture {
-    return defaultProcedure(capture)
+  = assignment:Assignment {
+    return {
+      name: ASSIGN_PROCEDURE_NAME,
+      args: [assignment.capture, assignment.value],
+    }
+  }
+  / capture:ValueCapture {
+    return {
+      name: DEFAULT_PROCEDURE_NAME,
+      args: [capture],
+    }
   }
   / name:IdentifierName __ '(' __ ')' {
     return { name, args: [] }
