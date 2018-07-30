@@ -57,7 +57,9 @@ export function isAttributeQualifier(qualifier: Qualifier): qualifier is Attribu
 }
 
 export function isCapture(x: any): x is Capture {
-  return typeof x === 'object' && typeof x.name === 'string' && Array.isArray(x.filterList)
+  return (
+    x != null && typeof x === 'object' && typeof x.name === 'string' && Array.isArray(x.filterList)
+  )
 }
 
 export function last<T>(arr: T[]): T {

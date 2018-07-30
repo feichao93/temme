@@ -5,14 +5,18 @@ import { defaultProcedureDict, ProcedureFn } from './procedures'
 import { defaultModifierDict, ModifierFn } from './modifiers'
 import { checkRootSelector, msg } from './check'
 import { CaptureResult } from './CaptureResult'
-import { isAttributeQualifier, isCheerioStatic, makeNormalCssSelector, last } from './utils'
 import {
-  AttributeQualifier,
+  isAttributeQualifier,
+  isCapture,
+  isCheerioStatic,
+  last,
+  makeNormalCssSelector,
+} from './utils'
+import {
   Dict,
   ExpandedTemmeSelector,
   NormalSelector,
   ParentRefSelector,
-  Procedure,
   SnippetDefine,
   TemmeSelector,
 } from './interfaces'
@@ -144,19 +148,10 @@ export default function temme(
     node: Cheerio,
     selector: NormalSelector | ParentRefSelector,
   ) {
-    const procedure = selector.procedure
     const section = selector.type === 'normal-selector' ? last(selector.sections) : selector.section
-    captureAttributes(result, node, section.qualifiers.filter(isAttributeQualifier))
-    executeProcedure(result, node, procedure)
-  }
 
-  function captureAttributes(
-    result: CaptureResult,
-    node: Cheerio,
-    attributeQualifiers: AttributeQualifier[],
-  ) {
-    for (const qualifier of attributeQualifiers) {
-      if (qualifier.value != null && typeof qualifier.value === 'object') {
+    for (const qualifier of section.qualifiers.filter(isAttributeQualifier)) {
+      if (isCapture(qualifier.value)) {
         const { attribute, value: capture } = qualifier
         const attributeValue = node.attr(attribute)
         if (attributeValue !== undefined) {
@@ -165,15 +160,12 @@ export default function temme(
         }
       }
     }
-  }
 
-  function executeProcedure(result: CaptureResult, node: Cheerio, procedure: Procedure) {
-    if (procedure == null) {
-      return
+    if (selector.procedure != null) {
+      const { name, args } = selector.procedure
+      const fn = procedureDict[name]
+      invariant(typeof fn === 'function', msg.invalidContentFunction(name))
+      fn(result, node, ...args)
     }
-    const { name, args } = procedure
-    const fn = procedureDict[name]
-    invariant(typeof fn === 'function', msg.invalidContentFunction(name))
-    fn(result, node, ...args)
   }
 }
