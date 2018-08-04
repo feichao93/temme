@@ -1,0 +1,89 @@
+{
+  "name": "vscode-temme",
+  "private": true,
+  "license": "MIT",
+  "displayName": "Temme",
+  "description": "Temme selector support for VSCode.",
+  "version": "0.7.0",
+  "publisher": "shinima",
+  "repository": "https://github.com/shinima/temme.git",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "npm-run-all --parallel start:*",
+    "start:grammar": "supervisor --no-restart-on exit --watch temme.tmLanguage.yaml -e yaml -- compile.js",
+    "start:tool": "webpack --watch --mode=development",
+    "build": "npm-run-all --parallel build:*",
+    "build:grammar": "node compile.js",
+    "build:tool": "webpack --mode=production"
+  },
+  "engines": {
+    "vscode": "^1.22.0"
+  },
+  "categories": [
+    "Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:temme",
+    "onCommand:temme.runSelector",
+    "onCommand:temme.startWatch",
+    "onCommand:temme.stop"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "temme",
+        "aliases": [
+          "temme",
+          "temme"
+        ],
+        "extensions": [
+          ".temme"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "temme",
+        "scopeName": "source.temme",
+        "path": "./dist/temme.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "temme.runSelector",
+        "category": "Temme",
+        "title": "Run temme selector"
+      },
+      {
+        "command": "temme.startWatch",
+        "category": "Temme",
+        "title": "Start watching"
+      },
+      {
+        "command": "temme.stop",
+        "category": "Temme",
+        "title": "Stop watching"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^9.6.5",
+    "js-yaml": "^3.11.0",
+    "mkdirp": "^0.5.1",
+    "npm-run-all": "^4.1.3",
+    "prettier": "^1.12.1",
+    "supervisor": "^0.12.0",
+    "ts-loader": "^4.2.0",
+    "typescript": "^2.8.1",
+    "vscode": "^1.1.14",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15",
+    "webpack-dev-server": "^3.1.3"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^1.6.8",
+    "node-fetch": "^2.1.2",
+    "temme": "0.7.0"
+  }
+}

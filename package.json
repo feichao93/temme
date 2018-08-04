@@ -1,57 +1,17 @@
 {
+  "private": true,
   "name": "temme",
-  "version": "0.8.0-SNAPSHOT",
-  "description": "Concise and convenient jQuery-like selector for node crawlers.",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
-  "repository": "https://github.com/shinima/temme.git",
-  "homepage": "https://temme.js.org",
+  "description": "Temme monorepo",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
-  "bin": "./bin/temme.js",
-  "engines": {
-    "node": ">= 6"
-  },
-  "files": [
-    "LICENSE",
-    "readme.md",
-    "bin/",
-    "build/",
-    "browser/"
-  ],
   "scripts": {
-    "test": "jest --coverage && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "build": "webpack --env.node --env.web",
-    "playground:start": "webpack-dev-server --config webpack.playground.config.ts --mode development",
-    "playground:build": "webpack --config webpack.playground.config.ts --mode production && cp -r playground/public/* playground-build"
-  },
-  "dependencies": {
-    "@types/cheerio": "^0.22.8",
-    "@types/invariant": "^2.2.29",
-    "cheerio": "^1.0.0-rc.2",
-    "commander": "^2.16.0",
-    "invariant": "^2.2.4"
+    "postinstall": "lerna bootstrap",
+    "test": "lerna run --parallel test",
+    "build": "lerna run --parallel build"
   },
   "devDependencies": {
-    "@types/html-webpack-plugin": "^3.2.0",
-    "@types/jest": "^23.3.1",
-    "@types/node": "^10.5.4",
-    "@types/pegjs": "^0.10.1",
-    "@types/webpack": "^4.4.8",
-    "coveralls": "^3.0.2",
-    "html-webpack-plugin": "^3.2.0",
-    "jest": "^23.4.2",
-    "lodash.debounce": "^4.0.8",
-    "pegjs": "^0.10.0",
-    "pegjs-loader": "^0.5.4",
-    "prettier": "^1.14.0",
-    "pretty": "^2.0.0",
-    "ts-jest": "^23.0.1",
-    "ts-loader": "^4.4.2",
-    "ts-node": "^7.0.0",
-    "typescript": "^2.9.2",
-    "webpack": "^4.16.3",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "lerna": "^3.0.0-rc.0",
+    "npm-run-all": "^4.1.3",
+    "prettier": "^1.14.0"
   }
 }

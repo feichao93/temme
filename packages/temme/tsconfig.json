@@ -1,17 +1,14 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "module": "es2015",
     "outDir": "build",
     "target": "es2017",
     "noImplicitAny": true,
     "declaration": true,
     "declarationDir": "build"
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

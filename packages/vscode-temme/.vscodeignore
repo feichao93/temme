@@ -1,0 +1,12 @@
+.idea/**
+.vscode/**
+fixtures/**
+node_modules/**
+src/**
+.editorconfig
+.gitignore
+compile.js
+temme.tmLanguage.yaml
+tsconfig.js
+webpack.config.js
+yarn.lock

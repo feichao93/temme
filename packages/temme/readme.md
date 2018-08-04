@@ -43,13 +43,14 @@ temme(html, selector)
 
 # Examples
 
-Full examples are available under the [*examples*](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example (Chinese)](/examples/douban-movie/readme.md) or [this StackOverflow example](/examples/stackoverflow/readme.md).
+Full examples are available under the [_examples_](/examples) folder. If you are not familiar with temme, you can start with [this douban-movie example (Chinese)](/examples/douban-movie/readme.md) or [this StackOverflow example](/examples/stackoverflow/readme.md).
 
 There are several short examples on the playground. [This example][example-github-commits] extracts commits information from GitHub commits page, including time, author, commit message and links. [This example][example-github-issues] extract issues information from GitHub issues page, including title, assignee and number of comments.
 
 # Inspiration
 
 Temme is inspired by [Emmet](https://emmet.io/). Emmet generates HTML according to a css-selector-like template. The behavior of emmet is like the following function:
+
 ```JavaScript
 emmet('div[class=red]{text content};')
 //=> <div class="red">text content</div>
@@ -60,14 +61,16 @@ emmet('div[class=$cls]{$content};', { cls: 'red', content: 'text content' })
 ```
 
 As the name indicates, temme is the reverse of emmet. If we abstract temme as a function, then it looks like:
+
 ```JavaScript
 temme('<div class="red">text content</div>', 'div[class=$cls]{$content};')
 //=> { cls: 'red', content: 'text content' }
 ```
 
 List the signatures of `emmet` and `temme`, and we get:
-* `emmet(selector, data) -> html`
-* `temme(html, selector) -> data`
+
+- `emmet(selector, data) -> html`
+- `temme(html, selector) -> data`
 
 Given a selector, `emmet` expand this selector to HTML using data, while `temme` capture data from HTML according to the selector.
 
@@ -75,26 +78,26 @@ Given a selector, `emmet` expand this selector to HTML using data, while `temme`
 
 Before extracting JSON from HTML, we need to answer two questions:
 
-1. How to find the nodes that contains the data we want?
-2. After finding the nodes, which attributes of the node should be extracted, and which fields should be used to store the extracted data?
+1.  How to find the nodes that contains the data we want?
+2.  After finding the nodes, which attributes of the node should be extracted, and which fields should be used to store the extracted data?
 
 The answer to the first question is simple: we use CSS selector. CSS selectors are widely used in various aspects. In web standards, CSS selectors define the elements to which a set of CSS rules apply. JQuery/cheerio uses CSS selectors to select elements/nodes in HTML documents. In temme, we use CSS selectors too.
 
-But CSS selectors only contain *match* information and they can only answer the first question. To answer the second question, we need to extend the CSS selectors syntax so that the new syntax (called temme-selector) can contain *capture* information. Capture information is mainly about which items are stored into which fields in result (result is an JavaScript object). Item can be value of attributes, text or html of nodes. Temme-selector `'div[class=$cls]'` captures attribute `class` into `.cls` of the result; Temme-selector `'p{$content}'` captures text content of the p element into field `.content` of the result.
+But CSS selectors only contain _match_ information and they can only answer the first question. To answer the second question, we need to extend the CSS selectors syntax so that the new syntax (called temme-selector) can contain _capture_ information. Capture information is mainly about which items are stored into which fields in result (result is an JavaScript object). Item can be value of attributes, text or html of nodes. Temme-selector `'div[class=$cls]'` captures attribute `class` into `.cls` of the result; Temme-selector `'p{$content}'` captures text content of the p element into field `.content` of the result.
 
 The extended syntax is inspired by several other tools. Temme supports JavaScript-style comments, JavaScript literals (string/number/null/boolean/RegExp), assignments, parent-reference as in [stylus](http://stylus-lang.com/docs/selectors.html#parent-reference), attributes/content capture inspired by Emmet, filters like in [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) and many other templates. The grammar and the running semantics of the extended syntax are listed below.
 
 # Grammar and Semantics
 
-## Value-Capture `$`
+## Value-Capture
 
 #### Syntax
 
-* `[foo=$xxx]`  Place in CSS attribute qualifiers to capture attribute value.
-* `{$xxx}`  Place in content part to capture html/text.
-* `[foo=$]` / `{$}`:  Omit xxx and make a default-value-capture.
+- `[foo=$xxx]` Place in CSS attribute qualifiers to capture attribute value.
+- `{$xxx}` Place in content part to capture html/text.
+- `[foo=$]` / `{$}`: Omit xxx and make a default-value-capture.
 
-Value-capture is a basic form of capture. Value-capture can be placed in attribute part (in square brackets) to capture attribute value, or in content part (in curly braces) to capture text/html. 
+Value-capture is a basic form of capture. Value-capture can be placed in attribute part (in square brackets) to capture attribute value, or in content part (in curly braces) to capture text/html.
 
 #### Running semantics
 
@@ -115,8 +118,9 @@ temme('<div class="red">text content</div>', 'div[class=$]')
 ## Array-capture `@`
 
 #### Syntax
-* `div.foo@xxx { /* children-selectors */ }`  Place `@xxx { /* ... */ }` after a normal CSS selector
-* `div.foo@ { /* children-selectors */ }` Omit xxx and make a default-array-capture.
+
+- `div.foo@xxx { /* children-selectors */ }` Place `@xxx { /* ... */ }` after a normal CSS selector
+- `div.foo@ { /* children-selectors */ }` Omit xxx and make a default-array-capture.
 
 Array-capture is another form of capture. It is useful when we want to capture an array of similar items. We need place `@xxx { /* ... */ }` after a normal CSS selector (called parent-selector). `@` is the mark of an array-capture. A pair of curly brackets is required after @xxx; Children selectors are put within the curly brackets.
 
@@ -144,7 +148,7 @@ const html = `
 
 temme(html, 'li@fruits { span[data-color=$color]{$name}; }')
 //=>
-// { 
+// {
 //   "fruits": [
 //     { "color": "red", "name": "apple" },
 //     { "color": "white", "name": "pear"  },
@@ -195,15 +199,15 @@ temme(html, ` [data-color=red]{$name};
 
 #### Syntax
 
-* `$foo = bar;`  foo should be a valid JavaScript identifier; bar should be a JavaScript literal (string/number/null/boolean/RegExp).
+- `$foo = bar;` foo should be a valid JavaScript identifier; bar should be a JavaScript literal (string/number/null/boolean/RegExp).
 
 #### Running Semantics
 
 The running semantics differs when assignments appear in different places:
 
-* At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result;
-* In content-capture: `div.foo{ $a = null }` is like a conditional capture: if there is such a div that satisfies `.foo` qualifier, then the assignment is executed;
-* In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field.
+- At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result;
+- In content-capture: `div.foo{ $a = null }` is like a conditional capture: if there is such a div that satisfies `.foo` qualifier, then the assignment is executed;
+- In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field.
 
 #### Examples
 
@@ -238,24 +242,26 @@ Temme selector supports both single line comments `// ......` and block comments
 ## Capture Filters `|`
 
 #### Syntax
-* `$foo|xxx` / `@bar|xxx`  Place right after a value-capture or array-capture; xxx is the filter functions name and should be a valid JavaScript identifier.
-* `$foo|xxx(arg1, arg2, ...)`  Filter can accept arguments. Every argument should be a JavaScript literal.
-* `$foo|f1(a,b)|f2`  Filters can be chained.
+
+- `$foo|xxx` / `@bar|xxx` Place right after a value-capture or array-capture; xxx is the filter functions name and should be a valid JavaScript identifier.
+- `$foo|xxx(arg1, arg2, ...)` Filter can accept arguments. Every argument should be a JavaScript literal.
+- `$foo|f1(a,b)|f2` Filters can be chained.
 
 #### Running Semantics
 
 When a value is captured, it is always a string. A filter is a simple function that receive input as `this` with several arguments, and returns a single value. We use filters to process the captured value.
 
-* `div{$x|foo}`  Every time x is captured, it will be processed as `x = foo.apply(x)`;
-* `div{$x|foo(1, false)}`  Every time variable x is captured, it will be processed as `x = foo.apply(x, [1, false])`;
-* `div{$x|foo|bar(0, 20)}`  The value will first be processed by filter foo and then by filter bar. The value is processed like `x = foo.apply(x); x = bar.apply(x, [0, 20]);`.
+- `div{$x|foo}` Every time x is captured, it will be processed as `x = foo.apply(x)`;
+- `div{$x|foo(1, false)}` Every time variable x is captured, it will be processed as `x = foo.apply(x, [1, false])`;
+- `div{$x|foo|bar(0, 20)}` The value will first be processed by filter foo and then by filter bar. The value is processed like `x = foo.apply(x); x = bar.apply(x, [0, 20]);`.
 
 #### Built-in filters
 
 Temme provides a few filters out of box. Built-in filters could be divided into three categories:
-1. Structure Manipulation Filters: this category includes `pack`, `flatten`, `compact`, `first`, `last`, `nth`, `get`. These functions are short but powerful. [See source for more detail](/src/filters.ts).
-2. Type Coercion Filters: this category includes `String`, `Number`, `Date`, `Boolean`. These filters converts the captured value to specific type.
-3. Prototype Filters: We can use methods on prototype chain as filters (This is why the input is supplied as `this`). For example, if we can ensure that x is always a string, then we can safely use `$x|substring(0, 20)` or `$x|toUpperCase`.
+
+1.  Structure Manipulation Filters: this category includes `pack`, `flatten`, `compact`, `first`, `last`, `nth`, `get`. These functions are short but powerful. [See source for more detail](/src/filters.ts).
+2.  Type Coercion Filters: this category includes `String`, `Number`, `Date`, `Boolean`. These filters converts the captured value to specific type.
+3.  Prototype Filters: We can use methods on prototype chain as filters (This is why the input is supplied as `this`). For example, if we can ensure that x is always a string, then we can safely use `$x|substring(0, 20)` or `$x|toUpperCase`.
 
 #### Array-Filters Syntax `||`
 
@@ -298,7 +304,7 @@ temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 
 #### Inline Filters Definition
 
-Define filters in selector. Inline filters definition has the same syntax as JavaScript-style function definition. The difference is that temme use *filter* as the keyword instead of *function*.
+Define filters in selector. Inline filters definition has the same syntax as JavaScript-style function definition. The difference is that temme use _filter_ as the keyword instead of _function_.
 
 ```
 filter myFilter(arg1, arg2, arg3) {
@@ -311,58 +317,58 @@ filter myFilter(arg1, arg2, arg3) {
 div{$txt|myFilter(x, y, z)};
 ```
 
-## Content (TODO rename to a better name)
+## TODO modifier
 
-The selectors in the curly brackets after normal CSS selector are called content. Content can be in one of the following forms:
+## Procedure
 
-1. Capture.  This will capture text/html of the node into the specified field;
-2. Assignment.  It is like a conditional assignment, if temme find that a node satisfies the normal CSS selector, then the assignment is executed;
-3. Content Function Call. See below for more detail.
+Procedure is a JavaScript function that will be called against the node that matches our selector.
 
-### Capture in Content
+#### Syntax
 
-`text`, `html`, `outerHTML` and `node` are special filters in content. One of these is always used as the first filter in content capture. If not specified explicitly, `text` will be used.
+- `div{ fn(arg1, arg2) }`: `fn` is the procedure name, and `arg1` / `arg2` are extra arguments passed to the procedure function. Every argument is either a capture (e.g. `$foo`) or a JavaScript literal.
+- `div{ $arg }`: This is a special form of procedure that means default procedure with a single extra argument. And this is the text-capture that we have seen previously.
+- `div{ $arg = value }`: This is a special form of procedure that means assign `value` to `$arg` TODO
+- `div{ fn($arg|filter!modifier) }` Filters and modifiers are allowed after the `$arg`.
 
-* `text` gets the text content of the matching nodes;
-* `html` gets the inner HTML of the matching nodes;
-* `outerHTML` gets the outer HTML of the matching nodes;
-* `node` gets the node itself, which is useful when temme-selector does not meet the requirements and we need to call cheerio APIs manually. 
+#### Built-in Procedures
 
-Examples:
+There are some built-in procedures out of the box.
+
+- `text($arg)` gets the text content and save it into `$arg`
+- `html($arg)` gets the inner HTML and save it into `$arg`
+- `node($arg)` gets the node itself and save it into `$arg`
+- `find(...args)` see below
+- `assign($capture, literal)` assigns `literal` to `$capture`.
+
+Examples: (TODO check this example)
 
 ```JavaScript
-const html = '<div class="outer"> <p>TEXT-1</p> <div class="inner">TEXT-2</div> </div>'
+const html = '<div class="outer"><div class="inner">test text</div></div>'
 const selector = `
 div.outer{ $a };
-div.outer{ $b|text };
-div.outer{ $c|html };
-div.outer{ $d|outerHTML };
-div.outer{ $e|node|attr('class') };
-div.outer{ $f|toLowerCase };
+div.outer{ text($b) };
+div.outer{ html($c) };
+div.outer{ node($d|attr('class')) };
 `
 temme(html, selector)
 //=>
 // {
-//   "a": " TEXT-1 TEXT-2 ",
-//   "b": " TEXT-1 TEXT-2 ",
-//   "c": " <p>TEXT-1</p> <div class=\"inner\">TEXT-2</div> ",
-//   "d": "<div class=\"outer\"> <p>TEXT-1</p> <div class=\"inner\">TEXT-2</div> </div>",
-//   "e": "outer",
-//   "f": " text-1 text-2 "
+//   "a": "test text",
+//   "b": "test text",
+//   "c": "<div class=\"inner\">test text</div> ",
+//   "d": "outer",
 // }
 ```
 
-### Content Functions
+#### Procedure `find`
 
-Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source codes](/src/contentFunctions.ts) for more implementation detail.
+Procedure `find` tries to capture a substring of the node text.
 
-Currently, there is only one built-in content function `find`. `find` try to capture a substring of the node text.
+- `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
+- `find('hello', $x)` will try to capture the text **after** `'hello'`.
+- `find('hello', $x, 'world')` will try to capture the text **between** `'hello'` and `'world'`.
 
-* `find($x, 'world')` will try to capture the text **before** `'world'`. If the text of node is `'hello world'`, then the result will be `{ x: 'hello' }`
-* `find('hello', $x)` will try to capture the text **after** `'hello'`.
-* `find('hello', $x, 'world')` will try to capture the text **between** `'hello'` and `'world'`.
-
-`find` simply uses `String#indexOf` to get the index of a substring. If `find` cannot find the substring that should appear before/after the target substring, then it will set the capture-result as *failed*.
+`find` simply uses `String#indexOf` to get the index of a substring.
 
 Example:
 
@@ -375,15 +381,27 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 //=> null
 ```
 
-### Use Customized Content Functions
+#### todo
+
+Call a content function, passing the capture-result object, the node and the arguments in the parentheses. Content function can do both matching and capturing. See [source codes](/src/contentFunctions.ts) for more implementation detail.
+
+### Customized Procedures
+
+Like filters and modifiers, you can also customize procedures using one of the following methods:
+
+1.  Use `defineProcedure` to define a global procedure
+2.  Pass customized procedures as an argument of `temme()`
+3.  Define inline procedures in selector string
 
 ```JavaScript
-import { contentFunctions } from 'temme'
+// method-1
+import { defineProcedure } from 'temme'
+defineProcedure('myContentFn', myContentFn)
 
-// Get/set/remove a customized content function
-contentFunctions.get('find')
-contentFunctions.set('myContentFn', myContentFn)
-contentFunctions.remove('uselessContentFn')
+// method-2
+temme(selector, filters, modifiers, procedures)
+
+// method-3 TODO
 
 function myContentFn(result, node, capture1, string2) {
   /* Your customized logic here */
@@ -407,8 +425,8 @@ Snippet is a way of reusing sub-selectors in a temme-selector. It is useful when
 
 #### Syntax
 
-* `@xxx = { /* selectors */ };`  Define a snippet named xxx. xxx should be a valid JavaScript identifier.
-* `@xxx;`  Expand the snippet named xxx. It is like that we replace xxx with the content of snippet.
+- `@xxx = { /* selectors */ };` Define a snippet named xxx. xxx should be a valid JavaScript identifier.
+- `@xxx;` Expand the snippet named xxx. It is like that we replace xxx with the content of snippet.
 
 Snippet-define is allowed at top level only. Snippet-expand can be place at top level or in children selectors. Snippets can be nested: `A -> B -> C` (A uses B, B uses C); But snippets should not be circled.
 
@@ -418,7 +436,7 @@ The running semantics of snippet is simple: when temme meets a snippet-expand, t
 
 #### Examples:
 
-Note that this example is made up and the selector does not work with the real StackOverflow html. A StackOverflow question asked by *person-A* may be edited by *person-B*. Without snippets, our temme-selector is: 
+Note that this example is made up and the selector does not work with the real StackOverflow html. A StackOverflow question asked by _person-A_ may be edited by _person-B_. Without snippets, our temme-selector is:
 
 ```
 .ask-info@asked|pack {

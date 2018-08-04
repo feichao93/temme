@@ -25,19 +25,11 @@ export interface TemmeParser {
   parse(temmeSelectorString: string): TemmeSelector[]
 }
 
-/** Prepare the temme-parser.
- * In the webpack building context, we use pegjs-loader to load parser from the grammar file.
- * In other context (e.x. jest context), we use fs and pegjs to generate the parser. */
-declare const WEBPACK_BUILD: boolean
-let temmeParser: TemmeParser
-if (typeof WEBPACK_BUILD !== 'undefined' && WEBPACK_BUILD) {
-  temmeParser = require('./grammar.pegjs')
-} else {
-  const fs = require('fs')
-  const pegjs = require('pegjs')
-  const source = fs.readFileSync('./src/grammar.pegjs', 'utf8')
-  temmeParser = pegjs.generate(source)
-}
+// Note that we are importing .pegjs file directly which requires using rollup as the bundler.
+// @ts-ignore
+import parser from './grammar.pegjs'
+
+const temmeParser: TemmeParser = parser
 
 export { cheerio, temmeParser }
 

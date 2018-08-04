@@ -1,9 +1,9 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
 import path from 'path'
-const packageInfo = require('./package.json')
+const pkg = require('./package.json')
 
-const config: webpack.Configuration = {
+const config = {
   context: __dirname,
   entry: './playground/index.js',
   target: 'web',
@@ -33,7 +33,7 @@ const config: webpack.Configuration = {
   plugins: [
     new webpack.DefinePlugin({
       WEBPACK_BUILD: JSON.stringify(true),
-      TEMME_VERSION: JSON.stringify(packageInfo.version),
+      TEMME_VERSION: JSON.stringify(pkg.version),
     }),
     new HtmlWebpackPlugin({
       template: 'playground/index.html',

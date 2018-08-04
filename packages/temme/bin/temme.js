@@ -2,10 +2,10 @@
 const program = require('commander')
 const temme = require('..').default
 const fs = require('fs')
-const packageInfo = require('../package.json')
+const pkg = require('../package.json')
 
 program
-  .version(packageInfo.version)
+  .version(pkg.version)
   .usage('[options] [selector] [html]')
   .option('-f, --format', 'output formatted JSON')
   .parse(process.argv)
