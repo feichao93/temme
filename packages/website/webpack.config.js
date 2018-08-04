@@ -1,14 +1,14 @@
-import HtmlWebpackPlugin from 'html-webpack-plugin'
-import webpack from 'webpack'
-import path from 'path'
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
+const path = require('path')
+
 const pkg = require('./package.json')
 
 const config = {
   context: __dirname,
-  entry: './playground/index.js',
   target: 'web',
   output: {
-    path: path.resolve(__dirname, 'playground-build'),
+    path: path.resolve(__dirname, 'dist'),
     filename: '[chunkhash].bundle.js',
   },
 
@@ -32,21 +32,16 @@ const config = {
 
   plugins: [
     new webpack.DefinePlugin({
-      WEBPACK_BUILD: JSON.stringify(true),
       TEMME_VERSION: JSON.stringify(pkg.version),
     }),
     new HtmlWebpackPlugin({
-      template: 'playground/index.html',
+      template: 'index.html',
     }),
   ],
 
-  // @ts-ignore
   devServer: {
-    contentBase: [
-      path.resolve(__dirname, 'playground'),
-      path.resolve(__dirname, 'playground/public'),
-    ],
+    contentBase: [path.resolve(__dirname, 'public')],
   },
 }
 
-export default config
+module.exports = config

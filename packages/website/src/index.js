@@ -2,8 +2,10 @@ import debounce from 'lodash.debounce'
 import examples from './examples'
 import loadExamples from './loadExample'
 import pretty from 'pretty'
+import * as Temme from 'temme'
 
 const { default: temme, temmeParser, cheerio } = Temme
+window.Temme = Temme
 
 /* example mode */
 const url = new URL(document.URL)

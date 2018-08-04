@@ -1,2 +1,2 @@
 __tests__/realworld/html/* linguist-vendored
-playground/public/resources/**/* linguist-vendored
+website/public/resources/**/* linguist-vendored
