@@ -193,7 +193,7 @@ procedure bar(result, node, capture) {
 }
 
 li@list!foo {
-  span{ bar($) };
+  span{ bar($); $foo };
 };`,
   })
 }

@@ -1,5 +1,5 @@
 'use strict'
-define('ace/mode/temme', function (require, exports) {
+define('ace/mode/temme', function(require, exports) {
   const TextMode = require('./text').Mode
   const TextHighlightRules = require('./text_highlight_rules').TextHighlightRules
   const Behaviour = require('./behaviour').Behaviour
@@ -7,18 +7,18 @@ define('ace/mode/temme', function (require, exports) {
 
   const identifierReg = '[a-zA-Z\\$_\u00a1-\uffff][a-zA-Z\\d\\$_\u00a1-\uffff]*'
 
-  function filters(next) {
+  function filtersOrModifiers(next) {
     return [
       {
-        // filter with args
+        // with args
         token: ['text', 'entity.name.function', 'paren.lparen'],
-        regex: `(\\||\\|\\|)(${identifierReg})(\\()`,
+        regex: `(\\||\\|\\||!)(${identifierReg})(\\()`,
         push: 'argsState',
       },
       {
-        // filter without args
+        // without args
         token: ['text', 'entity.name.function'],
-        regex: `(\\||\\|\\|)(${identifierReg})`,
+        regex: `(\\||\\|\\||!)(${identifierReg})`,
       },
       {
         regex: '',
@@ -35,16 +35,17 @@ define('ace/mode/temme', function (require, exports) {
         next: [
           { token: 'comment', regex: '\\*\\/', next: next || 'pop' },
           { defaultToken: 'comment', caseInsensitive: true },
-        ]
-      }, {
+        ],
+      },
+      {
         token: 'comment',
         regex: '\\/\\/',
         next: [
           { token: 'comment', regex: '$|^', next: next || 'pop' },
           { defaultToken: 'comment', caseInsensitive: true },
-        ]
-      }
-    ];
+        ],
+      },
+    ]
   }
 
   class TemmeHighlightRules extends TextHighlightRules {
@@ -56,27 +57,27 @@ define('ace/mode/temme', function (require, exports) {
           {
             // escapes
             token: 'regexp.keyword.operator',
-            regex: '\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)'
+            regex: '\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)',
           },
           {
             // flag
             token: 'string.regexp',
             regex: '/[sxngimy]*',
-            next: 'pop'
+            next: 'pop',
           },
           {
             // invalid operators
             token: 'invalid',
-            regex: /\{\d+\b,?\d*\}[+*]|[+*$^?][+*]|[$^][?]|\?{3,}/
+            regex: /\{\d+\b,?\d*\}[+*]|[+*$^?][+*]|[$^][?]|\?{3,}/,
           },
           {
             // operators
             token: 'constant.language.escape',
-            regex: /\(\?[:=!]|\)|\{\d+\b,?\d*\}|[+*]\?|[()$^+*?.]/
+            regex: /\(\?[:=!]|\)|\{\d+\b,?\d*\}|[+*]\?|[()$^+*?.]/,
           },
           {
             token: 'constant.language.delimiter',
-            regex: /\|/
+            regex: /\|/,
           },
           {
             token: 'constant.language.escape',
@@ -86,34 +87,34 @@ define('ace/mode/temme', function (require, exports) {
           {
             token: 'empty',
             regex: '$',
-            next: 'pop'
+            next: 'pop',
           },
           {
-            defaultToken: 'string.regexp'
-          }
+            defaultToken: 'string.regexp',
+          },
         ],
         regex_character_class: [
           {
             token: 'regexp.charclass.keyword.operator',
-            regex: '\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)'
+            regex: '\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)',
           },
           {
             token: 'constant.language.escape',
             regex: ']',
-            next: 'pop'
+            next: 'pop',
           },
           {
             token: 'constant.language.escape',
-            regex: '-'
+            regex: '-',
           },
           {
             token: 'empty',
             regex: '$',
-            next: 'pop'
+            next: 'pop',
           },
           {
-            defaultToken: 'string.regexp.charachterclass'
-          }
+            defaultToken: 'string.regexp.charachterclass',
+          },
         ],
         jsLiteralState: [
           {
@@ -123,18 +124,18 @@ define('ace/mode/temme', function (require, exports) {
               {
                 token: 'string.end',
                 regex: "'|$",
-                next: 'pop'
+                next: 'pop',
               },
               {
-                include: 'escapes'
+                include: 'escapes',
               },
               {
                 token: 'constant.language.escape',
                 regex: /\\$/,
-                consumeLineEnd: true
+                consumeLineEnd: true,
               },
               {
-                defaultToken: 'string'
+                defaultToken: 'string',
               },
             ],
           },
@@ -145,28 +146,28 @@ define('ace/mode/temme', function (require, exports) {
               {
                 token: 'string.end',
                 regex: '"|$',
-                next: 'pop'
+                next: 'pop',
               },
               {
-                include: 'escapes'
+                include: 'escapes',
               },
               {
                 token: 'constant.language.escape',
                 regex: /\\$/,
-                consumeLineEnd: true
+                consumeLineEnd: true,
               },
               {
-                defaultToken: 'string'
-              }
-            ]
+                defaultToken: 'string',
+              },
+            ],
           },
           {
             token: 'constant.numeric', // hexadecimal, octal and binary
-            regex: /0(?:[xX][0-9a-fA-F]+|[oO][0-7]+|[bB][01]+)\b/
+            regex: /0(?:[xX][0-9a-fA-F]+|[oO][0-7]+|[bB][01]+)\b/,
           },
           {
             token: 'constant.numeric', // decimal integers and floats
-            regex: /(?:\d\d*(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+\b)?/
+            regex: /(?:\d\d*(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+\b)?/,
           },
           {
             token: 'constant.language',
@@ -191,11 +192,11 @@ define('ace/mode/temme', function (require, exports) {
           },
           {
             token: 'variable',
-            regex: '\\.[a-z0-9-_]+'
+            regex: '\\.[a-z0-9-_]+',
           },
           {
             token: 'string',
-            regex: ':[a-z0-9-_]+'
+            regex: ':[a-z0-9-_]+',
           },
           {
             // inline filter/modifier/procedure definition
@@ -211,12 +212,12 @@ define('ace/mode/temme', function (require, exports) {
           },
           {
             token: 'constant',
-            regex: '[a-z0-9-_]+'
+            regex: '[a-z0-9-_]+',
           },
           {
             token: 'paren.lparen',
             regex: '\\{',
-            push: 'contentState',
+            push: 'procedure',
           },
           {
             token: 'paren.rparen',
@@ -231,13 +232,13 @@ define('ace/mode/temme', function (require, exports) {
           {
             token: ['variable.parameter'],
             regex: `\\$(?:${identifierReg})?`,
-            push: filters(),
+            push: filtersOrModifiers(),
           },
           {
             // snippet definition
             token: ['keyword', 'text', 'keyword.operator'],
             regex: `(@(?:${identifierReg})?)(\\s*)(=)`,
-            push: filters('beforeChildrenSelectorState'),
+            push: filtersOrModifiers('beforeChildrenSelectorState'),
           },
           {
             // snippet expansion
@@ -248,10 +249,10 @@ define('ace/mode/temme', function (require, exports) {
             // children selectors
             token: 'variable.parameter',
             regex: `@(?:${identifierReg})?`,
-            push: filters('beforeChildrenSelectorState'),
+            push: filtersOrModifiers('beforeChildrenSelectorState'),
           },
           {
-            caseInsensitive: true
+            caseInsensitive: true,
           },
         ],
 
@@ -269,7 +270,7 @@ define('ace/mode/temme', function (require, exports) {
           {
             token: 'variable.parameter',
             regex: `\\$(?:${identifierReg})?`,
-            push: filters(),
+            push: filtersOrModifiers(),
           },
           {
             token: 'constant',
@@ -286,20 +287,19 @@ define('ace/mode/temme', function (require, exports) {
           },
         ],
 
-        contentState: [
-          comments('contentState'),
+        procedure: [
+          comments('procedure'),
           { include: 'jsLiteralState' },
           {
-            // capture in content or the leftside of the assignment
+            // simple-text-capture or the left side of the assignment
             token: 'variable.parameter',
             regex: `\\$(?:${identifierReg})?`,
-            push: filters(),
+            push: filtersOrModifiers(),
           },
           {
-            // content function call
             token: ['entity.name.function', 'text', 'paren.lparen'],
             regex: '(' + identifierReg + ')(\\s*)(\\()',
-            push: 'argsState'
+            push: 'argsState',
           },
           {
             token: ['keyword.operator'],
@@ -319,11 +319,11 @@ define('ace/mode/temme', function (require, exports) {
           {
             token: 'variable.parameter',
             regex: `\\$(?:${identifierReg})?`,
-            push: filters(),
+            push: filtersOrModifiers(),
           },
           {
             token: 'punctuation.operator',
-            regex: '[, ]+'
+            regex: '[, ]+',
           },
           {
             token: 'paren.rparen',
@@ -335,9 +335,9 @@ define('ace/mode/temme', function (require, exports) {
         escapes: [
           {
             token: 'constant.language.escape',
-            regex: /\\([a-fA-F\d]{1,6}|[^a-fA-F\d])/
+            regex: /\\([a-fA-F\d]{1,6}|[^a-fA-F\d])/,
           },
-        ]
+        ],
       }
 
       this.normalizeRules()
