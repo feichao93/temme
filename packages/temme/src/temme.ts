@@ -71,7 +71,7 @@ export default function temme(
   function helper(cntCheerio: Cheerio, selectorArray: TemmeSelector[]): CaptureResult {
     const result = new CaptureResult(filterDict, modifierDict)
 
-    // First pass: process SnippetDefine and FilterDefine
+    // First pass: process SnippetDefine / FilterDefine / ModifierDefine / ProcedureDefine
     for (const selector of selectorArray) {
       if (selector.type === 'snippet-define') {
         invariant(!snippetsMap.has(selector.name), msg.snippetAlreadyDefined(selector.name))
@@ -81,6 +81,16 @@ export default function temme(
         invariant(!(name in filterDict), msg.filterAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
         filterDict[name] = eval(funcString)
+      } else if (selector.type === 'modifier-define') {
+        const { name, argsPart, code } = selector
+        invariant(!(name in modifierDict), msg.modifierAlreadyDefined(name))
+        const funcString = `(function (${argsPart}) { ${code} })`
+        modifierDict[name] = eval(funcString)
+      } else if (selector.type === 'procedure-define') {
+        const { name, argsPart, code } = selector
+        invariant(!(name in modifierDict), msg.procedureAlreadyDefined(name))
+        const funcString = `(function (${argsPart}) { ${code} })`
+        procedureDict[name] = eval(funcString)
       }
     }
 
@@ -156,7 +166,7 @@ export default function temme(
     if (selector.procedure != null) {
       const { name, args } = selector.procedure
       const fn = procedureDict[name]
-      invariant(typeof fn === 'function', msg.invalidContentFunction(name))
+      invariant(typeof fn === 'function', msg.invalidProcedure(name))
       fn(result, node, ...args)
     }
   }

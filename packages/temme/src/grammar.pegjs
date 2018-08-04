@@ -41,7 +41,15 @@ Start
   }
 
 // 选择器
-Selector = FilterDefine / ParentRefSelector / NormalSelector / AssignmentSelector / SnippetDefine / SnippetExpand
+Selector
+  = FilterDefine
+  / ModifierDefine
+  / ProcedureDefine
+  / ParentRefSelector
+  / NormalSelector
+  / AssignmentSelector
+  / SnippetDefine
+  / SnippetExpand
 
 // 自身选择器, 以 & 为开头的选择器
 ParentRefSelector
@@ -125,7 +133,6 @@ SnippetExpand
     }
   }
 
-// 内联过滤器定义
 FilterDefine
   = 'filter'
     __ name:IdentifierName
@@ -140,12 +147,40 @@ FilterDefine
     }
   }
 
+ModifierDefine
+  = 'modifier'
+    __ name:IdentifierName
+    __ argsPart:JSFunctionArgsPart
+    __ code:CodeBlock
+    SelectorEnd? {
+    return {
+      type: 'modifier-define',
+      name,
+      argsPart,
+      code,
+    }
+  }
+
+ProcedureDefine
+  = 'procedure'
+    __ name:IdentifierName
+    __ argsPart:JSFunctionArgsPart
+    __ code:CodeBlock
+    SelectorEnd? {
+    return {
+      type: 'procedure-define',
+      name,
+      argsPart,
+      code,
+    }
+  }
+
 JSFunctionArgsPart
-  = '(' str:FilterDefineArgsString ')' { return str }
+  = '(' str:JSFunctionArgsString ')' { return str }
   / '(' { error('Unbalanced parenthesis.') }
 
-FilterDefineArgsString
-  = $((![()] SourceCharacter)+ / '(' FilterDefineArgsString ')')*
+JSFunctionArgsString
+  = $((![()] SourceCharacter)+ / '(' JSFunctionArgsString ')')*
 
 Assignment
   = capture:ValueCapture __ '=' __ value:Literal {

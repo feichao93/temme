@@ -1,14 +1,14 @@
-import { Modifier, Qualifier, Section, TemmeSelector } from './interfaces'
+import { Qualifier, Section, TemmeSelector } from './interfaces'
 
 export const msg = {
   invalidFilter(name: string) {
     return `${name} is not a valid filter.`
   },
-  invalidModifier({ name }: Modifier) {
-    return `${name} is not a valid modifier`
+  invalidModifier(name: string) {
+    return `${name} is not a valid modifier.`
   },
-  invalidContentFunction(name: string) {
-    return `${name} is not a valid content function.`
+  invalidProcedure(name: string) {
+    return `${name} is not a valid procedure.`
   },
   hasLeadingAttributeCapture() {
     return 'Attribute capturing is only allowed in the last css section. Capture in leading css-selectors will be omitted.'
@@ -27,6 +27,12 @@ export const msg = {
   },
   filterAlreadyDefined(name: string) {
     return `Filter \`${name}\` is already defined.`
+  },
+  modifierAlreadyDefined(name: string) {
+    return `Modifier ${name} is already defined.`
+  },
+  procedureAlreadyDefined(name: string) {
+    return `Procedure ${name} is already defined.`
   },
   snippetNotDefined(name: string) {
     return `Snippet \`${name}\` is not defined.`

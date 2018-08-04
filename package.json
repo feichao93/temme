@@ -7,7 +7,9 @@
   "scripts": {
     "postinstall": "lerna bootstrap",
     "test": "lerna run --parallel test",
-    "build": "lerna run --parallel build"
+    "build": "lerna run --parallel build",
+    "start:website": "npm run --prefix=packages/website start",
+    "start:temme": "npm run --prefix=packages/temme start"
   },
   "devDependencies": {
     "lerna": "^3.0.0-rc.0",

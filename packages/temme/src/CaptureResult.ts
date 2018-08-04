@@ -33,7 +33,7 @@ export class CaptureResult {
   private exec(capture: Capture, value: any, defaultModifier: Modifier) {
     const modifier = capture.modifier || defaultModifier
     const modifierFn = this.modifierDict[modifier.name]
-    invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier))
+    invariant(typeof modifierFn === 'function', msg.invalidModifier(modifier.name))
     modifierFn(
       this,
       capture.name,

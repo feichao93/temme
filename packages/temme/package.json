@@ -3,7 +3,7 @@
   "version": "0.7.0",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "dist/temme.js",
-  "module": "dist/temme.es.js",
+  "module": "dist/temme.mjs",
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/shinima/temme.git",
   "homepage": "https://temme.js.org",
@@ -22,6 +22,7 @@
   "scripts": {
     "test-only": "jest --coverage",
     "test": "npm run test-only && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "start": "rollup --config rollup.config.js --watch",
     "build": "rollup --config rollup.config.js",
     "prepublish": "rimraf dist && npm run build"
   },

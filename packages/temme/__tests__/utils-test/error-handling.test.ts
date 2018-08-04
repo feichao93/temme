@@ -29,7 +29,7 @@ test('parent-ref-selector at top', () => {
 test('other error handling', () => {
   expect(() => {
     console.log(temme(html, 'div{ foo($bar) }'))
-  }).toThrowError(msg.invalidContentFunction('foo'))
+  }).toThrowError(msg.invalidProcedure('foo'))
 
   expect(() => temme(html, `.leading-css-part[foo=$bar] .content{$foo}`)).toThrowError(
     msg.hasLeadingAttributeCapture(),

@@ -198,9 +198,9 @@ define('ace/mode/temme', function (require, exports) {
             regex: ':[a-z0-9-_]+'
           },
           {
-            // inline filter definiton
+            // inline filter/modifier/procedure definition
             token: ['storage.type', 'text', 'entity.name.function'],
-            regex: `(filter)(\\s+)(${identifierReg})`,
+            regex: `(filter|modifier|procedure)(\\s+)(${identifierReg})`,
             push: [
               {
                 token: 'paren.lparen',

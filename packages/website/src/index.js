@@ -1,7 +1,5 @@
 import debounce from 'lodash.debounce'
 import examples from './examples'
-import loadExamples from './loadExample'
-import pretty from 'pretty'
 import * as Temme from 'temme'
 
 const { default: temme, temmeParser, cheerio } = Temme
@@ -42,10 +40,12 @@ function onToggleWidth() {
 
 function formatHtml() {
   const html = htmlEditor.getValue()
-  const formated = pretty(html, { ocd: true })
-  if (formated !== html) {
-    htmlEditor.setValue(formated)
-  }
+  import('pretty').then(({ default: pretty }) => {
+    const formated = pretty(html, { ocd: true })
+    if (formated !== html) {
+      htmlEditor.setValue(formated)
+    }
+  })
 }
 
 const errorLines = new Set()
@@ -242,5 +242,7 @@ formatHtmlButton.addEventListener('click', formatHtml)
 onChange()
 
 if (EXAMPLE_MODE) {
-  loadExamples(exampleName, htmlEditor, selectorEditor)
+  import('./loadExample').then(({ default: loadExamples }) => {
+    loadExamples(exampleName, htmlEditor, selectorEditor)
+  })
 }

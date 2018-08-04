@@ -29,6 +29,8 @@ export type TemmeSelector =
   | SnippetDefine
   | SnippetExpand
   | FilterDefine
+  | ModifierDefine
+  | ProcedureDefine
 
 export type ExpandedTemmeSelector =
   | ParentRefSelector
@@ -36,6 +38,8 @@ export type ExpandedTemmeSelector =
   | Assignment
   | SnippetDefine
   | FilterDefine
+  | ModifierDefine
+  | ProcedureDefine
 
 export interface NormalSelector {
   type: 'normal-selector'
@@ -78,6 +82,20 @@ export interface SnippetExpand {
 
 export interface FilterDefine {
   type: 'filter-define'
+  name: string
+  argsPart: string
+  code: string
+}
+
+export interface ModifierDefine {
+  type: 'modifier-define'
+  name: string
+  argsPart: string
+  code: string
+}
+
+export interface ProcedureDefine {
+  type: 'procedure-define'
   name: string
   argsPart: string
   code: string

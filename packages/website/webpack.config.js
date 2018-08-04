@@ -9,7 +9,7 @@ const config = {
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[chunkhash].bundle.js',
+    filename: '[chunkhash:6].bundle.js',
   },
 
   resolve: {

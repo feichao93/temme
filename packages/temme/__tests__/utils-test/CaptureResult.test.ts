@@ -1,4 +1,4 @@
-import { CaptureResult, defaultFilterDict, defaultModifierDict, Modifier, msg } from '../../src/index'
+import { CaptureResult, defaultFilterDict, defaultModifierDict, Modifier, msg } from '../../src'
 
 // TODO 需要添加 modifier 的测试
 
@@ -165,5 +165,5 @@ test('invalid modifier', () => {
   const foo: Modifier = { name: 'foo', args: [] }
   expect(() => {
     r.add({ name: 'key', filterList: [], modifier: foo }, 'value')
-  }).toThrow(msg.invalidModifier(foo))
+  }).toThrow(msg.invalidModifier(foo.name))
 })

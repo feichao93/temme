@@ -13,7 +13,7 @@ const simpleHtml2 = `
   </li>
 </ul>`
 
-export default [
+const examples = [
   {
     name: 'basic-value-capture',
     html: simpleHtml1,
@@ -38,11 +38,9 @@ export default [
     name: 'basic-content',
     html: simpleHtml1,
     selector: `
-a{
-  $text;                           // capture
-  $assignmentInContent = true;     // assignment
-  find('Star Me on ', $website);   // function call
-};`,
+a{ $text }; // capture
+a{ $assignmentInContent = true }; // assignment
+a{ find('Star Me on ', $website) }; // function call`,
   },
   {
     name: 'so-question-detail',
@@ -57,7 +55,7 @@ filter format() {
 #question-header a[href=$link]{$title};
 
 .question .vote-count-post{$upvoteCount|Number};
-.question .post-text{$postText|html|trim|format};
+.question .post-text{ html($postText|trim|format) };
 .question .post-tag@tagList{ &{$} };
 .question .post-signature:last-child .user-details a{$askedBy|format};
 
@@ -67,7 +65,7 @@ filter format() {
   &.accepted-answer{$accepted = true};
   .vote-count-post{$upvoteCount|Number};
 
-  .post-text{$postText|html|trim|format};
+  .post-text{ html($postText|trim|format) };
   .post-signature:last-child .user-details a{$answeredBy|format};
   .user-action-time{$action|trim|format}
 
@@ -115,7 +113,7 @@ filter url() {
 
   $commentCount = 0;
   .float-right.col-5 a span{$commentCount|Number};
-}`
+}`,
   },
   {
     name: 'douban-movie-summary-Chinese',
@@ -180,3 +178,24 @@ filter url() {
 }`,
   },
 ]
+
+if (process.env.NODE_ENV === 'development') {
+  examples.push({
+    name: 'test',
+    html: simpleHtml2,
+    selector: `// 测试用的样例
+modifier foo(result, node) {
+  result.set('foo', 'bar')
+}
+
+procedure bar(result, node, capture) {
+  result.add(capture, node.text())
+}
+
+li@list!foo {
+  span{ bar($) };
+};`,
+  })
+}
+
+export default examples

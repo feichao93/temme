@@ -21,7 +21,7 @@ function config(output) {
 export default [
   config({
     format: 'es',
-    file: 'dist/temme.es.js',
+    file: 'dist/temme.mjs',
   }),
   config({
     format: 'cjs',
