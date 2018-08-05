@@ -16,8 +16,7 @@
   "files": [
     "bin",
     "dist",
-    "readme.md",
-    "readme-zh.md"
+    "readme.md"
   ],
   "scripts": {
     "test-only": "jest --coverage",
