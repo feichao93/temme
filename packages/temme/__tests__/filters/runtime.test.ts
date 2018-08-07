@@ -211,14 +211,3 @@ test('filter with spread operator', () => {
     y: 7,
   })
 })
-
-test('use require in custom filter', () => {
-  const html = '<div>1</div>'
-  const selector = `
-  filter foo() {
-    return require('url').URL
-  };
-  div{$|foo};
-  `
-  expect(temme(html, selector)).toBe(require('url').URL)
-})

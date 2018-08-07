@@ -54,15 +54,9 @@ export class CaptureResult {
   }
 
   private applyFilter(value: any, filter: Filter) {
-    if (filter.name in this.filterDict) {
-      const filterFn = this.filterDict[filter.name]
-      return filterFn.apply(value, filter.args)
-    } else if (typeof value[filter.name] === 'function') {
-      const filterFn: FilterFn = value[filter.name]
-      return filterFn.apply(value, filter.args)
-    } else {
-      throw new Error(msg.invalidFilter(filter.name))
-    }
+    const filterFn: FilterFn = this.filterDict[filter.name] || value[filter.name]
+    invariant(typeof filterFn === 'function', msg.invalidFilter(filter.name))
+    return filterFn.apply(value, filter.args)
   }
 
   private applyFilterList(initValue: any, filterList: Filter[]) {

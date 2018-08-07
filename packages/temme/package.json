@@ -19,7 +19,7 @@
     "readme.md"
   ],
   "scripts": {
-    "test-only": "jest --coverage",
+    "test-only": "cross-env NODE_ENV=development jest --coverage",
     "test": "npm run test-only && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "rollup --config rollup.config.js --watch",
     "build": "rollup --config rollup.config.js",

@@ -31,6 +31,8 @@ import parser from './grammar.pegjs'
 
 const temmeParser: TemmeParser = parser
 
+const safeEval = eval
+
 export { cheerio, temmeParser }
 
 export default function temme(
@@ -59,7 +61,9 @@ export default function temme(
     return null
   }
 
-  rootSelectorArray.forEach(checkRootSelector)
+  if (process.env.NODE_ENV === 'development') {
+    rootSelectorArray.forEach(checkRootSelector)
+  }
 
   const filterDict: Dict<FilterFn> = Object.assign({}, defaultFilterDict, extraFilters)
   const modifierDict: Dict<ModifierFn> = Object.assign({}, defaultModifierDict, extraModifiers)
@@ -80,17 +84,17 @@ export default function temme(
         const { name, argsPart, code } = selector
         invariant(!(name in filterDict), msg.filterAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        filterDict[name] = eval(funcString)
+        filterDict[name] = safeEval(funcString)
       } else if (selector.type === 'modifier-define') {
         const { name, argsPart, code } = selector
         invariant(!(name in modifierDict), msg.modifierAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        modifierDict[name] = eval(funcString)
+        modifierDict[name] = safeEval(funcString)
       } else if (selector.type === 'procedure-define') {
         const { name, argsPart, code } = selector
         invariant(!(name in modifierDict), msg.procedureAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        procedureDict[name] = eval(funcString)
+        procedureDict[name] = safeEval(funcString)
       }
     }
 
