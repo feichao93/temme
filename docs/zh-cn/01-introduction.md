@@ -79,6 +79,6 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 
 第一个问题的答案简单：我们使用 CSS 选择器。CSS 选择器被广泛使用在前端开发中：Web 标准中 CSS 选择器用于指定 CSS 规则所应用的元素；JQuery/cheerio 使用 CSS 选择器来选择文档中的元素/结点；puppeteer 中很多函数都接受一个 CSS 选择器作为参数。同样的，temme 也使用 CSS 选择器。
 
-不过 CSS 选择器只包含了 _匹配_ 信息，只能回答第一个问题。为了回答第二个问题，我们需要去拓展 CSS 选择器的语法，使得新的语法（叫做 temme-selector）可以包含 _捕获_ 信息。捕获信息一般包含了「哪些数据需要被提取，并存放到结果的哪个字段」；这里的数据可以是结点特性的值，或是结点的文本 / HTML。选择器 `'div[class=$cls]'` 将特性 `class` 捕获到结果的 `.cls` 字段；选择器 `'p{$content}'` 将结点的文本内容捕获到结果的 `.content` 字段。
+不过 CSS 选择器只包含了 _匹配_ 信息，只能回答第一个问题。为了回答第二个问题，我们需要去拓展 CSS 选择器的语法，使得新的语法可以包含 _捕获_ 信息。捕获信息一般包含了「哪些数据需要被提取，并存放到结果的哪个字段」；这里的数据可以是结点特性的值，或是结点的文本 / HTML。选择器 `'div[class=$cls]'` 将特性 `class` 捕获到结果的 `.cls` 字段；选择器 `'p{$content}'` 将结点的文本内容捕获到结果的 `.content` 字段。
 
-拓展的语法部分参考了我以前用过的一些工具。Temme 支持 JavaScript 风格的注释，JavaScript 字面量（string/number/null/boolean/RegExp），赋值语句，父结点引用（参考了[stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)），特性/内容捕获（受 Emmet 的启发），以及过滤器（参考了 [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) 以及一些其他模板语法）。
+拓展的语法部分参考了我以前用过的一些工具。Temme 支持 JavaScript 风格的注释，JavaScript 字面量（string/number/null/boolean/RegExp），赋值语句，父结点引用（参考了[stylus](http://stylus-lang.com/docs/selectors.html#parent-reference)），特性/内容捕获（受 Emmet 的启发），以及过滤器（参考了 [Django](https://docs.djangoproject.com/en/dev/ref/templates/language/#filters) 以及一些其他模板语法）。这些拓展语法的规则和运行时行为详见对应文档。

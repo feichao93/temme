@@ -8,7 +8,7 @@ temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取
 
 ## 相关链接
 
-👉 中文文档：见下方「文档链接」
+👉[中文文档](#文档链接)
 
 👉[在线版本](https://temme.js.org)
 
@@ -19,10 +19,17 @@ temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取
 ## 例子
 
 ```html
-<ul class="fruit-list">
-  <li> <span data-color="red">apple</span>     </li>
-  <li> <span data-color="yellow">banana</span> </li>
-  <li> <span data-color="white">pear</span>    </li>
+<!-- 下面用到的 html 的内容 -->
+<ul>
+  <li data-fruit-id="1">
+    <span data-color="red">apple</span>
+  </li>
+  <li data-fruit-id="2">
+    <span data-color="white">pear</span>
+  </li>
+  <li data-fruit-id="3">
+    <span data-color="purple">grape</span>
+  </li>
 </ul>
 ```
 
@@ -32,18 +39,17 @@ temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取
 import temme from 'temme'
 // const temme = require('temme').default
 
-const selector = `li@list {
+const selector = `li@fruits {
   span[data-color=$color]{$name};
 }`
-
 temme(html, selector)
-// =>
+//=>
 // {
-//   list: [
-//     { color: 'red', name: 'apple' },
-//     { color: 'yellow', name: 'banana' },
-//     { color: 'white', name: 'pear' },
-//   ],
+//   "fruits": [
+//     { "color": "red", "name": "apple" },
+//     { "color": "white", "name": "pear"  },
+//     { "color": "purple", "name": "grape" }
+//   ]
 // }
 ```
 
@@ -53,21 +59,20 @@ temme(html, selector)
 
 ## 文档链接
 
-- [1-introduction](/docs/zh-cn/01-introduction.md)
-- [2-value-capture](/docs/zh-cn/02-value-capture.md)
-- [3-array-capture](/docs/zh-cn/03-array-capture.md)
-- [4-parent-reference](/docs/zh-cn/04-parent-reference.md)
-- [5-multiple-selector](/docs/zh-cn/05-multiple-selector.md)
-- [6-assignments](/docs/zh-cn/06-assignments.md)
-- [7-javascript](/docs/zh-cn/07-javascript.md)
-- [8-filters](/docs/zh-cn/08-filters.md)
-- [9-modifiers](/docs/zh-cn/09-modifiers.md)
-- [10-procedures](/docs/zh-cn/10-procedures.md)
-- [11-snippets](/docs/zh-cn/11-snippets.md)
+- [01-introduction](/docs/zh-cn/01-introduction.md)
+- [02-value-capture](/docs/zh-cn/02-value-capture.md)
+- [03-array-capture](/docs/zh-cn/03-array-capture.md)
+- [04-multiple-selector](/docs/zh-cn/04-multiple-selector.md)
+- [05-assignments](/docs/zh-cn/05-assignments.md)
+- [06-javascript](/docs/zh-cn/06-javascript.md)
+- [07-filters](/docs/zh-cn/07-filters.md)
+- [08-modifiers](/docs/zh-cn/08-modifiers.md)
+- [09-procedures](/docs/zh-cn/09-procedures.md)
+- [10-snippets](/docs/zh-cn/10-snippets.md)
 
 ## 升级指南：从 0.7 升级到 0.8
 
-0.8 版本的更新较大，主要是引入 procedure 和 modifier 两大特性，同时移除了原来的 content 机制。如果你仍需要老版本的文档，[可以在这里可以找到](https://github.com/shinima/temme/blob/v0.7.0/readme-zh.md)。
+0.8 版本的更新较大，主要是引入了 procedure 和 modifier 两大特性，同时移除了原来的 content 机制。如果你仍需要老版本的文档，[可以在这里可以找到](https://github.com/shinima/temme/blob/v0.7.0/readme-zh.md)。
 
 #### content 被重命名为 procedure
 
