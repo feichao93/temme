@@ -72,15 +72,12 @@ temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 
 在选择器字符串中直接定义过滤器。过滤器定义语法和 JavaScript 函数定义语法一样，区别在于将关键字 _function_ 换成了 _filter_。
 
-```
+```javascript
 filter myFilter(arg1, arg2, arg3) {
-  // todo 用中文
-  // todo 说明因为语法解析器的原因，不支持 js 解构、参数收集等语法
-  /* 在这里过滤器的逻辑. */
-  /* The code here will be executed as in a JavaScript function. */
-  /* Note that the curly braces must be balanced here. */
+  /* 在这里书写过滤器的逻辑，这里的代码将会以 JavaScript 函数的形式被执行 */
+  /* 注意因为语法解析器的限制，这里的花括号必须是平衡的 */
 }
 
-// 我们可以这么使用myFilter
+// 像下面这样使用 myFilter
 div{$txt|myFilter(x, y, z)};
 ```
