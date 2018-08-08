@@ -1,10 +1,12 @@
-## ~~Content~~ Procedures
+## (todo) Procedures
 
-Content，也就是常规选择器后面花括号中的部分。Content 用于抓取结点的文本或是 HTML。Content 由多个 content-part 组成，多个 content-part 之间用分号进行分隔。每一个 content-part 的形式可以为下面的形式之一：
+procedure，也就是常规选择器后面花括号中的部分。当某一个结点满足匹配规则时，procedure 将会执行。前面我们用到的文本捕获和花括号内赋值其实只是 procedure 用于抓取结点的文本或是 HTML。
 
-1. 捕获. 会抓取将结点的文本内容或是 HTML 到指定的字段；
-2. 赋值. 该形式类似条件赋值，当 temme 找到一个满足常规选择器的结点时，会执行该赋值；
-3. 内容函数调用. 具体见下方。
+### 语法
+
+1. `div{ proc(arg1, arg2) }`：当某一个结点满足匹配规则 `div` 时，执行 `proc` 这个 procedure，参数可以为 temme 支持的 JavaScript 字面量或是值捕获；
+2. `div{ $text }`：等价于 `div{ text($text) }`，即当只提供一个值捕获时，默认执行 `text` procedure；也就是说文本捕获语法是 procedure 的一种缩写形式。
+3. `div{ $foo = bar }`：等价于 `div{ assign($foo, bar) }`，即条件赋值语法是 `assign` procedure 的缩写形式。
 
 ### Content 中的捕获
 

@@ -6,7 +6,7 @@ Temme is a concise and convenient selector to extract JSON from HTML documents.
 
 ## Links
 
-👉 documentation：See below
+👉 [documentation](#Documentation)
 
 👉 [playground](https://temme.js.org)
 
@@ -36,4 +36,4 @@ Temme is a concise and convenient selector to extract JSON from HTML documents.
 
 ## Upgrade from 0.7 to 0.8
 
-(todo0)
+(todo)

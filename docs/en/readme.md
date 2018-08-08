@@ -1,5 +1,7 @@
 [![Build Status](https://img.shields.io/travis/shinima/temme/master.svg?style=flat-square)](https://travis-ci.org/shinima/temme) [![Coverage Status](https://img.shields.io/coveralls/shinima/temme/master.svg?style=flat-square)](https://coveralls.io/github/shinima/temme?branch=master) [![VSCode Extension](https://img.shields.io/badge/vscode-extension-green.svg?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme) [![NPM Package](https://img.shields.io/npm/v/temme.svg?style=flat-square)](https://www.npmjs.org/package/temme) ![Node Version Requirement](https://img.shields.io/badge/node-%3E=6-f37c43.svg?style=flat-square) [![Doc in Chinese](https://img.shields.io/badge/文档-中文-607D8B.svg?style=flat-square)](./readme-zh.md) [![Example Douban Movie](https://img.shields.io/badge/示例-豆瓣电影-2196F3.svg?style=flat-square)](/examples/douban-movie/readme.md) [![Example StackOverflow](https://img.shields.io/badge/Example-StackOverflow-2196F3.svg?style=flat-square)](/examples/stackoverflow/readme.md)
 
+**Note that English documentation for temme v0.8 is still working in progress. This readme reflects temme v0.7.**
+
 # Temme
 
 Temme is a concise and convenient selector to extract JSON from HTML documents. Try temme in the [playground](https://temme.js.org). If you are using VSCode editor, welcome install [the vscode-temme extension](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme).
