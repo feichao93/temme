@@ -3,7 +3,6 @@
 <head>
   <meta charset=utf-8>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8/normalize.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/temme@0.7.0/browser/index.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.3.3/src-min/ace.js"></script>
 
   <script src="./matching_brace_outdent.js"></script>
@@ -114,6 +113,7 @@
   <header style="background-color: #1d2a3f; color: white; display: flex">
     <p style="margin: 8px">
       <span style="font-size: 125%;">Temme</span>
+      (v<span id=version></span>)
       <span>is a concise selector to extract JSON from HTML.</span>
       <span style="padding-left: 8px;">
         <a style="color: inherit" href="https://github.com/shinima/temme" target=_blank>GitHub</a>
@@ -133,9 +133,11 @@
     </p>
     <div id=example-select-part style="display: none; margin: 8px 8px 0;">
       <select id=example-select title="Select an example" style="width: 350px"></select>
+      <button id=open-example-button class=nav-button style="background: #0f9d61">Open</button>
       <button id=prev-example-button class="nav-button">Prev</button>
       <button id=next-example-button class="nav-button">Next</button>
       <button id=exit-example-mode class=nav-button style="background: #b93309">Exit</button>
+      <!-- TODO 在常规页面中打开在例子的按钮 -->
     </div>
   </header>
   <div class="flex-grow-1" style="display: flex">
@@ -171,5 +173,9 @@
   </div>
 </div>
 
-<script type="text/javascript" src="0ec0b8be9b9ecca7094a.bundle.js"></script></body>
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+
+<!-- NOTE production build 的时候请保留下面这行代码，并输入正确的版本号 -->
+<script src="https://cdn.jsdelivr.net/npm/temme@0.8.0/dist/temme.umd.js"></script>
+<script type="text/javascript" src="bundle.d4ccd3.js"></script></body>
 </html>
