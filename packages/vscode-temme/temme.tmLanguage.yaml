@@ -1,0 +1,249 @@
+name: temme
+scopeName: source.temme
+
+patterns:
+  - include: '#inline-definition'
+  - include: '#temme-selector'
+
+repository:
+  temme-selector:
+    patterns:
+      - include: '#comments'
+      - include: '#JSLiteral' # 这个规则还可以改进
+
+      - comment: 'CSS selector id-qualifier'
+        match: '#[_[:alnum:]-]+'
+        name: entity.other.attribute-name.id.css.temme
+
+      - comment: 'Stylus-like parent-referent'
+        match: '&'
+        name: keyword.parent-reference.temme
+
+      - comment: 'CSS selector class qualifier'
+        match: "\\.[_[:alnum:]-]+"
+        name: entity.other.attribute-name.class.css.temme
+
+      - comment: 'CSS selector pesudo-qualifier'
+        match: ':[_[:alnum:]-]+'
+        name: meta.selector.temme
+
+      - comment: CSS selector tag qualifier
+        match: '[_[:alnum:]-]+'
+        name: entity.name.tag.temme
+
+      - comment: CSS selector attribute qualifier
+        begin: "\\["
+        beginCaptures: { 0: { name: meta.selector.temme } }
+        end: "\\]"
+        endCaptures: { 0: { name: meta.selector.temme } }
+        contentName: meta.attribute-selector.temme
+        patterns:
+          - include: '#comments'
+          - include: '#JSString'
+          - match: "=|~=|\\|=|\\*=|\\^=|\\$="
+            name: keyword.operator.pattern.temme
+          - begin: "\\$([_$[:alpha:]][_$[:alnum:]]*)?"
+            beginCaptures: { 0: { name: variable.parameter.temme } }
+            end: "(?!(\\||!))"
+            patterns:
+              - include: '#filters'
+          - match: '[_$[:alpha:]][_$[:alnum:]]*'
+            name: entity.other.attribute-name.temme
+
+      - begin: "(\\$([_$[:alpha:]][_$[:alnum:]]*)?)"
+        beginCaptures: { 0: { name: variable.parameter.temme } }
+        end: "(?!(\\||!))"
+        patterns:
+          - include: '#filters'
+
+      - comment: snippet expansion
+        match: "(@[_$[:alpha:]][_$[:alnum:]]*)\\s*;"
+        captures:
+          '1': { name: keyword.snippet-expansion.temme }
+
+      - comment: snippet definiton
+        begin: "(@[_$[:alpha:]][_$[:alnum:]]*)\\s*(=)"
+        end: "(?<=\\})"
+        beginCaptures:
+          '1': { name: keyword.snippet-definition.temme }
+          '2': { name: keyword.operator.snippet-definition.temme }
+        contentName: meta.snippte-define.temme
+        patterns:
+          - include: '#comments'
+          - begin: "\\{"
+            end: "\\}"
+            patterns:
+              - include: '#temme-selector'
+
+      - comment: children selectors
+        begin: '@([_$[:alpha:]][_$[:alnum:]]*)?'
+        beginCaptures:
+          0: { name: variable.parameter.temme }
+        end: "(?<=\\})"
+        patterns:
+          - begin: "(?=\\|)"
+            end: "(?!(\\||!))"
+            patterns:
+              - include: '#filters'
+          - begin: "\\{"
+            end: "\\}"
+            name: meta.children.temme
+            patterns:
+              - include: '#temme-selector'
+
+      - comment: temme procedure
+        begin: "\\{"
+        end: "\\}"
+        contentName: meta.procedure.temme
+        patterns:
+          - include: '#comments'
+          - include: '#JSLiteral'
+          - begin: "\\$([_$[:alpha:]][_$[:alnum:]]*)?"
+            beginCaptures: { 0: { name: variable.parameter.temme } }
+            end: "(?!(\\||!))"
+            patterns:
+              - include: '#filters'
+          - comment: procedure
+            begin: "([_$[:alpha:]][_$[:alnum:]]*)\\s*\\("
+            beginCaptures: { 1: { name: entity.name.function.temme } }
+            end: "\\)"
+            patterns: [{ include: '#parameters-body' }]
+          - match: '='
+            name: keyword.operator.temme
+
+  parameters-body:
+    patterns:
+      - include: '#comments'
+      - include: '#JSLiteral'
+      - begin: "\\$([_$[:alpha:]][_$[:alnum:]]*)?"
+        beginCaptures:
+          0: { name: variable.parameter.temme }
+        end: "(?!(\\||!))"
+        patterns:
+          - include: '#filters'
+      - name: punctuation.operator.temme
+        match: '[, ]+'
+
+  filters:
+    patterns:
+      - comment: Filter or modifier with parameters
+        begin: "(\\||\\|\\|)([_$[:alpha:]][_$[:alnum:]]*)(\\()"
+        beginCaptures:
+          1: { name: keyword.operator.filter-operator.temme }
+          2: { name: entity.name.function.filter.with-args.temme }
+        end: "\\)"
+        contentName: meta.parameters.temme
+        patterns:
+          - include: '#parameters-body'
+      - comment: Filter without parameters
+        match: "(\\||\\|\\|)([_$[:alpha:]][_$[:alnum:]]*)"
+        captures:
+          1: { name: keyword.operator.filter-operator.temme }
+          2: { name: entity.name.function.filter.no-args.temme }
+      - comment: Modifier with parameters
+        begin: "(!)([_$[:alpha:]][_$[:alnum:]]*)(\\()"
+        beginCaptures:
+          1: { name: keyword.operator.modifier-operator.temme }
+          2: { name: entity.name.function.modifier.with-args.temme }
+        end: "\\)"
+        contentName: meta.parameters.temme
+        patterns:
+          - include: '#parameters-body'
+      - comment: Modifier without parameters
+        match: '(!)([_$[:alpha:]][_$[:alnum:]]*)'
+        captures:
+          1: { name: keyword.operator.modifier-operator.temme }
+          2: { name: entity.name.function.filter.no-args.temme }
+
+  inline-definition:
+    patterns:
+      - begin: "(filter|modifier|procedure)\\s+([_$[:alpha:]][_$[:alnum:]]*)"
+        beginCaptures:
+          1: { name: storage.temme }
+          2: { name: entity.name.function.temme }
+        end: "(?<=\\})"
+        patterns:
+          - begin: "\\("
+            end: "\\)"
+            contentName: meta.inline-definition-parameters.temme
+            patterns:
+              # // TODO 这里需要使用 JavaScript 的方式
+              - include: '#parameters-body'
+          - begin: "\\{"
+            end: "\\}"
+            contentName: meta.js-in-temme
+            patterns:
+              - include: source.js
+
+  comments:
+    patterns:
+      - begin: "/\\*"
+        end: "\\*/"
+        name: comment.block
+        patterns:
+          - match: "(<.*>)\\s*(.+)$"
+            captures:
+              1: { name: constant.tag }
+              2: { name: variable.parameter.url.temme }
+      - name: comment.line
+        begin: "\\/\\/"
+        end: '$'
+        patterns:
+          - match: "(<.*>)\\s*(.+)$"
+            captures:
+              1: { name: constant.tag }
+              2: { name: variable.parameter.url.temme }
+
+  JSLiteral:
+    patterns:
+      - name: constant.language.temme
+        match: null|false|true
+      - include: '#JSString'
+      - include: '#JSNumeric'
+      - include: '#JSRegex'
+
+  JSString:
+    patterns:
+      - name: string.quoted.double.temme
+        begin: '"'
+        end: '"'
+        patterns:
+          - name: constant.character.escape.temme
+            match: "\\\\."
+      - name: string.quoted.single.temme
+        begin: "'"
+        end: "'"
+        patterns:
+          - match: "\\\\."
+            name: constant.character.escape.temme
+
+  JSNumeric:
+    patterns:
+      - comment: hexadecimal, octal and binary
+        name: constant.numeric.temme
+        match: 0(?:[xX][0-9a-fA-F]+|[oO][0-7]+|[bB][01]+)\b
+      - comment: decimal integers and floats
+        name: constant.numeric.temme
+        match: "(?:\\d\\d*(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+\b)?"
+
+  JSRegex:
+    patterns:
+      - begin: "\\/"
+        beginCaptures:
+          0: { name: punctuation.definition.string.begin.temme }
+        end: '(/)([gimsuy]*)'
+        endCaptures:
+          1: { name: punctuation.definition.string.end.temme }
+          2: { name: keyword.other.temme }
+        name: string.regexp.temme
+        patterns:
+          - comment: escapes
+            name: constant.character
+            match: "\\\\(?:u[\\da-fA-F]{4}|x[\\da-fA-F]{2}|.)"
+          - match: "\\|"
+            name: keyword.operator.or.regexp.temme
+          - begin: "\\[\\^?"
+            end: ']|$'
+            name: constant.character-set.regexp.temme
+          - match: "[?+*]|\\{(\\d+,\\d+|\\d+,|,\\d+|\\d+)\\}\\??"
+            name: 'keyword.operator.quantifier.regexp'

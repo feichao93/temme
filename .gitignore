@@ -1,5 +1,5 @@
 .idea
 node_modules
-build
 coverage
-playground-build
+dist
+.rpt2_cache
