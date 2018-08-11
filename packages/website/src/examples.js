@@ -1,4 +1,4 @@
-const simpleHtml1 = '<a href="https://github.com/shinima/temme">Star Me on GitHub</a>'
+const simpleHtml1 = '<a href="https://github.com/shinima/temme">Star Me on <span>GitHub</span></a>'
 
 const simpleHtml2 = `
 <ul>
@@ -12,6 +12,19 @@ const simpleHtml2 = `
     <span data-color="purple">grape</span>
   </li>
 </ul>`
+
+const simpleHtml3 = `
+<div class="audience-score">观众评分：<span class="n">20</span></div>
+<div class="audience-count">观众数量：<span class="n">2000</span></div>
+<div class="judge-score">评委评分：<span class="n">24</span></div>
+<div class="judge-count">评委数量：<span class="n">8</span></div>
+`
+
+const simpleHtml4 = `
+<div class="option-1"></div>
+<div class="option-2">value-2</div>
+<div class="option-3">value-3</div>
+`
 
 const examples = [
   {
@@ -35,12 +48,69 @@ const examples = [
     selector: `li@ {\n  &[data-fruit-id=$fid];\n  span[data-color=$color]{$name};\n}`,
   },
   {
-    name: 'basic-content',
+    name: 'basic-procedures',
     html: simpleHtml1,
     selector: `
-a{ $text }; // capture
-a{ $assignmentInContent = true }; // assignment
-a{ find('Star Me on ', $website) }; // function call`,
+a{ $text }; // text-capture
+a{ $hasAnchor = true }; // conditional-assignment
+a{ html($html) }; // procedure html
+a{ find('Star Me on ', $website) }; // procedure find`,
+  },
+  {
+    name: 'modifier-array',
+    html: simpleHtml3,
+    selector: `
+.audience-score .n{ $scores!array };
+.judge-score .n{ $scores!array };
+`,
+  },
+  {
+    name: 'modifier-candidate',
+    html: simpleHtml4,
+    selector: `
+// 下面选择器对应于以下 JavaScript 代码
+// The selectors below correspond to the following JavaScript code
+
+// result.v = $('option-1').text() || $('option-2').text() || $('option-3').text()
+
+.option-1{ $v!candidate };
+.option-2{ $v!candidate };
+.option-3{ $v!candidate };`,
+  },
+  {
+    name: 'modifier-spread',
+    htmlUrl: 'resources/tmall-reviews.html',
+    selector: `
+// procedure spread 示例，注意下面 notUse 和 useSpread 对应的结果的差别
+// spread 一般用在数组捕获中，且往往与 pack/first/last 等过滤器一起使用
+
+.rate-grid tr@notUse|first{
+  .rate-user-info{$user};
+  .rate-user-grade{$userGrade};
+  .tm-rate-append@append|pack {
+    .tm-rate-title{$Title}; // 结果存放在result.append.Title 字段
+    .tm-rate-fulltxt{$Text|trim};
+  };
+}
+
+.rate-grid tr@useSpread|first{
+  .rate-user-info{$user};
+  .rate-user-grade{$userGrade};
+  .tm-rate-append@append|pack!spread {
+    .tm-rate-title{$Title}; // 结果存放在result.appendTitle 字段
+    .tm-rate-fulltxt{$Text|trim};
+  };
+}
+
+.rate-grid tr@useSpread2|first{
+  .rate-user-info{$user};
+  .rate-user-grade{$userGrade};
+  // spread 也接受一个参数，用来指定前缀
+  .tm-rate-append@append|pack!spread('custom') {
+    .tm-rate-title{$Title}; // 结果存放在result.customTitle 字段
+    .tm-rate-fulltxt{$Text|trim};
+  };
+}`,
   },
   {
     name: 'so-question-detail',

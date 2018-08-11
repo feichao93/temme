@@ -81,7 +81,7 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 
 ## 使用自定义的 procedure
 
-和 filters 类似，temme 允许多种方式来自定义 procedure。当自定义 procedure 被调用时，参数依次为：捕获结果对象，满足 CSS 选择器的结点，以及选择器中 procedure 的参数。捕获结果对象的相关 API 见下方。
+和过滤器类似，temme 允许多种方式来自定义 procedure。当自定义 procedure 被调用时，参数依次为：捕获结果对象，满足 CSS 选择器的结点，以及选择器中 procedure 的参数。捕获结果对象的相关 API 见下方。
 
 procedure 是一个强大且复杂的机制。不过在大部分场景中，我们都是不需要使用该机制的。temme 支持伪类选择器（由 [css-select](https://github.com/fb55/css-select#supported-selectors) 实现）。尤其是 `:contains`，`:not` 和 `:has` 这三个伪类选择器，大大提升了选择器的能力。在使用自定义的 procedure 之前，先尝试一下伪类选择器是否满足需求。
 
@@ -89,12 +89,12 @@ procedure 是一个强大且复杂的机制。不过在大部分场景中，我�
 
 ### 定义全局 procedure
 
-使用 `defineProcedure` 来添加全局 procedure。
-
 ```JavaScript
 import { defineProcedure } from 'temme'
 
-defineProcedure('myProcedure', function myProcedure(result, node, arg1) { /* ... */ })
+defineProcedure('myProcedure', function myProcedure(result, node, ...args) {
+  /* ... */
+})
 ```
 
 ### 将 procedure 以参数的形式提供给 temme()
@@ -124,15 +124,3 @@ procedure mark(result, node, arg) {
 // 像下面这样使用 mark
 div{ mark($foo) };
 ```
-
-## 类 `CaptureResult`
-
-`CaptureResult` 实例用来存储捕获的数据，在自定义 procedure 中，我们需要调用 CaptureResult 的相应 API 来向捕获结果中添加数据。
-
-| API                              | 作用                                                                            |
-| -------------------------------- | ------------------------------------------------------------------------------- |
-| `result.get(key)`                | 返回已有结果中 key 字段对应的数据                                               |
-| `result.set(key, value)`         | 直接向结果的 key 字段中写入 value                                               |
-| `result.add(capture, value)`     | 向结果中添加值捕获，value 会经过 filters 和 modifier 的处理，然后被写入到结果中 |
-| `result.forceAdd(capture,value)` | 与 `add` 作用相同，但使用 forceAdd 作为默认的 modifier                          |
-| `reuslt.getResult()`             | 返回 CaptureResult 对象中保存的所有捕获结果                                     |

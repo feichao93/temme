@@ -1,5 +1,7 @@
 ## 过滤器 `|`
 
+temme 中的过滤器和其他常见模板一样，用于对数据进行格式转换。
+
 ### 语法
 
 - `$foo|xxx` 放在值捕获的右边；xxx 是过滤器的名字
@@ -9,21 +11,21 @@
 
 ### 运行时的行为
 
-每当一个值被捕获时，该值的类型总是字符串。一个过滤器是一个简单的函数，接受一个输入（也就是捕获的值，会放在 `this` 中）与若干参数，然后返回一个输出。我们可以使用过滤器来处理捕获的值。
+一个过滤器是一个简单的函数，接受一个输入（也就是捕获的值，会放在 `this` 中）与若干参数，然后返回一个输出。我们可以使用过滤器来处理捕获的值。
 
 - `div{$x|foo}` 每当 `x` 被捕获时，它就会像这样被处理：`x = foo.apply(x)`
 
-* `div{$x|foo(1, false)}` 每当 x 被捕获时，它就会像这样被处理：`x = foo.apply(x, [1, false])`
+- `div{$x|foo(1, false)}` 每当 x 被捕获时，它就会像这样被处理：`x = foo.apply(x, [1, false])`
 
-* `div{$x|foo|bar}` 被捕获的值首先被 foo 处理，然后会被 bar 处理。整个过程相当于以下代码：
+- `div{$x|foo|bar}` 被捕获的值首先被 foo 处理，然后会被 bar 处理。整个过程相当于以下代码：
   ```javascript
   x = foo.apply(x)
   x = bar.apply(x)
   ```
 
-### 内建的过滤器
+### 内置的过滤器
 
-Temme 提供了一些内建的过滤器。这些过滤器分为下面三个部分：
+Temme 提供了一些内置的过滤器。这些过滤器分为下面三个部分：
 
 1. Structure Manipulation Filters：该部分包括 `pack`，`flatten`，`compact`，`first`，`last`，`get`。这些过滤器简单又实用，看 [源代码](/packages/temme/src/filters.ts) 以了解细节。
 2. Type Coercion Filters：该部分包括 `String`，`Number`，`Date`，`Boolean`。这些过滤器用于将输入转换为指定的类型。
