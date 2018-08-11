@@ -4,6 +4,7 @@
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "dist/temme.js",
   "module": "dist/temme.mjs",
+  "unpkg": "dist/temme.umd.js",
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/shinima/temme.git",
   "homepage": "https://temme.js.org",
@@ -22,7 +23,9 @@
     "test-only": "cross-env NODE_ENV=development jest --coverage",
     "test": "npm run test-only && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "start": "rollup --config rollup.config.js --watch",
-    "build": "rollup --config rollup.config.js",
+    "build": "npm-run-all --serial build:*",
+    "build:rollup": "rollup --config rollup.config.js",
+    "build:webpack": "webpack --mode production",
     "prepublish": "rimraf dist && npm run build"
   },
   "dependencies": {
@@ -38,14 +41,19 @@
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "jest": "^23.4.2",
+    "npm-run-all": "^4.1.3",
     "pegjs": "^0.10.0",
     "pegjs-jest": "^0.0.2",
+    "pegjs-loader": "^0.5.4",
     "rimraf": "^2.6.2",
     "rollup": "^0.63.5",
     "rollup-plugin-pegjs": "^2.1.3",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-typescript2": "^0.16.1",
     "ts-jest": "^23.0.1",
-    "typescript": "^3.0.1"
+    "ts-loader": "^4.4.2",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
   }
 }
