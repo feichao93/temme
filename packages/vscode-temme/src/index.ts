@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import path from 'path'
-import temme, { cheerio, temmeParser } from 'temme'
+import temme, { cheerio, temmeParser } from '../../temme'
 import { TAGGED_LINK_PATTERN, TEMME_MODE } from './constants'
 import StatusBarController from './StatusBarController'
 import TemmeCodeActionProvider from './TemmeCodeActionProvider'

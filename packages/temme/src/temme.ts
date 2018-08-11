@@ -31,8 +31,6 @@ import parser from './grammar.pegjs'
 
 const temmeParser: TemmeParser = parser
 
-const safeEval = eval
-
 export { cheerio, temmeParser }
 
 export default function temme(
@@ -84,17 +82,17 @@ export default function temme(
         const { name, argsPart, code } = selector
         invariant(!(name in filterDict), msg.filterAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        filterDict[name] = safeEval(funcString)
+        filterDict[name] = eval(funcString)
       } else if (selector.type === 'modifier-define') {
         const { name, argsPart, code } = selector
         invariant(!(name in modifierDict), msg.modifierAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        modifierDict[name] = safeEval(funcString)
+        modifierDict[name] = eval(funcString)
       } else if (selector.type === 'procedure-define') {
         const { name, argsPart, code } = selector
         invariant(!(name in modifierDict), msg.procedureAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
-        procedureDict[name] = safeEval(funcString)
+        procedureDict[name] = eval(funcString)
       }
     }
 
