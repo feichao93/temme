@@ -113,4 +113,4 @@ const current = `
 
 #### CaptureResult 接口更新
 
-详见 [9-procedures](/docs/zh-cn/9-procedures.md) 文档。
+详见 [09-procedures](/docs/zh-cn/09-procedures.md) 文档。
