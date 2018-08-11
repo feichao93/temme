@@ -1,18 +1,16 @@
 import debounce from 'lodash.debounce'
 import examples from './examples'
-import * as Temme from 'temme'
-
-const { default: temme, temmeParser, cheerio } = Temme
-window.Temme = Temme
-
-/* example mode */
-const url = new URL(document.URL)
-const exampleName = url.searchParams.get('example')
-const EXAMPLE_MODE = exampleName !== null
+import temme, { cheerio, temmeParser, version } from 'temme'
+import { EXAMPLE_MODE, EXAMPLE_NAME } from './constants'
+import { loadContentFromUri, saveContentToUri } from './uriUtils'
+import {
+  debouncedSaveContentToLocalStorage,
+  loadContentFromLocalStorage,
+  saveContentToLocalStorage,
+} from './localStorageUtils'
 
 /* static elements */
-const lsKeyHtml = 'temme-playground-html'
-const lsKeySelectorString = 'temme-playground-selector-string'
+const versionSpan = document.querySelector('#version')
 const browseExampleLink = document.querySelector('#browse-example-link')
 const htmlInputDiv = document.querySelector('#html-input')
 const selectorInputDiv = document.querySelector('#selector-input')
@@ -24,6 +22,8 @@ const htmlPart = document.querySelector('#html-part')
 const selectorOutputPart = document.querySelector('#selector-output-part')
 const toggleWidthButton = document.querySelector('#toggle-width-button')
 const formatHtmlButton = document.querySelector('#format-html')
+
+const initContent = loadContentFromUri() || loadContentFromLocalStorage()
 
 /* functions and utilities */
 function onToggleWidth() {
@@ -41,9 +41,9 @@ function onToggleWidth() {
 function formatHtml() {
   const html = htmlEditor.getValue()
   import('pretty').then(({ default: pretty }) => {
-    const formated = pretty(html, { ocd: true })
-    if (formated !== html) {
-      htmlEditor.setValue(formated)
+    const formatted = pretty(html, { ocd: true })
+    if (formatted !== html) {
+      htmlEditor.setValue(formatted)
     }
   })
 }
@@ -151,11 +151,8 @@ function initHtmlEditor() {
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
-  if (!EXAMPLE_MODE) {
-    const html = localStorage.getItem(lsKeyHtml)
-    if (html) {
-      editor.setValue(html)
-    }
+  if (!EXAMPLE_MODE && initContent) {
+    editor.setValue(initContent.html)
   }
   return editor
 }
@@ -168,11 +165,8 @@ function initSelectorEditor() {
   session.setUseSoftTabs(true)
   session.setTabSize(2)
   editor.$blockScrolling = Infinity
-  if (!EXAMPLE_MODE) {
-    const selectorString = localStorage.getItem(lsKeySelectorString)
-    if (selectorString) {
-      editor.setValue(selectorString)
-    }
+  if (!EXAMPLE_MODE && initContent) {
+    editor.setValue(initContent.selectorString)
   }
   return editor
 }
@@ -189,24 +183,8 @@ function initOutputEditor() {
   return editor
 }
 
-window.addEventListener('beforeunload', () => {
-  if (!EXAMPLE_MODE) {
-    const html = htmlEditor.getValue()
-    const selectorString = selectorEditor.getValue()
-    if (html) {
-      localStorage.setItem(lsKeyHtml, html)
-    } else {
-      localStorage.removeItem(lsKeyHtml)
-    }
-    if (selectorString) {
-      localStorage.setItem(lsKeySelectorString, selectorString)
-    } else {
-      localStorage.removeItem(lsKeySelectorString)
-    }
-  }
-})
-
 /* kick start! */
+versionSpan.textContent = version
 browseExampleLink.href = `?example=${examples[0].name}`
 
 const htmlEditor = initHtmlEditor()
@@ -218,7 +196,10 @@ const debouncedComputeResultAndDisplay = debounce(computeResultAndDisplay, 300)
 const onChange = () => {
   const html = htmlEditor.getValue()
   const selectorString = selectorEditor.getValue()
+
+  saveContentToUri(html, selectorString)
   debouncedComputeResultAndDisplay(html, selectorString, outputEditor)
+  debouncedSaveContentToLocalStorage(html, selectorString)
 }
 
 htmlEditor.getSession().on('change', onChange)
@@ -239,10 +220,14 @@ copyResultButton.onclick = () => {
 toggleWidthButton.addEventListener('click', onToggleWidth)
 formatHtmlButton.addEventListener('click', formatHtml)
 
+window.addEventListener('beforeunload', () => {
+  saveContentToLocalStorage(htmlEditor.getValue(), selectorEditor.getValue())
+})
+
 onChange()
 
 if (EXAMPLE_MODE) {
   import('./loadExample').then(({ default: loadExamples }) => {
-    loadExamples(exampleName, htmlEditor, selectorEditor)
+    loadExamples(EXAMPLE_NAME, htmlEditor, selectorEditor)
   })
 }

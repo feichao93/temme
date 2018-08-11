@@ -9,7 +9,7 @@ const config = {
   target: 'web',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[chunkhash:6].bundle.js',
+    filename: 'bundle.[chunkhash:6].js',
   },
 
   resolve: {
@@ -28,6 +28,11 @@ const config = {
         exclude: /node_modules/,
       },
     ],
+  },
+
+  externals: {
+    'lz-string': 'LZString',
+    // temme: 'Temme', // NOTE production build 的时候请添加该行代码
   },
 
   plugins: [

@@ -113,6 +113,7 @@
   <header style="background-color: #1d2a3f; color: white; display: flex">
     <p style="margin: 8px">
       <span style="font-size: 125%;">Temme</span>
+      (v<span id=version></span>)
       <span>is a concise selector to extract JSON from HTML.</span>
       <span style="padding-left: 8px;">
         <a style="color: inherit" href="https://github.com/shinima/temme" target=_blank>GitHub</a>
@@ -132,9 +133,11 @@
     </p>
     <div id=example-select-part style="display: none; margin: 8px 8px 0;">
       <select id=example-select title="Select an example" style="width: 350px"></select>
+      <button id=open-example-button class=nav-button style="background: #0f9d61">Open</button>
       <button id=prev-example-button class="nav-button">Prev</button>
       <button id=next-example-button class="nav-button">Next</button>
       <button id=exit-example-mode class=nav-button style="background: #b93309">Exit</button>
+      <!-- TODO 在常规页面中打开在例子的按钮 -->
     </div>
   </header>
   <div class="flex-grow-1" style="display: flex">
@@ -170,5 +173,9 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
+
+<!-- NOTE production build 的时候请保留下面这行代码，并输入正确的版本号 -->
+<!--<script src="https://cdn.jsdelivr.net/npm/temme@0.7.0/browser/index.js"></script>-->
 </body>
 </html>

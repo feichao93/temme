@@ -1,10 +1,11 @@
 import examples from './examples'
+import { encodeContent } from './uriUtils'
 
 function gotoExample(name) {
   window.location = `?example=${name}`
 }
 
-function enterExampleMode(currentExampleName) {
+function enterExampleMode(currentExampleName, htmlEditor, selectorEditor) {
   const exitExampleModeLink = document.querySelector('#exit-example-mode')
   const url = new URL(document.URL)
   url.search = ''
@@ -38,12 +39,20 @@ function enterExampleMode(currentExampleName) {
       gotoExample(examples[index + 1].name)
     }
   }
+
+  const openButton = document.querySelector('#open-example-button')
+  openButton.onclick = () => {
+    const url = new URL(document.URL)
+    url.search = ''
+    url.hash = encodeContent(htmlEditor.getValue(), selectorEditor.getValue())
+    window.open(url.href)
+  }
 }
 
 export default async function loadExample(exampleName, htmlEditor, selectorEditor) {
-  enterExampleMode(exampleName)
-  selectorEditor.setValue('')
-  htmlEditor.setValue('')
+  enterExampleMode(exampleName, htmlEditor, selectorEditor)
+  selectorEditor.setValue('Loading examples...')
+  htmlEditor.setValue('Loading examples...')
   const example = examples.find(example => example.name === exampleName)
   if (!example) {
     alert('Invalid example name')
