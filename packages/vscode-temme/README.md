@@ -2,7 +2,7 @@
 
 VSCode extension for [temme selector](https://github.com/shinima/temme).
 
-![vscode-temme](docs/vscode-temme.gif)
+![vscode-temme](/docs/imgs/vscode-temme.gif)
 
 ## Features & Usages
 
@@ -24,17 +24,17 @@ In watch mode, every time the selector changes, the result will be re-calculated
 
 This extension will recognize pattern `// <tag> path` in temme files. When the cursor is at lines which contain tagged-link, vscode will provide some the following code actions. Tagged-link is required if you want to run temme selectors in vscode.
 
-![tagged-link-pattern](docs/tagged-link.jpg)
+![tagged-link-pattern](/docs/imgs/tagged-link.jpg)
 
 #### 5. Status Bar Items
 
 This extension will display some useful items in status bar.
 
-![status-bar-items](docs/status-bar-items.jpg)
+![status-bar-items](/docs/imgs/status-bar-items.jpg)
 
 #### 6. Error reporting for syntax errors
 
-![error-reporting](docs/error-reporting.jpg)
+![error-reporting](/docs/imgs/error-reporting.jpg)
 
 Note: Syntax errors are displayed at the correct line. Runtime errors in watching mode are always displayed at the first line.
 
