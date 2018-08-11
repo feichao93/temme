@@ -47,3 +47,7 @@ If you have any suggestions/questions, just fire an issue [here](https://github.
 ### 0.7.0
 
 Initial release.
+
+### 0.8.0
+
+Update temme to 0.8

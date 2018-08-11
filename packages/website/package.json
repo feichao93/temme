@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "website",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "scripts": {
     "start": "webpack-dev-server --mode development",
     "build": "webpack --mode production && copyfiles public/**/* dist --up 1"
@@ -17,6 +17,6 @@
     "lodash.debounce": "^4.0.8",
     "lz-string": "^1.4.4",
     "pretty": "^2.0.0",
-    "temme": "^0.7.0"
+    "temme": "^0.8.0"
   }
 }

@@ -1,4 +1,4 @@
-## [unreleased]
+## 0.8.0
 
 * Remove *content*, and introduce *procedure*
 * Introduce *modifier*
