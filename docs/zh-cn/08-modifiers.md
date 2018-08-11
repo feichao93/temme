@@ -1,4 +1,4 @@
-## modifiers `!`
+## Modifiers `!`
 
 filters 用于转换数据，而 modifiers 则用来执行 **将处理后的数据写入到结果** 的动作。
 
