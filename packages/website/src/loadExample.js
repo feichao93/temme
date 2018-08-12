@@ -51,7 +51,7 @@ function enterExampleMode(currentExampleName, htmlEditor, selectorEditor) {
 
 export default async function loadExample(exampleName, htmlEditor, selectorEditor) {
   enterExampleMode(exampleName, htmlEditor, selectorEditor)
-  selectorEditor.setValue('Loading examples...')
+  selectorEditor.setValue('// Loading examples...')
   htmlEditor.setValue('Loading examples...')
   const example = examples.find(example => example.name === exampleName)
   if (!example) {

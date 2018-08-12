@@ -113,6 +113,19 @@ a{ find('Star Me on ', $website) }; // procedure find`,
 }`,
   },
   {
+    name: 'modifier-reverse',
+    html: simpleHtml3,
+    selector: `
+// 一个能将字段名倒过来的，但并没有什么实际用处的 modifier
+modifier reverse(result, key, value) {
+  result.set(key.split('').reverse().join(''), value)
+}
+
+.audience-count .n{ $abc!reverse };
+.judge-count .n{ $xyz!reverse };
+`,
+  },
+  {
     name: 'so-question-detail',
     htmlUrl: 'resources/stackoverflow-question.html',
     selector: `

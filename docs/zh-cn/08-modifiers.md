@@ -68,7 +68,7 @@ temme(html, 'div{ $foo!reverse }', null, extraModifiers)
 
 ### 内联定义的 modifier
 
-在选择器字符串中直接定义 modifier。modifier 定义语法和 JavaScript 函数定义语法一样，区别在于将关键字 _function_ 换成了 _modifier_。
+在选择器字符串中直接定义 modifier。modifier 定义语法和 JavaScript 函数定义语法一样，区别在于将关键字 _function_ 换成了 _modifier_。[在线例子链接](https://temme.js.org/?example=modifier-reverse)
 
 ```javascript
 modifier reverse(result, key, value) {

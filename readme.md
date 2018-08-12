@@ -4,7 +4,7 @@
 
 # temme
 
-temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取所需的 JSON 数据。
+temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中提取所需的 JSON 数据。
 
 ## 相关链接
 
@@ -15,6 +15,8 @@ temme 是一个类 jQuery 的选择器，用于优雅地从 HTML 文档中提取
 👉[VSCode 插件](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme)
 
 👉[BUG 反馈](https://github.com/shinima/temme/issues)
+
+👉[升级指南](#升级指南从-07-升级到-08)
 
 ## 例子
 
@@ -53,9 +55,7 @@ temme(html, selector)
 // }
 ```
 
-完整的例子可以在 [_examples_](/examples) 文件夹中查看。如果对 temme 还不熟悉，那么可以从 [豆瓣电影的例子](/examples/douban-movie/readme.md) 开始。
-
-在线版本中也包含了一些其他较短的例子。比如[这个例子](https://temme.js.org?example=douban-movie-summary-Chinese)从豆瓣电影页面中抓取了电影的基本信息和评分信息。[这个例子](https://temme.js.org?example=tmall-reviews-Chinese)从天猫的商品详情页面中抓取了评论列表，包括用户的基本信息，初次评价和追加评价, 以及晒的照片的链接.
+如果你对 temme 还不熟悉，那么可以从 [豆瓣电影的例子](/examples/douban-movie/readme.md) 开始。在线版本中也包含了一些其他较短的例子。比如[这个例子](https://temme.js.org?example=douban-movie-summary-Chinese)从豆瓣电影页面中抓取了电影的基本信息和评分信息。[这个例子](https://temme.js.org?example=tmall-reviews-Chinese)从天猫的商品详情页面中抓取了评论列表，包括用户的基本信息，初次评价和追加评价, 以及晒的照片的链接.
 
 ## 文档链接
 
@@ -72,13 +72,12 @@ temme(html, selector)
 
 ## 升级指南：从 0.7 升级到 0.8
 
-0.8 版本的更新较大，主要是引入了 procedure 和 modifier 两大特性，同时移除了原来的 content 机制。如果你仍需要老版本的文档，[可以在这里可以找到](https://github.com/shinima/temme/blob/v0.7.0/readme-zh.md)。
+0.8 版本的更新较大，主要是引入了 modifier 特性，同时原来的 content 机制改为 procedure 机制。同时，类 CaptureResult 也得到了大幅简化，详见 [CaptureResult](/docs/zh-cn/08-modifiers.md#类-captureresult) 文档。
 
-#### content 被重命名为 procedure
 
-content 在 v0.8 中被大幅简化，并重命名为 procedure，表示匹配到符合规则的节点之后的捕获过程。procedure 的使用方法和 content 基本一致，详见 procedure 的文档。
+如果你仍需要老版本的文档，[可以在这里可以找到](https://github.com/shinima/temme/blob/v0.7.0/readme-zh.md)。
 
-#### content 仅支持单个 part
+#### 1. content/procedure 仅支持单个 part
 
 content/procedure 不再支持多个 part，想要使用多个 part，需要写成多个选择器的形式：
 
@@ -90,9 +89,9 @@ const current = `
 `
 ```
 
-#### 特殊 filters 被移除
+#### 2. 特殊 filters 被移除
 
-procedure 中不再提供「特殊 filters」，取而代之的是 default procedure，你需要将「特殊 filters」换成对应的 procedures：
+procedure 中不再提供「特殊 filters」，取而代之的是若干内置的 procedure，你需要将「特殊 filters」换成对应的 procedures：
 
 ```javascript
 const prev = `
@@ -109,8 +108,4 @@ const current = `
 `
 ```
 
-注意：因为 outerHTML 本身[并不是 cheerio/jQuery API 的一部分](https://github.com/cheeriojs/cheerio/issues/54)，所以 temme 中暂时没有提供 outerHTML procedure。如果需要 outerHTML 的话，请在 JavaScript 代码中手动获取。
-
-#### CaptureResult 接口更新
-
-详见 [09-procedures](/docs/zh-cn/09-procedures.md) 文档。
+注意：因为 outerHTML 本身[并不是 cheerio/jQuery API 的一部分](https://github.com/cheeriojs/cheerio/issues/54)，所以 temme 中暂时没有提供 outerHTML procedure。如果需要 outerHTML 的话，请使用 JavaScript API 进行获取。
