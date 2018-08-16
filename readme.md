@@ -74,7 +74,6 @@ temme(html, selector)
 
 0.8 版本的更新较大，主要是引入了 modifier 特性，同时原来的 content 机制改为 procedure 机制。同时，类 CaptureResult 也得到了大幅简化，详见 [CaptureResult](/docs/zh-cn/08-modifiers.md#类-captureresult) 文档。
 
-
 如果你仍需要老版本的文档，[可以在这里可以找到](https://github.com/shinima/temme/blob/v0.7.0/readme-zh.md)。
 
 #### 1. content/procedure 仅支持单个 part
@@ -109,3 +108,7 @@ const current = `
 ```
 
 注意：因为 outerHTML 本身[并不是 cheerio/jQuery API 的一部分](https://github.com/cheeriojs/cheerio/issues/54)，所以 temme 中暂时没有提供 outerHTML procedure。如果需要 outerHTML 的话，请使用 JavaScript API 进行获取。
+
+#### 3. filter nth 被移除
+
+请使用 filter `get`

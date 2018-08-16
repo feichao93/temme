@@ -146,7 +146,7 @@ export default function temme(
     return result
   }
 
-  /** Capture the node according to the selector. Returns an `CaptureResult`. */
+  /** Capture the node according to the selector. */
   function capture(
     result: CaptureResult,
     node: Cheerio,
