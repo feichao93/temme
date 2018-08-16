@@ -35,7 +35,7 @@ temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中
 </ul>
 ```
 
-对于上面的 html，我们可以使用下面的 temme 选择器来提取「水果颜色和名称的列表」。
+对于上面的 html，我们可以使用下面的 temme 选择器来提取「水果颜色和名称的列表」。（[在线版本链接](https://temme.js.org/?example=basic-array-capture)）
 
 ```javascript
 import temme from 'temme'
