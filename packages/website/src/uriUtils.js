@@ -7,7 +7,7 @@ export function encodeContent(html, selectorString) {
 
 export function saveContentToUri(html, selectorString) {
   if (!EXAMPLE_MODE) {
-    location.hash = encodeContent(html, selectorString)
+    location.replace('#' + encodeContent(html, selectorString))
   }
 }
 
