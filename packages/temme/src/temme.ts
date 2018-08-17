@@ -90,7 +90,7 @@ export default function temme(
         modifierDict[name] = eval(funcString)
       } else if (selector.type === 'procedure-define') {
         const { name, argsPart, code } = selector
-        invariant(!(name in modifierDict), msg.procedureAlreadyDefined(name))
+        invariant(!(name in procedureDict), msg.procedureAlreadyDefined(name))
         const funcString = `(function (${argsPart}) { ${code} })`
         procedureDict[name] = eval(funcString)
       }
@@ -118,7 +118,7 @@ export default function temme(
         }
       } else if (selector.type === 'assignment') {
         result.forceAdd(selector.capture, selector.value)
-      } // else selector.type is 'snippet-define' or 'filter-define'. Do nothing.
+      } // else selector.type is 'xxx-define'. Do nothing.
     }
     return result
   }

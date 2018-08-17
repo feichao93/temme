@@ -17,9 +17,29 @@ test('define the same filter twice', () => {
     temme(
       html,
       `filter myFilter() { return this }
-      filter myFilter() { return this }`,
+       filter myFilter() { return this }`,
     ),
   ).toThrowError(msg.filterAlreadyDefined('myFilter'))
+})
+
+test('define the same modifier twice', () => {
+  expect(() => {
+    temme(
+      html,
+      `modifier myModifier(result, key, value) { return result.set(key, value) };
+       modifier myModifier(result, key, value) { return result.set(key, value) };`,
+    )
+  }).toThrowError(msg.modifierAlreadyDefined('myModifier'))
+})
+
+test('define the same procedure twice', () => {
+  expect(() => {
+    temme(
+      html,
+      `procedure myProcedure(result, node) { return result };
+       procedure myProcedure(result, node) { return result };`,
+    )
+  }).toThrowError(msg.procedureAlreadyDefined('myProcedure'))
 })
 
 test('parent-ref-selector at top', () => {
