@@ -45,18 +45,21 @@ temme(html, selector, extraFilters, extraModifiers, extraProcedures)
 
 # 灵感
 
-从名字上也可以看出来，Temme 是 [Emmet](https://emmet.io/) 的「逆」。Emmet 根据一个模板（模板的语法和 CSS 选择器类似）生成 HTML 片段。用一个函数来表达 emmet，大概是这样的：
+从名字上也可以看出来，Temme 是 [Emmet](https://emmet.io/) 的「逆」。Emmet 根据一个模板（模板的语法和 CSS 选择器类似）生成 HTML 片段。如果用一个函数来表达 emmet，大概是这样的：
 
 ```javascript
 emmet('div[class=red]{text content}')
 // => <div class="red">text content</div>
+```
 
-// 拓展一下emmet函数, 使其接受第二个参数 `data`
+拓展一下 emmet 函数, 使其接受第二个参数 `data`：
+
+```javascript
 emmet('div[class=$cls]{$content}', { cls: 'red', content: 'text content' })
 // => <div class="red">text content</div>
 ```
 
-而 temme 是 emmet 的「逆」。temme 用函数表示出来是这样的：
+而 temme 是 emmet 的「逆」。temme 用函数表示出来是这个样子：
 
 ```javascript
 temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
@@ -70,7 +73,7 @@ temme('<div class="red">text content</div>', 'div[class=$cls]{$content}')
 
 给定一个选择器, `emmet` 会使用数据将该选择器展开为 HTML 片段，而 `temme` 根据该选择器从 HTML 文档/片段中抓取想要的数据。
 
-# 匹配 & 捕获
+# 匹配与捕获
 
 从 HTML 文档中选取 JSON 数据之前，我们需要回答两个问题：
 

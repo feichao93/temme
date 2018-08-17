@@ -14,7 +14,7 @@ temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中
 
 👉[VSCode 插件](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme)
 
-👉[BUG 反馈](https://github.com/shinima/temme/issues)
+👉[反馈 / 疑问](https://github.com/shinima/temme/issues)
 
 👉[升级指南](#升级指南从-07-升级到-08)
 
@@ -39,7 +39,6 @@ temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中
 
 ```javascript
 import temme from 'temme'
-// const temme = require('temme').default
 
 const selector = `li@fruits {
   span[data-color=$color]{$name};
@@ -90,7 +89,7 @@ const current = `
 
 #### 2. 特殊 filters 被移除
 
-procedure 中不再提供「特殊 filters」，取而代之的是若干内置的 procedure，你需要将「特殊 filters」换成对应的 procedures：
+procedure 中不再提供「特殊 filters」，但提供了对应的内置 procedure。你需要将「特殊 filters」换成对应的 procedures：
 
 ```javascript
 const prev = `
@@ -107,7 +106,7 @@ const current = `
 `
 ```
 
-注意：因为 outerHTML 本身[并不是 cheerio/jQuery API 的一部分](https://github.com/cheeriojs/cheerio/issues/54)，所以 temme 中暂时没有提供 outerHTML procedure。如果需要 outerHTML 的话，请使用 JavaScript API 进行获取。
+注意：因为 outerHTML 这个 API [本身就有些奇怪](https://github.com/cheeriojs/cheerio/issues/54)，所以 temme 中暂时没有提供 outerHTML procedure。如果需要 outerHTML 的话，请使用 JavaScript API 进行获取。
 
 #### 3. filter nth 被移除
 
