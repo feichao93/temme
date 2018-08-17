@@ -1,6 +1,6 @@
 {
   "name": "temme",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Concise and convenient jQuery-like selector for node crawlers.",
   "main": "dist/temme.js",
   "module": "dist/temme.mjs",
