@@ -176,7 +176,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/lz-string@1.4.4/libs/lz-string.min.js"></script>
 
-<!-- NOTE production build 的时候请保留下面这行代码，并输入正确的版本号 -->
-<!--<script src="https://cdn.jsdelivr.net/npm/temme@0.7.0/browser/index.js"></script>-->
+<% if (htmlWebpackPlugin.options.temmeVersion) { %>
+<script src="https://cdn.jsdelivr.net/npm/temme@<%= htmlWebpackPlugin.options.temmeVersion %>/dist/temme.umd.js"></script>
+<% } %>
 </body>
 </html>

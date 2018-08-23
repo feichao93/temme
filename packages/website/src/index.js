@@ -153,6 +153,7 @@ function initHtmlEditor() {
   editor.$blockScrolling = Infinity
   if (!EXAMPLE_MODE && initContent) {
     editor.setValue(initContent.html)
+    editor.getSession().selection.moveCursorFileStart()
   }
   return editor
 }
@@ -167,6 +168,7 @@ function initSelectorEditor() {
   editor.$blockScrolling = Infinity
   if (!EXAMPLE_MODE && initContent) {
     editor.setValue(initContent.selectorString)
+    editor.getSession().selection.moveCursorFileStart()
   }
   return editor
 }

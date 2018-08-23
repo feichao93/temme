@@ -4,7 +4,7 @@
   "version": "0.8.2",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production && copyfiles public/**/* dist --up 1"
+    "build": "webpack --mode production --env.prod && copyfiles public/**/* dist --up 1"
   },
   "devDependencies": {
     "copyfiles": "^2.0.0",
