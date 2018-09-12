@@ -66,7 +66,16 @@ test('test pseudo-qualifier', () => {
   expect(temme(html, 'body *:last-of-type{$}')).toBe('SECTION')
   expect(temme(html, 'body *:only-of-type{$}')).toBe('SECTION')
   expect(temme(html, 'body *:matches(section){$}')).toBe('SECTION')
-  // TODO :has
+})
+
+test('has pseudo-class', () => {
+  const html = `
+  <div><p class="foo">foo-text</p></div>
+  <div><p class="bar">bar-text</p></div>
+  `
+  const selector = `div:has(p.bar){$}`
+
+  expect(temme(html, selector)).toBe('bar-text')
 })
 
 describe('using " ", "+", ">" and "~" as section combinator', () => {

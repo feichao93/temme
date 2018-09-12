@@ -1,6 +1,6 @@
 (TODO)
 
-## Procedure
+## Procedures
 
 Procedure is a JavaScript function that will be called against the node that matches our selector.
 

@@ -1,7 +1,5 @@
 import { CaptureResult, defaultFilterDict, defaultModifierDict, Modifier, msg } from '../../src'
 
-// TODO 需要添加 modifier 的测试
-
 function add(result: CaptureResult, key: string, value: any) {
   result.add({ name: key, filterList: [], modifier: null }, value)
 }

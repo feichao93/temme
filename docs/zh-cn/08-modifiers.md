@@ -46,7 +46,7 @@ Temme 提供了以下几个 modifiers 来完成一些常见的操作。如果你
 ```JavaScript
 import { defineModifier } from 'temme'
 
-defineModifier('myModifier', function mymodifier(result, key, value, ...args) {
+defineModifier('myModifier', function myModifier(result, key, value, ...args) {
   /* ... */
 })
 ```
