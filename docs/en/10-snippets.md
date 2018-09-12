@@ -15,7 +15,7 @@ The running semantics of snippet is simple: when temme meets a snippet-expand, t
 
 ### Example-1
 
-In the online shopping mall, reviews of an item can be divides into two types: premiere reviews and append reviews. These two types of reviews has the same DOM structure in the web page but mounts into different parent node. [This example](https://temme.js.org/?example=tmall-reviews-Chinese) defines a snippet that captures a list of reviews, then uses the snippet to capture premiere reviews and append reviews respectively.
+In the online shopping mall, reviews of an item can be divides into two types: premiere reviews and appended reviews. These two types of reviews has the same DOM structure in the web page but mounts into different parent node. [This example](https://temme.js.org/?example=tmall-reviews-Chinese) defines a snippet that captures a list of reviews, then uses the snippet to capture premiere reviews and appended reviews respectively.
 
 ### Example-2
 
