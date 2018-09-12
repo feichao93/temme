@@ -59,7 +59,7 @@ export default function temme(
     return null
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV !== 'production') {
     rootSelectorArray.forEach(checkRootSelector)
   }
 
