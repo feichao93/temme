@@ -65,7 +65,7 @@ temme(html, 'div@arr|secondItem { p{$text} }', extraFilters)
 
 ### Inline Filters Definition
 
-Define filters in selector string. Inline filters definition has the same syntax as JavaScript-style function definition. The difference is that temme use _filter_ as the keyword instead of _function_.
+Define filters in selector string. Inline filters definition has the same syntax as JavaScript-style function definition. The difference is that temme uses _filter_ as the keyword instead of _function_.
 
 ```
 filter myFilter(arg1, arg2, arg3) {

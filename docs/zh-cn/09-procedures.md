@@ -81,7 +81,7 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 
 ## 使用自定义的 procedure
 
-和过滤器类似，temme 允许多种方式来自定义 procedure。当自定义 procedure 被调用时，参数依次为：捕获结果对象，满足 CSS 选择器的结点，以及选择器中 procedure 的参数。捕获结果对象的相关 API 见下方。
+和过滤器类似，temme 允许多种方式来自定义 procedure。当自定义 procedure 被调用时，参数依次为：捕获结果对象，满足 CSS 选择器的结点，以及选择器中 procedure 的参数。
 
 procedure 是一个强大且复杂的机制。不过在大部分场景中，我们都是不需要使用该机制的。temme 支持伪类选择器（由 [css-select](https://github.com/fb55/css-select#supported-selectors) 实现）。尤其是 `:contains`，`:not` 和 `:has` 这三个伪类选择器，大大提升了选择器的能力。在使用自定义的 procedure 之前，先尝试一下伪类选择器是否满足需求。
 
