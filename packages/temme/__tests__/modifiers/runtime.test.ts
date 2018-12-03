@@ -63,7 +63,7 @@ test('modifier `spread`', () => {
 
   const selector3 = `.name { $name|toNull!spread }`
   const filters = {
-    toNull() {
+    toNull(): any {
       return null
     },
   }
