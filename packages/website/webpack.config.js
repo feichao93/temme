@@ -4,12 +4,14 @@ const path = require('path')
 
 const pkg = require('./package.json')
 
-const config = (env = {}) => {
+const config = (_env, argv) => {
+  const prod = argv.mode === 'production'
+
   const externals = {
     'lz-string': 'LZString',
   }
 
-  if (env.prod) {
+  if (prod) {
     externals.temme = 'Temme'
   }
 
@@ -47,7 +49,7 @@ const config = (env = {}) => {
       }),
       new HtmlWebpackPlugin({
         template: 'index.html',
-        temmeVersion: env.prod ? pkg.version : null,
+        temmeVersion: prod ? pkg.version : null,
       }),
     ],
 
