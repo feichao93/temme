@@ -4,7 +4,7 @@
   "license": "MIT",
   "displayName": "Temme",
   "description": "Temme selector support for VSCode.",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "publisher": "shinima",
   "repository": "https://github.com/shinima/temme.git",
   "main": "dist/index.js",
