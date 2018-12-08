@@ -1,6 +1,6 @@
 {
   "private": true,
-  "name": "website",
+  "name": "website-frontend",
   "version": "0.8.3",
   "scripts": {
     "start": "webpack-dev-server --mode development",
