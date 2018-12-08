@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <a href="https://github.com/login/oauth/authorize?client_id=e60608a024b34778283a"
+      >通过 GitHub 登陆 temme website</a
+    >
+
+    <p><button onclick="getMyInfo()">获取当前登陆信息</button></p>
+
+    <p>
+      <label> login： <input type="text" id="login" /> </label>
+    </p>
+
+    <p>
+      <button onclick="getUserInfo()">获取用户信息</button>
+      <button onclick="getUserProjectList()">获取用户的项目列表</button>
+    </p>
+
+    <section style="margin: 16px 0; border: 1px solid #84b6eb">
+      <p>
+        <label> new project name: <input type="text" id="project-name"/></label>
+      </p>
+      <p>
+        <label> new project description: <input type="text" id="project-description"/></label>
+        <br />
+      </p>
+      <button onclick="addProject()">add project</button>
+    </section>
+
+    <section style="margin: 16px 0; border: 1px solid #84b6eb">
+      <p>
+        <label> project-id: <input id="project-id" type="text"/></label>
+      </p>
+      <button onclick="fetchProjectDetail()">获取项目详情</button>
+    </section>
+
+    <script>
+      async function getMyInfo() {
+        const response = await fetch('/api/my-info')
+        const myInfo = await response.json()
+        console.log(myInfo)
+        if (myInfo.login) {
+          document.querySelector('#login').value = myInfo.login
+        }
+      }
+
+      async function getUserInfo() {
+        const input = document.querySelector('#login')
+        const login = input.value
+        const response = await fetch(`/api/user-info/${login}`)
+        console.log(await response.json())
+      }
+
+      async function getUserProjectList() {
+        const input = document.querySelector('#login')
+        const login = input.value
+        const response = await fetch(`/api/user-info/${login}/projects`)
+        console.log(await response.json())
+      }
+
+      async function addProject() {
+        const projectName = document.querySelector('#project-name').value
+        const description = document.querySelector('#project-description').value
+        const res = await fetch('/api/add-project', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: projectName, description }),
+        })
+        console.log(res)
+      }
+
+      async function fetchProjectDetail() {
+        const projectId = Number(document.querySelector('#project-id').value)
+        const res = await fetch(`/api/project/${projectId}`)
+        console.log(await res.json())
+      }
+    </script>
+  </body>
+</html>

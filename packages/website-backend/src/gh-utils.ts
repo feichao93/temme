@@ -1,13 +1,13 @@
 import axios from 'axios'
-import { OAUTH_CLIENT_ID, OAUTH_CLIENT_SECRET } from './constants'
+import CONFIG from '../config'
 import { OAuthData, OAuthError, UserInfo } from './interfaces'
 
 export async function exchangeOAuthData(code: string) {
   const response = await axios.post(`https://github.com/login/oauth/access_token`, '', {
     headers: { Accept: 'application/json' },
     params: {
-      client_id: OAUTH_CLIENT_ID,
-      client_secret: OAUTH_CLIENT_SECRET,
+      client_id: CONFIG.oauthClientId,
+      client_secret: CONFIG.oauthClientSecret,
       code,
     },
   })
