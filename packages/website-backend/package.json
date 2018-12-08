@@ -1,0 +1,23 @@
+{
+  "private": true,
+  "name": "website-backend",
+  "version": "0.8.3",
+  "scripts": {
+    "start": "supervisor -e js,ts -s -w src -x ts-node -- src/server.ts",
+    "run-server": "ts-node src/server.ts"
+  },
+  "devDependencies": {
+    "supervisor": "^0.12.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {
+    "@types/koa": "^2.0.47",
+    "@types/koa-router": "^7.0.35",
+    "@types/mongodb": "^3.1.15",
+    "axios": "^0.18.0",
+    "koa": "^2.6.2",
+    "koa-router": "^7.4.0",
+    "mongodb": "^3.1.10"
+  }
+}
