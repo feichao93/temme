@@ -1,7 +1,7 @@
 {
   "name": "temme",
   "version": "0.8.3",
-  "description": "Concise and convenient jQuery-like selector for node crawlers.",
+  "description": "Concise selector to extract JSON from HTML.",
   "main": "dist/temme.js",
   "module": "dist/temme.mjs",
   "unpkg": "dist/temme.umd.js",

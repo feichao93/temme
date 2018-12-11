@@ -32,10 +32,7 @@ publicAPIRouter.get('/user-info/:login/projects', async ctx => {
   ctx.assert(login != null, 404)
   const userProfile = await ctx.service.users.findOne({ login })
   ctx.assert(userProfile != null, 404)
-  ctx.body = await ctx.service.projects
-    .find({ userId: userProfile.userId })
-    .project({ folders: false })
-    .toArray()
+  ctx.body = await ctx.service.projects.find({ userId: userProfile.userId }).toArray()
 })
 
 // 查看某个 project 的大致信息

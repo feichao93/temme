@@ -4,23 +4,24 @@ const path = require('path')
 
 const pkg = require('./package.json')
 
-const config = (_env, argv) => {
+const webpackConfig = (env, argv) => {
   const prod = argv.mode === 'production'
 
-  const externals = {
-    'lz-string': 'LZString',
-  }
+  // const externals = {
+  //   'lz-string': 'LZString',
+  // }
 
-  if (prod) {
-    externals.temme = 'Temme'
-  }
+  // if (prod) {
+  //   externals.temme = 'Temme'
+  // }
 
   return {
     context: __dirname,
     target: 'web',
+    entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.[chunkhash:6].js',
+      filename: 'bundle.[hash:6].js',
     },
 
     resolve: {
@@ -30,23 +31,26 @@ const config = (_env, argv) => {
     module: {
       rules: [
         {
-          test: /\.pegjs$/,
-          loader: 'pegjs-loader',
-        },
-        {
           test: /\.tsx?$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
         },
+        {
+          test: /\.css$/,
+          loaders: ['style-loader', 'css-loader'],
+        },
+        {
+          test: /\.styl$/,
+          loaders: ['style-loader', 'css-loader', 'stylus-loader'],
+        },
       ],
     },
-
-    externals,
 
     plugins: [
       new webpack.DefinePlugin({
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
+      new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         template: 'index.html',
         temmeVersion: prod ? pkg.version : null,
@@ -55,8 +59,13 @@ const config = (_env, argv) => {
 
     devServer: {
       contentBase: [path.resolve(__dirname, 'public')],
+
+      proxy: {
+        '/api': 'http://10.214.224.234:9000',
+      },
+      hot: true,
     },
   }
 }
 
-module.exports = config
+module.exports = webpackConfig
