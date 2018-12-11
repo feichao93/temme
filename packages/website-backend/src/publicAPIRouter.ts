@@ -12,7 +12,7 @@ publicAPIRouter.get('/my-info', async ctx => {
       login: user.userInfo.login,
     }
   } else {
-    ctx.bdoy = { userId: -1, login: null }
+    ctx.body = { userId: -1, login: null }
   }
 })
 
@@ -26,6 +26,7 @@ publicAPIRouter.get('/user-info/:login', async ctx => {
   ctx.body = userProfile.userInfo
 })
 
+// 查看每个用户的 project 列表
 publicAPIRouter.get('/user-info/:login/projects', async ctx => {
   const login = ctx.params.login
   ctx.assert(login != null, 404)
@@ -42,24 +43,23 @@ publicAPIRouter.get('/project/:projectId', async ctx => {
   const projectId = Number(ctx.params.projectId)
   const project = await ctx.service.projects.findOne({ projectId })
   ctx.assert(project != null, 404)
-  for (const folder of project.folders) {
-    for (const file of folder.files) {
-      delete file.content
-    }
-  }
   ctx.body = project
 })
 
 // 查看某个文件的内容
-publicAPIRouter.get('/file-content/:projectId/:folderName/:filename', async ctx => {
-  const projectId = Number(ctx.params.projectId)
-  const { folderName, filename } = ctx.query
-  const project = await ctx.service.projects.findOne({ projectId })
-  ctx.assert(project != null, 404)
-  const folder = project.folders.find(f => f.name == folderName)
-  ctx.assert(folder != null, 404)
+publicAPIRouter.get('/files/:folderId/:filename', async ctx => {
+  const folderId = Number(ctx.params.folderId)
+  ctx.assert(!isNaN(folderId), 404)
+  const filename = ctx.params.filename
+  ctx.assert(typeof filename === 'string', 404)
+
+  const folder = await ctx.service.folders.findOne({ folderId })
+  ctx.assert(folder, 404)
+
   const file = folder.files.find(file => file.filename === filename)
-  ctx.assert(file != null, 404)
+  ctx.assert(file, 404)
+
+  ctx.set('content-type', 'text/plain')
   ctx.body = file.content
 })
 

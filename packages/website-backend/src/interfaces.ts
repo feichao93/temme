@@ -18,3 +18,33 @@ export interface UserInfo {
   name: string
   // TODO 还有很多其他的用户信息，这里暂不记录
 }
+
+export interface UserProfile {
+  userId: number
+  login: string
+  access_token: string
+  userInfo: UserInfo
+}
+
+export interface Project {
+  projectId: number
+  userId: number
+  name: string
+  description: string
+  folderIds: number[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface Folder {
+  folderId: number
+  projectId: number
+  name: string
+  description: string
+  files: Array<{
+    filename: string
+    content: string
+    createdAt: string
+    updatedAt: string
+  }>
+}

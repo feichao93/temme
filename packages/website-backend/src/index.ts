@@ -27,9 +27,8 @@ function withService(service: Service): Middleware {
 async function oauthCallbackHandler(ctx: Context) {
   try {
     const code = ctx.query.code
-    if (code == null) {
-      ctx.throw(400, 'Invalid code')
-    }
+    ctx.assert(code != null, 400, `Invalid code - ${code}`)
+
     const { access_token } = await exchangeOAuthData(code)
     const userInfo = await fetchUserInfo(access_token)
     await ctx.service.updateUserProfile(userInfo.id, access_token, userInfo)
@@ -59,6 +58,7 @@ function makeApp(service: Service) {
     .use(withService(service))
     .use(bodyParser())
     .use(router.routes())
+    // fallback-handler to support client-side routing
     .use(fallbackHandler)
 
   return app
@@ -69,14 +69,13 @@ async function main() {
     CONFIG.mongoUri,
     { useNewUrlParser: true },
   )
-  console.log('Connected successfully to mongodb')
-  const db = client.db('temme-website')
-  const service = new Service(db)
+  console.log('Connected to mongodb successfully')
+  const service = new Service(client.db(CONFIG.mongoDb))
 
   const app = makeApp(service)
 
   app.listen(CONFIG.port, () => {
-    console.log(`Server started on :${CONFIG.port}`)
+    console.log(`Temme-website server started on :${CONFIG.port}`)
   })
 }
 
