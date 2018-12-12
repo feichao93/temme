@@ -9,6 +9,8 @@ import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
 import privateAPIRouter from './privateAPIRouter'
 import publicAPIRouter from './publicAPIRouter'
 import CONFIG from '../config'
+import * as path from 'path'
+import nunjucks from 'nunjucks'
 
 // extends koa context
 declare module 'koa' {
@@ -33,7 +35,8 @@ async function oauthCallbackHandler(ctx: Context) {
     const userInfo = await fetchUserInfo(access_token)
     await ctx.service.updateUserProfile(userInfo.id, access_token, userInfo)
     ctx.session.userId = userInfo.id
-    ctx.redirect(`/@${userInfo.login}`)
+    // ctx.redirect(`/@${userInfo.login}`)
+    ctx.redirect(`/login-success?user_id=${userInfo.id}&username=${userInfo.login}`)
   } catch (e) {
     ctx.throw(400, e.message)
   }
@@ -41,7 +44,12 @@ async function oauthCallbackHandler(ctx: Context) {
 
 async function fallbackHandler(ctx: Context) {
   ctx.set('content-type', 'text/html')
-  ctx.body = fs.readFileSync('tests/test.html', 'utf8')
+  const context = {
+    CLIENT_ID: JSON.stringify(CONFIG.oauthClientId),
+    USER_ID: JSON.stringify(ctx.session.userId || -1),
+  }
+  const template = fs.readFileSync(path.resolve(__dirname, 'view/index.njk'), 'utf8')
+  ctx.body = nunjucks.renderString(template, context)
 }
 
 function makeApp(service: Service) {

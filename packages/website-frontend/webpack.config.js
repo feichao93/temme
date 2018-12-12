@@ -21,7 +21,7 @@ const webpackConfig = (env, argv) => {
     entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.[hash:6].js',
+      filename: 'bundle.js',
     },
 
     resolve: {
@@ -51,17 +51,18 @@ const webpackConfig = (env, argv) => {
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({
-        template: 'index.html',
-        temmeVersion: prod ? pkg.version : null,
-      }),
+      // new HtmlWebpackPlugin({
+      //   template: 'index.html',
+      //   temmeVersion: prod ? pkg.version : null,
+      // }),
     ],
 
     devServer: {
-      contentBase: [path.resolve(__dirname, 'public')],
+      index: '',
+      // contentBase: [path.resolve(__dirname, 'public')],
 
       proxy: {
-        '/api': 'http://10.214.224.234:9000',
+        '/': 'http://localhost:3000',
       },
       hot: true,
     },

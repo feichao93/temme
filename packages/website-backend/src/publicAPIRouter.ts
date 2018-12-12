@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-
+import CONFIG from '../config'
 const publicAPIRouter = new Router({ prefix: '/api' })
 
 // 查看当前登陆用户的信息
@@ -16,6 +16,12 @@ publicAPIRouter.get('/my-info', async ctx => {
   }
 })
 
+// 请求client id
+publicAPIRouter.get('/client-id', async ctx => {
+  ctx.body = {
+    clientId: CONFIG.oauthClientId,
+  }
+})
 // 查看某个用户的个人信息
 publicAPIRouter.get('/user-info/:login', async ctx => {
   const login = ctx.params.login

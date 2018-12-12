@@ -6,6 +6,7 @@
     "run-server": "ts-node -T src/index.ts"
   },
   "devDependencies": {
+    "@types/nunjucks": "^3.1.0",
     "supervisor": "^0.12.0",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
@@ -21,6 +22,7 @@
     "koa-bodyparser": "^4.2.1",
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.0",
-    "mongodb": "^3.1.10"
+    "mongodb": "^3.1.10",
+    "nunjucks": "^3.1.4"
   }
 }
