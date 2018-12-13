@@ -1,15 +1,15 @@
 import { Collection, Db } from 'mongodb'
-import { Folder, Project, UserInfo, UserProfile } from './interfaces'
+import { Page, Project, UserInfo, UserProfile } from './interfaces'
 
 export default class Service {
   users: Collection<UserProfile>
   projects: Collection<Project>
-  folders: Collection<Folder>
+  pages: Collection<Page>
 
   constructor(readonly db: Db) {
     this.users = this.db.collection('users')
     this.projects = this.db.collection('projects')
-    this.folders = this.db.collection('folders')
+    this.pages = this.db.collection('pages')
   }
 
   updateUserProfile(userId: number, access_token: string, userInfo: UserInfo) {
@@ -37,14 +37,14 @@ export default class Service {
     return projectWithMaxId == null ? 1 : projectWithMaxId.projectId + 1
   }
 
-  /** 获取下一个 folder 的 id */
-  async getNextFolderId() {
-    const [folderWithMaxId] = await this.folders
+  /** 获取下一个 page 的 id */
+  async getNextPageId() {
+    const [pageWithMaxId] = await this.pages
       .find()
-      .project({ folderId: true })
-      .sort({ folderId: -1 })
+      .project({ pageId: true })
+      .sort({ pageId: -1 })
       .limit(1)
       .toArray()
-    return folderWithMaxId == null ? 1 : folderWithMaxId.folderId + 1
+    return pageWithMaxId == null ? 1 : pageWithMaxId.pageId + 1
   }
 }

@@ -32,7 +32,7 @@ privateAPIRouter.post('/add-project', async ctx => {
     projectId,
     name,
     description,
-    folderIds: [],
+    pageIds: [],
     createdAt: dateString,
     updatedAt: dateString,
   }
@@ -42,23 +42,23 @@ privateAPIRouter.post('/add-project', async ctx => {
 })
 
 // 删除 project
-privateAPIRouter.post('/delete-project/:projectId', async ctx => {
-  const projectId = Number(ctx.params.projectId)
-  ctx.assert(!isNaN(projectId), 400, `Invalid projectId ${ctx.params.projectId}`)
-
+privateAPIRouter.post('/delete-project', async ctx => {
+  const { projectId } = ctx.request.body
+  console.log(ctx.request.body)
   const userId = ctx.session.userId
+  console.log(userId, projectId)
   const ownership = await ctx.service.checkOwnership(userId, projectId)
   ctx.assert(ownership, 401, `No access to project with id ${projectId}`)
 
   await ctx.service.projects.deleteOne({ projectId })
-  await ctx.service.folders.deleteMany({ projectId })
+  await ctx.service.pages.deleteMany({ projectId })
   ctx.status = 200
 })
 
-// 创建新的 folder
-privateAPIRouter.post('/add-folder', async ctx => {
+// 创建新的 page
+privateAPIRouter.post('/add-page', async ctx => {
   const { projectId, name, description = '' } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid new folder name - ${name}`)
+  ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid new page name - ${name}`)
 
   const userId = ctx.session.userId
   const ownership = await ctx.service.checkOwnership(userId, projectId)
@@ -66,61 +66,70 @@ privateAPIRouter.post('/add-folder', async ctx => {
 
   const project = await ctx.service.projects.findOne({ projectId })
 
-  const existedFoldersInThisProject = await ctx.service.folders
-    .find({ folderId: { $in: project.folderIds } })
+  const existedPagesInThisProject = await ctx.service.pages
+    .find({ pageId: { $in: project.pageIds } })
     .project({ name: true })
     .toArray()
-  ctx.assert(existedFoldersInThisProject.every(f => f.name !== name), 400, 'Duplicated folder name')
+  ctx.assert(existedPagesInThisProject.every(f => f.name !== name), 400, 'Duplicated page name')
 
-  const folderId = await ctx.service.getNextFolderId()
+  const pageId = await ctx.service.getNextPageId()
   const now = new Date().toISOString()
 
-  await ctx.service.folders.insertOne({ folderId, projectId, description, files: [], name })
+  await ctx.service.pages.insertOne({
+    projectId,
+    description,
+    pageId,
+    name,
+    createdAt: now,
+    selectors: [],
+    html: '',
+    updatedAt: now,
+  })
 
-  const folderIds = project.folderIds
-  folderIds.push(folderId)
-  await ctx.service.projects.updateOne({ projectId }, { $set: { folderIds, updatedAt: now } })
+  const pageIds = project.pageIds
+  pageIds.push(pageId)
+  await ctx.service.projects.updateOne({ projectId }, { $set: { pageIds, updatedAt: now } })
 
   ctx.status = 200
 })
 
-// 删除 folder
-privateAPIRouter.post('/delete-folder', async ctx => {
-  const { folderId } = ctx.request.body
-  const folder = await ctx.service.folders.findOne({ folderId })
-  ctx.assert(folder, 404)
+// 删除 page
+privateAPIRouter.post('/delete-page', async ctx => {
+  const { pageId } = ctx.request.body
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
 
-  const project = await ctx.service.projects.findOne({ projectId: folder.projectId })
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
-  await ctx.service.folders.deleteOne({ folderId })
+  await ctx.service.pages.deleteOne({ pageId })
 
   const now = new Date().toISOString()
-  const folderIds = project.folderIds
-  remove(folderIds, folderId)
+  const pageIds = project.pageIds
+  remove(pageIds, pageId)
   await ctx.service.projects.updateOne(
     { projectId: project.projectId },
-    { $set: { folderIds, updatedAt: now } },
+    { $set: { pageIds, updatedAt: now } },
   )
 
   ctx.status = 200
 })
 
-// 新增文件
+// 新增选择器
 privateAPIRouter.post('/add-file', async ctx => {
-  const { folderId, filename } = ctx.request.body
+  const { pageId, name } = ctx.request.body
   // TODO check parameters
 
-  const folder = await ctx.service.folders.findOne({ folderId })
-  ctx.assert(folder, 404)
-  const project = await ctx.service.projects.findOne({ projectId: folder.projectId })
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toISOString()
-  folder.files.push({
-    filename,
+  page.selectors.push({
+    name,
     createdAt: now,
     updatedAt: now,
     content: '',
@@ -128,29 +137,29 @@ privateAPIRouter.post('/add-file', async ctx => {
   project.updatedAt = now
 
   await ctx.service.projects.updateOne({ projectId: project.projectId }, project)
-  await ctx.service.folders.updateOne({ folderId }, folder)
+  await ctx.service.pages.updateOne({ pageId }, page)
 
   ctx.status = 200
 })
 
-// 编辑文件
-privateAPIRouter.post('/edit-file', async ctx => {
-  const { folderId, filename, content } = ctx.request.body
+// 编辑选择器
+privateAPIRouter.post('/edit-selector', async ctx => {
+  const { pageId, name, content } = ctx.request.body
   // TODO check parameters
 
-  const folder = await ctx.service.folders.findOne({ folderId })
-  ctx.assert(folder, 404)
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
 
-  const project = await ctx.service.projects.findOne({ projectId: folder.projectId })
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toISOString()
 
-  const file = folder.files.find(f => f.filename === filename)
+  const file = page.selectors.find(s => s.name === name)
   file.content = content
   file.updatedAt = now
-  await ctx.service.folders.updateOne({ folderId }, folder)
+  await ctx.service.pages.updateOne({ pageId }, page)
 
   project.updatedAt = now
   await ctx.service.projects.updateOne({ projectId: project.projectId }, project)
@@ -159,20 +168,20 @@ privateAPIRouter.post('/edit-file', async ctx => {
 // TODO rename file
 
 // 删除文件
-privateAPIRouter.post('/delete-file', async ctx => {
-  const { folderId, filename } = ctx.request.body
+privateAPIRouter.post('/delete-selector', async ctx => {
+  const { pageId, name } = ctx.request.body
   // TODO check parameters
 
-  const folder = await ctx.service.folders.findOne({ folderId })
-  ctx.assert(folder, 404)
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
 
-  const project = await ctx.service.projects.findOne({ projectId: folder.projectId })
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toISOString()
-  folder.files = folder.files.filter(f => f.filename !== filename)
-  await ctx.service.folders.updateOne({ folderId }, folder)
+  page.selectors = page.selectors.filter(s => s.name !== name)
+  await ctx.service.pages.updateOne({ pageId }, page)
 
   project.updatedAt = now
   await ctx.service.projects.updateOne({ projectId: project.projectId }, project)

@@ -31,18 +31,21 @@ export interface Project {
   userId: number
   name: string
   description: string
-  folderIds: number[]
+  pageIds: number[]
   createdAt: string
   updatedAt: string
 }
 
-export interface Folder {
-  folderId: number
+export interface Page {
+  pageId: number
   projectId: number
   name: string
   description: string
-  files: Array<{
-    filename: string
+  html: string
+  createdAt: string
+  updatedAt: string
+  selectors: Array<{
+    name: string
     content: string
     createdAt: string
     updatedAt: string
