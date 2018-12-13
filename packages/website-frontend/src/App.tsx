@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import { Route, Switch } from 'react-router'
+import { Link } from 'react-router-dom'
 import { GithubIcon } from './icons'
 import './App.styl'
 import * as querystring from 'querystring'
@@ -27,7 +28,7 @@ function Header() {
       <div className="container">
         <div className="align-left">
           <div className="name">
-            <a href="/">temme</a>
+            <Link to="/">temme</Link>
           </div>
         </div>
         <div className="align-right">
@@ -38,10 +39,10 @@ function Header() {
                 <div style={{ margin: 10 }}>登录</div>
               </button>
             ) : (
-              <a href={`/@${username}`} className="button auth">
+              <Link to={`/@${username}`} className="button auth">
                 <GithubIcon src="https://github.com/mwindson.png?size=50" />
                 <div style={{ margin: 10 }}>{username}</div>
-              </a>
+              </Link>
             ))}
         </div>
       </div>

@@ -7,7 +7,7 @@ import { GithubIcon } from './icons'
 
 export default function UserPage(props: any) {
   return (
-    <div className="project-page">
+    <div className="user-page">
       <UserProfile />
       <UserProjects />
     </div>
