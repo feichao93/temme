@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import './UserPage.styl'
+import { Link } from 'react-router-dom'
 import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import { getDetailInfo, getUserProjects } from './utils/server'
 import { GithubIcon } from './icons'
+import './UserPage.styl'
 
 export default function UserPage(props: any) {
   return (
@@ -45,9 +46,9 @@ function UserProfile() {
         </a>
         <div className="location">{userInfoState.location}</div>
         <div className="divider" />
-        <a href={userInfoState.html_url} target="_blank">
+        <Link to={userInfoState.html_url} target="_blank">
           <GithubIcon size={30} />
-        </a>
+        </Link>
       </div>
     )
   )
@@ -86,9 +87,9 @@ function UserProjects() {
         {projectsState &&
           projectsState.map(project => (
             <div className="project-item" key={project.projectId}>
-              <a className="project-name" href={`/@${username}/${project.name}`}>
+              <Link className="project-name" to={`/@${username}/${project.name}`}>
                 {project.name}
-              </a>
+              </Link>
               <div className="project-description">{project.description}</div>
               <div className="project-update">{dayUpdated(project.updatedAt)}天前更新</div>
             </div>

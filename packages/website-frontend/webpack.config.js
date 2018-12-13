@@ -21,6 +21,7 @@ const webpackConfig = (env, argv) => {
     target: 'web',
     entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
+      publicPath: '/',
       path: path.resolve(__dirname, 'dist'),
       filename: 'bundle.js',
     },
