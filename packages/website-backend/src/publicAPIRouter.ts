@@ -49,21 +49,21 @@ publicAPIRouter.get('/project/:projectId', async ctx => {
   ctx.body = project
 })
 
-// 查看某个文件的内容
-publicAPIRouter.get('/files/:folderId/:filename', async ctx => {
-  const folderId = Number(ctx.params.folderId)
-  ctx.assert(!isNaN(folderId), 404)
-  const filename = ctx.params.filename
-  ctx.assert(typeof filename === 'string', 404)
+// 查看某个选择器的内容
+publicAPIRouter.get('/selectors/:pageId/:name', async ctx => {
+  const pageId = Number(ctx.params.pageId)
+  ctx.assert(!isNaN(pageId), 404)
+  const name = ctx.params.name
+  ctx.assert(typeof name === 'string', 404)
 
-  const folder = await ctx.service.folders.findOne({ folderId })
-  ctx.assert(folder, 404)
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
 
-  const file = folder.files.find(file => file.filename === filename)
-  ctx.assert(file, 404)
+  const selector = page.selectors.find(selector => selector.name === name)
+  ctx.assert(selector, 404)
 
   ctx.set('content-type', 'text/plain')
-  ctx.body = file.content
+  ctx.body = selector.content
 })
 
 export default publicAPIRouter
