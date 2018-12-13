@@ -10,8 +10,8 @@ body
   left 0
   right 0
   bottom 0
-header
-  position fixed
+.title-bar
+  position sticky
   top 0
   left 0
   right 0
@@ -23,8 +23,9 @@ header
   .container
     position relative
     margin 0 auto
-    width 70%
+    width 90%
     height 100%
+    max-width 1140px
   .name
     height 50px
     line-height 50px
@@ -32,18 +33,22 @@ header
     font-size 1.3rem
     display inline-block
     vertical-align middle
+    a
+      color white
 
 
 .align-left
   position absolute
   top 0
   left 0
+  bottom 0
 .align-right
   position absolute
   top 0
   right 0
+  bottom 0
 
-main
+.main-page
   padding-top 50px
   text-align center
   position absolute
@@ -55,18 +60,17 @@ main
   .intro-text
     background #478aff
     height 100px
-    margin 50px 0
 .button
   display flex
   align-items center
   justify-content center
-  width 155px
+  min-width 155px
 .auth
   outline 0
   cursor pointer
   margin-bottom 0
   border-radius 0
-  background rgba(0,120,207,0.8)
+  background #0078cfcc
   font-size 1rem
   color #fff
   border none
@@ -74,7 +78,11 @@ main
   position relative
   height 50px
   padding 0 20px
+  &:hover
+    background #016fbfcc
 .example
   padding 40px 0 40px 0
   background #262353
   position relative
+a
+  text-decoration none
