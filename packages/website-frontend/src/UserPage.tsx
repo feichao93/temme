@@ -4,14 +4,18 @@ import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import { getDetailInfo, getUserProjects } from './utils/server'
 import { GithubIcon } from './icons'
+import Header from './Header'
 import './UserPage.styl'
 
-export default function UserPage(props: any) {
+export default function UserPage() {
   return (
-    <div className="user-page">
-      <UserProfile />
-      <UserProjects />
-    </div>
+    <>
+      <Header />
+      <div className="user-page">
+        <UserProfile />
+        <UserProjects />
+      </div>
+    </>
   )
 }
 

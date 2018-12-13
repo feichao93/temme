@@ -8,6 +8,7 @@ import { btemme, pages } from './test-data'
 import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
 import './ProjectPage.styl'
+import { Link } from 'react-router-dom'
 
 type CodeEditor = monaco.editor.IStandaloneCodeEditor
 
@@ -142,7 +143,13 @@ export default function ProjectPage(
   return (
     <div className="project-page">
       <nav>
-        @{login}/{projectName}
+        <h1>
+          <Link to="/">T</Link>
+        </h1>
+        <Link style={{ color: 'white' }} to={`/@${login}`}>
+          @{login}
+        </Link>
+        <span>&nbsp;/&nbsp;{projectName}</span>
       </nav>
       <PageLayout
         layout={layout}
