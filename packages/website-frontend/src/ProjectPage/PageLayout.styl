@@ -1,0 +1,54 @@
+$resizer-size = 6px
+
+.project-page .resizer {
+  position absolute
+  z-index 1
+
+  &.vertical {
+    top 0
+    bottom 0
+    width $resizer-size
+    margin-left -(@width / 2)
+    padding-left (@width / 2)
+    cursor ew-resize
+
+    .line {
+      width 1px
+      height 100%
+      background #444444
+    }
+  }
+
+  &.horizontal {
+    left 0
+    right 0
+    height $resizer-size
+    margin-top -(@height / 2)
+    padding-top (@height / 2)
+    cursor ns-resize
+
+    .line {
+      height 1px
+      width 100%
+      background #444444
+    }
+  }
+
+  &.orthogonal {
+    cursor all-scroll
+    width $resizer-size
+    height $resizer-size
+    margin-left -(@width / 2)
+    padding-left (@width / 2)
+    margin-top -(@height / 2)
+    padding-top (@height / 2)
+  }
+}
+
+.project-page {
+  .left, .right {
+    display flex
+    flex-flow column
+    position relative
+  }
+}

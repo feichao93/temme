@@ -8,7 +8,6 @@ $list-item {
 }
 
 .sidebar {
-  width 250px // todo change to percentage
   background #252526
   color #ccc
   font-size 14px
@@ -22,24 +21,45 @@ $list-item {
   }
 
   .part-title {
+    display flex
     line-height 24px
     background #383838
     padding-left 8px
     text-transform uppercase
     font-weight bold
-    font-family sans-serif
   }
 
   .list {
     list-style none
+    user-select none
     padding 0
     margin 0
 
     > li {
       @extends $list-item
       padding-left 16px
+
       &.active {
         background #1a496f
+      }
+    }
+  }
+
+  .actions {
+    margin-left auto
+    margin-right 16px
+    display flex
+    align-items center
+  }
+
+  .icon {
+    cursor pointer
+
+    &.interactive {
+      transition transform 50ms ease
+
+      &:active {
+        transform scale(1.272)
       }
     }
   }

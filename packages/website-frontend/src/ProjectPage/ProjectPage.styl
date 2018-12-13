@@ -10,43 +10,14 @@
     background #3c3c3c
   }
 
-  .main {
+  > main {
     display flex
     flex-grow 1
     position relative
   }
 
-  .resizer {
-    position absolute
-    z-index 1
-
-    &.vertical {
-      top 0
-      bottom 0
-      width 4px
-      margin-left -(@width / 2)
-      background red
-      cursor ew-resize
-    }
-
-    &.horizontal {
-      left 0
-      right 0
-      height 4px
-      margin-top -(@height / 2)
-      background red
-      cursor ns-resize
-    }
-  }
-
-  .left, .right {
-    display flex
-    flex-flow column
-    position relative
-  }
-
   .editor-container {
-    flex 1 1 0
-    overflow hidden
+    width 100%
+    height 100%
   }
 }
