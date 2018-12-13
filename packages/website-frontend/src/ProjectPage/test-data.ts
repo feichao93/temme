@@ -20,26 +20,23 @@ export const project = {
   userId: 1,
   name: 'test-project',
   description: '测试项目描述测试项目描述测试项目描述',
-  folderIds: [1, 2],
+  pageIds: [1, 2],
   createAt: '2018-12-13T03:06:58.579Z',
   updatedAt: '2018-12-13T03:06:58.579Z',
 }
 
-export const folders = [
+export const pages = [
   {
-    folderId: 1,
+    pageId: 1,
     projectId: 1,
-    name: 'folder-1',
+    name: 'page-1',
     description: 'no-desc',
-    files: [
+    html: ahtml,
+    createAt: '2018-12-13T03:06:58.579Z',
+    updatedAt: '2018-12-13T03:06:58.579Z',
+    selectors: [
       {
-        filename: 'a.html',
-        content: ahtml,
-        createAt: '2018-12-13T03:06:58.579Z',
-        updatedAt: '2018-12-13T03:06:58.579Z',
-      },
-      {
-        filename: 'b.temme',
+        name: 'b.temme',
         content: btemme,
         createAt: '2018-12-13T03:06:58.579Z',
         updatedAt: '2018-12-13T03:06:58.579Z',
@@ -47,14 +44,17 @@ export const folders = [
     ],
   },
   {
-    folderId: 2,
+    pageId: 2,
     projectId: 1,
-    name: 'folder-2',
+    name: 'page-2',
     description: 'no-description',
-    files: [
+    html: chtml,
+    createAt: '2018-12-13T03:06:58.579Z',
+    updatedAt: '2018-12-13T03:06:58.579Z',
+    selectors: [
       {
-        filename: 'c.html',
-        content: chtml,
+        name: 'b.temme',
+        content: btemme,
         createAt: '2018-12-13T03:06:58.579Z',
         updatedAt: '2018-12-13T03:06:58.579Z',
       },

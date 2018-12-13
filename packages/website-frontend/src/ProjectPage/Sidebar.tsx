@@ -1,13 +1,25 @@
 import React from 'react'
-import { folders, project } from './test-data'
+import classNames from 'classnames'
+import { pages, project } from './test-data'
 import './Sidebar.styl'
 
 export interface SidebarProps {
   width: string
-  openFile(folderId: number, filename: string): void
+  activePageId: number
+  activeSelectorName: string
+  onChoosePage(pageId: number): void
+  onChooseSelector(selectorName: string): void
 }
 
-export default function Sidebar({ width, openFile }: SidebarProps) {
+export default function Sidebar({
+  width,
+  activePageId,
+  activeSelectorName,
+  onChoosePage,
+  onChooseSelector,
+}: SidebarProps) {
+  const activePage = pages.find(page => page.pageId === activePageId)
+
   return (
     <div className="sidebar" style={{ width }}>
       <div className="header">
@@ -20,27 +32,40 @@ export default function Sidebar({ width, openFile }: SidebarProps) {
           <div className="description">{project.description}</div>
         </div>
       </div>
-      <div className="part folders-part">
-        <div className="part-title">Folders</div>
+      <div className="part pages-part">
+        <div className="part-title">Pages</div>
         <div className="part-content">
-          <div className="folder-list">
-            {folders.map(fld => (
-              <div key={fld.folderId} className="folder-item">
-                <div className="folder-name">{fld.name}</div>
-                <div className="file-list">
-                  {fld.files.map(file => (
-                    <div
-                      key={file.filename}
-                      className="file-item"
-                      onClick={() => openFile(fld.folderId, file.filename)}
-                    >
-                      {file.filename}
-                    </div>
-                  ))}
+          <ul className="list page-list">
+            {pages.map(page => (
+              <li
+                key={page.pageId}
+                className={classNames({ active: page.pageId === activePageId })}
+              >
+                <div className="folder-name" onClick={() => onChoosePage(page.pageId)}>
+                  {page.name}
                 </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
+        </div>
+      </div>
+
+      <div className="part selectors-page">
+        <div className="part-title">Selectors</div>
+        <div className="part-content">
+          {activePage && (
+            <ul className="list selectors-list">
+              {activePage.selectors.map(sel => (
+                <li
+                  key={sel.name}
+                  className={classNames({ active: sel.name === activeSelectorName })}
+                  onClick={() => onChooseSelector(sel.name)}
+                >
+                  {sel.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

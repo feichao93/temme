@@ -18,18 +18,31 @@
 
   .resizer {
     position absolute
-    top 0
-    bottom 0
-    width 6px
-    margin-left -3px
-    background red
     z-index 1
-    cursor ew-resize
+
+    &.vertical {
+      top 0
+      bottom 0
+      width 4px
+      margin-left -(@width / 2)
+      background red
+      cursor ew-resize
+    }
+
+    &.horizontal {
+      left 0
+      right 0
+      height 4px
+      margin-top -(@height / 2)
+      background red
+      cursor ns-resize
+    }
   }
 
   .left, .right {
     display flex
     flex-flow column
+    position relative
   }
 
   .editor-container {
