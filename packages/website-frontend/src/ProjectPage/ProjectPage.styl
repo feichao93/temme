@@ -1,0 +1,39 @@
+.project-page {
+  height 100vh
+  display flex
+  flex-flow column
+  background #1e1e1e
+
+  > nav {
+    flex 0 0 40px
+    color #cccccc
+    background #3c3c3c
+  }
+
+  .main {
+    display flex
+    flex-grow 1
+    position relative
+  }
+
+  .resizer {
+    position absolute
+    top 0
+    bottom 0
+    width 6px
+    margin-left -3px
+    background red
+    z-index 1
+    cursor ew-resize
+  }
+
+  .left, .right {
+    display flex
+    flex-flow column
+  }
+
+  .editor-container {
+    flex 1 1 0
+    overflow hidden
+  }
+}

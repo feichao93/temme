@@ -4,6 +4,7 @@ import { GithubIcon } from './icons'
 import './App.styl'
 import * as querystring from 'querystring'
 import { useSession } from './utils/session'
+import ProjectPage from './ProjectPage/ProjectPage'
 
 export default function App() {
   return (
@@ -74,9 +75,4 @@ function MainPage() {
 function UserPage({ match }: RouteComponentProps<{ login: string }>) {
   const { login } = match.params
   return <h1>user page for {login}</h1>
-}
-
-function ProjectPage(props: any) {
-  console.log(props)
-  return <h1>ProjectPage</h1>
 }

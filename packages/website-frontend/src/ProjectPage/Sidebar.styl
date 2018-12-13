@@ -1,0 +1,50 @@
+.sidebar {
+  width 250px // todo change to percentage
+  background #252526
+  color #ccc
+  font-size 14px
+
+  .part-content {
+    padding 10px 0
+  }
+
+  .part.folders-part {
+    user-select none
+  }
+
+  .part-title {
+    line-height 24px
+    background #383838
+    padding-left 8px
+    text-transform uppercase
+    font-weight bold
+    font-family sans-serif
+  }
+
+  .file-item, .folder-name {
+    line-height 22px
+    cursor pointer
+
+    &:hover {
+      background #2a2d2e
+    }
+
+    // TODO
+
+    &.selected {
+      background #3f3f46
+    }
+
+    &:focus {
+      background #1a496f
+    }
+  }
+
+  .folder-name {
+    padding-left 16px
+  }
+
+  .file-item {
+    padding-left 24px
+  }
+}

@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 const webpack = require('webpack')
 const path = require('path')
 
@@ -55,6 +56,7 @@ const webpackConfig = (env, argv) => {
       //   template: 'index.html',
       //   temmeVersion: prod ? pkg.version : null,
       // }),
+      new MonacoWebpackPlugin(),
     ],
 
     devServer: {
