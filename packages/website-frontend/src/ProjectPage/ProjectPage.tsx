@@ -4,13 +4,25 @@ import * as monaco from 'monaco-editor'
 import temme from 'temme'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
-import { btemme, pages } from './test-data'
+import { Link } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
+import { ProjectRecord } from './interfaces'
+import * as server from '../utils/server'
 import './ProjectPage.styl'
-import { Link } from 'react-router-dom'
 
 type CodeEditor = monaco.editor.IStandaloneCodeEditor
+
+// TODO 应该用额外的字段来记录数据的加载状态
+const EMPTY_PROJECT: ProjectRecord = {
+  pages: [],
+  createdAt: null,
+  description: '',
+  name: '',
+  projectId: 0,
+  updatedAt: '',
+  userId: 0,
+}
 
 export default function ProjectPage(
   props: RouteComponentProps<{ login: string; projectName: string }>,
@@ -53,7 +65,7 @@ export default function ProjectPage(
   // selector-editor
   useEffect(() => {
     selectorEditorRef.current = monaco.editor.create(selectorEditorDOMRef.current, {
-      value: btemme,
+      value: '',
       language: null,
       theme: 'vs-dark',
       minimap: {
@@ -84,11 +96,11 @@ export default function ProjectPage(
   }, [])
 
   // choose first-page when mount
-  useEffect(() => {
-    if (pages.length > 0) {
-      onChoosePage(pages[0].pageId)
-    }
-  }, [])
+  // useEffect(() => {
+  //   if (pages.length > 0) {
+  //     onChoosePage(pages[0].pageId)
+  //   }
+  // }, [])
 
   useEffect(() => {
     const htmlEditor = htmlEditorRef.current
@@ -115,15 +127,42 @@ export default function ProjectPage(
     }
   }, [])
 
+  const [project, setProject] = useState<ProjectRecord>(EMPTY_PROJECT)
+
+  function fetchProject() {
+    return fetch(`/api/project/${login}/${projectName}`).then(async res => {
+      const json = await res.json()
+      setProject(json)
+      return json
+    })
+  }
+
+  useEffect(() => {
+    fetchProject().then((project: ProjectRecord) => {
+      // 载入 project 内容之后自动选中第一个目录
+      if (project.pages.length > 0) {
+        const firstPage = project.pages[0]
+
+        setActivePageId(firstPage.pageId)
+        htmlEditorRef.current.setValue(firstPage.html)
+
+        if (firstPage.selectors.length > 0) {
+          const selector = firstPage.selectors[0]
+          setActiveSelectorName(selector.name)
+          selectorEditorRef.current.setValue(selector.content)
+        }
+      }
+    })
+  }, [])
+
   function layout() {
-    // TODO debounce
     htmlEditorRef.current.layout()
     selectorEditorRef.current.layout()
     outputEditorRef.current.layout()
   }
 
   function onChoosePage(pageId: number) {
-    const page = pages.find(p => p.pageId === pageId)
+    const page = project.pages.find(p => p.pageId === pageId)
     setActivePageId(pageId)
     htmlEditorRef.current.setValue(page.html)
 
@@ -134,10 +173,75 @@ export default function ProjectPage(
     }
   }
 
+  async function onAddPage(pageName: string) {
+    try {
+      const result = await server.addPage(project.projectId, pageName)
+      if (result.ok) {
+        const nextPages = project.pages.concat([result.pageRecord])
+        setProject({ ...project, pages: nextPages })
+      } else {
+        // TODO use the global dialog
+        console.warn(result.reason)
+      }
+    } catch (e) {
+      // TODO use the global dialog
+      console.error(e)
+    }
+  }
+
+  async function onDeletePage(pageId: number) {
+    const page = project.pages.find(page => page.pageId === pageId)
+    if (!confirm(`确定要删除 ${page.name} 吗？该页面内的选择器都将被清空`)) {
+      return
+    }
+    // 乐观更新
+    const nextPages = project.pages.filter(page => page.pageId !== pageId)
+    setProject({ ...project, pages: nextPages })
+    if (activePageId === pageId) {
+      setActivePageId(-1)
+    }
+
+    try {
+      const { ok, reason } = await server.deletePage(pageId)
+      if (!ok) {
+        // 更新失败，回滚
+        setProject(project)
+        console.warn(reason)
+        return
+      }
+    } catch (e) {
+      // 更新失败，回滚
+      setProject(project)
+      console.error(e)
+    }
+  }
+
+  async function onAddSelector(selectorName: string) {
+    console.assert(activePageId !== -1)
+    try {
+      // TODO add-file 这个路由有点不太对劲
+      const response = await fetch('/api/add-file', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ pageId: activePageId, name: selectorName }),
+      })
+      if (!response.ok) {
+        // TODO use the global dialog
+        console.warn(await response.text())
+        return
+      }
+      fetchProject()
+    } catch (e) {
+      // TODO use the global dialog
+      console.error(e)
+    }
+  }
+
   function onChooseSelector(selectorName: string) {
-    const page = pages.find(pg => pg.pageId === activePageId)
+    const page = project.pages.find(pg => pg.pageId === activePageId)
     const selector = page.selectors.find(sel => sel.name === selectorName)
     selectorEditorRef.current.setValue(selector.content)
+    setActiveSelectorName(selectorName)
   }
 
   return (
@@ -155,10 +259,14 @@ export default function ProjectPage(
         layout={layout}
         sidebar={
           <Sidebar
+            project={project}
             onChooseSelector={onChooseSelector}
             activePageId={activePageId}
             activeSelectorName={activeSelectorName}
             onChoosePage={onChoosePage}
+            onAddPage={onAddPage}
+            onDeletePage={onDeletePage}
+            onAddSelector={onAddSelector}
           />
         }
         left={<div className="editor-container" ref={htmlEditorDOMRef} />}

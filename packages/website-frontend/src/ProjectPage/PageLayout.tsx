@@ -143,7 +143,7 @@ export default function PageLayout({
         <div className="line" />
       </div>
       <div
-        className="left"
+        className="left-part"
         style={{
           width: percentify(leftRatio),
           display: leftRatio === 0 ? 'none' : undefined,
@@ -158,7 +158,7 @@ export default function PageLayout({
       >
         <div className="line" />
       </div>
-      <div className="right" style={{ width: percentify(rightRatio) }}>
+      <div className="right-part" style={{ width: percentify(rightRatio) }}>
         <div style={{ height: percentify(topRatio) }}>{rightTop}</div>
         <div
           className="resizer horizontal"

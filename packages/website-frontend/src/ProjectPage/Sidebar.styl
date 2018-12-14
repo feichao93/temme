@@ -37,10 +37,18 @@ $list-item {
 
     > li {
       @extends $list-item
+      display flex
       padding-left 16px
 
       &.active {
         background #1a496f
+      }
+
+      .actions {
+        visibility hidden
+      }
+      &:hover .actions {
+        visibility visible
       }
     }
   }
@@ -60,6 +68,15 @@ $list-item {
 
       &:active {
         transform scale(1.272)
+      }
+    }
+
+    &.disabled {
+      cursor default
+      opacity 0.5
+
+      &:active {
+        transform none
       }
     }
   }

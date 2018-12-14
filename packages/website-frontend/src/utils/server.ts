@@ -1,4 +1,32 @@
 import { UserInfo, Project } from '../types'
+import { PageRecord } from '../ProjectPage/interfaces'
+
+export async function addPage(projectId: number, pageName: string) {
+  const response = await fetch('/api/add-page', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ projectId, name: pageName }),
+  })
+  if (response.ok) {
+    const pageRecord: PageRecord = await response.json()
+    return { ok: true, pageRecord }
+  } else {
+    return { ok: false, reason: await response.text() }
+  }
+}
+
+export async function deletePage(pageId: number) {
+  const response = await fetch('/api/delete-page', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ pageId }),
+  })
+  if (!response.ok) {
+    return { ok: false, reason: await response.text() }
+  } else {
+    return { ok: true }
+  }
+}
 
 export async function logout() {
   const res = await fetch('/api/logout')

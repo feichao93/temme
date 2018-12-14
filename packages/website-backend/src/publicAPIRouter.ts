@@ -41,12 +41,21 @@ publicAPIRouter.get('/user-info/:login/projects', async ctx => {
   ctx.body = await ctx.service.projects.find({ userId: userProfile.userId }).toArray()
 })
 
-// 查看某个 project 的大致信息
-publicAPIRouter.get('/project/:projectId', async ctx => {
-  const projectId = Number(ctx.params.projectId)
-  const project = await ctx.service.projects.findOne({ projectId })
+// 查看某个 project 的信息
+publicAPIRouter.get('/project/:login/:projectName', async ctx => {
+  const { login, projectName } = ctx.params
+  const user = await ctx.service.users.findOne({ login })
+  ctx.assert(user != null, 404)
+  const project = await ctx.service.projects.findOne(
+    { userId: user.userId, name: projectName },
+    { projection: { _id: false } },
+  )
   ctx.assert(project != null, 404)
-  ctx.body = project
+  const pages = await ctx.service.pages
+    .find({ projectId: project.projectId })
+    .project({ _id: false })
+    .toArray()
+  ctx.body = { ...project, pages }
 })
 
 // 查看某个选择器的内容

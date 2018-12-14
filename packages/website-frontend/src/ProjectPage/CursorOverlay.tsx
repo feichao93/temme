@@ -15,6 +15,13 @@ export default function CursorOverlay({ type }: { type: CursorOverlayType }) {
     return () => document.body.removeChild(overlay)
   }, [])
 
+  useLayoutEffect(
+    () => {
+      document.body.style.userSelect = type == null ? '' : 'none'
+    },
+    [type],
+  )
+
   if (type == null) {
     return null
   } else {

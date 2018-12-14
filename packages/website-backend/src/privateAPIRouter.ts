@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import { Project } from './interfaces'
+import { Page, Project } from './interfaces'
 
 function remove<T>(array: T[], item: T) {
   const index = array.indexOf(item)
@@ -75,22 +75,23 @@ privateAPIRouter.post('/add-page', async ctx => {
   const pageId = await ctx.service.getNextPageId()
   const now = new Date().toISOString()
 
-  await ctx.service.pages.insertOne({
-    projectId,
-    description,
+  const newPage: Page = {
     pageId,
+    projectId,
     name,
-    createdAt: now,
-    selectors: [],
+    description,
     html: '',
+    createdAt: now,
     updatedAt: now,
-  })
+    selectors: [],
+  }
+  await ctx.service.pages.insertOne(newPage)
 
   const pageIds = project.pageIds
   pageIds.push(pageId)
   await ctx.service.projects.updateOne({ projectId }, { $set: { pageIds, updatedAt: now } })
 
-  ctx.status = 200
+  ctx.body = newPage
 })
 
 // 删除 page
@@ -123,7 +124,10 @@ privateAPIRouter.post('/add-file', async ctx => {
 
   const page = await ctx.service.pages.findOne({ pageId })
   ctx.assert(page, 404)
-  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
+  const project = await ctx.service.projects.findOne(
+    { projectId: page.projectId },
+    { projection: { _id: false } },
+  )
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
@@ -134,10 +138,12 @@ privateAPIRouter.post('/add-file', async ctx => {
     updatedAt: now,
     content: '',
   })
-  project.updatedAt = now
 
-  await ctx.service.projects.updateOne({ projectId: project.projectId }, project)
-  await ctx.service.pages.updateOne({ pageId }, page)
+  await ctx.service.projects.updateOne(
+    { projectId: project.projectId },
+    { $set: { updatedAt: now } },
+  )
+  await ctx.service.pages.findOneAndReplace({ pageId }, page)
 
   ctx.status = 200
 })
