@@ -15,8 +15,9 @@ function useEventCallback(
 export type Pos = { x: number; y: number }
 
 interface UseDraggingOptions<S> {
-  onDrag?(delta: { dx: number; dy: number }, subject: S, startPos: Pos, cntPos: Pos): void
-  onDragEnd?(delta: { dx: number; dy: number }, subject: S, start: Pos, endPos: Pos): void
+  onDragStart?(arg: { subject: S; startPos: Pos }): void
+  onDrag?(arg: { subject: S; dx: number; dy: number; startPos: Pos; dragPos: Pos }): void
+  onDragEnd?(arg: { subject: S; dx: number; dy: number; startPos: Pos; endPos: Pos }): void
 }
 
 interface DraggingState<S> {
@@ -25,7 +26,7 @@ interface DraggingState<S> {
   subject: S
 }
 
-export default function useDragging<S>({ onDrag, onDragEnd }: UseDraggingOptions<S>) {
+export default function useDragging<S>({ onDragStart, onDrag, onDragEnd }: UseDraggingOptions<S>) {
   const [state, setState] = React.useState<DraggingState<S>>({
     hold: false,
     startPos: null,
@@ -38,16 +39,15 @@ export default function useDragging<S>({ onDrag, onDragEnd }: UseDraggingOptions
     e => {
       if (state.hold) {
         const dragPos = { x: e.clientX, y: e.clientY }
-        onDrag &&
-          onDrag(
-            {
-              dx: dragPos.x - state.startPos.x,
-              dy: dragPos.y - state.startPos.y,
-            },
-            state.subject,
-            state.startPos,
+        if (onDrag) {
+          onDrag({
+            subject: state.subject,
+            dx: dragPos.x - state.startPos.x,
+            dy: dragPos.y - state.startPos.y,
+            startPos: state.startPos,
             dragPos,
-          )
+          })
+        }
       }
     },
     [state], // TODO 有一定的优化空间
@@ -59,16 +59,15 @@ export default function useDragging<S>({ onDrag, onDragEnd }: UseDraggingOptions
     e => {
       if (state.hold) {
         const endPos = { x: e.clientX, y: e.clientY }
-        onDragEnd &&
-          onDragEnd(
-            {
-              dx: endPos.x - state.startPos.x,
-              dy: endPos.y - state.startPos.y,
-            },
-            state.subject,
-            state.startPos,
+        if (onDragEnd) {
+          onDragEnd({
+            dx: endPos.x - state.startPos.x,
+            dy: endPos.y - state.startPos.y,
+            subject: state.subject,
+            startPos: state.startPos,
             endPos,
-          )
+          })
+        }
         setState({ hold: false, startPos: null, subject: null })
       }
     },
@@ -78,6 +77,9 @@ export default function useDragging<S>({ onDrag, onDragEnd }: UseDraggingOptions
   const start = React.useCallback((e: { clientX: number; clientY: number }, subject: S = null) => {
     const startPos = { x: e.clientX, y: e.clientY }
     setState({ hold: true, startPos, subject })
+    if (onDragStart) {
+      onDragStart({ subject, startPos })
+    }
   }, [])
 
   return { start }

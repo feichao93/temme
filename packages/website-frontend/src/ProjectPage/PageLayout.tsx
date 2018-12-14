@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react'
 import useDragging, { Pos } from '../utils/useDragging'
+import CursorOverlay, { CursorOverlayType } from './CursorOverlay'
 import './PageLayout.styl'
 
 function clamp(min: number, value: number, max: number) {
@@ -7,10 +8,8 @@ function clamp(min: number, value: number, max: number) {
 }
 
 function percentify(ratio: number) {
-  return (ratio * 100).toFixed(1) + '%'
+  return (ratio * 100).toFixed(2) + '%'
 }
-
-// TODO 当用户进行拖拽时，需要放置一个遮罩层，防止鼠标进入其他交互元素而导致 cursor 抖动
 
 export interface PageLayoutProps {
   sidebar: React.ReactNode
@@ -28,6 +27,9 @@ export default function PageLayout({
   layout,
 }: PageLayoutProps) {
   const containerRef = useRef<HTMLMainElement>(null)
+
+  const [cursorOverlayType, setCursorOverlayType] = useState<CursorOverlayType>(null)
+  const hideCursorOverlay = () => setCursorOverlayType(null)
 
   const [sidebarRatio, setSidebarRatio] = useState(0.2)
   const [leftRatio, setLeftRatio] = useState(0.4)
@@ -52,24 +54,28 @@ export default function PageLayout({
   }, [])
 
   const dragSidebar = useDragging({
-    onDrag(delta, subject, startPos, cntPos) {
-      const totalWidth = containerRef.current.clientWidth
-      const ratio = cntPos.x / totalWidth
-
-      let nextSidebarRatio: number
-      if (ratio < 0.05) {
-        // 当用户尝试拖动 sidebar 到一个过短的宽度时，隐藏 sidebar
-        nextSidebarRatio = 0
-      } else {
-        // sidebar 的宽度必须在 10% 到 50% 之间
-        nextSidebarRatio = clamp(0.1, ratio, 0.5)
-      }
-
-      setSidebarRatio(nextSidebarRatio)
-      // 在拖动 sidebar 的过程中，保持右侧不同编辑器的宽度占比
-      const x = leftRatio / (leftRatio + rightRatio)
-      setLeftRatio(clamp(0.1, x * (1 - nextSidebarRatio), 0.9 - nextSidebarRatio))
+    onDragStart() {
+      setCursorOverlayType('ew-resize')
     },
+    onDrag({ dragPos }) {
+        const totalWidth = containerRef.current.clientWidth
+        const ratio = dragPos.x / totalWidth
+
+        let nextSidebarRatio: number
+        if (ratio < 0.05) {
+          // 当用户尝试拖动 sidebar 到一个过短的宽度时，隐藏 sidebar
+          nextSidebarRatio = 0
+        } else {
+          // sidebar 的宽度必须在 10% 到 50% 之间
+          nextSidebarRatio = clamp(0.1, ratio, 0.5)
+        }
+
+        setSidebarRatio(nextSidebarRatio)
+        // 在拖动 sidebar 的过程中，保持右侧不同编辑器的宽度占比
+        const x = leftRatio / (leftRatio + rightRatio)
+        setLeftRatio(clamp(0.1, x * (1 - nextSidebarRatio), 0.9 - nextSidebarRatio))
+    },
+    onDragEnd: hideCursorOverlay,
   })
 
   function handleDragLeft(cntPos: Pos) {
@@ -88,26 +94,39 @@ export default function PageLayout({
   }
 
   const dragLeft = useDragging({
-    onDrag(delta, subject, startPos, cntPos) {
-      handleDragLeft(cntPos)
+    onDragStart() {
+      setCursorOverlayType('ew-resize')
     },
+    onDrag({ dragPos }) {
+        handleDragLeft(dragPos)
+    },
+    onDragEnd: hideCursorOverlay,
   })
 
   const dragTop = useDragging({
-    onDrag(delta, subject, startPos, cntPos) {
-      handleDragTop(cntPos)
+    onDragStart() {
+      setCursorOverlayType('ns-resize')
     },
+    onDrag({ dragPos }) {
+        handleDragTop(dragPos)
+    },
+    onDragEnd: hideCursorOverlay,
   })
 
   const dragOrthogonal = useDragging({
-    onDrag(delta, subject, startPos, cntPos) {
-      handleDragLeft(cntPos)
-      handleDragTop(cntPos)
+    onDragStart() {
+      setCursorOverlayType('all-scroll')
     },
+    onDrag({ dragPos }) {
+        handleDragLeft(dragPos)
+        handleDragTop(dragPos)
+    },
+    onDragEnd: hideCursorOverlay,
   })
 
   return (
     <main ref={containerRef}>
+      <CursorOverlay type={cursorOverlayType} />
       <div
         style={{
           width: percentify(sidebarRatio),
