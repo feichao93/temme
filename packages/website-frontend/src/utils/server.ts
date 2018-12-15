@@ -1,6 +1,15 @@
 import { UserInfo, Project } from '../types'
 import { PageRecord } from '../ProjectPage/interfaces'
 
+export async function getProject(login: string, projectName: string) {
+  const response = await fetch(`/api/project/${login}/${projectName}`)
+  if (response.ok) {
+    return { ok: true, project: await response.json() }
+  } else {
+    return { ok: false, reason: await response.text() }
+  }
+}
+
 export async function addPage(projectId: number, pageName: string) {
   const response = await fetch('/api/add-page', {
     method: 'POST',

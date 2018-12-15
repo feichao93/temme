@@ -2,10 +2,11 @@ import React from 'react'
 import classNames from 'classnames'
 import { PageRecord, ProjectRecord } from './interfaces'
 import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
+import { Atom } from '../utils/atoms'
 import './Sidebar.styl'
 
 export interface SidebarProps {
-  project: ProjectRecord
+  projectAtom: Atom<ProjectRecord>
   activePageId: number
   activeSelectorName: string
   onChoosePage(pageId: number): void
@@ -39,7 +40,7 @@ function getRandomSelectorName(page: PageRecord) {
 }
 
 export default function Sidebar({
-  project,
+  projectAtom,
   activePageId,
   activeSelectorName,
   onChoosePage,
@@ -49,7 +50,9 @@ export default function Sidebar({
   onAddSelector,
   onDeleteSelector,
 }: SidebarProps) {
-  const pages = project == null ? [] : project.pages
+  const pages = projectAtom.status === 'ready' ? projectAtom.value.pages : []
+  const description = projectAtom.status === 'ready' ? projectAtom.value.description : 'loading...'
+
   const activePage = pages.find(page => page.pageId === activePageId)
 
   return (
@@ -62,14 +65,14 @@ export default function Sidebar({
       <div className="part">
         <div className="part-title">Info</div>
         <div className="part-content">
-          <div className="description">{project.description}</div>
+          <div className="description">{description}</div>
         </div>
       </div>
       <div className="part pages-part">
         <div className="part-title">
           <span>Pages</span>
           <div className="actions">
-            <AddFolderIcon onClick={() => onAddPage(getRandomPageName(project))} />
+            <AddFolderIcon onClick={() => onAddPage(getRandomPageName(projectAtom.value))} />
           </div>
         </div>
         <div className="part-content">

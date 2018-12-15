@@ -14,6 +14,7 @@
     padding-right 6px
     border-right 1px solid #252525
     cursor pointer
+    user-select none
 
     &.active {
       color white
@@ -23,28 +24,6 @@
     .tabname {
       padding-left 10px
       padding-right 6px
-    }
-  }
-
-  // TODO copy from sidebar.styl
-  .icon {
-    cursor pointer
-
-    &.interactive {
-      transition transform 50ms ease
-
-      &:active {
-        transform scale(1.272)
-      }
-    }
-
-    &.disabled {
-      cursor default
-      opacity 0.5
-
-      &:active {
-        transform none
-      }
     }
   }
 }

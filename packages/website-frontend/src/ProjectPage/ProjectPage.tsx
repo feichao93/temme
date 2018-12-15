@@ -2,39 +2,25 @@
 import * as monaco from 'monaco-editor'
 // @ts-ignore
 import temme from 'temme'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
 import { ProjectRecord } from './interfaces'
 import * as server from '../utils/server'
-import Tablist from './Tablist'
+import { HtmlTablist, SelectTabList, OutputTablist } from './tablists'
+import { useBodyOverflowHidden, useDidMount } from '../utils/common-hooks'
+import debounce from '../utils/debounce'
+import { Atom, atomReady } from '../utils/atoms'
+import { CodeEditor, INIT_EDITOR_OPTIONS } from './utils'
+import EditorWrapper from './EditorWrapper'
 import './ProjectPage.styl'
-
-type CodeEditor = monaco.editor.IStandaloneCodeEditor
-
-const tablistHeight = 35
-
-// TODO 应该用额外的字段来记录数据的加载状态
-const EMPTY_PROJECT: ProjectRecord = {
-  pages: [],
-  createdAt: null,
-  description: '',
-  name: '',
-  projectId: 0,
-  updatedAt: '',
-  userId: 0,
-}
 
 export default function ProjectPage(
   props: RouteComponentProps<{ login: string; projectName: string }>,
 ) {
   const { login, projectName } = props.match.params
-
-  const htmlEditorDOMRef = useRef<HTMLDivElement>(null)
-  const selectorEditorDOMRef = useRef<HTMLDivElement>(null)
-  const outputEditorDOMRef = useRef<HTMLDivElement>(null)
 
   const htmlEditorRef = useRef<CodeEditor>(null)
   const selectorEditorRef = useRef<CodeEditor>(null)
@@ -43,134 +29,229 @@ export default function ProjectPage(
   const [activePageId, setActivePageId] = useState(-1)
   const [activeSelectorName, setActiveSelectorName] = useState('')
 
-  // html-editor
-  useEffect(() => {
-    htmlEditorRef.current = monaco.editor.create(htmlEditorDOMRef.current, {
-      value: '',
-      language: 'html',
-      theme: 'vs-dark',
-      minimap: {
-        renderCharacters: false,
-      },
-    })
-
-    return () => {
-      htmlEditorRef.current.dispose()
-    }
-  }, [])
-
-  // 需要对 body 设置 overflow hidden，不然 monaco 编辑器中的部分元素会导致额外的滚动条
-  useLayoutEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => (document.body.style.overflow = '')
-  }, [])
-
-  // selector-editor
-  useEffect(() => {
-    selectorEditorRef.current = monaco.editor.create(selectorEditorDOMRef.current, {
-      value: '',
-      language: null,
-      theme: 'vs-dark',
-      minimap: {
-        renderCharacters: false,
-      },
-    })
-
-    return () => {
-      selectorEditorRef.current.dispose()
-    }
-  }, [])
-
-  // output-editor
-  useEffect(() => {
-    outputEditorRef.current = monaco.editor.create(outputEditorDOMRef.current, {
-      value: '{}',
-      language: 'json',
-      theme: 'vs-dark',
-      readOnly: true,
-      minimap: {
-        renderCharacters: false,
-      },
-    })
-
-    return () => {
-      outputEditorRef.current.dispose()
-    }
-  }, [])
-
-  useEffect(() => {
-    const htmlEditor = htmlEditorRef.current
-    const selectorEditor = selectorEditorRef.current
-
-    const a = htmlEditor.onDidChangeModelContent(compute)
-    const b = selectorEditor.onDidChangeModelContent(compute)
-
-    function compute() {
-      try {
-        const html = htmlEditor.getValue()
-        const selector = selectorEditor.getValue()
-
-        const result = temme(html, selector)
-        outputEditorRef.current.setValue(JSON.stringify(result, null, 2))
-      } catch (e) {
-        console.error(e)
-      }
-    }
-
-    return () => {
-      a.dispose()
-      b.dispose()
-    }
-  }, [])
-
-  const [project, setProject] = useState<ProjectRecord>(EMPTY_PROJECT)
-
-  function fetchProject() {
-    return fetch(`/api/project/${login}/${projectName}`).then(async res => {
-      const json = await res.json()
-      setProject(json)
-      return json
-    })
+  // selTabInfo 总是与当前 page 已打开的 selector model 相对应
+  // TODO 利用该对应关系来优化代码，例如 将该变量重命名为 aliveSelectorModelInfoList
+  const [selTabInfo, updateSelTabInfo] = useState<
+    { uriString: string; name: string; initAvid: number; avid: number }[]
+  >([])
+  const selectorTabItems = selTabInfo.map(t => ({ ...t, dirty: t.initAvid !== t.avid }))
+  const activeSelectorTabIndex = selectorTabItems.findIndex(
+    item => item.name === activeSelectorName,
+  )
+  const onChangeActiveSelectorTabIndex = (index: number) => {
+    openSelector(activePageId, selectorTabItems[index].name)
   }
 
-  useEffect(() => {
-    fetchProject().then((project: ProjectRecord) => {
-      // 载入 project 内容之后自动选中第一个目录
-      if (project.pages.length > 0) {
-        const firstPage = project.pages[0]
+  const onCloseSelectorTab = (index: number) => {
+    const info = selTabInfo[index]
 
-        setActivePageId(firstPage.pageId)
-        htmlEditorRef.current.setValue(firstPage.html)
+    // TODO 如果当前文件尚未保存，需要询问用户是否需要保存
 
-        if (firstPage.selectors.length > 0) {
-          const selector = firstPage.selectors[0]
-          setActiveSelectorName(selector.name)
-          selectorEditorRef.current.setValue(selector.content)
+    if (activeSelectorName === info.name) {
+      // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
+      if (selTabInfo.length === 1) {
+        closeSelector()
+      } else {
+        if (index === 0) {
+          openSelector(activePageId, selTabInfo[1].name)
+        } else {
+          openSelector(activePageId, selTabInfo[index - 1].name)
         }
       }
-    })
-  }, [])
+    }
+    selTabInfoUpdaters.remove(index)
+    const model = monaco.editor.getModel(monaco.Uri.parse(info.uriString))
+    model.dispose()
+  }
 
+  const selTabInfoUpdaters = {
+    add(uriString: string, name: string, avid: number) {
+      updateSelTabInfo(list => list.concat([{ uriString, name, initAvid: avid, avid }]))
+    },
+    remove(index: number) {
+      updateSelTabInfo(list => {
+        const slice = list.slice()
+        slice.splice(index, 1)
+        return slice
+      })
+    },
+    updateAvid(uriString: string, avid: number) {
+      updateSelTabInfo(list =>
+        list.map(item => (item.uriString === uriString ? { ...item, avid } : item)),
+      )
+    },
+    clear() {
+      updateSelTabInfo([])
+    },
+  }
+
+  // 将 body.style.overflow 设置为 hidden
+  // 防止 monaco 编辑器中部分元素导致的额外滚动条
+  useBodyOverflowHidden()
+
+  // 监听 htmlEditor 和 selectorEditor 中的变化，自动重新计算 output
+  useEffect(
+    () => {
+      const htmlEditor = htmlEditorRef.current
+      const selectorEditor = selectorEditorRef.current
+      const outputEditor = outputEditorRef.current
+
+      function compute() {
+        try {
+          const html = htmlEditor.getValue()
+          const selector = selectorEditor.getValue()
+
+          // TODO should use try-catch to catch parse/execution exceptions
+          const result = temme(html, selector)
+          const oldValue = outputEditor.getValue()
+          const newValue = JSON.stringify(result, null, 2)
+          if (oldValue !== newValue) {
+            outputEditor.setValue(newValue)
+          }
+        } catch (e) {
+          // TODO use the global dialog
+          console.error(e)
+        }
+      }
+
+      // 首次计算结果
+      compute()
+      // 每次 html 或 选择器的内容发生变化时，重新计算结果
+      const debouncedCompute = debounce(compute, 300)
+      const res1 = htmlEditor.onDidChangeModelContent(debouncedCompute)
+      const res2 = selectorEditor.onDidChangeModelContent(debouncedCompute)
+
+      return () => {
+        res1.dispose()
+        res2.dispose()
+      }
+    },
+    [activePageId, activeSelectorName],
+  )
+
+  // 监听 selectorEditor 中的变化，自动更新 selTabInfo 中的 avid
+  useEffect(
+    () => {
+      const selectorEditor = selectorEditorRef.current
+
+      const disposable = selectorEditor.onDidChangeModelContent(() => {
+        const model = selectorEditor.getModel()
+        const uriString = model.uri.toString()
+        selTabInfoUpdaters.updateAvid(uriString, model.getAlternativeVersionId())
+      })
+
+      return () => {
+        disposable.dispose()
+      }
+    },
+    [activePageId, activeSelectorName],
+  )
+
+  const [projectAtom, setProjectAtom] = useState<Atom<ProjectRecord>>({
+    status: 'loading',
+    value: null,
+  })
+  const setProject = (project: ProjectRecord) => setProjectAtom(atomReady(project))
+
+  // 组件加载时，请求后端获取 project 的相关信息
+  useDidMount(() => {
+    server.getProject(login, projectName).then(({ ok, reason, project }) => {
+      if (ok) {
+        setProject(project)
+      } else {
+        alert(reason)
+      }
+    })
+  })
+
+  // 首次载入 project 内容之后，自动选中第一个目录和第一个选择器
+  useEffect(
+    () => {
+      if (projectAtom.status === 'ready') {
+        const project = projectAtom.value
+        if (project.pages.length > 0) {
+          const firstPage = project.pages[0]
+          openHtml(firstPage.pageId)
+
+          if (firstPage.selectors.length > 0) {
+            openSelector(firstPage.pageId, firstPage.selectors[0].name)
+          }
+        }
+      }
+    },
+    [projectAtom.status],
+  )
+
+  /** 让各个编辑器重新根据父元素的大小进行布局 */
   function layout() {
     htmlEditorRef.current.layout()
     selectorEditorRef.current.layout()
     outputEditorRef.current.layout()
   }
 
-  function onChoosePage(pageId: number) {
+  /** 在 html 编辑器中打开 pageId 对应的 html model */
+  function openHtml(pageId: number) {
+    const project = projectAtom.value
     const page = project.pages.find(p => p.pageId === pageId)
+    const uri = monaco.Uri.parse(`inmemory://html/${pageId}`)
+    let htmlModel = monaco.editor.getModel(uri)
+    if (htmlModel == null) {
+      htmlModel = monaco.editor.createModel(page.html, 'html', uri)
+    }
     setActivePageId(pageId)
-    htmlEditorRef.current.setValue(page.html)
+    htmlEditorRef.current.setModel(htmlModel)
+  }
+
+  /** 在 selector 编辑器中打开 pageId / selectorName 对应的 selector model */
+  function openSelector(pageId: number, selectorName: string) {
+    const project = projectAtom.value
+    const page = project.pages.find(p => p.pageId === pageId)
+    const selector = page.selectors.find(sel => sel.name === selectorName)
+    const uriString = `inmemory://selector/${pageId}/${selectorName}`
+    const uri = monaco.Uri.parse(uriString)
+    let selectorModel = monaco.editor.getModel(uri)
+    if (selectorModel == null) {
+      selectorModel = monaco.editor.createModel(selector.content, null, uri)
+      const initAvid = selectorModel.getAlternativeVersionId()
+      selTabInfoUpdaters.add(uriString, selectorName, initAvid)
+    }
+    selectorEditorRef.current.setModel(selectorModel)
+    setActiveSelectorName(selector.name)
+  }
+
+  function closeSelector() {
+    selectorEditorRef.current.setModel(null)
+    setActiveSelectorName('')
+  }
+
+  function onChoosePage(pageId: number) {
+    const project = projectAtom.value
+    const page = project.pages.find(p => p.pageId === pageId)
+    openHtml(pageId)
+
+    // 销毁当前 page 下所有的 selector model
+    selTabInfo.forEach(item => {
+      // TODO 如果当前 model 尚未保存，需要询问用户是否需要保存
+      const uri = monaco.Uri.parse(item.uriString)
+      const model = monaco.editor.getModel(uri)
+      model.dispose()
+    })
+    selTabInfoUpdaters.clear()
 
     if (page.selectors.length > 0) {
-      const selector = page.selectors[0]
-      setActiveSelectorName(selector.name)
-      selectorEditorRef.current.setValue(selector.content)
+      openSelector(pageId, page.selectors[0].name)
+    } else {
+      closeSelector()
     }
+  }
+
+  function onChooseSelector(selectorName: string) {
+    openSelector(activePageId, selectorName)
   }
 
   async function onAddPage(pageName: string) {
     try {
+      const project = projectAtom.value
       const result = await server.addPage(project.projectId, pageName)
       if (result.ok) {
         const nextPages = project.pages.concat([result.pageRecord])
@@ -186,6 +267,7 @@ export default function ProjectPage(
   }
 
   async function onDeletePage(pageId: number) {
+    const project = projectAtom.value
     const page = project.pages.find(page => page.pageId === pageId)
     if (!confirm(`确定要删除 ${page.name} 吗？该页面内的选择器都将被清空`)) {
       return
@@ -226,7 +308,14 @@ export default function ProjectPage(
         console.warn(await response.text())
         return
       }
-      fetchProject()
+
+      // TODO 避免重新载入 project
+      const { ok, reason, project } = await server.getProject(login, projectName)
+      if (ok) {
+        setProject(project)
+      } else {
+        alert(reason)
+      }
     } catch (e) {
       // TODO use the global dialog
       console.error(e)
@@ -235,6 +324,7 @@ export default function ProjectPage(
 
   async function onDeleteSelector(selectorName: string) {
     console.assert(activePageId !== -1)
+    const project = projectAtom.value
     if (!confirm(`确定要删除选择器 '${selectorName}' 吗？`)) {
       return
     }
@@ -244,6 +334,7 @@ export default function ProjectPage(
 
     // 乐观更新
     setProject({
+      // TODO 使用 immutable-js / immer
       ...project,
       pages: [
         ...project.pages.slice(0, pageIndex),
@@ -263,13 +354,6 @@ export default function ProjectPage(
     }
   }
 
-  function onChooseSelector(selectorName: string) {
-    const page = project.pages.find(pg => pg.pageId === activePageId)
-    const selector = page.selectors.find(sel => sel.name === selectorName)
-    selectorEditorRef.current.setValue(selector.content)
-    setActiveSelectorName(selectorName)
-  }
-
   return (
     <div className="project-page">
       <nav>
@@ -285,7 +369,7 @@ export default function ProjectPage(
         layout={layout}
         sidebar={
           <Sidebar
-            project={project}
+            projectAtom={projectAtom}
             onChooseSelector={onChooseSelector}
             activePageId={activePageId}
             activeSelectorName={activeSelectorName}
@@ -298,29 +382,25 @@ export default function ProjectPage(
         }
         left={
           <>
-            <Tablist tabs={['html']} activeTab="html" />
-            <div
-              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
-              ref={htmlEditorDOMRef}
-            />
+            <HtmlTablist />
+            <EditorWrapper editorRef={htmlEditorRef} options={INIT_EDITOR_OPTIONS.html} />
           </>
         }
         rightTop={
           <>
-            <Tablist tabs={['selector-1', 'selector-2']} activeTab="selector-1" />
-            <div
-              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
-              ref={selectorEditorDOMRef}
+            <SelectTabList
+              tabItems={selectorTabItems}
+              activeIndex={activeSelectorTabIndex}
+              onChangeActiveIndex={onChangeActiveSelectorTabIndex}
+              onClose={onCloseSelectorTab}
             />
+            <EditorWrapper editorRef={selectorEditorRef} options={INIT_EDITOR_OPTIONS.selector} />
           </>
         }
         rightBottom={
           <>
-            <Tablist tabs={['output', 'typings']} activeTab="output" />
-            <div
-              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
-              ref={outputEditorDOMRef}
-            />
+            <OutputTablist />
+            <EditorWrapper editorRef={outputEditorRef} options={INIT_EDITOR_OPTIONS.output} />
           </>
         }
       />
