@@ -58,22 +58,22 @@ export default function PageLayout({
       setCursorOverlayType('ew-resize')
     },
     onDrag({ dragPos }) {
-        const totalWidth = containerRef.current.clientWidth
-        const ratio = dragPos.x / totalWidth
+      const totalWidth = containerRef.current.clientWidth
+      const ratio = dragPos.x / totalWidth
 
-        let nextSidebarRatio: number
-        if (ratio < 0.05) {
-          // 当用户尝试拖动 sidebar 到一个过短的宽度时，隐藏 sidebar
-          nextSidebarRatio = 0
-        } else {
-          // sidebar 的宽度必须在 10% 到 50% 之间
-          nextSidebarRatio = clamp(0.1, ratio, 0.5)
-        }
+      let nextSidebarRatio: number
+      if (ratio < 0.05) {
+        // 当用户尝试拖动 sidebar 到一个过短的宽度时，隐藏 sidebar
+        nextSidebarRatio = 0
+      } else {
+        // sidebar 的宽度必须在 10% 到 50% 之间
+        nextSidebarRatio = clamp(0.1, ratio, 0.5)
+      }
 
-        setSidebarRatio(nextSidebarRatio)
-        // 在拖动 sidebar 的过程中，保持右侧不同编辑器的宽度占比
-        const x = leftRatio / (leftRatio + rightRatio)
-        setLeftRatio(clamp(0.1, x * (1 - nextSidebarRatio), 0.9 - nextSidebarRatio))
+      setSidebarRatio(nextSidebarRatio)
+      // 在拖动 sidebar 的过程中，保持右侧不同编辑器的宽度占比
+      const x = leftRatio / (leftRatio + rightRatio)
+      setLeftRatio(clamp(0.1, x * (1 - nextSidebarRatio), 0.9 - nextSidebarRatio))
     },
     onDragEnd: hideCursorOverlay,
   })
@@ -98,7 +98,7 @@ export default function PageLayout({
       setCursorOverlayType('ew-resize')
     },
     onDrag({ dragPos }) {
-        handleDragLeft(dragPos)
+      handleDragLeft(dragPos)
     },
     onDragEnd: hideCursorOverlay,
   })
@@ -108,7 +108,7 @@ export default function PageLayout({
       setCursorOverlayType('ns-resize')
     },
     onDrag({ dragPos }) {
-        handleDragTop(dragPos)
+      handleDragTop(dragPos)
     },
     onDragEnd: hideCursorOverlay,
   })
@@ -118,8 +118,8 @@ export default function PageLayout({
       setCursorOverlayType('all-scroll')
     },
     onDrag({ dragPos }) {
-        handleDragLeft(dragPos)
-        handleDragTop(dragPos)
+      handleDragLeft(dragPos)
+      handleDragTop(dragPos)
     },
     onDragEnd: hideCursorOverlay,
   })
@@ -146,6 +146,7 @@ export default function PageLayout({
         className="left-part"
         style={{
           width: percentify(leftRatio),
+          position: 'relative',
           display: leftRatio === 0 ? 'none' : undefined,
         }}
       >
@@ -159,7 +160,7 @@ export default function PageLayout({
         <div className="line" />
       </div>
       <div className="right-part" style={{ width: percentify(rightRatio) }}>
-        <div style={{ height: percentify(topRatio) }}>{rightTop}</div>
+        <div style={{ height: percentify(topRatio), position: 'relative' }}>{rightTop}</div>
         <div
           className="resizer horizontal"
           style={{ top: percentify(topRatio) }}
@@ -167,7 +168,7 @@ export default function PageLayout({
         >
           <div className="line" />
         </div>
-        <div style={{ height: percentify(1 - topRatio) }}>{rightBottom}</div>
+        <div style={{ height: percentify(1 - topRatio), position: 'relative' }}>{rightBottom}</div>
       </div>
       <div
         className="resizer orthogonal"

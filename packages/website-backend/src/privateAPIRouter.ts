@@ -173,7 +173,7 @@ privateAPIRouter.post('/edit-selector', async ctx => {
 
 // TODO rename file
 
-// 删除文件
+// 删除选择器
 privateAPIRouter.post('/delete-selector', async ctx => {
   const { pageId, name } = ctx.request.body
   // TODO check parameters
@@ -187,10 +187,12 @@ privateAPIRouter.post('/delete-selector', async ctx => {
 
   const now = new Date().toISOString()
   page.selectors = page.selectors.filter(s => s.name !== name)
-  await ctx.service.pages.updateOne({ pageId }, page)
+  await ctx.service.pages.findOneAndReplace({ pageId }, page)
 
-  project.updatedAt = now
-  await ctx.service.projects.updateOne({ projectId: project.projectId }, project)
+  await ctx.service.projects.updateOne(
+    { projectId: project.projectId },
+    { $set: { updatedAt: now } },
+  )
 
   ctx.status = 200
 })

@@ -78,3 +78,35 @@ export function AddFolderIcon({ disabled, onClick, size }: IconProps) {
   )
 }
 AddFolderIcon.defaultProps = { size: 16 }
+
+export function CloseIcon({ disabled, onClick, size }: IconProps) {
+  return (
+    <svg
+      className={classNames('icon interactive', { disabled })}
+      onClick={disabled ? null : onClick}
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+    >
+      <path
+        d="M9.428 8L12 10.573 10.572 12 8 9.428 5.428 12 4 10.573 6.572 8 4 5.428 5.427 4 8 6.572 10.573 4 12 5.428 9.428 8z"
+        fill="#E8E8E8"
+      />
+    </svg>
+  )
+}
+CloseIcon.defaultProps = { size: 16 }
+
+// export function CloseDirtyIcon({ disabled, onClick, size }: IconProps) {
+//   return (
+//     <svg
+//       className={classNames('icon', { disabled })}
+//       onClick={disabled ? null : onClick}
+//       width={size}
+//       height={size}
+//       viewBox="0 0 16 16"
+//     >
+//       <circle fill="#C5C5C5" cx="8" cy="8" r="4" />
+//     </svg>
+//   )
+// }

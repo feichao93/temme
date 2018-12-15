@@ -28,6 +28,19 @@ export async function deletePage(pageId: number) {
   }
 }
 
+export async function deleteSelector(pageId: number, selectorName: string) {
+  const response = await fetch('/api/delete-selector', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ pageId, name: selectorName }),
+  })
+  if (!response.ok) {
+    return { ok: false, reason: await response.text() }
+  } else {
+    return { ok: true }
+  }
+}
+
 export async function logout() {
   const res = await fetch('/api/logout')
   if (res.ok) {

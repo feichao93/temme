@@ -18,3 +18,16 @@ export const GithubIcon = ({ size = 20, src = '' }) => {
     )
   }
 }
+
+export const FileIcon = ({ size }: { size: number }) => {
+  return (
+    <svg viewBox="0 0 32 32" width={size} height={size}>
+      <title>file</title>
+      <path
+        fill="#dcdbdd"
+        d="M19.28,4H7.93A1.91,1.91,0,0,0,6,6V26a1.91,1.91,0,0,0,1.93,2h16A2,2,0,0,0,26,26V10ZM24,26H8V6H18v6h6Z"
+      />
+    </svg>
+  )
+}
+FileIcon.defaultProps = { size: 16 }

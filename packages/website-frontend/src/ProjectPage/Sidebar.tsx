@@ -13,6 +13,7 @@ export interface SidebarProps {
   onAddPage(pageName: string): void
   onDeletePage(pageId: number): void
   onAddSelector(selectorName: string): void
+  onDeleteSelector(selectorName: string): void
 }
 
 // TODO
@@ -46,6 +47,7 @@ export default function Sidebar({
   onAddPage,
   onDeletePage,
   onAddSelector,
+  onDeleteSelector,
 }: SidebarProps) {
   const pages = project == null ? [] : project.pages
   const activePage = pages.find(page => page.pageId === activePageId)
@@ -83,6 +85,7 @@ export default function Sidebar({
                   <RenameIcon
                     onClick={e => {
                       e.stopPropagation()
+                      alert('仍在实现中')
                     }}
                   />
                   <DeleteIcon
@@ -98,7 +101,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="part selectors-page">
+      <div className="part selectors-part">
         <div className="part-title">
           <span>Selectors</span>
           <div className="actions">
@@ -117,7 +120,21 @@ export default function Sidebar({
                   className={classNames({ active: sel.name === activeSelectorName })}
                   onClick={() => onChooseSelector(sel.name)}
                 >
-                  {sel.name}
+                  <span className="selector-name">{sel.name}</span>
+                  <span className="actions">
+                    <RenameIcon
+                      onClick={e => {
+                        e.stopPropagation()
+                        alert('仍在实现中')
+                      }}
+                    />
+                    <DeleteIcon
+                      onClick={e => {
+                        e.stopPropagation()
+                        onDeleteSelector(sel.name)
+                      }}
+                    />
+                  </span>
                 </li>
               ))}
             </ul>

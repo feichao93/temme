@@ -9,9 +9,12 @@ import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
 import { ProjectRecord } from './interfaces'
 import * as server from '../utils/server'
+import Tablist from './Tablist'
 import './ProjectPage.styl'
 
 type CodeEditor = monaco.editor.IStandaloneCodeEditor
+
+const tablistHeight = 35
 
 // TODO 应该用额外的字段来记录数据的加载状态
 const EMPTY_PROJECT: ProjectRecord = {
@@ -94,13 +97,6 @@ export default function ProjectPage(
       outputEditorRef.current.dispose()
     }
   }, [])
-
-  // choose first-page when mount
-  // useEffect(() => {
-  //   if (pages.length > 0) {
-  //     onChoosePage(pages[0].pageId)
-  //   }
-  // }, [])
 
   useEffect(() => {
     const htmlEditor = htmlEditorRef.current
@@ -237,6 +233,36 @@ export default function ProjectPage(
     }
   }
 
+  async function onDeleteSelector(selectorName: string) {
+    console.assert(activePageId !== -1)
+    if (!confirm(`确定要删除选择器 '${selectorName}' 吗？`)) {
+      return
+    }
+    const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
+    const page = project.pages[pageIndex]
+    const nextSelectors = page.selectors.filter(sel => sel.name != selectorName)
+
+    // 乐观更新
+    setProject({
+      ...project,
+      pages: [
+        ...project.pages.slice(0, pageIndex),
+        { ...page, selectors: nextSelectors },
+        ...project.pages.slice(pageIndex + 1),
+      ],
+    })
+    if (activeSelectorName === selectorName) {
+      setActiveSelectorName('')
+    }
+
+    const { ok, reason } = await server.deleteSelector(activePageId, selectorName)
+    if (!ok) {
+      setProject(project)
+      setActiveSelectorName(activeSelectorName)
+      console.warn(reason)
+    }
+  }
+
   function onChooseSelector(selectorName: string) {
     const page = project.pages.find(pg => pg.pageId === activePageId)
     const selector = page.selectors.find(sel => sel.name === selectorName)
@@ -267,11 +293,36 @@ export default function ProjectPage(
             onAddPage={onAddPage}
             onDeletePage={onDeletePage}
             onAddSelector={onAddSelector}
+            onDeleteSelector={onDeleteSelector}
           />
         }
-        left={<div className="editor-container" ref={htmlEditorDOMRef} />}
-        rightTop={<div className="editor-container" ref={selectorEditorDOMRef} />}
-        rightBottom={<div className="editor-container" ref={outputEditorDOMRef} />}
+        left={
+          <>
+            <Tablist tabs={['html']} activeTab="html" />
+            <div
+              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
+              ref={htmlEditorDOMRef}
+            />
+          </>
+        }
+        rightTop={
+          <>
+            <Tablist tabs={['selector-1', 'selector-2']} activeTab="selector-1" />
+            <div
+              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
+              ref={selectorEditorDOMRef}
+            />
+          </>
+        }
+        rightBottom={
+          <>
+            <Tablist tabs={['output', 'typings']} activeTab="output" />
+            <div
+              style={{ position: 'absolute', left: 0, right: 0, top: tablistHeight, bottom: 0 }}
+              ref={outputEditorDOMRef}
+            />
+          </>
+        }
       />
     </div>
   )
