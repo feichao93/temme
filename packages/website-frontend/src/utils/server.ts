@@ -106,3 +106,17 @@ export async function getUserProjects(username: string) {
     throw new Error(await res.text())
   }
 }
+export async function deleteProject(projectId: number) {
+  const res = await fetch('/api/delete-project', {
+    method: 'post',
+    body: JSON.stringify({ projectId }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  if (res.ok) {
+    return true
+  } else {
+    throw new Error(await res.text())
+  }
+}
