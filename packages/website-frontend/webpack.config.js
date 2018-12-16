@@ -8,22 +8,14 @@ const pkg = require('./package.json')
 const webpackConfig = (env, argv) => {
   const prod = argv.mode === 'production'
 
-  // const externals = {
-  //   'lz-string': 'LZString',
-  // }
-
-  // if (prod) {
-  //   externals.temme = 'Temme'
-  // }
-
   return {
     context: __dirname,
     target: 'web',
     entry: path.resolve(__dirname, 'src/index.tsx'),
     output: {
-      publicPath: '/',
-      path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.js',
+      publicPath: '/static/',
+      path: path.resolve(__dirname, 'dist/static/'),
+      filename: '[name].[hash:6].js',
     },
 
     resolve: {
@@ -52,16 +44,17 @@ const webpackConfig = (env, argv) => {
       new webpack.DefinePlugin({
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
-      new webpack.HotModuleReplacementPlugin(),
+      !prod && new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         template: 'src/index.html',
-        // temmeVersion: prod ? pkg.version : null,
+        path: path.resolve(__dirname, 'dist'),
+        filename: 'index.html',
       }),
       new MonacoWebpackPlugin(),
-    ],
+    ].filter(Boolean),
 
     devServer: {
-      // contentBase: [path.resolve(__dirname, 'public')],
+      contentBase: path.resolve(__dirname, 'dist'),
       historyApiFallback: true,
       proxy: {
         '/api': 'http://localhost:3000',

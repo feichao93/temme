@@ -1,6 +1,12 @@
+import * as fs from 'fs'
 import Koa, { Context, Middleware } from 'koa'
+import conditional from 'koa-conditional-get'
+import etag from 'koa-etag'
+import serve from 'koa-static'
+import mount from 'koa-mount'
 import session from 'koa-session'
 import bodyParser from 'koa-bodyparser'
+import compress from 'koa-compress'
 import { MongoClient } from 'mongodb'
 import Router from 'koa-router'
 import Service from './Service'
@@ -8,6 +14,8 @@ import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
 import privateAPIRouter from './privateAPIRouter'
 import publicAPIRouter from './publicAPIRouter'
 import CONFIG from '../config'
+
+const ONE_YEAR = 365 * 24 * 3600 * 1000
 
 // extends koa context
 declare module 'koa' {
@@ -40,8 +48,8 @@ async function oauthCallbackHandler(ctx: Context) {
 }
 
 async function fallbackHandler(ctx: Context) {
-  // TODO
-  ctx.throw(404)
+  ctx.set('content-type', 'text/html')
+  ctx.body = fs.createReadStream('public/index.html')
 }
 
 function makeApp(service: Service) {
@@ -54,11 +62,14 @@ function makeApp(service: Service) {
     .use(privateAPIRouter.routes())
 
   app
+    .use(compress({ threshold: 2048 }))
+    .use(conditional())
+    .use(etag())
     .use(session(app))
     .use(withService(service))
     .use(bodyParser())
     .use(router.routes())
-    // fallback-handler to support client-side routing
+    .use(mount('/static', serve('public/static', { maxage: ONE_YEAR })))
     .use(fallbackHandler)
 
   return app

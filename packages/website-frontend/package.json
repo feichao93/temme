@@ -4,7 +4,7 @@
   "version": "0.8.3",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production && copyfiles public/**/* dist --up 1"
+    "build": "webpack --mode production"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.10.0",
