@@ -9,7 +9,7 @@ interface DialogContext {
 const DialogContext = createContext({} as DialogContext)
 
 export function DialogProvider({ children }: { children: JSX.Element }) {
-  const [showState, setShowState] = useState(true)
+  const [showState, setShowState] = useState(false)
   function openDialog() {
     setShowState(true)
   }
