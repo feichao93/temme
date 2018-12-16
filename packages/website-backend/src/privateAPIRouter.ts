@@ -41,6 +41,26 @@ privateAPIRouter.post('/add-project', async ctx => {
   ctx.status = 200
 })
 
+// 更新 html
+privateAPIRouter.post('/update-html', async ctx => {
+  const { pageId, content } = ctx.request.body
+
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
+
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
+  const userId = ctx.session.userId
+  ctx.assert(project.userId === userId, 401)
+
+  const now = new Date().toISOString()
+  await ctx.service.pages.updateOne({ pageId }, { $set: { html: content } })
+  await ctx.service.projects.updateOne(
+    { projectId: project.projectId },
+    { $set: { updatedAt: now } },
+  )
+  ctx.status = 200
+})
+
 // 删除 project
 privateAPIRouter.post('/delete-project', async ctx => {
   const { projectId } = ctx.request.body
@@ -148,8 +168,8 @@ privateAPIRouter.post('/add-file', async ctx => {
   ctx.status = 200
 })
 
-// 编辑选择器
-privateAPIRouter.post('/edit-selector', async ctx => {
+// 更新选择器
+privateAPIRouter.post('/update-selector', async ctx => {
   const { pageId, name, content } = ctx.request.body
   // TODO check parameters
 

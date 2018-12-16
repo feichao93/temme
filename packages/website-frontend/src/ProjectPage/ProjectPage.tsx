@@ -29,6 +29,8 @@ export default function ProjectPage(
   const [activePageId, setActivePageId] = useState(-1)
   const [activeSelectorName, setActiveSelectorName] = useState('')
 
+  const [htmlTabInfo, updateHtmlTabInfo] = useState({ initAvid: -1, avid: -1 })
+
   // selTabInfo 总是与当前 page 已打开的 selector model 相对应
   // TODO 利用该对应关系来优化代码，例如 将该变量重命名为 aliveSelectorModelInfoList
   const [selTabInfo, updateSelTabInfo] = useState<
@@ -121,26 +123,83 @@ export default function ProjectPage(
 
       // 首次计算结果
       compute()
-      // 每次 html 或 选择器的内容发生变化时，重新计算结果
+      // 每当 html 或 选择器的内容发生变化时，重新计算结果
       const debouncedCompute = debounce(compute, 300)
-      const res1 = htmlEditor.onDidChangeModelContent(debouncedCompute)
-      const res2 = selectorEditor.onDidChangeModelContent(debouncedCompute)
+      const disposable1 = htmlEditor.onDidChangeModelContent(debouncedCompute)
+      const disposable2 = selectorEditor.onDidChangeModelContent(debouncedCompute)
 
       return () => {
-        res1.dispose()
-        res2.dispose()
+        debouncedCompute.dispose()
+        disposable1.dispose()
+        disposable2.dispose()
       }
     },
     [activePageId, activeSelectorName],
   )
 
+  // 监听 htmlEditor 中的变化，自动更新 htmlTabInfo 中的 avid
+  useEffect(
+    () => {
+      const model = htmlEditorRef.current.getModel()
+      if (model == null) {
+        return
+      }
+      const disposable = model.onDidChangeContent(() => {
+        const avid = model.getAlternativeVersionId()
+        updateHtmlTabInfo(info => ({ ...info, avid }))
+      })
+      return () => {
+        disposable.dispose()
+      }
+    },
+    [activePageId],
+  )
+
+  const onSaveHtmlRef = useRef(noop)
+  useDidMount(() => {
+    const htmlEditor = htmlEditorRef.current
+    const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
+    // 使用闭包来访问 onSaveSelectorRef.current 的最新值
+    const handler = () => onSaveHtmlRef.current()
+    htmlEditor.addCommand(keybinding, handler)
+    // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
+  })
+  useEffect(
+    () => {
+      if (activePageId === -1) {
+        return
+      }
+
+      onSaveHtmlRef.current = async () => {
+        const model = htmlEditorRef.current.getModel()
+        const nextInitAvid = model.getAlternativeVersionId()
+        const prevInitAvid = htmlTabInfo.initAvid
+
+        // 乐观更新
+        updateHtmlTabInfo(info => ({ ...info, initAvid: nextInitAvid }))
+        const revert = () => {
+          updateHtmlTabInfo(info => ({ ...info, initAvid: prevInitAvid }))
+        }
+
+        try {
+          await server.saveHtml(activePageId, model.getValue())
+        } catch (e) {
+          revert()
+          console.error(e)
+        }
+      }
+    },
+    [activePageId],
+  )
+
   // 监听 selectorEditor 中的变化，自动更新 selTabInfo 中的 avid
   useEffect(
     () => {
-      const selectorEditor = selectorEditorRef.current
-
-      const disposable = selectorEditor.onDidChangeModelContent(() => {
-        const model = selectorEditor.getModel()
+      const model = selectorEditorRef.current.getModel()
+      if (model == null) {
+        return
+      }
+      const disposable = model.onDidChangeContent(() => {
         const uriString = model.uri.toString()
         selTabInfoUpdaters.updateAvid(uriString, model.getAlternativeVersionId())
       })
@@ -154,24 +213,24 @@ export default function ProjectPage(
 
   // monaco editor 不支持 removeCommand 操作
   // 所以我们这里使用 ref 来保存 command handler
-  const onSaveCurrentSelectorRef = useRef(noop)
+  const onSaveSelectorRef = useRef(noop)
   useDidMount(() => {
     const selectorEditor = selectorEditorRef.current
     const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
-    // 使用闭包来访问 onSaveCurrentSelectorRef.current 的最新值
-    const handler = () => onSaveCurrentSelectorRef.current()
+    // 使用闭包来访问 onSaveSelectorRef.current 的最新值
+    const handler = () => onSaveSelectorRef.current()
     selectorEditor.addCommand(keybinding, handler)
-    // 没有 removeCommand，那么也就没有 teardown logic 了
+    // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
     () => {
       const isValidSelector = activePageId !== -1 && activeSelectorName
       if (!isValidSelector) {
-        onSaveCurrentSelectorRef.current = noop
+        onSaveSelectorRef.current = noop
         return
       }
 
-      onSaveCurrentSelectorRef.current = async () => {
+      onSaveSelectorRef.current = async () => {
         const model = selectorEditorRef.current.getModel()
         const nextInitAvid = model.getAlternativeVersionId()
         const uriString = model.uri.toString()
@@ -250,12 +309,15 @@ export default function ProjectPage(
     const project = projectAtom.value
     const page = project.pages.find(p => p.pageId === pageId)
     const uri = monaco.Uri.parse(`inmemory://html/${pageId}`)
-    let htmlModel = monaco.editor.getModel(uri)
-    if (htmlModel == null) {
-      htmlModel = monaco.editor.createModel(page.html, 'html', uri)
+    let model = monaco.editor.getModel(uri)
+    if (model == null) {
+      model = monaco.editor.createModel(page.html, 'html', uri)
+      const avid = model.getAlternativeVersionId()
+      updateHtmlTabInfo({ avid, initAvid: avid })
     }
+    const editor = htmlEditorRef.current
+    editor.setModel(model)
     setActivePageId(pageId)
-    htmlEditorRef.current.setModel(htmlModel)
   }
 
   /** 在 selector 编辑器中打开 pageId / selectorName 对应的 selector model */
@@ -440,7 +502,10 @@ export default function ProjectPage(
         }
         left={
           <>
-            <HtmlTablist />
+            <HtmlTablist
+              dirty={htmlTabInfo.avid !== htmlTabInfo.initAvid}
+              onSave={onSaveHtmlRef.current}
+            />
             <EditorWrapper editorRef={htmlEditorRef} options={INIT_EDITOR_OPTIONS.html} />
           </>
         }

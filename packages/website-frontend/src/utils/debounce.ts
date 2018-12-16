@@ -3,7 +3,7 @@ export default function debounce(fn: () => void, timeout: number) {
   let t = 0
   let handle: any = null
 
-  return function debounced() {
+  function debounced() {
     const now = performance.now()
     if (!scheduled || now - t < timeout) {
       clearTimeout(handle)
@@ -14,7 +14,14 @@ export default function debounce(fn: () => void, timeout: number) {
       scheduled = true
       t = now
     }
-
-    return () => clearTimeout(handle)
   }
+
+  debounced.dispose = () => {
+    if (scheduled) {
+      scheduled = false
+      clearTimeout(handle)
+    }
+  }
+
+  return debounced
 }

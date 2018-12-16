@@ -1,8 +1,19 @@
 import { UserInfo, Project } from '../types'
 import { PageRecord } from '../ProjectPage/interfaces'
 
+export async function saveHtml(pageId: number, content: string) {
+  const response = await fetch('/api/update-html', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ pageId, content }),
+  })
+  if (!response.ok) {
+    throw new Error(`${response.status} ${await response.text()}`)
+  }
+}
+
 export async function saveSelector(pageId: number, selectorName: string, content: string) {
-  const response = await fetch(`/api/edit-selector`, {
+  const response = await fetch('/api/update-selector', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ pageId, name: selectorName, content }),

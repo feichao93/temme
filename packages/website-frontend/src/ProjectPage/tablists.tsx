@@ -10,34 +10,40 @@ import {
 } from './icons'
 import './tablists.styl'
 
-export function HtmlTablist() {
-  return (
-    <div className="tablist">
-      <div className="tab active">
-        <FileTypeHtmlIcon />
-        <span className="tabname">html</span>
-        <span style={{ width: 16 }} />
-      </div>
-    </div>
-  )
+interface HtmlTablistProps {
+  dirty: boolean
+  onSave(): void
 }
 
-export function OutputTablist() {
-  return (
-    <div className="tablist">
-      <div className="tab active">
-        <FileTypeJsonIcon />
-        <span className="tabname">output</span>
-        <span style={{ width: 16 }} />
-      </div>
-      <div className="tab">
-        <FileTypeTSIcon />
-        <span className="tabname">typings(wip)</span>
-        <span style={{ width: 16 }} />
-      </div>
+export const HtmlTablist = React.memo(({ dirty, onSave }: HtmlTablistProps) => (
+  <div className="tablist">
+    <div className="tab active">
+      <FileTypeHtmlIcon />
+      <span className="tabname">html</span>
+      <span style={{ width: 16 }} />
     </div>
-  )
-}
+    {dirty && (
+      <div className="tab-decoration" title="点击保存" onClick={onSave}>
+        未保存
+      </div>
+    )}
+  </div>
+))
+
+export const OutputTablist = React.memo(() => (
+  <div className="tablist">
+    <div className="tab active">
+      <FileTypeJsonIcon />
+      <span className="tabname">output</span>
+      <span style={{ width: 16 }} />
+    </div>
+    <div className="tab">
+      <FileTypeTSIcon />
+      <span className="tabname">typings(wip)</span>
+      <span style={{ width: 16 }} />
+    </div>
+  </div>
+))
 
 export interface TabItem {
   uriString: string
