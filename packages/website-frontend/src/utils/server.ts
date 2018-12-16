@@ -1,6 +1,17 @@
 import { UserInfo, Project } from '../types'
 import { PageRecord } from '../ProjectPage/interfaces'
 
+export async function saveSelector(pageId: number, selectorName: string, content: string) {
+  const response = await fetch(`/api/edit-selector`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ pageId, name: selectorName, content }),
+  })
+  if (!response.ok) {
+    throw new Error(`${response.status} ${await response.text()}`)
+  }
+}
+
 export async function getProject(login: string, projectName: string) {
   const response = await fetch(`/api/project/${login}/${projectName}`)
   if (response.ok) {

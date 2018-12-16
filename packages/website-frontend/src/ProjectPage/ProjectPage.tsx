@@ -9,11 +9,11 @@ import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
 import { ProjectRecord } from './interfaces'
 import * as server from '../utils/server'
-import { HtmlTablist, SelectTabList, OutputTablist } from './tablists'
-import { useBodyOverflowHidden, useDidMount } from '../utils/common-hooks'
+import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
+import { useBodyOverflowHidden, useDidMount, useWillUnmount } from '../utils/common-hooks'
 import debounce from '../utils/debounce'
 import { Atom, atomReady } from '../utils/atoms'
-import { CodeEditor, INIT_EDITOR_OPTIONS } from './utils'
+import { CodeEditor, INIT_EDITOR_OPTIONS, noop } from './utils'
 import EditorWrapper from './EditorWrapper'
 import './ProjectPage.styl'
 
@@ -78,6 +78,11 @@ export default function ProjectPage(
     updateAvid(uriString: string, avid: number) {
       updateSelTabInfo(list =>
         list.map(item => (item.uriString === uriString ? { ...item, avid } : item)),
+      )
+    },
+    updateInitAvid(uriString: string, initAvid: number) {
+      updateSelTabInfo(list =>
+        list.map(item => (item.uriString === uriString ? { ...item, initAvid } : item)),
       )
     },
     clear() {
@@ -147,6 +152,52 @@ export default function ProjectPage(
     [activePageId, activeSelectorName],
   )
 
+  // monaco editor 不支持 removeCommand 操作
+  // 所以我们这里使用 ref 来保存 command handler
+  const onSaveCurrentSelectorRef = useRef(noop)
+  useDidMount(() => {
+    const selectorEditor = selectorEditorRef.current
+    const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
+    // 使用闭包来访问 onSaveCurrentSelectorRef.current 的最新值
+    const handler = () => onSaveCurrentSelectorRef.current()
+    selectorEditor.addCommand(keybinding, handler)
+    // 没有 removeCommand，那么也就没有 teardown logic 了
+  })
+  useEffect(
+    () => {
+      const isValidSelector = activePageId !== -1 && activeSelectorName
+      if (!isValidSelector) {
+        onSaveCurrentSelectorRef.current = noop
+        return
+      }
+
+      onSaveCurrentSelectorRef.current = async () => {
+        const model = selectorEditorRef.current.getModel()
+        const nextInitAvid = model.getAlternativeVersionId()
+        const uriString = model.uri.toString()
+        const prevInitAvid = selTabInfo.find(item => item.name === activeSelectorName).initAvid
+
+        // 乐观更新
+        selTabInfoUpdaters.updateInitAvid(uriString, nextInitAvid)
+        const revert = () => {
+          selTabInfoUpdaters.updateInitAvid(uriString, prevInitAvid)
+        }
+
+        try {
+          await server.saveSelector(activePageId, activeSelectorName, model.getValue())
+        } catch (e) {
+          revert()
+          console.error(e)
+        }
+      }
+    },
+    [
+      activePageId,
+      activeSelectorName,
+      activeSelectorName ? selTabInfo.find(item => item.name === activeSelectorName).initAvid : -1,
+    ],
+  )
+
   const [projectAtom, setProjectAtom] = useState<Atom<ProjectRecord>>({
     status: 'loading',
     value: null,
@@ -182,6 +233,11 @@ export default function ProjectPage(
     [projectAtom.status],
   )
 
+  // 在退出页面时，销毁所有的 model
+  useWillUnmount(() => {
+    monaco.editor.getModels().forEach((m: monaco.editor.ITextModel) => m.dispose())
+  })
+
   /** 让各个编辑器重新根据父元素的大小进行布局 */
   function layout() {
     htmlEditorRef.current.layout()
@@ -209,13 +265,15 @@ export default function ProjectPage(
     const selector = page.selectors.find(sel => sel.name === selectorName)
     const uriString = `inmemory://selector/${pageId}/${selectorName}`
     const uri = monaco.Uri.parse(uriString)
-    let selectorModel = monaco.editor.getModel(uri)
-    if (selectorModel == null) {
-      selectorModel = monaco.editor.createModel(selector.content, null, uri)
-      const initAvid = selectorModel.getAlternativeVersionId()
+    let model = monaco.editor.getModel(uri)
+    if (model == null) {
+      model = monaco.editor.createModel(selector.content, null, uri)
+      const initAvid = model.getAlternativeVersionId()
       selTabInfoUpdaters.add(uriString, selectorName, initAvid)
     }
-    selectorEditorRef.current.setModel(selectorModel)
+    const editor = selectorEditorRef.current
+    editor.setModel(model)
+    editor.focus()
     setActiveSelectorName(selector.name)
   }
 

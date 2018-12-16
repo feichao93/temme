@@ -165,10 +165,13 @@ privateAPIRouter.post('/edit-selector', async ctx => {
   const file = page.selectors.find(s => s.name === name)
   file.content = content
   file.updatedAt = now
-  await ctx.service.pages.updateOne({ pageId }, page)
+  await ctx.service.pages.findOneAndReplace({ pageId }, page)
 
-  project.updatedAt = now
-  await ctx.service.projects.updateOne({ projectId: project.projectId }, project)
+  await ctx.service.projects.updateOne(
+    { projectId: project.projectId },
+    { $set: { updatedAt: now } },
+  )
+  ctx.status = 200
 })
 
 // TODO rename file

@@ -1,5 +1,3 @@
-// @ts-ignore
-import * as monaco from 'monaco-editor'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
@@ -33,7 +31,6 @@ declare global {
 if (module.hot) {
   module.hot.accept() // self accept
   module.hot.accept('./App.tsx', () => {
-    monaco.editor.getModels().forEach((m: monaco.editor.ITextModel) => m.dispose())
     const { default: App } = require('./App.tsx')
     render(App)
   })

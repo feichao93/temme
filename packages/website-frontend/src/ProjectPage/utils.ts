@@ -37,3 +37,5 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
     },
   },
 }
+
+export function noop() {}
