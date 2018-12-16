@@ -53,19 +53,18 @@ const webpackConfig = (env, argv) => {
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
       new webpack.HotModuleReplacementPlugin(),
-      // new HtmlWebpackPlugin({
-      //   template: 'index.html',
-      //   temmeVersion: prod ? pkg.version : null,
-      // }),
+      new HtmlWebpackPlugin({
+        template: 'src/index.html',
+        // temmeVersion: prod ? pkg.version : null,
+      }),
       new MonacoWebpackPlugin(),
     ],
 
     devServer: {
-      index: '',
       // contentBase: [path.resolve(__dirname, 'public')],
-
+      historyApiFallback: true,
       proxy: {
-        '/': 'http://localhost:3000',
+        '/api': 'http://localhost:3000',
       },
       hot: true,
     },

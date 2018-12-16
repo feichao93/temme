@@ -25,8 +25,6 @@ declare global {
   interface NodeModule {
     hot: any
   }
-  const CLIENT_ID: string
-  const USER_ID: string
 }
 
 if (module.hot) {

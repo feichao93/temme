@@ -1,5 +1,4 @@
 import Koa, { Context, Middleware } from 'koa'
-import * as fs from 'fs'
 import session from 'koa-session'
 import bodyParser from 'koa-bodyparser'
 import { MongoClient } from 'mongodb'
@@ -9,8 +8,6 @@ import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
 import privateAPIRouter from './privateAPIRouter'
 import publicAPIRouter from './publicAPIRouter'
 import CONFIG from '../config'
-import * as path from 'path'
-import nunjucks from 'nunjucks'
 
 // extends koa context
 declare module 'koa' {
@@ -43,13 +40,8 @@ async function oauthCallbackHandler(ctx: Context) {
 }
 
 async function fallbackHandler(ctx: Context) {
-  ctx.set('content-type', 'text/html')
-  const context = {
-    CLIENT_ID: JSON.stringify(CONFIG.oauthClientId),
-    USER_ID: JSON.stringify(ctx.session.userId || -1),
-  }
-  const template = fs.readFileSync(path.resolve(__dirname, 'view/index.njk'), 'utf8')
-  ctx.body = nunjucks.renderString(template, context)
+  // TODO
+  ctx.throw(404)
 }
 
 function makeApp(service: Service) {
