@@ -14,7 +14,7 @@ export interface Project {
   userId: number
   name: string
   description: string
-  folderIds: number[]
+  pageIds: number[]
   createdAt: string
   updatedAt: string
 }

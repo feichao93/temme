@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
-import { getDetailInfo, getUserProjects } from './utils/server'
-import { GithubIcon } from './icons'
 import Header from './Header'
 import './UserPage.styl'
-
+import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
+import { DeleteIcon, EditIcon, GithubIcon } from './icons'
+import { ProjectDialog } from './Dialog/ProjectDialog'
+import { useDialog } from './Dialog/dialog'
 export default function UserPage() {
   return (
     <>
@@ -14,6 +15,7 @@ export default function UserPage() {
       <div className="user-page">
         <UserProfile />
         <UserProjects />
+        <ProjectDialog />
       </div>
     </>
   )
@@ -61,6 +63,7 @@ function UserProfile() {
 function UserProjects() {
   const { username } = useSession()
   const [projectsState, setProjectsState] = useState([] as Project[])
+  const { openDialog } = useDialog()
   const fetchUserProjects = async (username: string) => {
     try {
       const projects = await getUserProjects(username)
@@ -77,8 +80,32 @@ function UserProjects() {
     },
     [username],
   )
-  const dayUpdated = (lastUpdate: string) =>
-    Math.floor((new Date().valueOf() - new Date(lastUpdate).valueOf()) / (1000 * 3600 * 24))
+  const createProject = () => {
+    openDialog()
+  }
+  const handleDeleteProject = async (projectId: number, name: string) => {
+    if (confirm(`是否删除项目${name}`)) {
+      try {
+        await deleteProject(projectId)
+        alert('删除成功')
+        fetchUserProjects(username)
+      } catch (e) {
+        alert('删除失败，请稍后再试')
+      }
+    }
+  }
+  const updateTime = (lastUpdate: string) => {
+    const diffTime = (new Date().valueOf() - new Date(lastUpdate).valueOf()) / 1000
+    if (diffTime > 3600 * 24) {
+      return `${Math.floor(diffTime / 3600 / 24)}天`
+    } else if (diffTime > 3600) {
+      return `${Math.floor(diffTime / 3600)}小时`
+    } else if (diffTime > 60) {
+      return `${Math.floor(diffTime / 60)}分钟`
+    } else {
+      return '几秒'
+    }
+  }
   return (
     <div className="user-project">
       <div className="tab-bar">
@@ -86,16 +113,27 @@ function UserProjects() {
           Project
           <span className="count">{projectsState.length}</span>
         </div>
+        <button onClick={createProject} className="create-project-button align-right">
+          New Project
+        </button>
       </div>
       <div className="project-list">
         {projectsState &&
-          projectsState.map(project => (
-            <div className="project-item" key={project.projectId}>
+          projectsState.map((project, index) => (
+            <div className="project-item" key={`project-${index}`}>
               <Link className="project-name" to={`/@${username}/${project.name}`}>
                 {project.name}
               </Link>
               <div className="project-description">{project.description}</div>
-              <div className="project-update">{dayUpdated(project.updatedAt)}天前更新</div>
+              <div className="project-update">{updateTime(project.updatedAt)}前更新</div>
+              <div className="manage-project">
+                <a href={`/@${username}/${project.name}`}>
+                  <EditIcon />
+                </a>
+                <span onClick={() => handleDeleteProject(project.projectId, project.name)}>
+                  <DeleteIcon />
+                </span>
+              </div>
             </div>
           ))}
       </div>

@@ -1,0 +1,73 @@
+.dialog
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+  z-index -1
+  background #00000080
+  &.show
+    z-index 9999
+  .dialog-container
+    position absolute
+    top 30%
+    left 50%
+    transform translate(-50%,-50%)
+    margin 10px auto
+    background white
+    overflow-y auto
+    border 1px solid rgba(27,31,35,.35)
+    border-radius 5px
+    padding 5px
+    display flex
+.project-dialog
+  width 250px
+  margin 10px 20px
+  .name,.title
+    color gray
+    padding 5px 0
+  .title
+    color black
+    border-bottom 1px solid #d1d5da
+  input
+    background-color #fafbfc
+    margin-right 5px
+    width 100%
+    border 1px solid #d1d5da
+    border-radius 3px
+    box-shadow inset 0 1px 2px rgba(27,31,35,.075)
+    color #24292e
+    font-size 16px
+    line-height 20px
+    min-height 34px
+    padding 5px
+  .dialog-buttons
+    display flex
+    justify-content flex-end
+    margin-top 10px
+.button
+  padding 5px
+  color #24292e
+  border 1px solid rgba(27,31,35,0.35)
+  border-radius 3px
+  outline none
+  cursor pointer
+  background-color #e6ebf1
+  background-image linear-gradient(-180deg, #f0f3f6, #e6ebf1 90%)
+  background-position -0.5em
+  font-size 16px
+  margin 5px
+  &:active
+    background-image none
+    border-color rgba(27,31,35,.35)
+    box-shadow inset 0 0.15em 0.3em rgba(27,31,35,.15)
+  &.error
+    background red
+    color white
+    &:active
+      background-color #d00303
+  &.success
+    background #32c955
+    color white
+    &:active
+      background-color #279f43
