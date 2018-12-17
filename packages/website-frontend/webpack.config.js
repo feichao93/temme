@@ -8,15 +8,27 @@ const pkg = require('./package.json')
 const webpackConfig = (env, argv) => {
   const prod = argv.mode === 'production'
 
+  const output = prod
+    ? {
+        publicPath: '/static/',
+        path: path.resolve(__dirname, 'dist/static/'),
+        filename: '[name].[hash:6].js',
+      }
+    : {
+        publicPath: '/',
+        filename: '[name].js',
+      }
+
+  const htmlWebpackPlugin = new HtmlWebpackPlugin({
+    template: 'src/index.html',
+    filename: prod ? '../index.html' : 'index.html',
+  })
+
   return {
     context: __dirname,
     target: 'web',
     entry: path.resolve(__dirname, 'src/index.tsx'),
-    output: {
-      publicPath: '/static/',
-      path: path.resolve(__dirname, 'dist/static/'),
-      filename: '[name].[hash:6].js',
-    },
+    output,
 
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -45,16 +57,11 @@ const webpackConfig = (env, argv) => {
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
       !prod && new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({
-        template: 'src/index.html',
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'index.html',
-      }),
+      htmlWebpackPlugin,
       new MonacoWebpackPlugin(),
     ].filter(Boolean),
 
     devServer: {
-      contentBase: path.resolve(__dirname, 'dist'),
       historyApiFallback: true,
       proxy: {
         '/api': 'http://localhost:3000',
