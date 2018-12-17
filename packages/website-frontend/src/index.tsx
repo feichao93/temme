@@ -2,16 +2,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
 import { Router } from 'react-router'
+import { DialogContextProvider } from './Dialog/dialogs'
 import history from './utils/history'
 import { SessionProvider } from './utils/session'
 
 function render(Component: typeof App) {
   ReactDOM.render(
-    <SessionProvider>
-      <Router history={history}>
-        <Component />
-      </Router>
-    </SessionProvider>,
+    <DialogContextProvider>
+      <SessionProvider>
+        <Router history={history}>
+          <Component />
+        </Router>
+      </SessionProvider>
+    </DialogContextProvider>,
     document.querySelector('#app'),
   )
 }
