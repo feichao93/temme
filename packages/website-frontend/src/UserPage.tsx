@@ -156,7 +156,7 @@ function UserProjects() {
           ))}
       </div>
       <ProjectDialog
-        key={selectedProjectState.projectId}
+        key={`${show}-${selectedProjectState.projectId}`}
         show={show}
         onClose={onClose}
         {...{ ...selectedProjectState, username, fetchUserProjects }}
