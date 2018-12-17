@@ -65,6 +65,7 @@ const webpackConfig = (env, argv) => {
       historyApiFallback: true,
       proxy: {
         '/api': 'http://localhost:3000',
+        '/oauth-callback': 'http://localhost:3000',
       },
       hot: true,
     },

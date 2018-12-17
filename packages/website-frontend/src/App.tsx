@@ -8,13 +8,11 @@ import './App.styl'
 
 export default function App() {
   return (
-    <>
-      <Switch>
-        <Route path="/login-success" component={LoginSuccessPage} />
-        <Route path="/@:login/:projectName" component={ProjectPage} />
-        <Route path="/@:login" component={UserPage} />
-        <Route path="/" component={MainPage} />
-      </Switch>
-    </>
+    <Switch>
+      <Route path="/login-success" component={LoginSuccessPage} />
+      <Route path="/@:login/:projectName" component={ProjectPage} />
+      <Route path="/@:login" component={UserPage} />
+      <Route path="/" component={MainPage} />
+    </Switch>
   )
 }
