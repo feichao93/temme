@@ -4,7 +4,7 @@ import '../Dialog.styl'
 
 interface DialogContainerProps {
   show: boolean
-  onClose(): void
+  onClose?(): void
   children: React.ReactNode
   canOutsideClickClose: boolean
 }

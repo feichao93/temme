@@ -2,9 +2,12 @@
 import * as monaco from 'monaco-editor'
 // @ts-ignore
 import temme from 'temme'
+// @ts-ignore
+import produce from 'immer'
 import React, { useEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
+import { useDialogs } from '../Dialog/dialogs'
 import Sidebar from './Sidebar'
 import PageLayout from './PageLayout'
 import { ProjectRecord } from './interfaces'
@@ -21,6 +24,7 @@ export default function ProjectPage(
   props: RouteComponentProps<{ login: string; projectName: string }>,
 ) {
   const { login, projectName } = props.match.params
+  const dialogs = useDialogs()
 
   const htmlEditorRef = useRef<CodeEditor>(null)
   const selectorEditorRef = useRef<CodeEditor>(null)
@@ -44,8 +48,20 @@ export default function ProjectPage(
     openSelector(activePageId, selectorTabItems[index].name)
   }
 
-  const onCloseSelectorTab = (index: number) => {
+  async function onCloseSelectorTab(index: number) {
     const info = selTabInfo[index]
+
+    const needSave = info.initAvid !== info.avid
+    if (needSave) {
+      const option = await dialogs.ternary({ message: `是否将更改保存到 ${info.name}` })
+      if (option === 'cancel') {
+        return
+      }
+      if (option === 'yes') {
+        // TODO 这个不对，需要根据 index 来判断到底保存哪个 selector 的内容
+        onSaveSelectorRef.current()
+      }
+    }
 
     // TODO 如果当前文件尚未保存，需要询问用户是否需要保存
 
@@ -116,7 +132,7 @@ export default function ProjectPage(
             outputEditor.setValue(newValue)
           }
         } catch (e) {
-          // TODO use the global dialog
+          dialogs.alert(e.message)
           console.error(e)
         }
       }
@@ -232,18 +248,27 @@ export default function ProjectPage(
 
       onSaveSelectorRef.current = async () => {
         const model = selectorEditorRef.current.getModel()
+        const content = model.getValue()
         const nextInitAvid = model.getAlternativeVersionId()
         const uriString = model.uri.toString()
         const prevInitAvid = selTabInfo.find(item => item.name === activeSelectorName).initAvid
 
         // 乐观更新
         selTabInfoUpdaters.updateInitAvid(uriString, nextInitAvid)
+        setProjectAtom(
+          produce((draft: Atom<ProjectRecord>) => {
+            const page = draft.value.pages.find(page => page.pageId === activePageId)
+            const selector = page.selectors.find(sel => sel.name === activeSelectorName)
+            selector.content = content
+          }),
+        )
         const revert = () => {
           selTabInfoUpdaters.updateInitAvid(uriString, prevInitAvid)
+          setProject(projectAtom.value) // TODO 这样真的对么？
         }
 
         try {
-          await server.saveSelector(activePageId, activeSelectorName, model.getValue())
+          await server.saveSelector(activePageId, activeSelectorName, content)
         } catch (e) {
           revert()
           console.error(e)
@@ -344,8 +369,26 @@ export default function ProjectPage(
     setActiveSelectorName('')
   }
 
-  function onChoosePage(pageId: number) {
+  async function onChoosePage(pageId: number) {
     const project = projectAtom.value
+
+    // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
+    // const dirtySelectors = selTabInfo.filter(item => item.avid !== item.initAvid)
+
+    // const needSave = isHtmlDirty || dirtySelectors.length > 0
+    // let shouldSave:boolean
+    // if (needSave) {
+    //   const commonDialogs: any = {}
+    //   const option = await commonDialogs.save('是否将更改保存到 xxx 中？')
+    //   if (option === 'cancel') {
+    //     return
+    //   }
+    //   shouldSave = option === 'yes'
+    // }
+    // if (shouldSave) {
+    //   // TODO executing all the save
+    // }
+
     const page = project.pages.find(p => p.pageId === pageId)
     openHtml(pageId)
 
@@ -445,7 +488,7 @@ export default function ProjectPage(
   async function onDeleteSelector(selectorName: string) {
     console.assert(activePageId !== -1)
     const project = projectAtom.value
-    if (!confirm(`确定要删除选择器 '${selectorName}' 吗？`)) {
+    if (!(await dialogs.confirm({ message: `确定要删除选择器 '${selectorName}' 吗？` }))) {
       return
     }
     const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
