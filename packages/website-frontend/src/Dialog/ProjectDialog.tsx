@@ -2,10 +2,18 @@ import { Dispatch, SetStateAction, useState } from 'react'
 import React from 'react'
 import { useDialog } from './dialog'
 import { DialogContainer } from './DialogContainer'
+import { addProject, updateProject } from '../utils/server'
 
-export function ProjectDialogContent(props: any) {
-  const [nameState, setNameState] = useState('')
-  const [descState, setDescState] = useState('')
+interface ProjectDialogProps {
+  projectId: number
+  name: string
+  description: string
+  username: string
+  fetchUserProjects: (username: string) => Promise<void>
+}
+export function ProjectDialogContent(props: ProjectDialogProps) {
+  const [nameState, setNameState] = useState(props.name)
+  const [descState, setDescState] = useState(props.description)
   const { closeDialog } = useDialog()
   const onInputChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -13,8 +21,19 @@ export function ProjectDialogContent(props: any) {
   ) => {
     cb(event.target.value)
   }
-  const onConfirm = () => {
+  const onConfirm = async () => {
+    const { fetchUserProjects, projectId, username } = props
     // todo 根据projectId 发送请求
+    try {
+      if (projectId === -1) {
+        await addProject(nameState, descState)
+      } else {
+        await updateProject(projectId, nameState, descState)
+      }
+      await fetchUserProjects(username)
+    } catch (e) {
+      alert(projectId === -1 ? '创建失败項目' : '更新項目失败')
+    }
     closeDialog()
   }
   const onCancel = () => {
@@ -38,8 +57,8 @@ export function ProjectDialogContent(props: any) {
     </div>
   )
 }
-export const ProjectDialog = () => (
+export const ProjectDialog = (props: ProjectDialogProps) => (
   <DialogContainer>
-    <ProjectDialogContent />
+    <ProjectDialogContent {...props} />
   </DialogContainer>
 )

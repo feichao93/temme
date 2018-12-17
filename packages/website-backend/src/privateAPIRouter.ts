@@ -64,9 +64,8 @@ privateAPIRouter.post('/update-html', async ctx => {
 // 删除 project
 privateAPIRouter.post('/delete-project', async ctx => {
   const { projectId } = ctx.request.body
-  console.log(ctx.request.body)
   const userId = ctx.session.userId
-  console.log(userId, projectId)
+
   const ownership = await ctx.service.checkOwnership(userId, projectId)
   ctx.assert(ownership, 401, `No access to project with id ${projectId}`)
 
@@ -75,6 +74,22 @@ privateAPIRouter.post('/delete-project', async ctx => {
   ctx.status = 200
 })
 
+privateAPIRouter.post('/update-project', async ctx => {
+  const { name, description, projectId } = ctx.request.body
+  const isNameValid = typeof name === 'string' && name.length > 0
+  ctx.assert(isNameValid, 400, 'Invalid new project name.')
+
+  const userId = ctx.session.userId
+  const existedProject = await ctx.service.projects.findOne({ projectId, userId })
+  ctx.assert(existedProject.name == name, 400, 'Project name already exists')
+
+  const now = new Date().toISOString()
+  await ctx.service.projects.updateOne(
+    { projectId },
+    { $set: { name, description, updatedAt: now } },
+  )
+  ctx.status = 200
+})
 // 创建新的 page
 privateAPIRouter.post('/add-page', async ctx => {
   const { projectId, name, description = '' } = ctx.request.body

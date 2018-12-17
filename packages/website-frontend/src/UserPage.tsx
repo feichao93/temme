@@ -8,6 +8,7 @@ import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
 import { DeleteIcon, EditIcon, GithubIcon } from './icons'
 import { ProjectDialog } from './Dialog/ProjectDialog'
 import { useDialog } from './Dialog/dialog'
+
 export default function UserPage() {
   return (
     <>
@@ -15,7 +16,6 @@ export default function UserPage() {
       <div className="user-page">
         <UserProfile />
         <UserProjects />
-        <ProjectDialog />
       </div>
     </>
   )
@@ -63,7 +63,12 @@ function UserProfile() {
 function UserProjects() {
   const { username } = useSession()
   const [projectsState, setProjectsState] = useState([] as Project[])
-  const { openDialog } = useDialog()
+  const [selectedProjectState, setSelectedProjectState] = useState({
+    name: '',
+    projectId: -1,
+    description: '',
+  })
+  const { openDialog, show } = useDialog()
   const fetchUserProjects = async (username: string) => {
     try {
       const projects = await getUserProjects(username)
@@ -80,9 +85,12 @@ function UserProjects() {
     },
     [username],
   )
+
   const createProject = () => {
+    setSelectedProjectState({ name: '', projectId: -1, description: '' })
     openDialog()
   }
+
   const handleDeleteProject = async (projectId: number, name: string) => {
     if (confirm(`是否删除项目${name}`)) {
       try {
@@ -94,6 +102,13 @@ function UserProjects() {
       }
     }
   }
+
+  const handleEditProject = (project: Project) => {
+    const { name, description, projectId } = project
+    setSelectedProjectState({ name, description, projectId })
+    openDialog()
+  }
+
   const updateTime = (lastUpdate: string) => {
     const diffTime = (new Date().valueOf() - new Date(lastUpdate).valueOf()) / 1000
     if (diffTime > 3600 * 24) {
@@ -106,6 +121,7 @@ function UserProjects() {
       return '几秒'
     }
   }
+
   return (
     <div className="user-project">
       <div className="tab-bar">
@@ -127,9 +143,9 @@ function UserProjects() {
               <div className="project-description">{project.description}</div>
               <div className="project-update">{updateTime(project.updatedAt)}前更新</div>
               <div className="manage-project">
-                <a href={`/@${username}/${project.name}`}>
+                <span onClick={() => handleEditProject(project)}>
                   <EditIcon />
-                </a>
+                </span>
                 <span onClick={() => handleDeleteProject(project.projectId, project.name)}>
                   <DeleteIcon />
                 </span>
@@ -137,6 +153,7 @@ function UserProjects() {
             </div>
           ))}
       </div>
+      {show && <ProjectDialog {...{ ...selectedProjectState, username, fetchUserProjects }} />}
     </div>
   )
 }

@@ -128,6 +128,34 @@ export async function getUserProjects(username: string) {
     throw new Error(await res.text())
   }
 }
+export async function addProject(name: string, description: string) {
+  const res = await fetch('/api/add-project', {
+    method: 'post',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ name, description }),
+  })
+  if (res.ok) {
+    return true
+  } else {
+    throw new Error('创建新项目失败')
+  }
+}
+export async function updateProject(projectId: number, name: string, description: string) {
+  const res = await fetch('/api/update-project', {
+    method: 'post',
+    body: JSON.stringify({ projectId, name, description }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  if (res.ok) {
+    return true
+  } else {
+    throw new Error(await res.text())
+  }
+}
 export async function deleteProject(projectId: number) {
   const res = await fetch('/api/delete-project', {
     method: 'post',
