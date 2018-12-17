@@ -1,28 +1,26 @@
-// @ts-ignore
-import * as monaco from 'monaco-editor'
-// @ts-ignore
-import temme from 'temme'
-// @ts-ignore
 import produce from 'immer'
+import * as monaco from 'monaco-editor'
 import React, { useEffect, useRef, useState } from 'react'
 import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
+import temme from 'temme'
 import { useDialogs } from '../Dialog/dialogs'
-import Sidebar from './Sidebar'
-import PageLayout from './PageLayout'
-import { ProjectRecord } from './interfaces'
-import * as server from '../utils/server'
-import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
+import { Atom, atomReady } from '../utils/atoms'
 import { useBodyOverflowHidden, useDidMount, useWillUnmount } from '../utils/common-hooks'
 import debounce from '../utils/debounce'
-import { Atom, atomReady } from '../utils/atoms'
-import { CodeEditor, INIT_EDITOR_OPTIONS, noop } from './utils'
+import * as server from '../utils/server'
 import EditorWrapper from './EditorWrapper'
+import { ProjectRecord } from './interfaces'
+import PageLayout from './PageLayout'
 import './ProjectPage.styl'
+import Sidebar from './Sidebar'
+import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
+import useTabItemsManager from './useTabItemsManager'
+import { CodeEditor, INIT_EDITOR_OPTIONS, noop } from './utils'
 
-export default function ProjectPage(
-  props: RouteComponentProps<{ login: string; projectName: string }>,
-) {
+type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
+
+export default function ProjectPage(props: ProjectPageProps) {
   const { login, projectName } = props.match.params
   const dialogs = useDialogs()
 
@@ -34,77 +32,49 @@ export default function ProjectPage(
   const [activeSelectorName, setActiveSelectorName] = useState('')
 
   const [htmlTabInfo, updateHtmlTabInfo] = useState({ initAvid: -1, avid: -1 })
+  const selectorTabItemsManager = useTabItemsManager()
+  const selectorTabItems = selectorTabItemsManager.items
 
-  // selTabInfo 总是与当前 page 已打开的 selector model 相对应
-  // TODO 利用该对应关系来优化代码，例如 将该变量重命名为 aliveSelectorModelInfoList
-  const [selTabInfo, updateSelTabInfo] = useState<
-    { uriString: string; name: string; initAvid: number; avid: number }[]
-  >([])
-  const selectorTabItems = selTabInfo.map(t => ({ ...t, dirty: t.initAvid !== t.avid }))
   const activeSelectorTabIndex = selectorTabItems.findIndex(
     item => item.name === activeSelectorName,
   )
-  const onChangeActiveSelectorTabIndex = (index: number) => {
-    openSelector(activePageId, selectorTabItems[index].name)
-  }
 
-  async function onCloseSelectorTab(index: number) {
-    const info = selTabInfo[index]
+  const selectorTabListHandlers = {
+    onChangeActiveIndex(index: number) {
+      openSelector(activePageId, selectorTabItems[index].name)
+    },
 
-    const needSave = info.initAvid !== info.avid
-    if (needSave) {
-      const option = await dialogs.ternary({ message: `是否将更改保存到 ${info.name}` })
-      if (option === 'cancel') {
-        return
-      }
-      if (option === 'yes') {
-        // TODO 这个不对，需要根据 index 来判断到底保存哪个 selector 的内容
-        onSaveSelectorRef.current()
-      }
-    }
+    async onClose(index: number) {
+      const info = selectorTabItems[index]
 
-    // TODO 如果当前文件尚未保存，需要询问用户是否需要保存
-
-    if (activeSelectorName === info.name) {
-      // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
-      if (selTabInfo.length === 1) {
-        closeSelector()
-      } else {
-        if (index === 0) {
-          openSelector(activePageId, selTabInfo[1].name)
-        } else {
-          openSelector(activePageId, selTabInfo[index - 1].name)
+      const needSave = info.initAvid !== info.avid
+      if (needSave) {
+        const option = await dialogs.ternary({ message: `是否将更改保存到 ${info.name}` })
+        if (option === 'cancel') {
+          return
+        }
+        if (option === 'yes') {
+          // TODO 根据 index 来保存相应的 selector
+          //  需要向后端发送，然后根据 project 缓存
+          //  LAST EDIT HERE
         }
       }
-    }
-    selTabInfoUpdaters.remove(index)
-    const model = monaco.editor.getModel(monaco.Uri.parse(info.uriString))
-    model.dispose()
-  }
 
-  const selTabInfoUpdaters = {
-    add(uriString: string, name: string, avid: number) {
-      updateSelTabInfo(list => list.concat([{ uriString, name, initAvid: avid, avid }]))
-    },
-    remove(index: number) {
-      updateSelTabInfo(list => {
-        const slice = list.slice()
-        slice.splice(index, 1)
-        return slice
-      })
-    },
-    updateAvid(uriString: string, avid: number) {
-      updateSelTabInfo(list =>
-        list.map(item => (item.uriString === uriString ? { ...item, avid } : item)),
-      )
-    },
-    updateInitAvid(uriString: string, initAvid: number) {
-      updateSelTabInfo(list =>
-        list.map(item => (item.uriString === uriString ? { ...item, initAvid } : item)),
-      )
-    },
-    clear() {
-      updateSelTabInfo([])
+      if (activeSelectorName === info.name) {
+        // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
+        if (selectorTabItems.length === 1) {
+          closeSelector()
+        } else {
+          if (index === 0) {
+            openSelector(activePageId, selectorTabItems[1].name)
+          } else {
+            openSelector(activePageId, selectorTabItems[index - 1].name)
+          }
+        }
+      }
+      selectorTabItemsManager.remove(index)
+      const model = monaco.editor.getModel(monaco.Uri.parse(info.uriString))
+      model.dispose()
     },
   }
 
@@ -177,7 +147,7 @@ export default function ProjectPage(
     const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
     // 使用闭包来访问 onSaveSelectorRef.current 的最新值
     const handler = () => onSaveHtmlRef.current()
-    htmlEditor.addCommand(keybinding, handler)
+    htmlEditor.addCommand(keybinding, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
@@ -189,18 +159,10 @@ export default function ProjectPage(
       onSaveHtmlRef.current = async () => {
         const model = htmlEditorRef.current.getModel()
         const nextInitAvid = model.getAlternativeVersionId()
-        const prevInitAvid = htmlTabInfo.initAvid
-
-        // 乐观更新
-        updateHtmlTabInfo(info => ({ ...info, initAvid: nextInitAvid }))
-        const revert = () => {
-          updateHtmlTabInfo(info => ({ ...info, initAvid: prevInitAvid }))
-        }
-
         try {
           await server.saveHtml(activePageId, model.getValue())
+          updateHtmlTabInfo(info => ({ ...info, initAvid: nextInitAvid }))
         } catch (e) {
-          revert()
           console.error(e)
         }
       }
@@ -208,7 +170,7 @@ export default function ProjectPage(
     [activePageId],
   )
 
-  // 监听 selectorEditor 中的变化，自动更新 selTabInfo 中的 avid
+  // 监听 selectorEditor 中的变化，自动更新 selectorTabItems 中的 avid
   useEffect(
     () => {
       const model = selectorEditorRef.current.getModel()
@@ -217,7 +179,7 @@ export default function ProjectPage(
       }
       const disposable = model.onDidChangeContent(() => {
         const uriString = model.uri.toString()
-        selTabInfoUpdaters.updateAvid(uriString, model.getAlternativeVersionId())
+        selectorTabItemsManager.updateAvid(uriString, model.getAlternativeVersionId())
       })
 
       return () => {
@@ -235,13 +197,13 @@ export default function ProjectPage(
     const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
     // 使用闭包来访问 onSaveSelectorRef.current 的最新值
     const handler = () => onSaveSelectorRef.current()
-    selectorEditor.addCommand(keybinding, handler)
+    selectorEditor.addCommand(keybinding, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
     () => {
-      const isValidSelector = activePageId !== -1 && activeSelectorName
-      if (!isValidSelector) {
+      const hasSelectorOpen = activePageId !== -1 && activeSelectorName
+      if (!hasSelectorOpen) {
         onSaveSelectorRef.current = noop
         return
       }
@@ -251,35 +213,24 @@ export default function ProjectPage(
         const content = model.getValue()
         const nextInitAvid = model.getAlternativeVersionId()
         const uriString = model.uri.toString()
-        const prevInitAvid = selTabInfo.find(item => item.name === activeSelectorName).initAvid
-
-        // 乐观更新
-        selTabInfoUpdaters.updateInitAvid(uriString, nextInitAvid)
-        setProjectAtom(
-          produce((draft: Atom<ProjectRecord>) => {
-            const page = draft.value.pages.find(page => page.pageId === activePageId)
-            const selector = page.selectors.find(sel => sel.name === activeSelectorName)
-            selector.content = content
-          }),
-        )
-        const revert = () => {
-          selTabInfoUpdaters.updateInitAvid(uriString, prevInitAvid)
-          setProject(projectAtom.value) // TODO 这样真的对么？
-        }
 
         try {
           await server.saveSelector(activePageId, activeSelectorName, content)
+          selectorTabItemsManager.updateInitAvid(uriString, nextInitAvid)
+          setProjectAtom(
+            produce(draft => {
+              const page = draft.value.pages.find(page => page.pageId === activePageId)
+              const selector = page.selectors.find(sel => sel.name === activeSelectorName)
+              selector.content = content
+            }),
+          )
         } catch (e) {
-          revert()
           console.error(e)
+          await dialogs.alert(e.message)
         }
       }
     },
-    [
-      activePageId,
-      activeSelectorName,
-      activeSelectorName ? selTabInfo.find(item => item.name === activeSelectorName).initAvid : -1,
-    ],
+    [activePageId, activeSelectorName],
   )
 
   const [projectAtom, setProjectAtom] = useState<Atom<ProjectRecord>>({
@@ -356,7 +307,7 @@ export default function ProjectPage(
     if (model == null) {
       model = monaco.editor.createModel(selector.content, null, uri)
       const initAvid = model.getAlternativeVersionId()
-      selTabInfoUpdaters.add(uriString, selectorName, initAvid)
+      selectorTabItemsManager.add(uriString, selectorName, initAvid)
     }
     const editor = selectorEditorRef.current
     editor.setModel(model)
@@ -373,7 +324,7 @@ export default function ProjectPage(
     const project = projectAtom.value
 
     // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
-    // const dirtySelectors = selTabInfo.filter(item => item.avid !== item.initAvid)
+    // const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
 
     // const needSave = isHtmlDirty || dirtySelectors.length > 0
     // let shouldSave:boolean
@@ -393,13 +344,13 @@ export default function ProjectPage(
     openHtml(pageId)
 
     // 销毁当前 page 下所有的 selector model
-    selTabInfo.forEach(item => {
+    selectorTabItems.forEach(item => {
       // TODO 如果当前 model 尚未保存，需要询问用户是否需要保存
       const uri = monaco.Uri.parse(item.uriString)
       const model = monaco.editor.getModel(uri)
       model.dispose()
     })
-    selTabInfoUpdaters.clear()
+    selectorTabItemsManager.clear()
 
     if (page.selectors.length > 0) {
       openSelector(pageId, page.selectors[0].name)
@@ -487,24 +438,22 @@ export default function ProjectPage(
 
   async function onDeleteSelector(selectorName: string) {
     console.assert(activePageId !== -1)
-    const project = projectAtom.value
     if (!(await dialogs.confirm({ message: `确定要删除选择器 '${selectorName}' 吗？` }))) {
       return
     }
+    const project = projectAtom.value
     const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
     const page = project.pages[pageIndex]
     const nextSelectors = page.selectors.filter(sel => sel.name != selectorName)
 
     // 乐观更新
-    setProject({
-      // TODO 使用 immutable-js / immer
-      ...project,
-      pages: [
-        ...project.pages.slice(0, pageIndex),
-        { ...page, selectors: nextSelectors },
-        ...project.pages.slice(pageIndex + 1),
-      ],
-    })
+    setProjectAtom(
+      produce(atom => {
+        const page = atom.value.pages[pageIndex]
+        page.selectors = nextSelectors
+      }),
+    )
+
     if (activeSelectorName === selectorName) {
       setActiveSelectorName('')
     }
@@ -557,8 +506,7 @@ export default function ProjectPage(
             <SelectTabList
               tabItems={selectorTabItems}
               activeIndex={activeSelectorTabIndex}
-              onChangeActiveIndex={onChangeActiveSelectorTabIndex}
-              onClose={onCloseSelectorTab}
+              {...selectorTabListHandlers}
             />
             <EditorWrapper editorRef={selectorEditorRef} options={INIT_EDITOR_OPTIONS.selector} />
           </>

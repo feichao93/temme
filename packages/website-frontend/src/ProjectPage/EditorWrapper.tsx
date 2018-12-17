@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as monaco from 'monaco-editor'
 import { useEffect, useRef } from 'react'
 import React from 'react'

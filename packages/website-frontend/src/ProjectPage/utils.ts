@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as monaco from 'monaco-editor'
 
 export type CodeEditor = monaco.editor.IStandaloneCodeEditor

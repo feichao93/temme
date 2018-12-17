@@ -45,10 +45,15 @@ export const OutputTablist = React.memo(() => (
   </div>
 ))
 
+function isTabItemDirty(tabItem: TabItem) {
+  return tabItem.avid !== tabItem.initAvid
+}
+
 export interface TabItem {
   uriString: string
   name: string
-  dirty: boolean
+  avid: number
+  initAvid: number
 }
 
 export interface SelectTabListProps {
@@ -75,7 +80,7 @@ export function SelectTabList({
         >
           <FileIcon />
           <span className="tabname">{tabItem.name}</span>
-          {React.createElement(tabItem.dirty ? CloseDirtyIcon : CloseIcon, {
+          {React.createElement(isTabItemDirty(tabItem) ? CloseDirtyIcon : CloseIcon, {
             size: 16,
             onClick(e: any) {
               e.stopPropagation()
