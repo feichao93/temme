@@ -27,7 +27,6 @@ export default function ProjectDialog(props: ProjectDialogProps) {
   }
 
   const onConfirm = async () => {
-    // todo 根据projectId 发送请求
     try {
       if (projectId === -1) {
         await addProject(nameState, descState)

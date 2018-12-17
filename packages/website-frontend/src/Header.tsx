@@ -2,17 +2,24 @@ import { useSession } from './utils/session'
 import { Link } from 'react-router-dom'
 import { GithubIcon } from './icons'
 import React from 'react'
+import './Header.styl'
 
 export default function Header() {
   const { login, connected, username, userId } = useSession()
 
   return (
-    <div className="title-bar">
+    <div className="nav-bar">
       <div className="container">
         <div className="align-left">
-          <div className="name">
-            <Link to="/">temme</Link>
+          <div className="logo">
+            <Link to="/">Temme</Link>
           </div>
+          <a href="https://github.com/shinima/temme" target="_blank" className="nav-link">
+            Github
+          </a>
+          <a href="https://github.com/shinima/temme#%E6%96%87%E6%A1%A3%E9%93%BE%E6%8E%A5" target="_blank" className="nav-link">
+            Docs
+          </a>
         </div>
         <div className="align-right">
           {connected &&
