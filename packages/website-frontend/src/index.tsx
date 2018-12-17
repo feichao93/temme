@@ -4,17 +4,14 @@ import App from './App'
 import { Router } from 'react-router'
 import history from './utils/history'
 import { SessionProvider } from './utils/session'
-import { DialogProvider } from './Dialog/dialog'
 
 function render(Component: typeof App) {
   ReactDOM.render(
-    <DialogProvider>
-      <SessionProvider>
-        <Router history={history}>
-          <Component />
-        </Router>
-      </SessionProvider>
-    </DialogProvider>,
+    <SessionProvider>
+      <Router history={history}>
+        <Component />
+      </Router>
+    </SessionProvider>,
     document.querySelector('#app'),
   )
 }

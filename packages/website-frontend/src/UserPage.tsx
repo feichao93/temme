@@ -3,11 +3,10 @@ import { Link } from 'react-router-dom'
 import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import Header from './Header'
-import './UserPage.styl'
 import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
 import { DeleteIcon, EditIcon, GithubIcon } from './icons'
-import { ProjectDialog } from './Dialog/ProjectDialog'
-import { useDialog } from './Dialog/dialog'
+import ProjectDialog from './Dialog/ProjectDialog'
+import './UserPage.styl'
 
 export default function UserPage() {
   return (
@@ -68,7 +67,10 @@ function UserProjects() {
     projectId: -1,
     description: '',
   })
-  const { openDialog, show } = useDialog()
+  const [show, setShow] = useState(false)
+  const onOpen = () => setShow(true)
+  const onClose = () => setShow(false)
+
   const fetchUserProjects = async (username: string) => {
     try {
       const projects = await getUserProjects(username)
@@ -88,7 +90,7 @@ function UserProjects() {
 
   const createProject = () => {
     setSelectedProjectState({ name: '', projectId: -1, description: '' })
-    openDialog()
+    onOpen()
   }
 
   const handleDeleteProject = async (projectId: number, name: string) => {
@@ -106,7 +108,7 @@ function UserProjects() {
   const handleEditProject = (project: Project) => {
     const { name, description, projectId } = project
     setSelectedProjectState({ name, description, projectId })
-    openDialog()
+    onOpen()
   }
 
   const updateTime = (lastUpdate: string) => {
@@ -153,7 +155,12 @@ function UserProjects() {
             </div>
           ))}
       </div>
-      {show && <ProjectDialog {...{ ...selectedProjectState, username, fetchUserProjects }} />}
+      <ProjectDialog
+        key={selectedProjectState.projectId}
+        show={show}
+        onClose={onClose}
+        {...{ ...selectedProjectState, username, fetchUserProjects }}
+      />
     </div>
   )
 }

@@ -1,23 +1,40 @@
 import React from 'react'
 import { createPortal } from 'react-dom'
 import '../Dialog.styl'
-import classNames from 'classnames'
-import { useDialog } from './dialog'
 
-export function DialogContainer({ children }: { children: JSX.Element }) {
-  const { show, closeDialog } = useDialog()
-  function onClose(event: React.MouseEvent<HTMLDivElement>) {
+interface DialogContainerProps {
+  show: boolean
+  onClose(): void
+  children: React.ReactNode
+  canOutsideClickClose: boolean
+}
+
+export function DialogContainer({
+  show,
+  onClose,
+  children,
+  canOutsideClickClose,
+}: DialogContainerProps) {
+  if (!show) {
+    return null
+  }
+
+  function onClickOverlay(event: React.MouseEvent<HTMLDivElement>) {
     const target = event.target as HTMLDivElement
-    if (target.id === 'dialog') {
-      closeDialog()
+    if (target.dataset.dialogoverlay) {
+      if (canOutsideClickClose) {
+        onClose()
+      }
     }
   }
+
   return createPortal(
-    <div id="dialog" className={classNames('dialog', { show })} onClick={onClose}>
-      <div className="dialog-container">{children}</div>
+    <div data-dialogoverlay className="dialog-container" onClick={onClickOverlay}>
+      <div className="dialog">{children}</div>
     </div>,
     document.getElementById('app'),
   )
 }
-
-
+DialogContainer.defaultProps = {
+  canOutsideClickClose: true,
+}
