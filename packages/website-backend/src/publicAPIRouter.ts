@@ -15,6 +15,10 @@ publicAPIRouter.get('/my-info', async ctx => {
     ctx.body = { userId: -1, login: null }
   }
 })
+publicAPIRouter.get('/logout', async ctx => {
+  ctx.session = null
+  ctx.status = 200
+})
 
 // 请求client id
 publicAPIRouter.get('/client-id', async ctx => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, match } from 'react-router-dom'
 import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import Header from './Header'
@@ -8,20 +8,24 @@ import { DeleteIcon, EditIcon, GithubIcon } from './icons'
 import ProjectDialog from './Dialog/ProjectDialog'
 import './UserPage.styl'
 
-export default function UserPage() {
+interface Params {
+  login: string
+}
+
+export default function UserPage({ match }: { match: match<Params> }) {
   return (
     <>
       <Header />
       <div className="user-page">
-        <UserProfile />
-        <UserProjects />
+        <UserProfile login={match.params.login} />
+        <UserProjects login={match.params.login} />
       </div>
     </>
   )
 }
 
-function UserProfile() {
-  const { username } = useSession()
+function UserProfile({ login }: { login: string }) {
+  const { username, logout } = useSession()
   const [userInfoState, setUserInfoState] = useState(null as UserInfo)
   const fetchUserInfo = async (username: string) => {
     try {
@@ -33,18 +37,18 @@ function UserProfile() {
   }
   useEffect(
     () => {
-      if (username) {
-        fetchUserInfo(username)
+      if (login) {
+        fetchUserInfo(login)
       }
     },
-    [username],
+    [login],
   )
   return (
     userInfoState && (
       <div className="user-profile">
         <img src={userInfoState.avatar_url} alt="avatar-icon" />
         <div className="fullname">{userInfoState.name}</div>
-        <div className="username">{username}</div>
+        <div className="username">{login}</div>
         <div className="bio">{userInfoState.bio}</div>
         <a className="email" href={`mailto:${userInfoState.email}`}>
           {userInfoState.email}
@@ -54,12 +58,22 @@ function UserProfile() {
         <Link to={userInfoState.html_url} target="_blank">
           <GithubIcon size={30} />
         </Link>
+        {username === login && (
+          <div
+            onClick={() => {
+              logout()
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            Sign out
+          </div>
+        )}
       </div>
     )
   )
 }
 
-function UserProjects() {
+function UserProjects({ login }: { login: string }) {
   const { username } = useSession()
   const [projectsState, setProjectsState] = useState([] as Project[])
   const [selectedProjectState, setSelectedProjectState] = useState({
@@ -81,11 +95,11 @@ function UserProjects() {
   }
   useEffect(
     () => {
-      if (username) {
-        fetchUserProjects(username)
+      if (login) {
+        fetchUserProjects(login)
       }
     },
-    [username],
+    [login],
   )
 
   const createProject = () => {
@@ -98,7 +112,7 @@ function UserProjects() {
       try {
         await deleteProject(projectId)
         alert('删除成功')
-        fetchUserProjects(username)
+        fetchUserProjects(login)
       } catch (e) {
         alert('删除失败，请稍后再试')
       }
@@ -131,27 +145,35 @@ function UserProjects() {
           Project
           <span className="count">{projectsState.length}</span>
         </div>
-        <button onClick={createProject} className="create-project-button align-right">
-          New Project
-        </button>
+        {username === login && (
+          <button onClick={createProject} className="create-project-button align-right">
+            New Project
+          </button>
+        )}
       </div>
       <div className="project-list">
         {projectsState &&
           projectsState.map((project, index) => (
             <div className="project-item" key={`project-${index}`}>
-              <Link className="project-name" to={`/@${username}/${project.name}`}>
-                {project.name}
-              </Link>
+              {username === login ? (
+                <Link className="project-name" to={`/@${login}/${project.name}`}>
+                  {project.name}
+                </Link>
+              ) : (
+                <div className="project-name">{project.name}</div>
+              )}
               <div className="project-description">{project.description}</div>
               <div className="project-update">{updateTime(project.updatedAt)}前更新</div>
-              <div className="manage-project">
-                <span onClick={() => handleEditProject(project)}>
-                  <EditIcon />
-                </span>
-                <span onClick={() => handleDeleteProject(project.projectId, project.name)}>
-                  <DeleteIcon />
-                </span>
-              </div>
+              {username === login && (
+                <div className="manage-project">
+                  <span onClick={() => handleEditProject(project)}>
+                    <EditIcon />
+                  </span>
+                  <span onClick={() => handleDeleteProject(project.projectId, project.name)}>
+                    <DeleteIcon />
+                  </span>
+                </div>
+              )}
             </div>
           ))}
       </div>
@@ -159,7 +181,7 @@ function UserProjects() {
         key={`${show}-${selectedProjectState.projectId}`}
         show={show}
         onClose={onClose}
-        {...{ ...selectedProjectState, username, fetchUserProjects }}
+        {...{ ...selectedProjectState, username: login, fetchUserProjects }}
       />
     </div>
   )
