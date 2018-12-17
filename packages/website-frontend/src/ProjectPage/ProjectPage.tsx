@@ -98,7 +98,6 @@ export default function ProjectPage(props: ProjectPageProps) {
             outputEditor.setValue(newValue)
           }
         } catch (e) {
-          dialogs.alert(e.message)
           console.error(e)
         }
       }
@@ -140,10 +139,9 @@ export default function ProjectPage(props: ProjectPageProps) {
   const onSaveHtmlRef = useRef(noop)
   useDidMount(() => {
     const htmlEditor = htmlEditorRef.current
-    const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
     // 使用闭包来访问 onSaveSelectorRef.current 的最新值
     const handler = () => onSaveHtmlRef.current()
-    htmlEditor.addCommand(keybinding, handler, '')
+    htmlEditor.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
@@ -159,7 +157,7 @@ export default function ProjectPage(props: ProjectPageProps) {
           await server.saveHtml(activePageId, model.getValue())
           updateHtmlTabInfo(info => ({ ...info, initAvid: nextInitAvid }))
         } catch (e) {
-          console.error(e)
+          await dialogs.alert(e.message)
         }
       }
     },
@@ -174,8 +172,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         return
       }
       const disposable = model.onDidChangeContent(() => {
-        const uri = model.uri.toString()
-        selectorTabManager.updateAvid(uri, model.getAlternativeVersionId())
+        selectorTabManager.updateActiveAvid(model.getAlternativeVersionId())
       })
 
       return () => {
@@ -219,7 +216,6 @@ export default function ProjectPage(props: ProjectPageProps) {
             }),
           )
         } catch (e) {
-          console.error(e)
           await dialogs.alert(e.message)
         }
       }
@@ -382,25 +378,16 @@ export default function ProjectPage(props: ProjectPageProps) {
       if (!confirm(`确定要删除 ${page.name} 吗？该页面内的选择器都将被清空`)) {
         return
       }
-      // 乐观更新
-      const nextPages = project.pages.filter(page => page.pageId !== pageId)
-      setProject({ ...project, pages: nextPages })
-      if (activePageId === pageId) {
-        setActivePageId(-1)
-      }
 
       try {
-        const { ok, reason } = await server.deletePage(pageId)
-        if (!ok) {
-          // 更新失败，回滚
-          setProject(project)
-          console.warn(reason)
-          return
+        await server.deletePage(pageId)
+        const nextPages = project.pages.filter(page => page.pageId !== pageId)
+        setProject({ ...project, pages: nextPages })
+        if (activePageId === pageId) {
+          setActivePageId(-1)
         }
       } catch (e) {
-        // 更新失败，回滚
-        setProject(project)
-        console.error(e)
+        await dialogs.alert(e.message)
       }
     },
 
@@ -457,7 +444,6 @@ export default function ProjectPage(props: ProjectPageProps) {
           selectorTabManager.setActiveUri(null)
         }
       } catch (e) {
-        console.error(e)
         await dialogs.alert(e.message)
       }
     },

@@ -53,9 +53,7 @@ export async function deletePage(pageId: number) {
     body: JSON.stringify({ pageId }),
   })
   if (!response.ok) {
-    return { ok: false, reason: await response.text() }
-  } else {
-    return { ok: true }
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 

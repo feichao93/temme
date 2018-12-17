@@ -15,6 +15,7 @@ export default function useTabManager() {
     update(
       produce(state => {
         state.items = []
+        state.activeIndex = -1
       }),
     )
   }
@@ -27,11 +28,10 @@ export default function useTabManager() {
     )
   }
 
-  function updateAvid(uri: string, avid: number) {
+  function updateActiveAvid(avid: number) {
     update(
       produce(state => {
-        const targetItem = state.items.find(item => item.uri === uri)
-        targetItem.avid = avid
+        state.items[state.activeIndex].avid = avid
       }),
     )
   }
@@ -68,7 +68,7 @@ export default function useTabManager() {
     items,
     add,
     remove,
-    updateAvid,
+    updateActiveAvid,
     updateActiveInitAvid,
     clear,
     activeIndex,
