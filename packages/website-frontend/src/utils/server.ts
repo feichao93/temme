@@ -66,9 +66,7 @@ export async function deleteSelector(pageId: number, selectorName: string) {
     body: JSON.stringify({ pageId, name: selectorName }),
   })
   if (!response.ok) {
-    return { ok: false, reason: await response.text() }
-  } else {
-    return { ok: true }
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 

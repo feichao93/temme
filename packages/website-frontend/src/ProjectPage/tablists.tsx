@@ -50,7 +50,7 @@ function isTabItemDirty(tabItem: TabItem) {
 }
 
 export interface TabItem {
-  uriString: string
+  uri: string
   name: string
   avid: number
   initAvid: number

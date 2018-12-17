@@ -38,3 +38,9 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
 }
 
 export function noop() {}
+
+export const CTRL_S = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
+
+export function getSelectorUri(pageId: number, selectorName: string) {
+  return `inmemory://selector/${pageId}/${selectorName}`
+}

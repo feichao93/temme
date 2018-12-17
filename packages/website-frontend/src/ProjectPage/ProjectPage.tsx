@@ -15,8 +15,8 @@ import PageLayout from './PageLayout'
 import './ProjectPage.styl'
 import Sidebar from './Sidebar'
 import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
-import useTabItemsManager from './useTabItemsManager'
-import { CodeEditor, INIT_EDITOR_OPTIONS, noop } from './utils'
+import useTabManager from './useTabManager'
+import { CodeEditor, CTRL_S, getSelectorUri, INIT_EDITOR_OPTIONS, noop } from './utils'
 
 type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
 
@@ -29,19 +29,15 @@ export default function ProjectPage(props: ProjectPageProps) {
   const outputEditorRef = useRef<CodeEditor>(null)
 
   const [activePageId, setActivePageId] = useState(-1)
-  const [activeSelectorName, setActiveSelectorName] = useState('')
 
   const [htmlTabInfo, updateHtmlTabInfo] = useState({ initAvid: -1, avid: -1 })
-  const selectorTabItemsManager = useTabItemsManager()
-  const selectorTabItems = selectorTabItemsManager.items
-
-  const activeSelectorTabIndex = selectorTabItems.findIndex(
-    item => item.name === activeSelectorName,
-  )
+  const selectorTabManager = useTabManager()
+  const selectorTabItems = selectorTabManager.items
+  const activeSelectorTabIndex = selectorTabManager.activeIndex
 
   const selectorTabListHandlers = {
     onChangeActiveIndex(index: number) {
-      openSelector(activePageId, selectorTabItems[index].name)
+      openSelector(activePageId, selectorTabItems[index].uri)
     },
 
     async onClose(index: number) {
@@ -60,20 +56,20 @@ export default function ProjectPage(props: ProjectPageProps) {
         }
       }
 
-      if (activeSelectorName === info.name) {
+      if (selectorTabManager.activeTabName === info.name) {
         // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
         if (selectorTabItems.length === 1) {
           closeSelector()
         } else {
           if (index === 0) {
-            openSelector(activePageId, selectorTabItems[1].name)
+            openSelector(activePageId, selectorTabItems[1].uri)
           } else {
-            openSelector(activePageId, selectorTabItems[index - 1].name)
+            openSelector(activePageId, selectorTabItems[index - 1].uri)
           }
         }
       }
-      selectorTabItemsManager.remove(index)
-      const model = monaco.editor.getModel(monaco.Uri.parse(info.uriString))
+      selectorTabManager.remove(index)
+      const model = monaco.editor.getModel(monaco.Uri.parse(info.uri))
       model.dispose()
     },
   }
@@ -120,7 +116,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         disposable2.dispose()
       }
     },
-    [activePageId, activeSelectorName],
+    [activePageId, selectorTabManager.activeUri],
   )
 
   // 监听 htmlEditor 中的变化，自动更新 htmlTabInfo 中的 avid
@@ -178,15 +174,15 @@ export default function ProjectPage(props: ProjectPageProps) {
         return
       }
       const disposable = model.onDidChangeContent(() => {
-        const uriString = model.uri.toString()
-        selectorTabItemsManager.updateAvid(uriString, model.getAlternativeVersionId())
+        const uri = model.uri.toString()
+        selectorTabManager.updateAvid(uri, model.getAlternativeVersionId())
       })
 
       return () => {
         disposable.dispose()
       }
     },
-    [activePageId, activeSelectorName],
+    [activePageId, selectorTabManager.activeUri],
   )
 
   // monaco editor 不支持 removeCommand 操作
@@ -194,16 +190,14 @@ export default function ProjectPage(props: ProjectPageProps) {
   const onSaveSelectorRef = useRef(noop)
   useDidMount(() => {
     const selectorEditor = selectorEditorRef.current
-    const keybinding = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
     // 使用闭包来访问 onSaveSelectorRef.current 的最新值
     const handler = () => onSaveSelectorRef.current()
-    selectorEditor.addCommand(keybinding, handler, '')
+    selectorEditor.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
     () => {
-      const hasSelectorOpen = activePageId !== -1 && activeSelectorName
-      if (!hasSelectorOpen) {
+      if (!selectorTabManager.activeItem) {
         onSaveSelectorRef.current = noop
         return
       }
@@ -212,11 +206,11 @@ export default function ProjectPage(props: ProjectPageProps) {
         const model = selectorEditorRef.current.getModel()
         const content = model.getValue()
         const nextInitAvid = model.getAlternativeVersionId()
-        const uriString = model.uri.toString()
+        const activeSelectorName = selectorTabManager.activeTabName
 
         try {
           await server.saveSelector(activePageId, activeSelectorName, content)
-          selectorTabItemsManager.updateInitAvid(uriString, nextInitAvid)
+          selectorTabManager.updateActiveInitAvid(nextInitAvid)
           setProjectAtom(
             produce(draft => {
               const page = draft.value.pages.find(page => page.pageId === activePageId)
@@ -230,7 +224,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         }
       }
     },
-    [activePageId, activeSelectorName],
+    [selectorTabManager.activeUri],
   )
 
   const [projectAtom, setProjectAtom] = useState<Atom<ProjectRecord>>({
@@ -260,7 +254,8 @@ export default function ProjectPage(props: ProjectPageProps) {
           openHtml(firstPage.pageId)
 
           if (firstPage.selectors.length > 0) {
-            openSelector(firstPage.pageId, firstPage.selectors[0].name)
+            const firstSelector = firstPage.selectors[0]
+            openSelector(firstPage.pageId, getSelectorUri(firstPage.pageId, firstSelector.name))
           }
         }
       }
@@ -297,173 +292,175 @@ export default function ProjectPage(props: ProjectPageProps) {
   }
 
   /** 在 selector 编辑器中打开 pageId / selectorName 对应的 selector model */
-  function openSelector(pageId: number, selectorName: string) {
+  // TODO 将 pageId 编码到 uri 中
+  function openSelector(pageId: number, uri: string) {
     const project = projectAtom.value
     const page = project.pages.find(p => p.pageId === pageId)
-    const selector = page.selectors.find(sel => sel.name === selectorName)
-    const uriString = `inmemory://selector/${pageId}/${selectorName}`
-    const uri = monaco.Uri.parse(uriString)
-    let model = monaco.editor.getModel(uri)
+    const selector = page.selectors.find(sel => getSelectorUri(page.pageId, sel.name) === uri)
+    const uriObject = monaco.Uri.parse(uri)
+    let model = monaco.editor.getModel(uriObject)
     if (model == null) {
-      model = monaco.editor.createModel(selector.content, null, uri)
+      model = monaco.editor.createModel(selector.content, null, uriObject)
       const initAvid = model.getAlternativeVersionId()
-      selectorTabItemsManager.add(uriString, selectorName, initAvid)
+      selectorTabManager.add(uri, selector.name, initAvid)
     }
     const editor = selectorEditorRef.current
     editor.setModel(model)
     editor.focus()
-    setActiveSelectorName(selector.name)
+    selectorTabManager.setActiveUri(uri)
   }
 
   function closeSelector() {
     selectorEditorRef.current.setModel(null)
-    setActiveSelectorName('')
+    selectorTabManager.setActiveUri(null)
   }
 
-  async function onChoosePage(pageId: number) {
-    const project = projectAtom.value
-
-    // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
-    // const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
-
-    // const needSave = isHtmlDirty || dirtySelectors.length > 0
-    // let shouldSave:boolean
-    // if (needSave) {
-    //   const commonDialogs: any = {}
-    //   const option = await commonDialogs.save('是否将更改保存到 xxx 中？')
-    //   if (option === 'cancel') {
-    //     return
-    //   }
-    //   shouldSave = option === 'yes'
-    // }
-    // if (shouldSave) {
-    //   // TODO executing all the save
-    // }
-
-    const page = project.pages.find(p => p.pageId === pageId)
-    openHtml(pageId)
-
-    // 销毁当前 page 下所有的 selector model
-    selectorTabItems.forEach(item => {
-      // TODO 如果当前 model 尚未保存，需要询问用户是否需要保存
-      const uri = monaco.Uri.parse(item.uriString)
-      const model = monaco.editor.getModel(uri)
-      model.dispose()
-    })
-    selectorTabItemsManager.clear()
-
-    if (page.selectors.length > 0) {
-      openSelector(pageId, page.selectors[0].name)
-    } else {
-      closeSelector()
-    }
-  }
-
-  function onChooseSelector(selectorName: string) {
-    openSelector(activePageId, selectorName)
-  }
-
-  async function onAddPage(pageName: string) {
-    try {
+  const sidebarHandlers = {
+    async onChoosePage(pageId: number) {
       const project = projectAtom.value
-      const result = await server.addPage(project.projectId, pageName)
-      if (result.ok) {
-        const nextPages = project.pages.concat([result.pageRecord])
-        setProject({ ...project, pages: nextPages })
+
+      // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
+      // const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
+
+      // const needSave = isHtmlDirty || dirtySelectors.length > 0
+      // let shouldSave:boolean
+      // if (needSave) {
+      //   const commonDialogs: any = {}
+      //   const option = await commonDialogs.save('是否将更改保存到 xxx 中？')
+      //   if (option === 'cancel') {
+      //     return
+      //   }
+      //   shouldSave = option === 'yes'
+      // }
+      // if (shouldSave) {
+      //   // TODO executing all the save
+      // }
+
+      const page = project.pages.find(p => p.pageId === pageId)
+      openHtml(pageId)
+
+      // 销毁当前 page 下所有的 selector model
+      selectorTabItems.forEach(item => {
+        // TODO 如果当前 model 尚未保存，需要询问用户是否需要保存
+        const uri = monaco.Uri.parse(item.uri)
+        const model = monaco.editor.getModel(uri)
+        model.dispose()
+      })
+      selectorTabManager.clear()
+
+      if (page.selectors.length > 0) {
+        openSelector(pageId, getSelectorUri(pageId, page.selectors[0].name))
       } else {
-        // TODO use the global dialog
-        console.warn(result.reason)
+        closeSelector()
       }
-    } catch (e) {
-      // TODO use the global dialog
-      console.error(e)
-    }
-  }
+    },
 
-  async function onDeletePage(pageId: number) {
-    const project = projectAtom.value
-    const page = project.pages.find(page => page.pageId === pageId)
-    if (!confirm(`确定要删除 ${page.name} 吗？该页面内的选择器都将被清空`)) {
-      return
-    }
-    // 乐观更新
-    const nextPages = project.pages.filter(page => page.pageId !== pageId)
-    setProject({ ...project, pages: nextPages })
-    if (activePageId === pageId) {
-      setActivePageId(-1)
-    }
+    onChooseSelector(uri: string) {
+      openSelector(activePageId, uri)
+    },
 
-    try {
-      const { ok, reason } = await server.deletePage(pageId)
-      if (!ok) {
+    async onAddPage(pageName: string) {
+      try {
+        const project = projectAtom.value
+        const result = await server.addPage(project.projectId, pageName)
+        if (result.ok) {
+          const nextPages = project.pages.concat([result.pageRecord])
+          setProject({ ...project, pages: nextPages })
+        } else {
+          // TODO use the global dialog
+          console.warn(result.reason)
+        }
+      } catch (e) {
+        // TODO use the global dialog
+        console.error(e)
+      }
+    },
+
+    async onDeletePage(pageId: number) {
+      const project = projectAtom.value
+      const page = project.pages.find(page => page.pageId === pageId)
+      if (!confirm(`确定要删除 ${page.name} 吗？该页面内的选择器都将被清空`)) {
+        return
+      }
+      // 乐观更新
+      const nextPages = project.pages.filter(page => page.pageId !== pageId)
+      setProject({ ...project, pages: nextPages })
+      if (activePageId === pageId) {
+        setActivePageId(-1)
+      }
+
+      try {
+        const { ok, reason } = await server.deletePage(pageId)
+        if (!ok) {
+          // 更新失败，回滚
+          setProject(project)
+          console.warn(reason)
+          return
+        }
+      } catch (e) {
         // 更新失败，回滚
         setProject(project)
-        console.warn(reason)
-        return
+        console.error(e)
       }
-    } catch (e) {
-      // 更新失败，回滚
-      setProject(project)
-      console.error(e)
-    }
-  }
+    },
 
-  async function onAddSelector(selectorName: string) {
-    console.assert(activePageId !== -1)
-    try {
-      // TODO add-file 这个路由有点不太对劲
-      const response = await fetch('/api/add-file', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ pageId: activePageId, name: selectorName }),
-      })
-      if (!response.ok) {
+    async onAddSelector(selectorName: string) {
+      console.assert(activePageId !== -1)
+      try {
+        // TODO add-file 这个路由有点不太对劲
+        const response = await fetch('/api/add-file', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ pageId: activePageId, name: selectorName }),
+        })
+        if (!response.ok) {
+          // TODO use the global dialog
+          console.warn(await response.text())
+          return
+        }
+
+        // TODO 避免重新载入 project
+        const { ok, reason, project } = await server.getProject(login, projectName)
+        if (ok) {
+          setProject(project)
+        } else {
+          alert(reason)
+        }
+      } catch (e) {
         // TODO use the global dialog
-        console.warn(await response.text())
+        console.error(e)
+      }
+    },
+
+    async onDeleteSelector(uri: string) {
+      console.assert(activePageId !== -1)
+      const project = projectAtom.value
+      const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
+      const page = project.pages[pageIndex]
+      const selector = page.selectors.find(sel => getSelectorUri(page.pageId, sel.name) === uri)
+      if (!(await dialogs.confirm({ message: `确定要删除选择器 '${selector.name}' 吗？` }))) {
         return
       }
 
-      // TODO 避免重新载入 project
-      const { ok, reason, project } = await server.getProject(login, projectName)
-      if (ok) {
-        setProject(project)
-      } else {
-        alert(reason)
+      try {
+        await server.deleteSelector(activePageId, selector.name)
+        setProjectAtom(
+          produce(atom => {
+            const project = atom.value
+            const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
+            const page = project.pages[pageIndex]
+            const selectorIndex = page.selectors.findIndex(sel => sel.name === uri)
+            page.selectors.splice(selectorIndex, 1)
+          }),
+        )
+        if (selectorTabManager.activeTabName === uri) {
+          selectorTabManager.setActiveUri(null)
+        }
+      } catch (e) {
+        console.error(e)
+        await dialogs.alert(e.message)
       }
-    } catch (e) {
-      // TODO use the global dialog
-      console.error(e)
-    }
-  }
-
-  async function onDeleteSelector(selectorName: string) {
-    console.assert(activePageId !== -1)
-    if (!(await dialogs.confirm({ message: `确定要删除选择器 '${selectorName}' 吗？` }))) {
-      return
-    }
-    const project = projectAtom.value
-    const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
-    const page = project.pages[pageIndex]
-    const nextSelectors = page.selectors.filter(sel => sel.name != selectorName)
-
-    // 乐观更新
-    setProjectAtom(
-      produce(atom => {
-        const page = atom.value.pages[pageIndex]
-        page.selectors = nextSelectors
-      }),
-    )
-
-    if (activeSelectorName === selectorName) {
-      setActiveSelectorName('')
-    }
-
-    const { ok, reason } = await server.deleteSelector(activePageId, selectorName)
-    if (!ok) {
-      setProject(project)
-      setActiveSelectorName(activeSelectorName)
-      console.warn(reason)
-    }
+    },
   }
 
   return (
@@ -482,14 +479,9 @@ export default function ProjectPage(props: ProjectPageProps) {
         sidebar={
           <Sidebar
             projectAtom={projectAtom}
-            onChooseSelector={onChooseSelector}
             activePageId={activePageId}
-            activeSelectorName={activeSelectorName}
-            onChoosePage={onChoosePage}
-            onAddPage={onAddPage}
-            onDeletePage={onDeletePage}
-            onAddSelector={onAddSelector}
-            onDeleteSelector={onDeleteSelector}
+            activeSelectorName={selectorTabManager.activeTabName}
+            {...sidebarHandlers}
           />
         }
         left={

@@ -4,17 +4,18 @@ import { PageRecord, ProjectRecord } from './interfaces'
 import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
 import { Atom } from '../utils/atoms'
 import './Sidebar.styl'
+import { getSelectorUri } from './utils'
 
 export interface SidebarProps {
   projectAtom: Atom<ProjectRecord>
   activePageId: number
   activeSelectorName: string
   onChoosePage(pageId: number): void
-  onChooseSelector(selectorName: string): void
+  onChooseSelector(uri: string): void
   onAddPage(pageName: string): void
   onDeletePage(pageId: number): void
   onAddSelector(selectorName: string): void
-  onDeleteSelector(selectorName: string): void
+  onDeleteSelector(uri: string): void
 }
 
 // TODO
@@ -121,7 +122,7 @@ export default function Sidebar({
                 <li
                   key={sel.name}
                   className={classNames({ active: sel.name === activeSelectorName })}
-                  onClick={() => onChooseSelector(sel.name)}
+                  onClick={() => onChooseSelector(getSelectorUri(activePageId, sel.name))}
                 >
                   <span className="selector-name">{sel.name}</span>
                   <span className="actions">
@@ -134,7 +135,7 @@ export default function Sidebar({
                     <DeleteIcon
                       onClick={e => {
                         e.stopPropagation()
-                        onDeleteSelector(sel.name)
+                        onDeleteSelector(getSelectorUri(activePageId, sel.name))
                       }}
                     />
                   </span>
