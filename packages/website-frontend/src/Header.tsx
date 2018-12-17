@@ -23,7 +23,12 @@ export default function Header() {
               </button>
             ) : (
               <Link to={`/@${username}`} className="button auth">
-                <GithubIcon src={`https://github.com/${username}.png?size=50`} />
+                <img
+                  alt="icon"
+                  src={`https://github.com/${username}.png?size=40`}
+                  width={20}
+                  height={20}
+                />
                 <div style={{ margin: 10 }}>{username}</div>
               </Link>
             ))}
