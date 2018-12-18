@@ -37,7 +37,7 @@ export function DeleteIcon({ disabled, onClick, size }: IconProps) {
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="#f44336"
+      fill="#c5c5c5"
     >
       <path d="M 10 3 L 9 4 L 5 4 L 5 6 L 19 6 L 19 4 L 15 4 L 14 3 L 10 3 z M 6 7 L 6 20 C 6 21.1 6.9 22 8 22 L 16 22 C 17.1 22 18 21.1 18 20 L 18 7 L 6 7 z M 9 10 L 11 10 L 11 19 L 9 19 L 9 10 z M 13 10 L 15 10 L 15 19 L 13 19 L 13 10 z" />
     </svg>

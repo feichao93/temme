@@ -16,7 +16,7 @@ import './ProjectPage.styl'
 import Sidebar from './Sidebar'
 import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
 import useTabManager from './useTabManager'
-import { CodeEditor, CTRL_S, getSelectorUri, INIT_EDITOR_OPTIONS, noop } from './utils'
+import { CodeEditor, CTRL_S, getSelectorUri, INIT_EDITOR_OPTIONS, noop, getHtmlUri } from './utils'
 
 type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
 
@@ -37,7 +37,7 @@ export default function ProjectPage(props: ProjectPageProps) {
 
   const selectorTabListHandlers = {
     onChangeActiveIndex(index: number) {
-      openSelector(activePageId, selectorTabItems[index].uri)
+      openSelector(activePageId, selectorTabItems[index].name)
     },
 
     async onClose(index: number) {
@@ -66,9 +66,9 @@ export default function ProjectPage(props: ProjectPageProps) {
           closeSelector()
         } else {
           if (index === 0) {
-            openSelector(activePageId, selectorTabItems[1].uri)
+            openSelector(activePageId, selectorTabItems[1].name)
           } else {
-            openSelector(activePageId, selectorTabItems[index - 1].uri)
+            openSelector(activePageId, selectorTabItems[index - 1].name)
           }
         }
       }
@@ -143,26 +143,23 @@ export default function ProjectPage(props: ProjectPageProps) {
   const onSaveHtmlRef = useRef(noop)
   useDidMount(() => {
     const htmlEditor = htmlEditorRef.current
-    // 使用闭包来访问 onSaveSelectorRef.current 的最新值
-    const handler = () => onSaveHtmlRef.current()
+    const handler = async () => {
+      try {
+        // 使用闭包来访问 onSaveHtmlRef.current 的最新值
+        await onSaveHtmlRef.current()
+      } catch (e) {
+        dialogs.alert({ title: '', message: e.message })
+      }
+    }
     htmlEditor.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
     () => {
       if (activePageId === -1) {
-        return
-      }
-
-      onSaveHtmlRef.current = async () => {
-        const model = htmlEditorRef.current.getModel()
-        const nextInitAvid = model.getAlternativeVersionId()
-        try {
-          await server.saveHtml(activePageId, model.getValue())
-          updateHtmlTabInfo(info => ({ ...info, initAvid: nextInitAvid }))
-        } catch (e) {
-          await dialogs.alert(e.message)
-        }
+        onSaveHtmlRef.current = noop
+      } else {
+        onSaveHtmlRef.current = () => saveHtml(activePageId)
       }
     },
     [activePageId],
@@ -191,9 +188,9 @@ export default function ProjectPage(props: ProjectPageProps) {
   const onSaveSelectorRef = useRef(noop)
   useDidMount(() => {
     const selectorEditor = selectorEditorRef.current
-    // 使用闭包来访问 onSaveSelectorRef.current 的最新值
     async function handler() {
       try {
+        // 使用闭包来访问 onSaveSelectorRef.current 的最新值
         onSaveSelectorRef.current()
       } catch (e) {
         await dialogs.alert({ message: e.message })
@@ -205,9 +202,8 @@ export default function ProjectPage(props: ProjectPageProps) {
   useEffect(
     () => {
       if (selectorTabManager.activeUri) {
-        onSaveSelectorRef.current = () => {
-          return saveSelector(activePageId, selectorTabManager.activeTabName)
-        }
+        onSaveSelectorRef.current = () =>
+          saveSelector(activePageId, selectorTabManager.activeTabName)
       } else {
         onSaveSelectorRef.current = noop
       }
@@ -215,12 +211,28 @@ export default function ProjectPage(props: ProjectPageProps) {
     [selectorTabManager.activeUri],
   )
 
+  /** 获取 pageId 在编辑器中的 model 的值，将其保存到服务器
+   * 然后更新 htmlTabInfo */
+  async function saveHtml(pageId: number) {
+    const uri = getHtmlUri(pageId)
+    const uriObject = monaco.Uri.parse(uri)
+    const model = monaco.editor.getModel(uriObject)
+    const content = model.getValue()
+    const nextInitAvid = model.getAlternativeVersionId()
+    await server.saveHtml(activePageId, content)
+    updateHtmlTabInfo(
+      produce(info => {
+        info.initAvid = nextInitAvid
+      }),
+    )
+  }
+
   /** 获取 pageId/selectorName 在编辑器中的 model 的值，将其保存到服务器
    * 然后更新 selectorTabManager 和 project 的状态 */
   async function saveSelector(pageId: number, selectorName: string) {
     const uri = getSelectorUri(pageId, selectorName)
-    const parsedUri = monaco.Uri.parse(uri)
-    const model = monaco.editor.getModel(parsedUri)
+    const uriObject = monaco.Uri.parse(uri)
+    const model = monaco.editor.getModel(uriObject)
     const content = model.getValue()
     const nextInitAvid = model.getAlternativeVersionId()
     await server.saveSelector(pageId, selectorName, content)
@@ -262,7 +274,7 @@ export default function ProjectPage(props: ProjectPageProps) {
 
           if (firstPage.selectors.length > 0) {
             const firstSelector = firstPage.selectors[0]
-            openSelector(firstPage.pageId, getSelectorUri(firstPage.pageId, firstSelector.name))
+            openSelector(firstPage.pageId, firstSelector.name)
           }
         }
       }
@@ -277,19 +289,20 @@ export default function ProjectPage(props: ProjectPageProps) {
 
   /** 让各个编辑器重新根据父元素的大小进行布局 */
   function layout() {
-    htmlEditorRef.current.layout()
-    selectorEditorRef.current.layout()
-    outputEditorRef.current.layout()
+    // 用户可能在各个编辑器尚未加载时 调整了浏览器窗口大小
+    htmlEditorRef.current && htmlEditorRef.current.layout()
+    selectorEditorRef.current && selectorEditorRef.current.layout()
+    outputEditorRef.current && outputEditorRef.current.layout()
   }
 
   /** 在 html 编辑器中打开 pageId 对应的 html model */
   function openHtml(pageId: number) {
     const project = projectAtom.value
     const page = project.pages.find(p => p.pageId === pageId)
-    const uri = monaco.Uri.parse(`inmemory://html/${pageId}`)
-    let model = monaco.editor.getModel(uri)
+    const uriObject = monaco.Uri.parse(getHtmlUri(pageId))
+    let model = monaco.editor.getModel(uriObject)
     if (model == null) {
-      model = monaco.editor.createModel(page.html, 'html', uri)
+      model = monaco.editor.createModel(page.html, 'html', uriObject)
       const avid = model.getAlternativeVersionId()
       updateHtmlTabInfo({ avid, initAvid: avid })
     }
@@ -299,11 +312,11 @@ export default function ProjectPage(props: ProjectPageProps) {
   }
 
   /** 在 selector 编辑器中打开 pageId / selectorName 对应的 selector model */
-  // TODO 将 pageId 编码到 uri 中
-  function openSelector(pageId: number, uri: string) {
+  function openSelector(pageId: number, selectorName: string) {
     const project = projectAtom.value
     const page = project.pages.find(p => p.pageId === pageId)
-    const selector = page.selectors.find(sel => getSelectorUri(page.pageId, sel.name) === uri)
+    const selector = page.selectors.find(sel => sel.name === selectorName)
+    const uri = getSelectorUri(pageId, selectorName)
     const uriObject = monaco.Uri.parse(uri)
     let model = monaco.editor.getModel(uriObject)
     if (model == null) {
@@ -326,44 +339,52 @@ export default function ProjectPage(props: ProjectPageProps) {
     async onChoosePage(pageId: number) {
       const project = projectAtom.value
 
-      // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
-      // const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
+      const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
+      const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
 
-      // const needSave = isHtmlDirty || dirtySelectors.length > 0
-      // let shouldSave:boolean
-      // if (needSave) {
-      //   const commonDialogs: any = {}
-      //   const option = await commonDialogs.save('是否将更改保存到 xxx 中？')
-      //   if (option === 'cancel') {
-      //     return
-      //   }
-      //   shouldSave = option === 'yes'
-      // }
-      // if (shouldSave) {
-      //   // TODO executing all the save
-      // }
-
-      const page = project.pages.find(p => p.pageId === pageId)
-      openHtml(pageId)
+      const needSave = isHtmlDirty || dirtySelectors.length > 0
+      if (needSave) {
+        const option = await dialogs.ternary({
+          message: 'HTML或部分选择器尚未保存，是否保存当前更改？',
+        })
+        if (option === 'cancel') {
+          return
+        }
+        if (option === 'yes') {
+          try {
+            const saveHtmlPromise = isHtmlDirty ? saveHtml(activePageId) : Promise.resolve()
+            const saveSelectorPromises = dirtySelectors.map(selector =>
+              saveSelector(activePageId, selector.name),
+            )
+            await Promise.all([saveHtmlPromise, ...saveSelectorPromises])
+          } catch (e) {
+            dialogs.alert(e)
+            return
+          }
+        }
+      }
 
       // 销毁当前 page 下所有的 selector model
       selectorTabItems.forEach(item => {
-        // TODO 如果当前 model 尚未保存，需要询问用户是否需要保存
         const uri = monaco.Uri.parse(item.uri)
         const model = monaco.editor.getModel(uri)
         model.dispose()
       })
       selectorTabManager.clear()
 
+      const page = project.pages.find(p => p.pageId === pageId)
+      openHtml(pageId)
       if (page.selectors.length > 0) {
-        openSelector(pageId, getSelectorUri(pageId, page.selectors[0].name))
+        openSelector(pageId, page.selectors[0].name)
       } else {
         closeSelector()
       }
     },
 
     onChooseSelector(uri: string) {
-      openSelector(activePageId, uri)
+      const page = projectAtom.value.pages.find(p => p.pageId === activePageId)
+      const selector = page.selectors.find(sel => getSelectorUri(activePageId, sel.name) === uri)
+      openSelector(activePageId, selector.name)
     },
 
     async onAddPage(pageName: string) {

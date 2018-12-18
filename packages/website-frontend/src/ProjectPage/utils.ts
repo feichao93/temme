@@ -44,3 +44,7 @@ export const CTRL_S = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
 export function getSelectorUri(pageId: number, selectorName: string) {
   return `inmemory://selector/${pageId}/${selectorName}`
 }
+
+export function getHtmlUri(pageId: number) {
+  return `inmemory://html/${pageId}`
+}
