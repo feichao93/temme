@@ -20,10 +20,11 @@ export default function useTabManager() {
     )
   }
 
-  function updateActiveInitAvid(initAvid: number) {
+  function updateInitAvid(uri: string, initAvid: number) {
     update(
       produce(state => {
-        state.items[state.activeIndex].initAvid = initAvid
+        const item = state.items.find(item => item.uri === uri)
+        item.initAvid = initAvid
       }),
     )
   }
@@ -69,7 +70,7 @@ export default function useTabManager() {
     add,
     remove,
     updateActiveAvid,
-    updateActiveInitAvid,
+    updateInitAvid,
     clear,
     activeIndex,
     setActiveUri,

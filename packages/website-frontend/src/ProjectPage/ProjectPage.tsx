@@ -41,23 +41,27 @@ export default function ProjectPage(props: ProjectPageProps) {
     },
 
     async onClose(index: number) {
-      const info = selectorTabItems[index]
+      const tab = selectorTabManager.items[index]
 
-      const needSave = info.initAvid !== info.avid
+      const needSave = tab.initAvid !== tab.avid
       if (needSave) {
-        const option = await dialogs.ternary({ message: `是否将更改保存到 ${info.name}` })
+        const option = await dialogs.ternary({ message: `是否将更改保存到 ${tab.name}` })
         if (option === 'cancel') {
           return
         }
         if (option === 'yes') {
-          // TODO 根据 index 来保存相应的 selector
-          //  需要向后端发送，然后根据 project 缓存
-          //  LAST EDIT HERE
+          try {
+            await saveSelector(activePageId, tab.name)
+          } catch (e) {
+            console.log(e)
+            dialogs.alert({ title: '保存失败', message: e.message })
+            return
+          }
         }
       }
 
-      if (selectorTabManager.activeTabName === info.name) {
-        // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
+      // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
+      if (selectorTabManager.activeTabName === tab.name) {
         if (selectorTabItems.length === 1) {
           closeSelector()
         } else {
@@ -69,7 +73,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         }
       }
       selectorTabManager.remove(index)
-      const model = monaco.editor.getModel(monaco.Uri.parse(info.uri))
+      const model = monaco.editor.getModel(monaco.Uri.parse(tab.uri))
       model.dispose()
     },
   }
@@ -115,7 +119,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         disposable2.dispose()
       }
     },
-    [activePageId, selectorTabManager.activeUri],
+    [selectorTabManager.activeUri],
   )
 
   // 监听 htmlEditor 中的变化，自动更新 htmlTabInfo 中的 avid
@@ -188,40 +192,47 @@ export default function ProjectPage(props: ProjectPageProps) {
   useDidMount(() => {
     const selectorEditor = selectorEditorRef.current
     // 使用闭包来访问 onSaveSelectorRef.current 的最新值
-    const handler = () => onSaveSelectorRef.current()
+    async function handler() {
+      try {
+        onSaveSelectorRef.current()
+      } catch (e) {
+        await dialogs.alert({ message: e.message })
+      }
+    }
     selectorEditor.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
   useEffect(
     () => {
-      if (!selectorTabManager.activeItem) {
-        onSaveSelectorRef.current = noop
-        return
-      }
-
-      onSaveSelectorRef.current = async () => {
-        const model = selectorEditorRef.current.getModel()
-        const content = model.getValue()
-        const nextInitAvid = model.getAlternativeVersionId()
-        const activeSelectorName = selectorTabManager.activeTabName
-
-        try {
-          await server.saveSelector(activePageId, activeSelectorName, content)
-          selectorTabManager.updateActiveInitAvid(nextInitAvid)
-          setProjectAtom(
-            produce(draft => {
-              const page = draft.value.pages.find(page => page.pageId === activePageId)
-              const selector = page.selectors.find(sel => sel.name === activeSelectorName)
-              selector.content = content
-            }),
-          )
-        } catch (e) {
-          await dialogs.alert(e.message)
+      if (selectorTabManager.activeUri) {
+        onSaveSelectorRef.current = () => {
+          return saveSelector(activePageId, selectorTabManager.activeTabName)
         }
+      } else {
+        onSaveSelectorRef.current = noop
       }
     },
     [selectorTabManager.activeUri],
   )
+
+  /** 获取 pageId/selectorName 在编辑器中的 model 的值，将其保存到服务器
+   * 然后更新 selectorTabManager 和 project 的状态 */
+  async function saveSelector(pageId: number, selectorName: string) {
+    const uri = getSelectorUri(pageId, selectorName)
+    const parsedUri = monaco.Uri.parse(uri)
+    const model = monaco.editor.getModel(parsedUri)
+    const content = model.getValue()
+    const nextInitAvid = model.getAlternativeVersionId()
+    await server.saveSelector(pageId, selectorName, content)
+    selectorTabManager.updateInitAvid(uri, nextInitAvid)
+    setProjectAtom(
+      produce(draft => {
+        const page = draft.value.pages.find(page => page.pageId === pageId)
+        const selector = page.selectors.find(sel => sel.name === selectorName)
+        selector.content = content
+      }),
+    )
+  }
 
   const [projectAtom, setProjectAtom] = useState<Atom<ProjectRecord>>({
     status: 'loading',

@@ -69,6 +69,21 @@ export function SelectTabList({
   onChangeActiveIndex,
   onClose,
 }: SelectTabListProps) {
+  function onMouseDown(e: React.MouseEvent<HTMLDivElement>, index: number) {
+    // 阻止浏览器的默认行为，包括
+    // * 鼠标左键会改变焦点元素
+    // * 鼠标中键会触发滚轮
+    e.preventDefault()
+
+    if (e.button === 0) {
+      // 鼠标左键
+      onChangeActiveIndex(index)
+    } else if (e.button === 1) {
+      // 鼠标中键
+      onClose(index)
+    }
+  }
+
   return (
     <div className="tablist selector-tablist">
       {tabItems.map((tabItem, index) => (
@@ -76,7 +91,7 @@ export function SelectTabList({
           key={index}
           className={classNames('tab', { active: index === activeIndex })}
           draggable
-          onClick={() => onChangeActiveIndex(index)}
+          onMouseDown={e => onMouseDown(e, index)}
         >
           <FileIcon />
           <span className="tabname">{tabItem.name}</span>
