@@ -1,6 +1,7 @@
 import invariant from 'invariant'
 import React, { createContext, useContext, useRef, useState } from 'react'
 import { DialogContainer } from './DialogContainer'
+import './dialog.styl'
 
 // TODO 精简代码
 
@@ -119,9 +120,15 @@ function ConfirmDialogContent({
 }) {
   return (
     <div className="confirm-dialog">
-      {message}
-      <button onClick={() => cbRef.current(true)}>确认</button>
-      <button onClick={() => cbRef.current(false)}>取消</button>
+      <div className="message">{message}</div>
+      <div className="dialog-buttons">
+        <button onClick={() => cbRef.current(true)} className="dialog-button confirm">
+          确认
+        </button>
+        <button onClick={() => cbRef.current(false)} className="dialog-button cancel">
+          取消
+        </button>
+      </div>
     </div>
   )
 }
@@ -159,15 +166,13 @@ function AlertDialogContent({
   message: string
   cbRef: React.RefObject<Callback>
 }) {
-  return (
-    <div className="prompt-dialog">
+  return <div className="prompt-dialog">
       <h1>{title}</h1>
       <h2>{message}</h2>
       <div>
-        <button onClick={() => cbRef.current()}>确认</button>
+         <button onClick={() => cbRef.current()}>确认</button>
       </div>
     </div>
-  )
 }
 
 function TernaryDialogContent({
@@ -181,11 +186,18 @@ function TernaryDialogContent({
 }) {
   return (
     <div className="confirm-dialog">
-      <h1>{title}</h1>
-      <h2>{message}</h2>
-      <button onClick={() => cbRef.current('yes')}>保存</button>
-      <button onClick={() => cbRef.current('no')}>不保存</button>
-      <button onClick={() => cbRef.current('cancel')}>取消</button>
+      <div className="message">{message}</div>
+      <div className="dialog-buttons">
+        <button onClick={() => cbRef.current('yes')} className="dialog-button confirm">
+          保存
+        </button>
+        <button onClick={() => cbRef.current('no')} className="dialog-button cancel">
+          不保存
+        </button>
+        <button onClick={() => cbRef.current('cancel')} className="dialog-button cancel">
+          取消
+        </button>
+      </div>
     </div>
   )
 }

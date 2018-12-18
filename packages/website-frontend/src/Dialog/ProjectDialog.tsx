@@ -49,10 +49,10 @@ export default function ProjectDialog(props: ProjectDialogProps) {
         <div className="name">description</div>
         <input onChange={event => onInputChange(event, setDescState)} value={descState} />
         <div className="dialog-buttons">
-          <button className="button success" onClick={onConfirm}>
+          <button className="dialog-button success" onClick={onConfirm}>
             confirm
           </button>
-          <button className="button error" onClick={onClose}>
+          <button className="dialog-button error" onClick={onClose}>
             cancel
           </button>
         </div>
