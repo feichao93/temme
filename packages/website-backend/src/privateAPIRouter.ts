@@ -74,7 +74,7 @@ privateAPIRouter.post('/delete-project', async ctx => {
   ctx.status = 200
 })
 
-privateAPIRouter.post('/update-project', async ctx => {
+privateAPIRouter.post('/update-roject', async ctx => {
   const { name, description, projectId } = ctx.request.body
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
@@ -101,11 +101,11 @@ privateAPIRouter.post('/add-page', async ctx => {
 
   const project = await ctx.service.projects.findOne({ projectId })
 
-  const existedPagesInThisProject = await ctx.service.pages
-    .find({ pageId: { $in: project.pageIds } })
-    .project({ name: true })
-    .toArray()
-  ctx.assert(existedPagesInThisProject.every(f => f.name !== name), 400, 'Duplicated page name')
+  const pageWithSameName = await ctx.service.pages.findOne({
+    pageId: { $in: project.pageIds },
+    name,
+  })
+  ctx.assert(pageWithSameName == null, 400, 'Duplicated page name')
 
   const pageId = await ctx.service.getNextPageId()
   const now = new Date().toISOString()
@@ -129,6 +129,27 @@ privateAPIRouter.post('/add-page', async ctx => {
   ctx.body = newPage
 })
 
+// rename page
+privateAPIRouter.post('/rename-page', async ctx => {
+  const { pageId, name, projectId } = ctx.request.body
+  ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid new page name - ${name}`)
+
+  const userId = ctx.session.userId
+  const ownership = await ctx.service.checkOwnership(userId, projectId)
+  ctx.assert(ownership, 401, `No access to project with id ${projectId}`)
+
+  const pageWithSameName = await ctx.service.pages.findOne({
+    projectId,
+    pageId: { $not: { $eq: pageId } },
+    name,
+  })
+  ctx.assert(pageWithSameName == null, 400, 'Duplicated page name')
+
+  const now = new Date().toDateString()
+  await ctx.service.pages.updateOne({ pageId }, { $set: { name, updatedAt: now } })
+
+  ctx.status = 200
+})
 // 删除 page
 privateAPIRouter.post('/delete-page', async ctx => {
   const { pageId } = ctx.request.body
@@ -153,7 +174,7 @@ privateAPIRouter.post('/delete-page', async ctx => {
 })
 
 // 新增选择器
-privateAPIRouter.post('/add-file', async ctx => {
+privateAPIRouter.post('/add-selector', async ctx => {
   const { pageId, name } = ctx.request.body
   // TODO check parameters
 

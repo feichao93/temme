@@ -166,3 +166,18 @@ export async function deleteProject(projectId: number) {
     throw new Error(await res.text())
   }
 }
+
+export async function renamePage(projectId: number, pageId: number, name: string) {
+  const res = await fetch('/api/rename-page', {
+    method: 'post',
+    body: JSON.stringify({ name, projectId, pageId }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  if (res.ok) {
+    return true
+  } else {
+    throw new Error(await res.text())
+  }
+}

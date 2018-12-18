@@ -403,6 +403,27 @@ export default function ProjectPage(props: ProjectPageProps) {
         console.error(e)
       }
     },
+    async onRenamePage(pageId: number, oldName: string) {
+      try {
+        const project = projectAtom.value
+        const newName = await dialogs.prompt({ message: '请输入新的名称', initValue: oldName })
+        if (newName != null && newName !== oldName) {
+          const result = await server.renamePage(project.projectId, pageId, newName)
+          if (result) {
+            setProjectAtom(
+              produce(atom => {
+                const project = atom.value
+                const pageIndex = project.pages.findIndex(page => page.pageId === pageId)
+                const page = project.pages[pageIndex]
+                page.name = newName
+              }),
+            )
+          }
+        }
+      } catch (e) {
+        dialogs.alert({ message: '项目重命名失败' })
+      }
+    },
 
     async onDeletePage(pageId: number) {
       const project = projectAtom.value
@@ -426,8 +447,7 @@ export default function ProjectPage(props: ProjectPageProps) {
     async onAddSelector(selectorName: string) {
       console.assert(activePageId !== -1)
       try {
-        // TODO add-file 这个路由有点不太对劲
-        const response = await fetch('/api/add-file', {
+        const response = await fetch('/api/add-selector', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ pageId: activePageId, name: selectorName }),

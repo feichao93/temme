@@ -14,6 +14,7 @@ export interface SidebarProps {
   onChooseSelector(uri: string): void
   onAddPage(pageName: string): void
   onDeletePage(pageId: number): void
+  onRenamePage(pageId: number, oldName: string): void
   onAddSelector(selectorName: string): void
   onDeleteSelector(uri: string): void
 }
@@ -48,6 +49,7 @@ export default function Sidebar({
   onChooseSelector,
   onAddPage,
   onDeletePage,
+  onRenamePage,
   onAddSelector,
   onDeleteSelector,
 }: SidebarProps) {
@@ -89,7 +91,7 @@ export default function Sidebar({
                   <RenameIcon
                     onClick={e => {
                       e.stopPropagation()
-                      alert('仍在实现中')
+                      onRenamePage(page.pageId, page.name)
                     }}
                   />
                   <DeleteIcon

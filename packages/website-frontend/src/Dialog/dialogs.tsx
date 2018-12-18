@@ -8,10 +8,11 @@ import './dialog.styl'
 interface Content {
   title?: string
   message: string
+  initValue?: string
 }
 
 type EmptyDialogState = { type: 'empty' }
-type PromptDialogState = { type: 'prompt'; title: string; message: string }
+type PromptDialogState = { type: 'prompt'; title: string; message: string; initValue: string }
 type ConfirmDialogState = { type: 'confirm'; title: string; message: string }
 type AlertDialogState = { type: 'alert'; title: string; message: string }
 type TernaryDialogState = { type: 'ternary'; title: string; message: string }
@@ -40,9 +41,9 @@ export function DialogContextProvider({ children }: { children?: React.ReactNode
   const [state, setState] = useState<DialogState>({ type: 'empty' })
   const cbRef = useRef<Callback>(null)
 
-  function prompt({ title, message }: Content) {
+  function prompt({ title, message, initValue = '' }: Content) {
     invariant(cbRef.current == null, 'Cannot create multiple dialog at the same time.')
-    setState({ type: 'prompt', title, message })
+    setState({ type: 'prompt', title, message, initValue })
     return new Promise<string>(resolve => {
       cbRef.current = result => {
         cbRef.current = null
@@ -94,7 +95,12 @@ export function DialogContextProvider({ children }: { children?: React.ReactNode
       <DialogContainer show={state.type !== 'empty'} canOutsideClickClose={false}>
         {state.type === 'confirm' && <ConfirmDialogContent message={state.message} cbRef={cbRef} />}
         {state.type === 'prompt' && (
-          <PromptDialogContent title={state.title} message={state.message} cbRef={cbRef} />
+          <PromptDialogContent
+            title={state.title}
+            message={state.message}
+            cbRef={cbRef}
+            initValue={state.initValue}
+          />
         )}
         {state.type === 'alert' && (
           <AlertDialogContent title={state.title} message={state.message} cbRef={cbRef} />
@@ -133,25 +139,46 @@ function ConfirmDialogContent({
   )
 }
 
+function autoSelect(node: HTMLInputElement) {
+  if (node != null) {
+    node.select()
+  }
+}
+
 function PromptDialogContent({
   title,
   message,
   cbRef,
+  initValue,
 }: {
   title: string
   message: string
+  initValue: string
   cbRef: React.RefObject<Callback>
 }) {
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(initValue)
+  function onKeyPress(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      cbRef.current(value)
+    }
+  }
   return (
     <div className="prompt-dialog">
-      {message}
-      <input type="text" value={value} onChange={e => setValue(e.target.value)} />
-      <div>
-        <div>
-          <button onClick={() => cbRef.current(value)}>确认</button>
-          <button onClick={() => cbRef.current(null)}>取消</button>
-        </div>
+      <div className="message">{message}</div>
+      <input
+        type="text"
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        ref={autoSelect}
+        onKeyPress={onKeyPress}
+      />
+      <div className="dialog-buttons">
+        <button onClick={() => cbRef.current(value)} className="dialog-button confirm">
+          确认
+        </button>
+        <button onClick={() => cbRef.current(null)} className="dialog-button cancel">
+          取消
+        </button>
       </div>
     </div>
   )
@@ -166,13 +193,17 @@ function AlertDialogContent({
   message: string
   cbRef: React.RefObject<Callback>
 }) {
-  return <div className="prompt-dialog">
+  return (
+    <div className="prompt-dialog">
       <h1>{title}</h1>
-      <h2>{message}</h2>
-      <div>
-         <button onClick={() => cbRef.current()}>确认</button>
+      <div className="message">{message}</div>
+      <div className="dialog-buttons">
+        <button onClick={() => cbRef.current()} className="dialog-button confirm">
+          确认
+        </button>
       </div>
     </div>
+  )
 }
 
 function TernaryDialogContent({
