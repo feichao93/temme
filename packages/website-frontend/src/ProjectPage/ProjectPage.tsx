@@ -25,6 +25,7 @@ import {
   INIT_EDITOR_OPTIONS,
   noop,
 } from './utils'
+import './configureTemmeLanguage'
 
 type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
 
@@ -325,7 +326,7 @@ export default function ProjectPage(props: ProjectPageProps) {
     const uriObject = monaco.Uri.parse(uri)
     let model = monaco.editor.getModel(uriObject)
     if (model == null) {
-      model = monaco.editor.createModel(selector.content, null, uriObject)
+      model = monaco.editor.createModel(selector.content, 'temme', uriObject)
       const initAvid = model.getAlternativeVersionId()
       selectorTabManager.add(uri, selector.name, initAvid)
     }
@@ -495,7 +496,7 @@ export default function ProjectPage(props: ProjectPageProps) {
             const newUriObj = monaco.Uri.parse(getSelectorUri(pageId, newName))
             const oldUriObj = monaco.Uri.parse(getSelectorUri(pageId, selectorName))
             const model = monaco.editor.getModel(oldUriObj)
-            monaco.editor.createModel(model.getValue(), null, newUriObj)
+            monaco.editor.createModel(model.getValue(), 'temme', newUriObj)
             model.dispose()
             if (selectorName === selectorTabManager.activeTabName) {
               openSelector(pageId, newName)
