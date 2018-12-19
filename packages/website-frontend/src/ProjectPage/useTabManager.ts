@@ -1,6 +1,7 @@
 import produce from 'immer'
 import { useState } from 'react'
 import { TabItem } from './tablists'
+import { getSelectorUri } from './utils'
 
 export interface TabManagerState {
   activeIndex: number
@@ -60,6 +61,15 @@ export default function useTabManager() {
       }),
     )
   }
+  function updateTabName(pageId: number, oldName: string, newName: string) {
+    update(
+      produce(state => {
+        const item = state.items.find(item => item.name === oldName)
+        item.name = newName
+        item.uri = getSelectorUri(pageId, newName)
+      }),
+    )
+  }
 
   const activeItem = items[activeIndex]
   const activeTabName = activeItem && activeItem.name
@@ -77,5 +87,6 @@ export default function useTabManager() {
     activeItem,
     activeTabName,
     activeUri,
+    updateTabName,
   }
 }

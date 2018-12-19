@@ -181,3 +181,18 @@ export async function renamePage(projectId: number, pageId: number, name: string
     throw new Error(await res.text())
   }
 }
+
+export async function renameSelector(pageId: number, selectorName: string, newName: string) {
+  const res = await fetch('/api/rename-selector', {
+    method: 'post',
+    body: JSON.stringify({ pageId, selectorName, newName }),
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  if (res.ok) {
+    return true
+  } else {
+    throw new Error(await res.text())
+  }
+}

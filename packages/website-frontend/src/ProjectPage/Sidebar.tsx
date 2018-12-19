@@ -17,6 +17,7 @@ export interface SidebarProps {
   onRenamePage(pageId: number, oldName: string): void
   onAddSelector(selectorName: string): void
   onDeleteSelector(uri: string): void
+  onRenameSelector(pageId: number, selectorName: string): void
 }
 
 // TODO
@@ -52,6 +53,7 @@ export default function Sidebar({
   onRenamePage,
   onAddSelector,
   onDeleteSelector,
+  onRenameSelector,
 }: SidebarProps) {
   const pages = projectAtom.status === 'ready' ? projectAtom.value.pages : []
   const description = projectAtom.status === 'ready' ? projectAtom.value.description : 'loading...'
@@ -131,7 +133,7 @@ export default function Sidebar({
                     <RenameIcon
                       onClick={e => {
                         e.stopPropagation()
-                        alert('仍在实现中')
+                        onRenameSelector(activePageId, sel.name)
                       }}
                     />
                     <DeleteIcon

@@ -74,7 +74,7 @@ privateAPIRouter.post('/delete-project', async ctx => {
   ctx.status = 200
 })
 
-privateAPIRouter.post('/update-roject', async ctx => {
+privateAPIRouter.post('/update-project', async ctx => {
   const { name, description, projectId } = ctx.request.body
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
@@ -230,8 +230,38 @@ privateAPIRouter.post('/update-selector', async ctx => {
   ctx.status = 200
 })
 
-// TODO rename file
+// rename selector
+privateAPIRouter.post('/rename-selector', async ctx => {
+  const { pageId, selectorName, newName } = ctx.request.body
+  ctx.assert(
+    typeof newName === 'string' && newName.length > 0,
+    400,
+    `Invalid new selector name - ${newName}`,
+  )
 
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page, 404)
+
+  const userId = ctx.session.userId
+  const ownership = await ctx.service.checkOwnership(userId, page.projectId)
+  ctx.assert(ownership, 401, `No access to project with id ${page.projectId}`)
+  ctx.assert(
+    page.selectors.find(s => s.name === newName) == null,
+    400,
+    'Duplicated selector newName',
+  )
+
+  const now = new Date().toISOString()
+  const selector = page.selectors.find(s => s.name === selectorName)
+  selector.name = newName
+  selector.updatedAt = now
+
+  await ctx.service.pages.updateOne(
+    { projectId: page.projectId, pageId },
+    { $set: { updatedAt: now, selectors: page.selectors } },
+  )
+  ctx.status = 200
+})
 // 删除选择器
 privateAPIRouter.post('/delete-selector', async ctx => {
   const { pageId, name } = ctx.request.body

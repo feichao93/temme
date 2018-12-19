@@ -403,6 +403,7 @@ export default function ProjectPage(props: ProjectPageProps) {
         console.error(e)
       }
     },
+
     async onRenamePage(pageId: number, oldName: string) {
       try {
         const project = projectAtom.value
@@ -468,6 +469,36 @@ export default function ProjectPage(props: ProjectPageProps) {
       } catch (e) {
         // TODO use the global dialog
         console.error(e)
+      }
+    },
+
+    async onRenameSelector(pageId: number, selectorName: string) {
+      try {
+        const newName = await dialogs.prompt({ message: '请输入新的名称', initValue: selectorName })
+        if (newName != null && newName !== selectorName) {
+          const result = await server.renameSelector(pageId, selectorName, newName)
+          if (result) {
+            setProjectAtom(
+              produce(atom => {
+                const project = atom.value
+                const page = project.pages.find(page => page.pageId === pageId)
+                const selector = page.selectors.find(s => s.name === selectorName)
+                selector.name = newName
+              }),
+            )
+            selectorTabManager.updateTabName(pageId, selectorName, newName)
+            const newUriObj = monaco.Uri.parse(getSelectorUri(pageId, newName))
+            const oldUriObj = monaco.Uri.parse(getSelectorUri(pageId, selectorName))
+            const model = monaco.editor.getModel(oldUriObj)
+            monaco.editor.createModel(model.getValue(), null, newUriObj)
+            model.dispose()
+            if (selectorName === selectorTabManager.activeTabName) {
+              openSelector(pageId, newName)
+            }
+          }
+        }
+      } catch (e) {
+        dialogs.alert({ message: '重命名失败' })
       }
     },
 
