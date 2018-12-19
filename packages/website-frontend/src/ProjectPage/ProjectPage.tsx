@@ -70,18 +70,15 @@ export default function ProjectPage(props: ProjectPageProps) {
       }
 
       // 如果正在关闭当前 tab 页，则需要自动打开另一个 tab 页
+      const nextOpen = selectorTabManager.findNext(tab.name)
+      selectorTabManager.remove(index)
       if (selectorTabManager.activeTabName === tab.name) {
-        if (selectorTabItems.length === 1) {
+        if (nextOpen == null) {
           closeSelector()
         } else {
-          if (index === 0) {
-            openSelector(activePageId, selectorTabItems[1].name)
-          } else {
-            openSelector(activePageId, selectorTabItems[index - 1].name)
-          }
+          openSelector(activePageId, nextOpen)
         }
       }
-      selectorTabManager.remove(index)
       const model = monaco.editor.getModel(monaco.Uri.parse(tab.uri))
       model.dispose()
     },
@@ -508,29 +505,40 @@ export default function ProjectPage(props: ProjectPageProps) {
       }
     },
 
-    async onDeleteSelector(uri: string) {
-      console.assert(activePageId !== -1)
+    async onDeleteSelector(pageId: number, selectorName: string) {
+      console.assert(pageId !== -1)
       const project = projectAtom.value
-      const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
-      const page = project.pages[pageIndex]
-      const selector = page.selectors.find(sel => getSelectorUri(page.pageId, sel.name) === uri)
+      const page = project.pages.find(page => page.pageId === pageId)
+      const selector = page.selectors.find(sel => sel.name === selectorName)
       if (!(await dialogs.confirm({ message: `确定要删除选择器 '${selector.name}' 吗？` }))) {
         return
       }
 
       try {
-        await server.deleteSelector(activePageId, selector.name)
+        await server.deleteSelector(pageId, selector.name)
         setProjectAtom(
           produce(atom => {
             const project = atom.value
-            const pageIndex = project.pages.findIndex(page => page.pageId === activePageId)
-            const page = project.pages[pageIndex]
-            const selectorIndex = page.selectors.findIndex(sel => sel.name === uri)
+            const page = project.pages.find(page => page.pageId === pageId)
+            const selectorIndex = page.selectors.findIndex(sel => sel.name === selectorName)
             page.selectors.splice(selectorIndex, 1)
           }),
         )
-        if (selectorTabManager.activeTabName === uri) {
-          selectorTabManager.setActiveUri(null)
+        const index = selectorTabManager.items.findIndex(item => item.name === selectorName)
+        if (index > -1) {
+          const nextOpen = selectorTabManager.findNext(selectorName)
+          selectorTabManager.remove(index)
+          if (selectorTabManager.activeTabName === selectorName) {
+            if (nextOpen == null) {
+              closeSelector()
+            } else {
+              openSelector(activePageId, nextOpen)
+            }
+          }
+          const model = monaco.editor.getModel(
+            monaco.Uri.parse(getSelectorUri(pageId, selectorName)),
+          )
+          model.dispose()
         }
       } catch (e) {
         await dialogs.alert(e.message)

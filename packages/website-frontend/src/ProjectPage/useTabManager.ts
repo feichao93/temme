@@ -29,7 +29,11 @@ export default function useTabManager() {
       }),
     )
   }
-
+  function findNext(selectorName: string) {
+    if (items.length === 1) return null
+    const index = items.findIndex(item => item.name === selectorName)
+    return index === 0 ? items[1].name : items[index - 1].name
+  }
   function updateActiveAvid(avid: number) {
     update(
       produce(state => {
@@ -88,5 +92,6 @@ export default function useTabManager() {
     activeTabName,
     activeUri,
     updateTabName,
+    findNext,
   }
 }
