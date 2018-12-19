@@ -48,3 +48,9 @@ export function getSelectorUri(pageId: number, selectorName: string) {
 export function getHtmlUri(pageId: number) {
   return `inmemory://html/${pageId}`
 }
+
+export function disposeAllEditorModels() {
+  for (const model of monaco.editor.getModels()) {
+    model.dispose()
+  }
+}

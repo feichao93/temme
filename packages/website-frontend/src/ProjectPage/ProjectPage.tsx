@@ -16,7 +16,15 @@ import './ProjectPage.styl'
 import Sidebar from './Sidebar'
 import { HtmlTablist, OutputTablist, SelectTabList } from './tablists'
 import useTabManager from './useTabManager'
-import { CodeEditor, CTRL_S, getSelectorUri, INIT_EDITOR_OPTIONS, noop, getHtmlUri } from './utils'
+import {
+  CodeEditor,
+  CTRL_S,
+  disposeAllEditorModels,
+  getHtmlUri,
+  getSelectorUri,
+  INIT_EDITOR_OPTIONS,
+  noop,
+} from './utils'
 
 type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
 
@@ -211,8 +219,7 @@ export default function ProjectPage(props: ProjectPageProps) {
     [selectorTabManager.activeUri],
   )
 
-  /** 获取 pageId 在编辑器中的 model 的值，将其保存到服务器
-   * 然后更新 htmlTabInfo */
+  /** 获取 pageId 在编辑器中的 model 的值，将其保存到服务器，然后更新 htmlTabInfo */
   async function saveHtml(pageId: number) {
     const uri = getHtmlUri(pageId)
     const uriObject = monaco.Uri.parse(uri)
@@ -283,9 +290,7 @@ export default function ProjectPage(props: ProjectPageProps) {
   )
 
   // 在退出页面时，销毁所有的 model
-  useWillUnmount(() => {
-    monaco.editor.getModels().forEach((m: monaco.editor.ITextModel) => m.dispose())
-  })
+  useWillUnmount(disposeAllEditorModels)
 
   /** 让各个编辑器重新根据父元素的大小进行布局 */
   function layout() {
