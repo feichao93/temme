@@ -16,7 +16,7 @@ export interface SidebarProps {
   onDeletePage(pageId: number): void
   onRenamePage(pageId: number, oldName: string): void
   onAddSelector(selectorName: string): void
-  onDeleteSelector(uri: string): void
+  onDeleteSelector(pageId: number, selectorName: string): void
   onRenameSelector(pageId: number, selectorName: string): void
 }
 
@@ -139,7 +139,7 @@ export default function Sidebar({
                     <DeleteIcon
                       onClick={e => {
                         e.stopPropagation()
-                        onDeleteSelector(getSelectorUri(activePageId, sel.name))
+                        onDeleteSelector(activePageId, sel.name)
                       }}
                     />
                   </span>
