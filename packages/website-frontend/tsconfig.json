@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es2015",
+    "outDir": "build",
+    "target": "es2017",
+    "jsx": "react",
+    "noImplicitAny": true,
+    "skipLibCheck": true,
+    "moduleResolution": "node"
+  },
+  "include": ["src"]
+}

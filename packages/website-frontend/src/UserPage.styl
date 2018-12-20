@@ -1,0 +1,114 @@
+.user-page
+  width 90%
+  margin 25px auto 50px auto
+  display flex
+  max-width 1140px
+  &::after
+    content ''
+    display table
+    clear both
+.user-profile
+  flex 0 0 22%
+  img
+    width 100%
+    max-width 250px
+    border-radius 6px
+    margin-bottom 20px
+  .fullname
+    font-size 26px
+    line-height 30px
+    font-weight 700
+  .username
+    font-size 20px
+    font-weight 300
+    line-height 24px
+    color #666
+    margin-bottom 20px
+  .bio,.location
+    color #6a737d
+    font-size 14px
+  .email
+    color #0366d6
+    text-decoration none
+.user-project
+  flex 0 0 74%
+  margin-left 4%
+  .tab-bar
+    border-bottom solid 1px #d1d5da
+    position relative
+    .tab
+      display inline-block
+      padding 20px
+      font-size 14px
+      .count
+        margin-left 5px
+        display inline-block
+        padding 2px 5px
+        font-size 12px
+        font-weight 600
+        line-height 1
+        color #586069
+        background-color rgba(27,31,35,0.08)
+        border-radius 20px
+    .create-project-button
+      margin 15px 10px
+      padding 5px
+      color #24292e
+      border 1px solid rgba(27,31,35,.35)
+      border-radius 3px
+      outline none
+      cursor pointer
+      background-color #e6ebf1
+      background-image linear-gradient(-180deg,#f0f3f6,#e6ebf1 90%)
+      background-position -.5em
+      &:active
+        background-color #e9ecef
+        background-image none
+        border-color rgba(27,31,35,.35)
+        box-shadow inset 0 0.15em 0.3em rgba(27,31,35,.15)
+  .project-list
+    .project-item
+      position relative
+      padding 24px 0
+      border-bottom solid 1px #d1d5da
+      &:hover
+        .manage-project
+          visibility visible
+      .project-name
+        display inline-block
+        font-size 20px
+        font-weight 700
+        color #0366d6
+        margin-bottom 15px
+      a.project-name
+        text-decoration none
+        cursor pointer
+        &:hover
+          text-decoration underline
+      .project-description
+        margin-bottom 15px
+        font-size 14px
+        color #586069
+      .project-update
+        color #586069
+        font-size 12px
+        display inline-block
+        vertical-align middle
+      .manage-project
+        position absolute
+        top 25px
+        right 25px
+        width 50px
+        display flex
+        justify-content space-between
+        visibility hidden
+        > span
+          cursor pointer
+.divider
+  width 100%
+  margin 10px 0
+  height 1px
+  background #d1d5da
+
+
+

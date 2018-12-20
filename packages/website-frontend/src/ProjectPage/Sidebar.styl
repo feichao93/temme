@@ -1,0 +1,57 @@
+$list-item {
+  line-height 24px
+  cursor pointer
+
+  &:hover {
+    background #2a2d2e
+  }
+}
+
+.sidebar {
+  background #252526
+  color #ccc
+  font-size 14px
+  height 100%
+
+  .part-content {
+    padding 10px 0
+  }
+
+  .part.pages-part {
+    user-select none
+  }
+
+  .part-title {
+    display flex
+    line-height 24px
+    background #383838
+    padding-left 8px
+    text-transform uppercase
+    font-weight bold
+  }
+
+  .list {
+    list-style none
+    user-select none
+    padding 0
+    margin 0
+
+    > li {
+      @extends $list-item
+      display flex
+      padding-left 16px
+
+      &.active {
+        background #1a496f
+      }
+
+      .actions {
+        visibility hidden
+      }
+
+      &:hover .actions {
+        visibility visible
+      }
+    }
+  }
+}

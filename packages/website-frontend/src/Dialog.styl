@@ -1,0 +1,32 @@
+.dialog-container
+  position absolute
+  top 0
+  left 0
+  right 0
+  bottom 0
+  z-index 20
+  background #00000080
+
+  .dialog
+    position absolute
+    top 30%
+    left 50%
+    transform translate(-50%,-50%)
+    margin 10px auto
+    overflow-y auto
+    display flex
+
+.project-dialog
+  width 250px
+  padding 10px 20px
+  background white
+  .name,.title
+    color gray
+    padding 5px 0
+  .title
+    color black
+    border-bottom 1px solid #d1d5da
+  .dialog-buttons
+    display flex
+    justify-content flex-end
+    margin-top 10px
