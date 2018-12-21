@@ -4,7 +4,7 @@ import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import Header from './Header'
 import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
-import { DeleteIcon, EditIcon, GithubIcon } from './icons'
+import { DeleteIcon, EditIcon, GithubIcon, LogoutIcon } from './icons'
 import ProjectDialog from './Dialog/ProjectDialog'
 import './UserPage.styl'
 
@@ -55,17 +55,19 @@ function UserProfile({ login }: { login: string }) {
         </a>
         <div className="location">{userInfoState.location}</div>
         <div className="divider" />
-        <Link to={userInfoState.html_url} target="_blank">
+        <a href={userInfoState.html_url} target="_blank">
           <GithubIcon size={30} />
-        </Link>
+        </a>
         {username === login && (
           <div
             onClick={() => {
               logout()
             }}
             style={{ cursor: 'pointer' }}
+            className="logout"
           >
-            Sign out
+            <LogoutIcon size={15} />
+            <span>Sign out</span>
           </div>
         )}
       </div>
