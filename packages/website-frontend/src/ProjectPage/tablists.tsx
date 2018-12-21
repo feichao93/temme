@@ -1,34 +1,71 @@
-import React from 'react'
 import classNames from 'classnames'
+import { Map } from 'immutable'
+import React from 'react'
 import { FileIcon } from '../icons'
+import { AtomRecord } from '../utils/atoms'
 import {
+  CloseCleanIcon,
   CloseDirtyIcon,
   CloseIcon,
   FileTypeHtmlIcon,
   FileTypeJsonIcon,
   FileTypeTSIcon,
 } from './icons'
+import { HtmlRecord, HtmlTabRecord, SelectorRecord, SelectorTabRecord } from './interfaces'
 import './tablists.styl'
 
-interface HtmlTablistProps {
-  dirty: boolean
-  onSave(): void
+export interface HtmlTablistProps {
+  tabs: Map<number, HtmlTabRecord>
+  activeHtmlId: number
+  htmlAtoms: Map<number, AtomRecord<HtmlRecord>>
+  onOpen(htmlId: number): void
+  onClose(htmlId: number): void
 }
 
-export const HtmlTablist = React.memo(({ dirty, onSave }: HtmlTablistProps) => (
-  <div className="tablist">
-    <div className="tab active">
-      <FileTypeHtmlIcon />
-      <span className="tabname">html</span>
-      <span style={{ width: 16 }} />
+// TODO HtmlTablist 和 selectorTabList 代码重复
+
+export function HtmlTablist({ tabs, activeHtmlId, htmlAtoms, onOpen, onClose }: HtmlTablistProps) {
+  function onMouseDown(e: React.MouseEvent<HTMLDivElement>, htmlId: number) {
+    // TODO 下面这个行为有点问题
+    // 阻止浏览器的默认行为，包括
+    // * 鼠标左键会改变焦点元素
+    // * 鼠标中键会触发滚轮
+    e.preventDefault()
+
+    if (e.button === 0) {
+      // 鼠标左键
+      onOpen(htmlId)
+    } else if (e.button === 1) {
+      // 鼠标中键
+      onClose(htmlId)
+    }
+  }
+
+  return (
+    <div className="tablist">
+      {tabs
+        .sortBy(tab => tab.placeOrder)
+        .map(tab => (
+          <div
+            key={tab.htmlId}
+            className={classNames('tab', { active: tab.htmlId === activeHtmlId })}
+            draggable
+            onMouseDown={e => onMouseDown(e, tab.htmlId)}
+          >
+            <FileTypeHtmlIcon />
+            <span className="tabname">{htmlAtoms.get(tab.htmlId).value.name}</span>
+            <CloseIcon
+              onClick={e => {
+                e.stopPropagation()
+                onClose(tab.htmlId)
+              }}
+            />
+          </div>
+        ))
+        .valueSeq()}
     </div>
-    {dirty && (
-      <div className="tab-decoration" title="点击保存" onClick={onSave}>
-        未保存
-      </div>
-    )}
-  </div>
-))
+  )
+}
 
 export const OutputTablist = React.memo(() => (
   <div className="tablist">
@@ -45,31 +82,22 @@ export const OutputTablist = React.memo(() => (
   </div>
 ))
 
-function isTabItemDirty(tabItem: TabItem) {
-  return tabItem.avid !== tabItem.initAvid
-}
-
-export interface TabItem {
-  uri: string
-  name: string
-  avid: number
-  initAvid: number
-}
-
 export interface SelectTabListProps {
-  tabItems: TabItem[]
-  activeIndex: number
-  onChangeActiveIndex(nextIndex: number): void
-  onClose(tabIndex: number): void
+  tabs: Map<number, SelectorTabRecord>
+  activeSelectorId: number
+  selectorAtoms: Map<number, AtomRecord<SelectorRecord>>
+  onOpen(selectorId: number): void
+  onClose(selectorId: number): void
 }
 
-export function SelectTabList({
-  activeIndex,
-  tabItems,
-  onChangeActiveIndex,
+export function SelectorTabList({
+  tabs,
+  activeSelectorId,
+  onOpen,
   onClose,
+  selectorAtoms,
 }: SelectTabListProps) {
-  function onMouseDown(e: React.MouseEvent<HTMLDivElement>, index: number) {
+  function onMouseDown(e: React.MouseEvent<HTMLDivElement>, selectorId: number) {
     // 阻止浏览器的默认行为，包括
     // * 鼠标左键会改变焦点元素
     // * 鼠标中键会触发滚轮
@@ -77,33 +105,36 @@ export function SelectTabList({
 
     if (e.button === 0) {
       // 鼠标左键
-      onChangeActiveIndex(index)
+      onOpen(selectorId)
     } else if (e.button === 1) {
       // 鼠标中键
-      onClose(index)
+      onClose(selectorId)
     }
   }
 
   return (
-    <div className="tablist selector-tablist">
-      {tabItems.map((tabItem, index) => (
-        <div
-          key={index}
-          className={classNames('tab', { active: index === activeIndex })}
-          draggable
-          onMouseDown={e => onMouseDown(e, index)}
-        >
-          <FileIcon />
-          <span className="tabname">{tabItem.name}</span>
-          {React.createElement(isTabItemDirty(tabItem) ? CloseDirtyIcon : CloseIcon, {
-            size: 16,
-            onClick(e: any) {
-              e.stopPropagation()
-              onClose(index)
-            },
-          })}
-        </div>
-      ))}
+    <div className="tablist">
+      {tabs
+        .sortBy(tab => tab.placeOrder)
+        .map(tab => (
+          <div
+            key={tab.selectorId}
+            className={classNames('tab', { active: tab.selectorId === activeSelectorId })}
+            draggable
+            onMouseDown={e => onMouseDown(e, tab.selectorId)}
+          >
+            <FileIcon />
+            <span className="tabname">{selectorAtoms.get(tab.selectorId).value.name}</span>
+            {React.createElement(tab.isDirty() ? CloseDirtyIcon : CloseCleanIcon, {
+              size: 16,
+              onClick(e: any) {
+                e.stopPropagation()
+                onClose(tab.selectorId)
+              },
+            })}
+          </div>
+        ))
+        .valueSeq()}
     </div>
   )
 }

@@ -7,7 +7,9 @@ monaco.languages.register({
   mimetypes: ['text/temme'],
 })
 
-// TODO monaco.languages.setLanguageConfiguration('temme'
+// TODO monaco.languages.setLanguageConfiguration('temme', ...)
+// todo 给 temme 添加一个自定义的主题
+// TODO 去掉以 test- 开头的测试用的 token-class
 
 monaco.languages.setMonarchTokensProvider('temme', {
   defaultToken: process.env.NODE_ENV === 'production' ? '' : 'invalid',

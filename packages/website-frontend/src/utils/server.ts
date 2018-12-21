@@ -1,5 +1,35 @@
+import { Map } from 'immutable'
 import { UserInfo, Project } from '../types'
-import { PageRecord } from '../ProjectPage/interfaces'
+import { HtmlRecord, PageRecord, ProjectRecord, SelectorRecord } from '../ProjectPage/interfaces'
+import { AtomRecord } from './atoms'
+
+/** @deprecated */
+export interface DeprecatedProjectRecord {
+  projectId: number
+  userId: number
+  name: string
+  description: string
+  pages: DeprecatedPageRecord[]
+  createdAt: string
+  updatedAt: string
+}
+
+/** @deprecated */
+export interface DeprecatedPageRecord {
+  pageId: number
+  projectId: number
+  name: string
+  description: string
+  html: string
+  createdAt: string
+  updatedAt: string
+  selectors: Array<{
+    name: string
+    content: string
+    createdAt: string
+    updatedAt: string
+  }>
+}
 
 export async function saveHtml(pageId: number, content: string) {
   const response = await fetch('/api/update-html', {
@@ -25,10 +55,79 @@ export async function saveSelector(pageId: number, selectorName: string, content
 
 export async function getProject(login: string, projectName: string) {
   const response = await fetch(`/api/project/${login}/${projectName}`)
-  if (response.ok) {
-    return { ok: true, project: await response.json() }
-  } else {
-    return { ok: false, reason: await response.text() }
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.text()}`)
+  }
+  const obj: DeprecatedProjectRecord = await response.json()
+
+  // TODO 兼容层
+  const project = new ProjectRecord({
+    projectId: obj.projectId,
+    userId: obj.userId,
+    name: obj.name,
+    description: obj.description,
+    pages: Map(
+      obj.pages.map(
+        p =>
+          [
+            p.pageId,
+            new PageRecord({
+              pageId: p.pageId,
+              name: p.name,
+              description: p.description,
+              createdAt: p.createdAt,
+              updatedAt: p.updatedAt,
+            }),
+          ] as [number, PageRecord],
+      ),
+    ),
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt,
+  })
+
+  const temp1: [number, SelectorRecord][] = []
+  for (const page of obj.pages) {
+    for (let index = 0; index < page.selectors.length; index++) {
+      const s = page.selectors[index]
+      const selectorId = page.pageId * 1000 + index
+      temp1.push([
+        selectorId,
+        new SelectorRecord({
+          selectorId,
+          folderId: page.pageId,
+          name: s.name,
+          content: s.content,
+          updatedAt: s.updatedAt,
+          createdAt: s.createdAt,
+        }),
+      ])
+    }
+  }
+  const selectorAtoms = Map(temp1).map(AtomRecord.ready)
+
+  const temp2: [number, HtmlRecord][] = []
+  for (const page of obj.pages) {
+    for (let i = 0; i < 3; i++) {
+      const htmlId = 1000 * i + page.pageId
+      temp2.push([
+        htmlId,
+        new HtmlRecord({
+          htmlId,
+          folderId: page.pageId,
+          name: `${page.name}-${i}`,
+          createdAt: page.createdAt,
+          updatedAt: page.updatedAt,
+          content: page.html,
+        }),
+      ])
+    }
+  }
+  const htmlAtoms = Map(temp2).map(AtomRecord.ready)
+
+  return {
+    projectAtom: AtomRecord.ready(project),
+    selectorAtoms,
+    htmlAtoms,
   }
 }
 
@@ -39,7 +138,7 @@ export async function addPage(projectId: number, pageName: string) {
     body: JSON.stringify({ projectId, name: pageName }),
   })
   if (response.ok) {
-    const pageRecord: PageRecord = await response.json()
+    const pageRecord: DeprecatedPageRecord = await response.json()
     return { ok: true, pageRecord }
   } else {
     return { ok: false, reason: await response.text() }

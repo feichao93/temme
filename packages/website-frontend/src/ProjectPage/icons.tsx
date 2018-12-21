@@ -79,7 +79,16 @@ export function AddFolderIcon({ disabled, onClick, size }: IconProps) {
 }
 AddFolderIcon.defaultProps = { size: 16 }
 
-export function CloseIcon({ disabled, onClick, size }: IconProps) {
+export function CloseIcon({ dirty, disabled, onClick, size }: IconProps & { dirty?: boolean }) {
+  if (dirty) {
+    return <CloseDirtyIcon disabled={disabled} onClick={onClick} size={size} />
+  } else {
+    return <CloseCleanIcon disabled={disabled} onClick={onClick} size={size} />
+  }
+}
+CloseIcon.defaultProps = { size: 16 }
+
+export function CloseCleanIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
@@ -95,7 +104,7 @@ export function CloseIcon({ disabled, onClick, size }: IconProps) {
     </svg>
   )
 }
-CloseIcon.defaultProps = { size: 16 }
+CloseCleanIcon.defaultProps = { size: 16 }
 
 export function CloseDirtyIcon({ disabled, onClick, size }: IconProps) {
   return (

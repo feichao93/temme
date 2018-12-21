@@ -26,7 +26,7 @@ type DialogState =
 
 type TernaryOption = 'yes' | 'no' | 'cancel'
 
-interface DialogContextType {
+export interface DialogContextType {
   confirm(content: Content): Promise<boolean>
   prompt(content: Content): Promise<string>
   alert(content: Content): Promise<void>

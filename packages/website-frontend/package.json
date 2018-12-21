@@ -7,7 +7,7 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.10.0",
+    "@little-saga/use-saga": "little-saga/use-saga#v0.7.2",
     "@types/classnames": "^2.2.6",
     "@types/history": "^4.7.2",
     "@types/react": "^16.7.13",
@@ -16,14 +16,12 @@
     "@types/react-router-dom": "^4.3.1",
     "classnames": "^2.2.6",
     "history": "^4.7.2",
-    "immer": "^1.9.2",
+    "immutable": "^4.0.0-rc.12",
     "invariant": "^2.2.4",
-    "lodash.debounce": "^4.0.8",
-    "lz-string": "^1.4.4",
+    "little-saga": "^0.6.1",
     "monaco-editor": "^0.15.6",
-    "pretty": "^2.0.0",
-    "react": "^16.7.0-alpha.2",
-    "react-dom": "^16.7.0-alpha.2",
+    "react": "16.7.0-alpha.2",
+    "react-dom": "16.7.0-alpha.2",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "temme": "^0.8.3"

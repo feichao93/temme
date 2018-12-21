@@ -37,20 +37,14 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
   },
 }
 
-export function noop() {}
+export function noop(...args: any[]) {}
 
 export const CTRL_S = monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_S
-
-export function getSelectorUri(pageId: number, selectorName: string) {
-  return `inmemory://selector/${pageId}/${selectorName}`
-}
-
-export function getHtmlUri(pageId: number) {
-  return `inmemory://html/${pageId}`
-}
 
 export function disposeAllEditorModels() {
   for (const model of monaco.editor.getModels()) {
     model.dispose()
   }
 }
+
+export const inc = (x: number) => x + 1
