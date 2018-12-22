@@ -1,15 +1,17 @@
 import { Collection, Db } from 'mongodb'
-import { Page, Project, UserInfo, UserProfile } from './interfaces'
+import { Project, UserInfo, UserProfile, Html, Selector } from './interfaces'
 
 export default class Service {
   users: Collection<UserProfile>
   projects: Collection<Project>
-  pages: Collection<Page>
+  htmls: Collection<Html>
+  selectors: Collection<Selector>
 
   constructor(readonly db: Db) {
     this.users = this.db.collection('users')
     this.projects = this.db.collection('projects')
-    this.pages = this.db.collection('pages')
+    this.htmls = this.db.collection('htmls')
+    this.selectors = this.db.collection('selectors')
   }
 
   updateUserProfile(userId: number, access_token: string, userInfo: UserInfo) {
@@ -21,7 +23,7 @@ export default class Service {
   }
 
   /**  判断一个用户是否具有一个 project 的权限 */
-  async checkOwnership(userId: number, projectId: number) {
+  async checkProjectOwnership(userId: number, projectId: number) {
     const project = await this.projects.findOne({ userId, projectId })
     return project != null
   }
@@ -37,14 +39,35 @@ export default class Service {
     return projectWithMaxId == null ? 1 : projectWithMaxId.projectId + 1
   }
 
-  /** 获取下一个 page 的 id */
-  async getNextPageId() {
-    const [pageWithMaxId] = await this.pages
+  /** 获取下一个 folder 的 id */
+  async getNextFolderId() {
+    const [withMaxFolderId] = await this.projects
+      .aggregate<{ folders: { folderId: number } }>([
+        { $unwind: '$folders' },
+        { $sort: { 'folders.folderId': -1 } },
+        { $limit: 1 },
+      ])
+      .toArray()
+    return withMaxFolderId == null ? 1 : withMaxFolderId.folders.folderId + 1
+  }
+
+  async getNextHtmlId() {
+    const [htmlWithMaxId] = await this.htmls
       .find()
-      .project({ pageId: true })
-      .sort({ pageId: -1 })
+      .project({ htmlId: true })
+      .sort({ htmlId: -1 })
       .limit(1)
       .toArray()
-    return pageWithMaxId == null ? 1 : pageWithMaxId.pageId + 1
+    return htmlWithMaxId == null ? 1 : htmlWithMaxId.htmlId + 1
+  }
+
+  async getNextSelectorId() {
+    const [selectorWithMaxId] = await this.selectors
+      .find()
+      .project({ selectorId: true })
+      .sort({ selectorId: -1 })
+      .limit(1)
+      .toArray()
+    return selectorWithMaxId == null ? 1 : selectorWithMaxId.selectorId + 1
   }
 }

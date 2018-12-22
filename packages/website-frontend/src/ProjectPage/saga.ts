@@ -2,11 +2,10 @@ import { io, takeEvery } from 'little-saga'
 import * as monaco from 'monaco-editor'
 import React from 'react'
 import { DialogContextType } from '../Dialog/dialogs'
-import { AtomRecord } from '../utils/atoms'
 import * as server from '../utils/server'
 import * as actions from './actions'
 import { a } from './actions'
-import { EditorPageState, HtmlRecord, SelectorRecord } from './interfaces'
+import { EditorPageState, FolderRecord, HtmlRecord, SelectorRecord } from './interfaces'
 import * as selectors from './selectors'
 import * as updaters from './updaters'
 import { CodeEditor } from './utils'
@@ -18,56 +17,72 @@ type SagaEnv = {
   dialogs: DialogContextType
 }
 
-function reducer(state: EditorPageState, action: actions.Action) {
-  if (action.type === 'update-html-avid') {
-    return state.setIn(['htmlTabs', action.htmlId, 'avid'], action.avid)
-  } else if (action.type === 'update-selector-avid') {
-    return state.setIn(['selectorTabs', action.selectorId, 'avid'], action.avid)
-  } else {
-    return state
+function applyReducer<A extends actions.Action>(
+  reducer: (state: EditorPageState, action: A) => EditorPageState,
+) {
+  return function*(action: A) {
+    yield io.update(reducer, action)
   }
 }
 
 export default function* saga(login: string, projectName: string) {
-  yield io.fork(function*() {
-    while (true) {
-      const action = yield io.take('*')
-      yield io.update(reducer, action)
-    }
-  })
-
   yield io.fork(loadProjectData, login, projectName)
+
+  yield takeEvery(
+    a('update-html-avid'),
+    applyReducer((state, action: actions.UpdateHtmlAvid) =>
+      state.setIn(['htmlTabs', action.htmlId, 'avid'], action.avid),
+    ),
+  )
+  yield takeEvery(
+    a('update-selector-avid'),
+    applyReducer((state, action: actions.UpdateSelectorAvid) =>
+      state.setIn(['selectorTabs', action.selectorId, 'avid'], action.avid),
+    ),
+  )
 
   yield takeEvery(a('open-html-tab'), handleOpenHtmlTab)
   yield takeEvery(a('open-selector-tab'), handleOpenSelectorTab)
   yield takeEvery(a('close-html-tab'), handleCloseHtmlTab)
   yield takeEvery(a('close-selector-tab'), handleCloseSelectorTab)
   yield takeEvery(a('open-folder'), handleOpenFolder)
-  yield takeEvery(a('delete-selector'), handleDeleteSelector)
-  // TODO add listener for RequestSaveCurrentHtml and others
+  yield takeEvery(a('request-delete-selector'), handleRequestDeleteSelector)
+  yield takeEvery(a('request-add-folder'), handleRequestAddFolder)
+  yield takeEvery(a('request-delete-folder'), handleRequestDeleteFolder)
+  yield takeEvery(a('request-add-html'), handleRequestAddHtml)
+  yield takeEvery(a('request-delete-html'), handleRequestDeleteHtml)
+  yield takeEvery(a('request-add-selector'), handleRequestAddSelector)
+
+  yield takeEvery(a('request-save-current-html'), function*() {
+    const state: EditorPageState = yield io.select()
+    yield saveHtml(state.activeHtmlId)
+  })
+  yield takeEvery(a('request-save-current-selector'), function*() {
+    const state: EditorPageState = yield io.select()
+    yield saveSelector(state.activeSelectorId)
+  })
 }
 
 function* loadProjectData(login: string, projectName: string) {
   const data = yield server.getProject(login, projectName)
-  const { projectAtom }: EditorPageState = yield io.update((state: EditorPageState) =>
+  const { project }: EditorPageState = yield io.update((state: EditorPageState) =>
     state.merge(data),
   )
 
-  const project = projectAtom.value
-  // 首次载入 project 之后，自动选中第一个目录下的 第一个 html 和第一个 selector
-  if (!project.pages.isEmpty()) {
-    const firstPage = project.pages.first<null>()
-    yield io.put(actions.openFolder(firstPage.pageId))
+  // 首次载入 project 之后，自动选中第一个 folder 下的 第一个 html 和第一个 selector
+  if (!project.folders.isEmpty()) {
+    const firstFolder = project.folders.first<null>()
+    yield io.put(actions.openFolder(firstFolder.folderId))
   }
 }
 
 function* handleOpenHtmlTab({ htmlId }: actions.OpenHtmlTab) {
-  // todo 目前我们假设 htmlAtom 一定是 ready 的
-  const htmlAtom: AtomRecord<HtmlRecord> = yield io.select(selectors.html, htmlId)
-  const uriObject = htmlAtom.value.getUriObject()
+  // todo 目前我们假设 html.status 一定是 ready 的
+  const html: HtmlRecord = yield io.select(selectors.html, htmlId)
+  const uriObject = html.getUriObject()
   let model = monaco.editor.getModel(uriObject)
   if (model == null) {
-    model = monaco.editor.createModel(htmlAtom.value.content, 'html', uriObject)
+    model = monaco.editor.createModel(html.content, 'html', uriObject)
     const avid = model.getAlternativeVersionId()
     yield io.update(updaters.pushHtmlTabRecord, htmlId, avid)
   } else {
@@ -81,13 +96,13 @@ function* handleOpenHtmlTab({ htmlId }: actions.OpenHtmlTab) {
 }
 
 function* handleOpenSelectorTab({ selectorId }: actions.OpenSelectorTab) {
-  // todo 目前我们假设 selectorAtom 一定是 ready 的
-  const selectorAtom: AtomRecord<SelectorRecord> = yield io.select(selectors.selector, selectorId)
-  const uriObject = selectorAtom.value.getUriObject()
+  // todo 目前我们假设 selector 一定是 ready 的
+  const selector: SelectorRecord = yield io.select(selectors.selector, selectorId)
+  const uriObject = selector.getUriObject()
 
   let model = monaco.editor.getModel(uriObject)
   if (model == null) {
-    model = monaco.editor.createModel(selectorAtom.value.content, 'temme', uriObject)
+    model = monaco.editor.createModel(selector.content, 'temme', uriObject)
     const avid = model.getAlternativeVersionId()
     yield io.update(updaters.pushSelectorTabRecord, selectorId, avid)
   } else {
@@ -102,9 +117,9 @@ function* handleOpenSelectorTab({ selectorId }: actions.OpenSelectorTab) {
 
 function* handleCloseHtmlTab({ htmlId }: actions.CloseHtmlTab) {
   const { dialogs }: SagaEnv = yield io.getEnv()
-  const { htmlTabs, htmlAtoms, activeHtmlId }: EditorPageState = yield io.select()
+  const { htmlTabs, htmls, activeHtmlId }: EditorPageState = yield io.select()
   const tab = htmlTabs.get(htmlId)
-  const html = htmlAtoms.get(htmlId).value
+  const html = htmls.get(htmlId)
 
   if (tab.isDirty()) {
     const option = yield dialogs.ternary({ message: `是否将更改保存到 ${html.name}` })
@@ -139,9 +154,13 @@ function* handleCloseHtmlTab({ htmlId }: actions.CloseHtmlTab) {
 
 function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
   const { dialogs }: SagaEnv = yield io.getEnv()
-  const { selectorTabs, selectorAtoms, activeSelectorId }: EditorPageState = yield io.select()
+  const {
+    selectorTabs,
+    selectors: selectorMap,
+    activeSelectorId,
+  }: EditorPageState = yield io.select()
   const tab = selectorTabs.get(selectorId)
-  const selector = selectorAtoms.get(selectorId).value
+  const selector = selectorMap.get(selectorId)
 
   if (tab.isDirty()) {
     const option = yield dialogs.ternary({ message: `是否将更改保存到 ${selector.name}` })
@@ -176,13 +195,12 @@ function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
 
 function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   const {
-    projectAtom,
+    project,
     selectorTabs,
     htmlTabs,
-    htmlAtoms,
-    selectorAtoms,
+    htmls,
+    selectors: selectorMap,
   }: EditorPageState = yield io.select()
-  const project = projectAtom.value
   // TODO 这里假设 selectorAtoms, htmlAtoms, projectAtom 已经全部加载完毕
 
   // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
@@ -212,7 +230,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
 
   // 销毁当前 folder 下所有的 html model
   htmlTabs.forEach(tab => {
-    const html = htmlAtoms.get(tab.htmlId).value
+    const html = htmls.get(tab.htmlId)
     const model = monaco.editor.getModel(html.getUriObject())
     model.dispose()
   })
@@ -220,7 +238,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
 
   // 销毁当前 folder 下所有的 selector model
   selectorTabs.forEach(tab => {
-    const selector = selectorAtoms.get(tab.selectorId).value
+    const selector = selectorMap.get(tab.selectorId)
     const model = monaco.editor.getModel(selector.getUriObject())
     model.dispose()
   })
@@ -229,8 +247,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   yield io.update(updaters.setActiveFolderId, folderId)
 
   // 自动打开第一个 html
-  const firstHtmlId = htmlAtoms
-    .map(atom => atom.value)
+  const firstHtmlId = htmls
     .filter(html => html.folderId === folderId)
     .map(html => html.htmlId)
     .min()
@@ -242,8 +259,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   //  activeHtmlId ?
 
   // 自动打开第一个 selector
-  const firstSelectorId = selectorAtoms
-    .map(atom => atom.value)
+  const firstSelectorId = selectorMap
     .filter(selector => selector.folderId === folderId)
     .map(selector => selector.selectorId)
     .min()
@@ -256,73 +272,135 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   //  activeSelectorId ?
 }
 
-function* handleDeleteSelector({ folderId, selectorId }: actions.DeleteSelector) {
-  const { projectAtom, selectorTabs, htmlTabs }: EditorPageState = yield io.select()
-  const project = projectAtom.value
-  // try {
-  //   await server.deleteSelector(pageId, selector.name)
-  //   setProjectAtom(
-  //     produce(atom => {
-  //       const project = atom.value
-  //       const page = project.pages.find(page => page.pageId === pageId)
-  //       const selectorIndex = page.selectors.findIndex(sel => sel.name === selectorName)
-  //       page.selectors.splice(selectorIndex, 1)
-  //     }),
-  //   )
-  //   const index = selectorTabManager.items.findIndex(item => item.name === selectorName)
-  //   if (index > -1) {
-  //     const nextOpen = selectorTabManager.findNext(selectorName)
-  //     selectorTabManager.remove(index)
-  //     if (selectorTabManager.activeTabName === selectorName) {
-  //       if (nextOpen == null) {
-  //         closeSelector()
-  //       } else {
-  //         openSelector(activePageId, nextOpen)
-  //       }
-  //     }
-  //     const model = monaco.editor.getModel(
-  //       monaco.Uri.parse(getSelectorUri(pageId, selectorName)),
-  //     )
-  //     model.dispose()
-  //   }
-  // } catch (e) {
-  //   await dialogs.alert(e.message)
-  // }
+function* handleRequestDeleteSelector({ selectorId }: actions.RequestDeleteSelector) {
+  const selector: SelectorRecord = yield io.select(selectors.selector, selectorId)
+  yield server.deleteSelector(selectorId)
+  const { activeSelectorId }: EditorPageState = yield io.update((state: EditorPageState) =>
+    state
+      .update('selectors', selectors => selectors.delete(selectorId))
+      .update('selectorTabs', tabs => tabs.delete(selectorId))
+      .set('activeSelectorId', state.activeSelectorId === selectorId ? -1 : state.activeSelectorId),
+  )
+  const model = monaco.editor.getModel(selector.getUriObject())
+  if (model) {
+    model.dispose()
+  }
+
+  // 尝试自动打开另一个 tab
+  if (activeSelectorId === -1) {
+    const nextSelectorToOpen: SelectorRecord = yield io.select(selectors.nextSelectorToOpen)
+    if (nextSelectorToOpen != null) {
+      yield io.put(actions.openSelectorTab(nextSelectorToOpen.selectorId))
+    } else {
+      const { selectorEditorRef }: SagaEnv = yield io.getEnv()
+      selectorEditorRef.current.setModel(null)
+    }
+  }
+  // todo 错误处理
 }
 
-/** TODO
- * 获取 pageId 在编辑器中的 model 的值，将其保存到服务器，然后更新 htmlTabInfo */
+/** 获取 html 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
 function* saveHtml(htmlId: number) {
-  yield io.select()
-  // const uri = getHtmlUri(pageId)
-  // const uriObject = monaco.Uri.parse(uri)
-  // const model = monaco.editor.getModel(uriObject)
-  // const content = model.getValue()
-  // const nextInitAvid = model.getAlternativeVersionId()
-  // await server.saveHtml(activePageId, content)
-  // updateHtmlTabInfo(
-  //   produce(info => {
-  //     info.initAvid = nextInitAvid
-  //   }),
-  // )
+  const html: HtmlRecord = yield io.select(selectors.html, htmlId)
+  const model = monaco.editor.getModel(html.getUriObject())
+  const content = model.getValue()
+  const nextInitAvid = model.getAlternativeVersionId()
+  yield server.saveHtml(htmlId, content)
+  yield io.update(updaters.updateHtmlInitAvid, htmlId, nextInitAvid)
+  yield io.update(updaters.updateHtmlContent, htmlId, content)
+  // todo 错误处理
 }
 
-/** TODO
- * 获取 pageId/selectorName 在编辑器中的 model 的值，将其保存到服务器
- * 然后更新 selectorTabManager 和 project 的状态 */
-async function saveSelector(selectorId: number) {
-  // const uri = getSelectorUri(pageId, selectorName)
-  // const uriObject = monaco.Uri.parse(uri)
-  // const model = monaco.editor.getModel(uriObject)
-  // const content = model.getValue()
-  // const nextInitAvid = model.getAlternativeVersionId()
-  // await server.saveSelector(pageId, selectorName, content)
-  // selectorTabManager.updateInitAvid(uri, nextInitAvid)
-  // setProjectAtom(
-  //   produce(draft => {
-  //     const page = draft.value.pages.find(page => page.pageId === pageId)
-  //     const selector = page.selectors.find(sel => sel.name === selectorName)
-  //     selector.content = content
-  //   }),
-  // )
+/** 获取 selector 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
+function* saveSelector(selectorId: number) {
+  const selector: SelectorRecord = yield io.select(selectors.selector, selectorId)
+  const model = monaco.editor.getModel(selector.getUriObject())
+  const content = model.getValue()
+  const nextInitAvid = model.getAlternativeVersionId()
+  yield server.saveSelector(selectorId, content)
+  yield io.update(updaters.updateSelectorInitAvid, selectorId, nextInitAvid)
+  yield io.update(updaters.updateSelectorContent, selectorId, content)
+  // todo 错误处理
+}
+
+function* handleRequestAddFolder({ name, description }: actions.RequestAddFolder) {
+  const projectId: number = yield io.select(selectors.projectId)
+  const newFolder: FolderRecord = yield server.addFolder(projectId, name, description)
+  yield io.update(updaters.updateFolder, newFolder)
+  // todo 错误处理
+}
+
+function* handleRequestDeleteFolder({ folderId }: actions.RequestDeleteFolder) {
+  yield server.deleteFolder(folderId)
+  yield io.update((state: EditorPageState) => {
+    const selectorIdSet = state.selectors
+      .filter(sel => sel.folderId === folderId)
+      .keySeq()
+      .toSet()
+    const htmlIdSet = state.htmls
+      .filter(html => html.folderId === folderId)
+      .keySeq()
+      .toSet()
+
+    let nextState = state
+    nextState = nextState
+      .deleteIn(['project', 'folders', folderId])
+      .update('selectors', selectors => selectors.filterNot(sel => sel.folderId === folderId))
+      .update('htmls', htmls => htmls.filterNot(html => html.folderId === folderId))
+      .update('htmlTabs', tabs => tabs.filterNot(tab => htmlIdSet.has(tab.htmlId)))
+      .update('selectorTabs', tabs => tabs.filterNot(tab => selectorIdSet.has(tab.selectorId)))
+
+    if (nextState.activeFolderId === folderId) {
+      nextState = nextState.merge({
+        activeSelectorId: -1,
+        activeHtmlId: -1,
+        activeFolderId: -1,
+      })
+    }
+    return nextState
+  })
+  // todo 错误处理
+}
+
+function* handleRequestAddHtml({ name }: actions.RequestAddHtml) {
+  const folderId: number = yield io.select((s: EditorPageState) => s.activeFolderId)
+  const newHtml: HtmlRecord = yield server.addHtml(folderId, name)
+  yield io.update(updaters.updateHtml, newHtml)
+  yield io.put(actions.openHtmlTab(newHtml.htmlId))
+  // todo 错误处理
+}
+
+function* handleRequestDeleteHtml({ htmlId }: actions.RequestDeleteHtml) {
+  const html: HtmlRecord = yield io.select(selectors.html, htmlId)
+  yield server.deleteHtml(htmlId)
+  const { activeHtmlId }: EditorPageState = yield io.update((state: EditorPageState) =>
+    state
+      .update('htmls', htmls => htmls.delete(htmlId))
+      .update('htmlTabs', tabs => tabs.delete(htmlId))
+      .set('activeHtmlId', state.activeHtmlId === htmlId ? -1 : state.activeHtmlId),
+  )
+  const model = monaco.editor.getModel(html.getUriObject())
+  if (model) {
+    model.dispose()
+  }
+
+  // 尝试自动打开另一个 tab
+  if (activeHtmlId === -1) {
+    const nextHtmlToOpen: HtmlRecord = yield io.select(selectors.nextHtmlToOpen)
+    if (nextHtmlToOpen != null) {
+      yield io.put(actions.openHtmlTab(nextHtmlToOpen.htmlId))
+    } else {
+      const { htmlEditorRef }: SagaEnv = yield io.getEnv()
+      htmlEditorRef.current.setModel(null)
+    }
+  }
+  // todo 错误处理
+}
+
+function* handleRequestAddSelector({ name }: actions.RequestAddSelector) {
+  const folderId: number = yield io.select((s: EditorPageState) => s.activeFolderId)
+  const newSelector: SelectorRecord = yield server.addSelector(folderId, name)
+  yield io.update(updaters.updateSelector, newSelector)
+  yield io.put(actions.openSelectorTab(newSelector.selectorId))
+  // todo 错误处理
 }

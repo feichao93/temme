@@ -52,6 +52,10 @@ async function fallbackHandler(ctx: Context) {
   ctx.body = fs.createReadStream('public/index.html')
 }
 
+const staticApp = new Koa()
+  .use(serve('public/static', { maxage: ONE_YEAR }))
+  .use(ctx => ctx.throw(404))
+
 function makeApp(service: Service) {
   const app = new Koa()
   app.keys = CONFIG.appKeys
@@ -69,7 +73,7 @@ function makeApp(service: Service) {
     .use(withService(service))
     .use(bodyParser())
     .use(router.routes())
-    .use(mount('/static', serve('public/static', { maxage: ONE_YEAR })))
+    .use(mount('/static', staticApp))
     .use(fallbackHandler)
 
   return app

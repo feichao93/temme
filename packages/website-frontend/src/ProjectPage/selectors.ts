@@ -1,11 +1,11 @@
 import { EditorPageState } from './interfaces'
 
 export function selector(state: EditorPageState, selectorId: number) {
-  return state.selectorAtoms.get(selectorId)
+  return state.selectors.get(selectorId)
 }
 
 export function html(state: EditorPageState, htmlId: number) {
-  return state.htmlAtoms.get(htmlId)
+  return state.htmls.get(htmlId)
 }
 
 export function nextHtmlTabPlaceOrder(state: EditorPageState) {
@@ -30,4 +30,8 @@ export function nextSelectorToOpen(state: EditorPageState) {
 
 export function nextHtmlToOpen(state: EditorPageState) {
   return state.htmlTabs.maxBy(tab => tab.openOrder)
+}
+
+export function projectId(state: EditorPageState) {
+  return state.project.projectId
 }

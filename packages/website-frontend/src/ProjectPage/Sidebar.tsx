@@ -1,10 +1,11 @@
 import classNames from 'classnames'
 import { Map } from 'immutable'
 import React from 'react'
+import { useDialogs } from '../Dialog/dialogs'
 import * as actions from './actions'
 import { Action } from './actions'
 import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
-import { EditorPageState, PageRecord, ProjectRecord } from './interfaces'
+import { EditorPageState, FolderRecord, ProjectRecord } from './interfaces'
 import './Sidebar.styl'
 import { noop } from './utils'
 
@@ -14,11 +15,11 @@ export interface SidebarProps {
 }
 
 // TODO
-function getRandomPageName(project: ProjectRecord) {
+function getRandomFolderName(project: ProjectRecord) {
   let n = 1
   while (true) {
-    const name = `page-${n}`
-    if (project.pages.every(p => p.name !== name)) {
+    const name = `folder-${n}`
+    if (project.folders.every(p => p.name !== name)) {
       return name
     }
     n++
@@ -26,7 +27,7 @@ function getRandomPageName(project: ProjectRecord) {
 }
 
 function getRandomHtmlName() {
-  return `selector-${Math.random().toFixed(3)}`
+  return `html-${Math.random().toFixed(3)}`
 }
 
 function getRandomSelectorName() {
@@ -34,19 +35,13 @@ function getRandomSelectorName() {
 }
 
 export default function Sidebar({ state, dispatch }: SidebarProps) {
-  const {
-    activePageId: activeFolderId,
-    projectAtom,
-    htmlAtoms,
-    selectorAtoms,
-    activeHtmlId,
-    activeSelectorId,
-  } = state
+  const { activeFolderId, project, htmls, selectors, activeHtmlId, activeSelectorId } = state
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
     return (...args: ARGS) => dispatch(actionCreator(...args))
   }
 
+  // TODO 去掉 noop
   const folderHandlers = {
     add: wrap(actions.requestAddFolder),
     delete: wrap(actions.requestDeleteFolder),
@@ -54,31 +49,63 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
     rename: wrap(actions.requestRenameFolder),
   }
   const htmlHandlers = {
-    add: noop,
+    add: wrap(actions.requestAddHtml),
     choose: wrap(actions.openHtmlTab),
-    delete: noop,
+    delete: wrap(actions.requestDeleteHtml),
     rename: noop,
   }
   const selectorHandlers = {
-    add: noop,
+    add: wrap(actions.requestAddSelector),
     choose: wrap(actions.openSelectorTab),
-    delete: noop,
+    delete: wrap(actions.requestDeleteSelector),
     rename: noop,
   }
 
-  const folders =
-    projectAtom.status === 'ready' ? projectAtom.value.pages : Map<number, PageRecord>()
-  const description = projectAtom.status === 'ready' ? projectAtom.value.description : 'loading...'
+  const dialogs = useDialogs()
 
-  const activeFolder = folders.find(folder => folder.pageId === activeFolderId)
+  async function onDeleteFolder(folderId: number) {
+    const folder = project.folders.get(folderId)
+    const confirmed = await dialogs.confirm({
+      title: '确认删除',
+      message: `确定要删除文件夹 ${folder.name} 吗？该操作无法撤销`,
+    })
+    if (!confirmed) {
+      return
+    }
+    folderHandlers.delete(folderId)
+  }
 
-  // todo 假设所有的 atom 已经加载完成
-  const visibleHtmls = htmlAtoms
-    .map(atom => atom.value)
-    .filter(html => html.folderId === activeFolderId)
-  const visibleSelectors = selectorAtoms
-    .map(atom => atom.value)
-    .filter(selector => selector.folderId === activeFolderId)
+  async function onDeleteHtml(htmlId: number) {
+    const html = htmls.get(htmlId)
+    const confirmed = await dialogs.confirm({
+      title: '确认删除',
+      message: `确定要删除文档 ${html.name} 吗？该操作无法撤销`,
+    })
+    if (!confirmed) {
+      return
+    }
+    htmlHandlers.delete(htmlId)
+  }
+
+  async function onDeleteSelector(selectorId: number) {
+    const selector = selectors.get(selectorId)
+    const confirmed = await dialogs.confirm({
+      title: '确认删除',
+      message: `确定要删除选择器 ${selector.name} 吗？该操作无法撤销`,
+    })
+    if (!confirmed) {
+      return
+    }
+    selectorHandlers.delete(selectorId)
+  }
+
+  // TODO 有更好的方法判断 project 是否加载完毕
+  const folders = project.projectId > 0 ? project.folders : Map<number, FolderRecord>()
+  const description = project.projectId > 0 ? project.description : 'loading...'
+
+  const activeFolder = folders.find(folder => folder.folderId === activeFolderId)
+  const visibleHtmls = htmls.filter(html => html.folderId === activeFolderId)
+  const visibleSelectors = selectors.filter(selector => selector.folderId === activeFolderId)
 
   return (
     <div className="sidebar">
@@ -93,24 +120,22 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
           <div className="description">{description}</div>
         </div>
       </div>
-      <div className="part pages-part">
+      <div className="part folders-part">
         <div className="part-title">
-          <span>Pages</span>
+          <span>Folders</span>
           <div className="actions">
-            <AddFolderIcon
-              onClick={() => folderHandlers.add(getRandomPageName(projectAtom.value), '')}
-            />
+            <AddFolderIcon onClick={() => folderHandlers.add(getRandomFolderName(project), '')} />
           </div>
         </div>
         <div className="part-content">
           <ul className="list folder-list">
             {folders
-              .sortBy(folder => folder.pageId)
+              .sortBy(folder => folder.folderId)
               .map(folder => (
                 <li
-                  key={folder.pageId}
-                  className={classNames({ active: folder.pageId === activeFolderId })}
-                  onClick={() => folderHandlers.choose(folder.pageId)}
+                  key={folder.folderId}
+                  className={classNames({ active: folder.folderId === activeFolderId })}
+                  onClick={() => folderHandlers.choose(folder.folderId)}
                 >
                   <span className="folder-name">{folder.name}</span>
                   <span className="actions">
@@ -118,14 +143,13 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                       onClick={e => {
                         e.stopPropagation()
                         // TODO get new folder name from user input
-                        folderHandlers.rename(folder.pageId, '')
+                        folderHandlers.rename(folder.folderId, '')
                       }}
                     />
                     <DeleteIcon
                       onClick={e => {
                         e.stopPropagation()
-                        // TODO 需要让用户确认删除
-                        folderHandlers.delete(folder.pageId)
+                        onDeleteFolder(folder.folderId)
                       }}
                     />
                   </span>
@@ -142,7 +166,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
           <div className="actions">
             <AddFileIcon
               disabled={activeFolder == null}
-              onClick={() => selectorHandlers.add(getRandomHtmlName())}
+              onClick={() => htmlHandlers.add(getRandomHtmlName())}
             />
           </div>
         </div>
@@ -170,7 +194,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                         onClick={e => {
                           e.stopPropagation()
                           // TODO user confirmation
-                          htmlHandlers.delete(html.htmlId)
+                          onDeleteHtml(html.htmlId)
                         }}
                       />
                     </span>
@@ -215,8 +239,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                       <DeleteIcon
                         onClick={e => {
                           e.stopPropagation()
-                          // TODO user confirmation
-                          selectorHandlers.delete(selector.selectorId)
+                          onDeleteSelector(selector.selectorId)
                         }}
                       />
                     </span>

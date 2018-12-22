@@ -1,8 +1,8 @@
 import { Map, Record } from 'immutable'
 import * as monaco from 'monaco-editor'
-import { AtomRecord } from '../utils/atoms'
 
 const SelectorRecordBase = Record({
+  // TODO status
   selectorId: 0,
   folderId: 0,
   name: '',
@@ -21,6 +21,7 @@ export class SelectorRecord extends SelectorRecordBase {
 }
 
 const HtmlRecordBase = Record({
+  // TODO status
   htmlId: 0,
   folderId: 0,
   name: '',
@@ -38,22 +39,23 @@ export class HtmlRecord extends HtmlRecordBase {
   }
 }
 
-const PageRecordBase = Record({
-  pageId: 0,
+const FolderRecordBase = Record({
+  folderId: 0,
   name: '',
   description: '',
   createdAt: '',
   updatedAt: '',
 })
 
-export class PageRecord extends PageRecordBase {}
+export class FolderRecord extends FolderRecordBase {}
 
 const ProjectRecordBase = Record({
+  // TODO status
   projectId: 0,
   userId: 0,
   name: '',
   description: '',
-  pages: Map<number, PageRecord>(),
+  folders: Map<number, FolderRecord>(),
   createdAt: '',
   updatedAt: '',
 })
@@ -83,16 +85,15 @@ export class HtmlTabRecord extends Record({
   }
 }
 
+// 注意更新 htmlTabs/selectorTabs 的时候记得同步更新 monaco editor model
 export class EditorPageState extends Record({
-  projectAtom: AtomRecord.loading(null as ProjectRecord),
-  selectorAtoms: Map<number, AtomRecord<SelectorRecord>>(),
-  htmlAtoms: Map<number, AtomRecord<HtmlRecord>>(),
+  project: new ProjectRecord(),
+  selectors: Map<number, SelectorRecord>(),
+  htmls: Map<number, HtmlRecord>(),
   selectorTabs: Map<number, SelectorTabRecord>(),
   htmlTabs: Map<number, HtmlTabRecord>(),
-  activePageId: -1,
+  activeFolderId: -1,
   activeSelectorId: -1,
   activeHtmlId: -1,
   nextOpenOrder: 1,
 }) {}
-
-// const state = new EditorPageState()

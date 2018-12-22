@@ -7,11 +7,14 @@ export type Action =
   | CloseHtmlTab
   | LoadTestData
   | OpenFolder
-  | DeleteSelector
   | UpdateHtmlAvid
   | UpdateSelectorAvid
   | RequestSaveCurrentHtml
   | RequestSaveCurrentSelector
+  | RequestAddHtml
+  | RequestDeleteHtml
+  | RequestAddSelector
+  | RequestDeleteSelector
   | RequestAddFolder
   | RequestDeleteFolder
   | RequestRenameFolder
@@ -64,9 +67,9 @@ export function openFolder(folderId: number) {
   return { type: 'open-folder' as 'open-folder', folderId }
 }
 
-export type DeleteSelector = ReturnType<typeof deleteSelector>
-export function deleteSelector(folderId: number, selectorId: number) {
-  return { type: 'delete-selector' as 'delete-selector', folderId, selectorId }
+export type RequestDeleteSelector = ReturnType<typeof requestDeleteSelector>
+export function requestDeleteSelector(selectorId: number) {
+  return { type: 'request-delete-selector' as 'request-delete-selector', selectorId }
 }
 
 export type UpdateHtmlAvid = ReturnType<typeof updateHtmlAvid>
@@ -87,6 +90,21 @@ export function requestSaveCurrentHtml() {
 export type RequestSaveCurrentSelector = ReturnType<typeof requestSaveCurrentSelector>
 export function requestSaveCurrentSelector() {
   return { type: 'request-save-current-selector' as 'request-save-current-selector' }
+}
+
+export type RequestAddHtml = ReturnType<typeof requestAddHtml>
+export function requestAddHtml(name: string) {
+  return { type: 'request-add-html' as 'request-add-html', name }
+}
+
+export type RequestDeleteHtml = ReturnType<typeof requestDeleteHtml>
+export function requestDeleteHtml(htmlId: number) {
+  return { type: 'request-delete-html' as 'request-delete-html', htmlId }
+}
+
+export type RequestAddSelector = ReturnType<typeof requestAddSelector>
+export function requestAddSelector(name: string) {
+  return { type: 'request-add-selector' as 'request-add-selector', name }
 }
 
 export type RequestAddFolder = ReturnType<typeof requestAddFolder>

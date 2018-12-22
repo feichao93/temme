@@ -34,15 +34,11 @@ export default function ProjectPage(props: ProjectPageProps) {
     args: [login, projectName],
     initialState: new EditorPageState(),
   })
-  const { htmlAtoms, selectorAtoms, htmlTabs, selectorTabs, activeHtmlId, activeSelectorId } = state
+  const { htmls, selectors, htmlTabs, selectorTabs, activeHtmlId, activeSelectorId } = state
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
     return (...args: ARGS) => dispatch(actionCreator(...args))
   }
-
-  // console.log('activeFolderId:', activePageId)
-  // console.log('activeHtmlId:', activeHtmlId)
-  // console.log('activeSelectorId:', activeSelectorId)
 
   // 将 body.style.overflow 设置为 hidden
   // 防止 monaco 编辑器中部分元素导致的额外滚动条
@@ -157,7 +153,7 @@ export default function ProjectPage(props: ProjectPageProps) {
             <HtmlTablist
               tabs={htmlTabs}
               activeHtmlId={activeHtmlId}
-              htmlAtoms={htmlAtoms}
+              htmls={htmls}
               onOpen={wrap(actions.openHtmlTab)}
               onClose={wrap(actions.closeHtmlTab)}
             />
@@ -169,7 +165,7 @@ export default function ProjectPage(props: ProjectPageProps) {
             <SelectorTabList
               tabs={selectorTabs}
               activeSelectorId={activeSelectorId}
-              selectorAtoms={selectorAtoms}
+              selectors={selectors}
               onOpen={wrap(actions.openSelectorTab)}
               onClose={wrap(actions.closeSelectorTab)}
             />

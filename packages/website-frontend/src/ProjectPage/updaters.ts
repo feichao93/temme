@@ -1,6 +1,33 @@
-import { EditorPageState, HtmlTabRecord, SelectorTabRecord } from './interfaces'
+import {
+  EditorPageState,
+  FolderRecord,
+  HtmlRecord,
+  HtmlTabRecord,
+  SelectorRecord,
+  SelectorTabRecord,
+} from './interfaces'
 import * as selectors from './selectors'
 import { inc } from './utils'
+
+export function updateHtmlContent(state: EditorPageState, htmlId: number, content: string) {
+  return state.setIn(['htmls', htmlId, 'content'], content)
+}
+
+export function updateSelectorContent(state: EditorPageState, selectorId: number, content: string) {
+  return state.setIn(['selectors', selectorId, 'content'], content)
+}
+
+export function updateHtmlInitAvid(state: EditorPageState, htmlId: number, initAvid: number) {
+  return state.setIn(['htmlTabs', htmlId, 'initAvid'], initAvid)
+}
+
+export function updateSelectorInitAvid(
+  state: EditorPageState,
+  selectorId: number,
+  initAvid: number,
+) {
+  return state.setIn(['selectorTabs', selectorId, 'initAvid'], initAvid)
+}
 
 export function pushHtmlTabRecord(state: EditorPageState, htmlId: number, avid: number) {
   const openOrder = state.nextOpenOrder
@@ -51,7 +78,7 @@ export function clearSelectorTabRecord(state: EditorPageState) {
 }
 
 export function setActiveFolderId(state: EditorPageState, folderId: number) {
-  return state.set('activePageId', folderId)
+  return state.set('activeFolderId', folderId)
 }
 
 export function deleteSelectorTabRecord(state: EditorPageState, selectorId: number) {
@@ -60,4 +87,16 @@ export function deleteSelectorTabRecord(state: EditorPageState, selectorId: numb
 
 export function deleteHtmlTabRecord(state: EditorPageState, htmlId: number) {
   return state.update('htmlTabs', tabs => tabs.delete(htmlId))
+}
+
+export function updateFolder(state: EditorPageState, folder: FolderRecord) {
+  return state.setIn(['project', 'folders', folder.folderId], folder)
+}
+
+export function updateHtml(state: EditorPageState, html: HtmlRecord) {
+  return state.setIn(['htmls', html.htmlId], html)
+}
+
+export function updateSelector(state: EditorPageState, selector: SelectorRecord) {
+  return state.setIn(['selectors', selector.selectorId], selector)
 }

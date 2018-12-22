@@ -2,29 +2,21 @@ import classNames from 'classnames'
 import { Map } from 'immutable'
 import React from 'react'
 import { FileIcon } from '../icons'
-import { AtomRecord } from '../utils/atoms'
-import {
-  CloseCleanIcon,
-  CloseDirtyIcon,
-  CloseIcon,
-  FileTypeHtmlIcon,
-  FileTypeJsonIcon,
-  FileTypeTSIcon,
-} from './icons'
+import { CloseIcon, FileTypeHtmlIcon, FileTypeJsonIcon, FileTypeTSIcon } from './icons'
 import { HtmlRecord, HtmlTabRecord, SelectorRecord, SelectorTabRecord } from './interfaces'
 import './tablists.styl'
 
 export interface HtmlTablistProps {
   tabs: Map<number, HtmlTabRecord>
   activeHtmlId: number
-  htmlAtoms: Map<number, AtomRecord<HtmlRecord>>
+  htmls: Map<number, HtmlRecord>
   onOpen(htmlId: number): void
   onClose(htmlId: number): void
 }
 
 // TODO HtmlTablist 和 selectorTabList 代码重复
 
-export function HtmlTablist({ tabs, activeHtmlId, htmlAtoms, onOpen, onClose }: HtmlTablistProps) {
+export function HtmlTablist({ tabs, activeHtmlId, htmls, onOpen, onClose }: HtmlTablistProps) {
   function onMouseDown(e: React.MouseEvent<HTMLDivElement>, htmlId: number) {
     // TODO 下面这个行为有点问题
     // 阻止浏览器的默认行为，包括
@@ -53,8 +45,9 @@ export function HtmlTablist({ tabs, activeHtmlId, htmlAtoms, onOpen, onClose }: 
             onMouseDown={e => onMouseDown(e, tab.htmlId)}
           >
             <FileTypeHtmlIcon />
-            <span className="tabname">{htmlAtoms.get(tab.htmlId).value.name}</span>
+            <span className="tabname">{htmls.get(tab.htmlId).name}</span>
             <CloseIcon
+              dirty={tab.isDirty()}
               onClick={e => {
                 e.stopPropagation()
                 onClose(tab.htmlId)
@@ -85,7 +78,7 @@ export const OutputTablist = React.memo(() => (
 export interface SelectTabListProps {
   tabs: Map<number, SelectorTabRecord>
   activeSelectorId: number
-  selectorAtoms: Map<number, AtomRecord<SelectorRecord>>
+  selectors: Map<number, SelectorRecord>
   onOpen(selectorId: number): void
   onClose(selectorId: number): void
 }
@@ -95,7 +88,7 @@ export function SelectorTabList({
   activeSelectorId,
   onOpen,
   onClose,
-  selectorAtoms,
+  selectors,
 }: SelectTabListProps) {
   function onMouseDown(e: React.MouseEvent<HTMLDivElement>, selectorId: number) {
     // 阻止浏览器的默认行为，包括
@@ -124,14 +117,14 @@ export function SelectorTabList({
             onMouseDown={e => onMouseDown(e, tab.selectorId)}
           >
             <FileIcon />
-            <span className="tabname">{selectorAtoms.get(tab.selectorId).value.name}</span>
-            {React.createElement(tab.isDirty() ? CloseDirtyIcon : CloseCleanIcon, {
-              size: 16,
-              onClick(e: any) {
+            <span className="tabname">{selectors.get(tab.selectorId).name}</span>
+            <CloseIcon
+              dirty={tab.isDirty()}
+              onClick={e => {
                 e.stopPropagation()
                 onClose(tab.selectorId)
-              },
-            })}
+              }}
+            />
           </div>
         ))
         .valueSeq()}
