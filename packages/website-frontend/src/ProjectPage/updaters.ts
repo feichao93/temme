@@ -81,6 +81,14 @@ export function setActiveFolderId(state: EditorPageState, folderId: number) {
   return state.set('activeFolderId', folderId)
 }
 
+export function setActiveHtmlId(state: EditorPageState, htmlId: number) {
+  return state.set('activeHtmlId', htmlId)
+}
+
+export function setActiveSelectorId(state: EditorPageState, selectorId: number) {
+  return state.set('activeSelectorId', selectorId)
+}
+
 export function deleteSelectorTabRecord(state: EditorPageState, selectorId: number) {
   return state.update('selectorTabs', tabs => tabs.delete(selectorId))
 }

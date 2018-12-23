@@ -195,42 +195,47 @@ function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
 
 function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   const {
-    project,
     selectorTabs,
     htmlTabs,
-    htmls,
+    htmls: htmlMap,
     selectors: selectorMap,
   }: EditorPageState = yield io.select()
   // TODO 这里假设 selectorAtoms, htmlAtoms, projectAtom 已经全部加载完毕
+  const { dialogs, htmlEditorRef, selectorEditorRef }: SagaEnv = yield io.getEnv()
+  const dirtyHtmls = htmlTabs.filter(tab => tab.isDirty()).map(tab => htmlMap.get(tab.htmlId))
+  const dirtySelectors = selectorTabs
+    .filter(tab => tab.isDirty())
+    .map(tab => selectorMap.get(tab.selectorId))
 
-  // const isHtmlDirty = htmlTabInfo.initAvid !== htmlTabInfo.avid
-  // const dirtySelectors = selectorTabItems.filter(item => item.avid !== item.initAvid)
-  //
-  // const needSave = isHtmlDirty || dirtySelectors.length > 0
-  // if (needSave) {
-  //   const option = await dialogs.ternary({
-  //     message: 'HTML或部分选择器尚未保存，是否保存当前更改？',
-  //   })
-  //   if (option === 'cancel') {
-  //     return
-  //   }
-  //   if (option === 'yes') {
-  //     try {
-  //       const saveHtmlPromise = isHtmlDirty ? saveHtml(activePageId) : Promise.resolve()
-  //       const saveSelectorPromises = dirtySelectors.map(selector =>
-  //         saveSelector(activePageId, selector.name),
-  //       )
-  //       await Promise.all([saveHtmlPromise, ...saveSelectorPromises])
-  //     } catch (e) {
-  //       dialogs.alert(e)
-  //       return
-  //     }
-  //   }
-  // }
+  const needSave = !(dirtyHtmls.isEmpty() && dirtySelectors.isEmpty())
+  if (needSave) {
+    const option = yield dialogs.ternary({
+      message: '部分文档或选择器尚未保存，是否保存当前更改？',
+    })
+    if (option === 'cancel') {
+      return
+    }
+    if (option === 'yes') {
+      try {
+        const saveHtmlEffects = dirtyHtmls
+          .map(html => saveHtml(html.htmlId))
+          .valueSeq()
+          .toArray()
+        const saveSelectorEffects = dirtySelectors
+          .map(selector => saveSelector(selector.selectorId))
+          .valueSeq()
+          .toArray()
+        yield io.all(saveHtmlEffects.concat(saveSelectorEffects))
+      } catch (e) {
+        dialogs.alert(e)
+        return
+      }
+    }
+  }
 
   // 销毁当前 folder 下所有的 html model
   htmlTabs.forEach(tab => {
-    const html = htmls.get(tab.htmlId)
+    const html = htmlMap.get(tab.htmlId)
     const model = monaco.editor.getModel(html.getUriObject())
     model.dispose()
   })
@@ -247,16 +252,16 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   yield io.update(updaters.setActiveFolderId, folderId)
 
   // 自动打开第一个 html
-  const firstHtmlId = htmls
+  const firstHtmlId = htmlMap
     .filter(html => html.folderId === folderId)
     .map(html => html.htmlId)
     .min()
   if (firstHtmlId != null) {
     yield io.put(actions.openHtmlTab(firstHtmlId))
+  } else {
+    htmlEditorRef.current.setModel(null)
+    yield io.update(updaters.setActiveHtmlId, -1)
   }
-  // TODO
-  //  htmlEditorRef.current.setModel(null)
-  //  activeHtmlId ?
 
   // 自动打开第一个 selector
   const firstSelectorId = selectorMap
@@ -266,14 +271,23 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
 
   if (firstSelectorId != null) {
     yield io.put(actions.openSelectorTab(firstSelectorId))
+  } else {
+    selectorEditorRef.current.setModel(null)
+    yield io.update(updaters.setActiveSelectorId, -1)
   }
-  // TODO
-  //  selectorEditorRef.current.setModel(null)
-  //  activeSelectorId ?
 }
 
 function* handleRequestDeleteSelector({ selectorId }: actions.RequestDeleteSelector) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
   const selector: SelectorRecord = yield io.select(selectors.selector, selectorId)
+  const confirmed = yield dialogs.confirm({
+    title: '确认删除',
+    message: `确定要删除选择器 ${selector.name} 吗？该操作无法撤销`,
+  })
+  if (!confirmed) {
+    return
+  }
+
   yield server.deleteSelector(selectorId)
   const { activeSelectorId }: EditorPageState = yield io.update((state: EditorPageState) =>
     state
@@ -308,7 +322,6 @@ function* saveHtml(htmlId: number) {
   yield server.saveHtml(htmlId, content)
   yield io.update(updaters.updateHtmlInitAvid, htmlId, nextInitAvid)
   yield io.update(updaters.updateHtmlContent, htmlId, content)
-  // todo 错误处理
 }
 
 /** 获取 selector 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
@@ -320,7 +333,6 @@ function* saveSelector(selectorId: number) {
   yield server.saveSelector(selectorId, content)
   yield io.update(updaters.updateSelectorInitAvid, selectorId, nextInitAvid)
   yield io.update(updaters.updateSelectorContent, selectorId, content)
-  // todo 错误处理
 }
 
 function* handleRequestAddFolder({ name, description }: actions.RequestAddFolder) {
@@ -331,6 +343,16 @@ function* handleRequestAddFolder({ name, description }: actions.RequestAddFolder
 }
 
 function* handleRequestDeleteFolder({ folderId }: actions.RequestDeleteFolder) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const folder = yield io.select(selectors.folder, folderId)
+  const confirmed: boolean = yield dialogs.confirm({
+    title: '确认删除',
+    message: `确定要删除文件夹 ${folder.name} 吗？该操作无法撤销`,
+  })
+  if (!confirmed) {
+    return
+  }
+
   yield server.deleteFolder(folderId)
   yield io.update((state: EditorPageState) => {
     const selectorIdSet = state.selectors
@@ -371,7 +393,16 @@ function* handleRequestAddHtml({ name }: actions.RequestAddHtml) {
 }
 
 function* handleRequestDeleteHtml({ htmlId }: actions.RequestDeleteHtml) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
   const html: HtmlRecord = yield io.select(selectors.html, htmlId)
+  const confirmed: boolean = yield dialogs.confirm({
+    title: '确认删除',
+    message: `确定要删除文档 ${html.name} 吗？该操作无法撤销`,
+  })
+  if (!confirmed) {
+    return
+  }
+
   yield server.deleteHtml(htmlId)
   const { activeHtmlId }: EditorPageState = yield io.update((state: EditorPageState) =>
     state

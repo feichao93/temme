@@ -2,6 +2,14 @@ import { MouseEventHandler } from 'react'
 import classNames from 'classnames'
 import React from 'react'
 
+type PropagationStoppable = { stopPropagation(): any }
+function stopPropagation<E extends PropagationStoppable, RET>(handler: (e: E) => RET) {
+  return function(e: E) {
+    e.stopPropagation()
+    return handler(e)
+  }
+}
+
 export interface IconProps {
   disabled?: boolean
   onClick: MouseEventHandler
@@ -33,7 +41,7 @@ export function DeleteIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
       viewBox="0 0 24 24"
@@ -49,7 +57,7 @@ export function RenameIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
       viewBox="0 0 100 100"

@@ -1,7 +1,6 @@
 import classNames from 'classnames'
 import { Map } from 'immutable'
 import React from 'react'
-import { useDialogs } from '../Dialog/dialogs'
 import * as actions from './actions'
 import { Action } from './actions'
 import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
@@ -34,6 +33,49 @@ function getRandomSelectorName() {
   return `selector-${Math.random().toFixed(3)}`
 }
 
+function Part({
+  name,
+  actions,
+  children,
+}: {
+  name: string
+  actions: React.ReactNode
+  children: React.ReactNode
+}) {
+  return (
+    <div className={classNames('part', `part-${name}`)}>
+      <div className="part-title">
+        <span>{name}</span>
+        <div className="actions">{actions}</div>
+      </div>
+      <div className="part-content">{children}</div>
+    </div>
+  )
+}
+
+function SimpleList({ children }: { children: React.ReactNode }) {
+  return <ul className="list htmls-list">{children}</ul>
+}
+
+function SimpleListItem({
+  text,
+  active,
+  onClick,
+  actions,
+}: {
+  active: boolean
+  onClick(): void
+  text: string
+  actions: React.ReactNode
+}) {
+  return (
+    <li className={classNames({ active })} onClick={onClick}>
+      <span className="html-name">{text}</span>
+      <span className="actions">{actions}</span>
+    </li>
+  )
+}
+
 export default function Sidebar({ state, dispatch }: SidebarProps) {
   const { activeFolderId, project, htmls, selectors, activeHtmlId, activeSelectorId } = state
 
@@ -59,44 +101,6 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
     choose: wrap(actions.openSelectorTab),
     delete: wrap(actions.requestDeleteSelector),
     rename: noop,
-  }
-
-  const dialogs = useDialogs()
-
-  async function onDeleteFolder(folderId: number) {
-    const folder = project.folders.get(folderId)
-    const confirmed = await dialogs.confirm({
-      title: '确认删除',
-      message: `确定要删除文件夹 ${folder.name} 吗？该操作无法撤销`,
-    })
-    if (!confirmed) {
-      return
-    }
-    folderHandlers.delete(folderId)
-  }
-
-  async function onDeleteHtml(htmlId: number) {
-    const html = htmls.get(htmlId)
-    const confirmed = await dialogs.confirm({
-      title: '确认删除',
-      message: `确定要删除文档 ${html.name} 吗？该操作无法撤销`,
-    })
-    if (!confirmed) {
-      return
-    }
-    htmlHandlers.delete(htmlId)
-  }
-
-  async function onDeleteSelector(selectorId: number) {
-    const selector = selectors.get(selectorId)
-    const confirmed = await dialogs.confirm({
-      title: '确认删除',
-      message: `确定要删除选择器 ${selector.name} 吗？该操作无法撤销`,
-    })
-    if (!confirmed) {
-      return
-    }
-    selectorHandlers.delete(selectorId)
   }
 
   // TODO 有更好的方法判断 project 是否加载完毕
@@ -139,19 +143,8 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                 >
                   <span className="folder-name">{folder.name}</span>
                   <span className="actions">
-                    <RenameIcon
-                      onClick={e => {
-                        e.stopPropagation()
-                        // TODO get new folder name from user input
-                        folderHandlers.rename(folder.folderId, '')
-                      }}
-                    />
-                    <DeleteIcon
-                      onClick={e => {
-                        e.stopPropagation()
-                        onDeleteFolder(folder.folderId)
-                      }}
-                    />
+                    <RenameIcon onClick={() => folderHandlers.rename(folder.folderId, '')} />
+                    <DeleteIcon onClick={() => folderHandlers.delete(folder.folderId)} />
                   </span>
                 </li>
               ))
@@ -160,96 +153,65 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         </div>
       </div>
 
-      <div className="part htmls-part">
-        <div className="part-title">
-          <span>Htmls</span>
-          <div className="actions">
-            <AddFileIcon
-              disabled={activeFolder == null}
-              onClick={() => htmlHandlers.add(getRandomHtmlName())}
-            />
-          </div>
-        </div>
-        <div className="part-content">
-          {!visibleHtmls.isEmpty() && (
-            <ul className="list htmls-list">
-              {visibleHtmls
-                .sortBy(html => html.htmlId)
-                .map(html => (
-                  <li
-                    key={html.htmlId}
-                    className={classNames({ active: html.htmlId === activeHtmlId })}
-                    onClick={() => htmlHandlers.choose(html.htmlId)}
-                  >
-                    <span className="html-name">{html.name}</span>
-                    <span className="actions">
-                      <RenameIcon
-                        onClick={e => {
-                          e.stopPropagation()
-                          // TODO dialogs.prompt
-                          htmlHandlers.rename(html.htmlId, '')
-                        }}
-                      />
-                      <DeleteIcon
-                        onClick={e => {
-                          e.stopPropagation()
-                          // TODO user confirmation
-                          onDeleteHtml(html.htmlId)
-                        }}
-                      />
-                    </span>
-                  </li>
-                ))
-                .valueSeq()}
-            </ul>
-          )}
-        </div>
-      </div>
+      <Part
+        name="htmls"
+        actions={
+          <AddFileIcon
+            disabled={activeFolder == null}
+            onClick={() => htmlHandlers.add(getRandomHtmlName())}
+          />
+        }
+      >
+        <SimpleList>
+          {visibleHtmls
+            .sortBy(html => html.htmlId)
+            .map(html => (
+              <SimpleListItem
+                key={html.htmlId}
+                active={html.htmlId === activeHtmlId}
+                onClick={() => htmlHandlers.choose(html.htmlId)}
+                text={html.name}
+                actions={
+                  <>
+                    <RenameIcon onClick={() => htmlHandlers.rename(html.htmlId, '')} />
+                    <DeleteIcon onClick={() => htmlHandlers.delete(html.htmlId)} />
+                  </>
+                }
+              />
+            ))
+            .valueSeq()}
+        </SimpleList>
+      </Part>
 
-      <div className="part selectors-part">
-        <div className="part-title">
-          <span>Selectors</span>
-          <div className="actions">
-            <AddFileIcon
-              disabled={activeFolder == null}
-              onClick={() => selectorHandlers.add(getRandomSelectorName())}
-            />
-          </div>
-        </div>
-        <div className="part-content">
-          {!visibleSelectors.isEmpty() && (
-            <ul className="list selectors-list">
-              {visibleSelectors
-                .sortBy(selector => selector.selectorId)
-                .map(selector => (
-                  <li
-                    key={selector.selectorId}
-                    className={classNames({ active: selector.selectorId === activeSelectorId })}
-                    onClick={() => selectorHandlers.choose(selector.selectorId)}
-                  >
-                    <span className="selector-name">{selector.name}</span>
-                    <span className="actions">
-                      <RenameIcon
-                        onClick={e => {
-                          e.stopPropagation()
-                          // TODO dialogs.prompt
-                          selectorHandlers.rename(selector.selectorId, '')
-                        }}
-                      />
-                      <DeleteIcon
-                        onClick={e => {
-                          e.stopPropagation()
-                          onDeleteSelector(selector.selectorId)
-                        }}
-                      />
-                    </span>
-                  </li>
-                ))
-                .valueSeq()}
-            </ul>
-          )}
-        </div>
-      </div>
+      <Part
+        name="selectors"
+        actions={
+          <AddFileIcon
+            disabled={activeFolder == null}
+            onClick={() => selectorHandlers.add(getRandomSelectorName())}
+          />
+        }
+      >
+        <SimpleList>
+          {visibleSelectors
+            .sortBy(selector => selector.selectorId)
+            .map(selector => (
+              <SimpleListItem
+                key={selector.selectorId}
+                active={selector.selectorId === activeSelectorId}
+                onClick={() => selectorHandlers.choose(selector.selectorId)}
+                text={selector.name}
+                actions={
+                  <>
+                    <RenameIcon onClick={() => selectorHandlers.rename(selector.selectorId, '')} />
+                    <DeleteIcon onClick={() => selectorHandlers.delete(selector.selectorId)} />
+                  </>
+                }
+              />
+            ))
+            .valueSeq()}
+        </SimpleList>
+      </Part>
     </div>
   )
 }

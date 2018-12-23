@@ -1,5 +1,9 @@
 import { EditorPageState } from './interfaces'
 
+export function folder(state: EditorPageState, folderId:number) {
+  return state.project.folders.get(folderId)
+}
+
 export function selector(state: EditorPageState, selectorId: number) {
   return state.selectors.get(selectorId)
 }
