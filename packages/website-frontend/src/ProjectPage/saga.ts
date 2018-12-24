@@ -380,6 +380,10 @@ function* handleRequestUpdateFolder({ folderId }: actions.RequestUpdateFolder) {
   if (newName == null || newName === folder.name) {
     return
   }
+  if (state.project.folders.some(f => f.name === newName)) {
+    yield dialogs.alert({ message: '已存在相同名称的文件夹' })
+    return
+  }
   try {
     yield server.renameFolder(folderId, newName)
     yield io.update((state: State) =>
@@ -478,6 +482,10 @@ function* handleRequestRenameHtml({ htmlId }: actions.RequestRenameHtml) {
   if (newName == null || newName === html.name) {
     return
   }
+  if (state.htmls.some(h => h.folderId === html.folderId && h.name === newName)) {
+    yield dialogs.alert({ message: '已存在相同名称的 html' })
+    return
+  }
   try {
     yield server.renameHtml(htmlId, newName)
     yield io.update((state: State) => state.setIn(['htmls', htmlId, 'name'], newName))
@@ -552,6 +560,10 @@ function* handleRequestRenameSelector({ selectorId }: actions.RequestRenameSelec
     initValue: selector.name,
   })
   if (newName == null || newName == selector.name) {
+    return
+  }
+  if (state.selectors.some(s => s.folderId === selector.folderId && s.name === newName)) {
+    yield dialogs.alert({ message: '已存在相同名称的选择器' })
     return
   }
   try {
