@@ -49,17 +49,21 @@ export default function* saga(login: string, projectName: string) {
     ),
   )
 
+  yield takeEvery(a('open-folder'), handleOpenFolder)
   yield takeEvery(a('open-html-tab'), handleOpenHtmlTab)
   yield takeEvery(a('open-selector-tab'), handleOpenSelectorTab)
   yield takeEvery(a('close-html-tab'), handleCloseHtmlTab)
   yield takeEvery(a('close-selector-tab'), handleCloseSelectorTab)
-  yield takeEvery(a('open-folder'), handleOpenFolder)
-  yield takeEvery(a('request-delete-selector'), handleRequestDeleteSelector)
+
   yield takeEvery(a('request-add-folder'), handleRequestAddFolder)
+  yield takeEvery(a('request-update-folder'), handleRequestUpdateFolder)
   yield takeEvery(a('request-delete-folder'), handleRequestDeleteFolder)
   yield takeEvery(a('request-add-html'), handleRequestAddHtml)
+  yield takeEvery(a('request-rename-html'), handleRequestRenameHtml)
   yield takeEvery(a('request-delete-html'), handleRequestDeleteHtml)
   yield takeEvery(a('request-add-selector'), handleRequestAddSelector)
+  yield takeEvery(a('request-rename-selector'), handleRequestRenameSelector)
+  yield takeEvery(a('request-delete-selector'), handleRequestDeleteSelector)
 
   yield takeEvery(a('request-save-current-html'), function*() {
     const state: State = yield io.select()
@@ -69,11 +73,6 @@ export default function* saga(login: string, projectName: string) {
     const state: State = yield io.select()
     yield saveSelector(state.activeSelectorId)
   })
-
-  // TODO
-  //  takeEvery(a('request-rename-folder'), ...)
-  //  takeEvery(a('request-rename-html') ...)
-  //  takeEvery(a('request-rename-selector') ...)
 }
 
 function* loadProjectData(login: string, projectName: string) {
@@ -161,7 +160,7 @@ function* handleCloseHtmlTab({ htmlId }: actions.CloseHtmlTab) {
       try {
         yield saveHtml(htmlId)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         yield dialogs.alert({ title: '保存失败', message: e.message })
         return
       }
@@ -198,7 +197,7 @@ function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
       try {
         yield saveSelector(selectorId)
       } catch (e) {
-        console.log(e)
+        console.error(e)
         yield dialogs.alert({ title: '保存失败', message: e.message })
         return
       }
@@ -237,7 +236,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
   const needSave = !(dirtyHtmls.isEmpty() && dirtySelectors.isEmpty())
   if (needSave) {
     const option = yield dialogs.ternary({
-      message: '部分文档或选择器尚未保存，是否保存当前更改？',
+      message: '部分 html 或选择器尚未保存，是否保存当前更改？',
     })
     if (option === 'cancel') {
       return
@@ -267,7 +266,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
     const model = monaco.editor.getModel(html.getUriObject())
     model.dispose()
   })
-  yield io.update(updaters.clearHtmlTabRecord)
+  yield io.update((state: State) => state.update('htmlTabs', tabs => tabs.clear()))
 
   // 销毁当前 folder 下所有的 selector model
   selectorTabs.forEach(tab => {
@@ -275,9 +274,9 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
     const model = monaco.editor.getModel(selector.getUriObject())
     model.dispose()
   })
-  yield io.update(updaters.clearSelectorTabRecord)
-
-  yield io.update(updaters.setActiveFolderId, folderId)
+  yield io.update((state: State) =>
+    state.update('selectorTabs', tabs => tabs.clear()).set('activeFolderId', folderId),
+  )
 
   // 自动打开第一个 html
   const firstHtmlId = htmlMap
@@ -288,7 +287,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
     yield io.put(actions.openHtmlTab(firstHtmlId))
   } else {
     htmlEditorRef.current.setModel(null)
-    yield io.update(updaters.setActiveHtmlId, -1)
+    yield io.update((state: State) => state.set('activeHtmlId', -1))
   }
 
   // 自动打开第一个 selector
@@ -301,7 +300,7 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
     yield io.put(actions.openSelectorTab(firstSelectorId))
   } else {
     selectorEditorRef.current.setModel(null)
-    yield io.update(updaters.setActiveSelectorId, -1)
+    yield io.update((state: State) => state.set('activeSelectorId', -1))
   }
 }
 
@@ -368,6 +367,28 @@ function* saveSelector(selectorId: number) {
   yield server.saveSelector(selectorId, content)
   yield io.update(updaters.updateSelectorInitAvid, selectorId, nextInitAvid)
   yield io.update(updaters.updateSelectorContent, selectorId, content)
+}
+
+function* handleRequestUpdateFolder({ folderId }: actions.RequestUpdateFolder) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const folder = state.project.folders.get(folderId)
+  const newName: string = yield dialogs.prompt({
+    initValue: folder.name,
+    message: '新的文件夹名称',
+  })
+  if (newName == null || newName === folder.name) {
+    return
+  }
+  try {
+    yield server.renameFolder(folderId, newName)
+    yield io.update((state: State) =>
+      state.setIn(['project', 'folders', folderId, 'name'], newName),
+    )
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '更新文件夹失败', message: e.message })
+  }
 }
 
 function* handleRequestAddFolder() {
@@ -438,7 +459,7 @@ function* handleRequestAddHtml() {
   const state: State = yield io.select()
   const folderId = state.activeFolderId
   const htmlName = getNewHtmlName(state.nextHtmlPostfix)
-  yield io.update((state: State) => state.update('nextFolderPostfix', inc))
+  yield io.update((state: State) => state.update('nextHtmlPostfix', inc))
   try {
     const html: HtmlRecord = yield server.addHtml(folderId, htmlName)
     yield io.update(updaters.updateHtml, html)
@@ -446,6 +467,23 @@ function* handleRequestAddHtml() {
   } catch (e) {
     console.error(e)
     yield dialogs.alert({ title: '添加 html 失败', message: e.message })
+  }
+}
+
+function* handleRequestRenameHtml({ htmlId }: actions.RequestRenameHtml) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const html = state.htmls.get(htmlId)
+  const newName: string = yield dialogs.prompt({ message: '新的 html 名称', initValue: html.name })
+  if (newName == null || newName === html.name) {
+    return
+  }
+  try {
+    yield server.renameHtml(htmlId, newName)
+    yield io.update((state: State) => state.setIn(['htmls', htmlId, 'name'], newName))
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '重命名 html 失败', message: e.message })
   }
 }
 
@@ -494,7 +532,7 @@ function* handleRequestAddSelector() {
   const state: State = yield io.select()
   const folderId = state.activeFolderId
   const selectorName = getNewSelectorName(state.nextSelectorPostfix)
-  yield io.update((state: State) => state.update('nextFolderPostfix', inc))
+  yield io.update((state: State) => state.update('nextSelectorPostfix', inc))
   try {
     const selector: SelectorRecord = yield server.addSelector(folderId, selectorName)
     yield io.update(updaters.updateSelector, selector)
@@ -502,5 +540,25 @@ function* handleRequestAddSelector() {
   } catch (e) {
     console.error(e)
     yield dialogs.alert({ title: '添加选择器失败', message: e.message })
+  }
+}
+
+function* handleRequestRenameSelector({ selectorId }: actions.RequestRenameSelector) {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const selector = state.selectors.get(selectorId)
+  const newName: string = yield dialogs.prompt({
+    message: '新的选择器名称',
+    initValue: selector.name,
+  })
+  if (newName == null || newName == selector.name) {
+    return
+  }
+  try {
+    yield server.renameSelector(selectorId, newName)
+    yield io.update((state: State) => state.setIn(['selectors', selectorId, 'name'], newName))
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '重命名选择器失败', message: e.message })
   }
 }

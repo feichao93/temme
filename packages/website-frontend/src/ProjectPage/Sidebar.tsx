@@ -96,7 +96,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                   <span className="folder-name">{folder.name}</span>
                   <span className="actions">
                     <RenameIcon
-                      onClick={() => dispatch(actions.requestRenameFolder(folder.folderId))}
+                      onClick={() => dispatch(actions.requestUpdateFolder(folder.folderId))}
                     />
                     <DeleteIcon
                       onClick={() => dispatch(actions.requestDeleteFolder(folder.folderId))}

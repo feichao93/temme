@@ -255,11 +255,12 @@ async function updateSelector(ctx: Router.IRouterContext) {
 }
 
 async function renameHtml(ctx: Router.IRouterContext) {
-  const { htmlId, newName } = ctx.request.body
-  ctx.assert(typeof newName === 'string' && newName.length > 0, 400, 'Invalid new html name')
+  const { htmlId, name } = ctx.request.body
+  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid new html name')
 
-  const project = await ctx.service.projects.findOne({ htmlIds: htmlId })
-  ctx.assert(project, 404)
+  const html = await ctx.service.htmls.findOne({ htmlId })
+  ctx.assert(html, 404)
+  const project = await ctx.service.projects.findOne({ 'folders.folderId': html.folderId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
@@ -268,16 +269,17 @@ async function renameHtml(ctx: Router.IRouterContext) {
     { projectId: project.projectId },
     { $set: { updatedAt: now } },
   )
-  await ctx.service.htmls.updateOne({ htmlId }, { $set: { name: newName, updatedAt: now } })
+  await ctx.service.htmls.updateOne({ htmlId }, { $set: { name, updatedAt: now } })
   ctx.body = ''
 }
 
 async function renameSelector(ctx: Router.IRouterContext) {
-  const { selectorId, newName } = ctx.request.body
-  ctx.assert(typeof newName === 'string' && newName.length > 0, 400, 'Invalid new selector name')
+  const { selectorId, name } = ctx.request.body
+  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid new selector name')
 
-  const project = await ctx.service.projects.findOne({ selectorIds: selectorId })
-  ctx.assert(project, 404)
+  const selector = await ctx.service.selectors.findOne({ selectorId })
+  ctx.assert(selector, 404)
+  const project = await ctx.service.projects.findOne({ 'folders.folderId': selector.folderId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
@@ -286,7 +288,7 @@ async function renameSelector(ctx: Router.IRouterContext) {
     { projectId: project.projectId },
     { $set: { updatedAt: now } },
   )
-  await ctx.service.selectors.updateOne({ selectorId }, { $set: { name: newName, updatedAt: now } })
+  await ctx.service.selectors.updateOne({ selectorId }, { $set: { name, updatedAt: now } })
   ctx.body = ''
 }
 

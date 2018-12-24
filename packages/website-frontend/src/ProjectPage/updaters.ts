@@ -1,4 +1,4 @@
-import { HtmlRecord, HtmlTabRecord, SelectorRecord, SelectorTabRecord, State, } from './interfaces'
+import { HtmlRecord, HtmlTabRecord, SelectorRecord, SelectorTabRecord, State } from './interfaces'
 import * as selectors from './selectors'
 import { inc } from './utils'
 
@@ -31,10 +31,6 @@ export function pushHtmlTabRecord(state: State, htmlId: number, avid: number) {
   return state.update('htmlTabs', tabs => tabs.set(htmlId, tabRecord)).update('nextOpenOrder', inc)
 }
 
-export function clearHtmlTabRecord(state: State) {
-  return state.update('htmlTabs', tabs => tabs.clear())
-}
-
 export function refreshHtmlTabOpenOrder(state: State, htmlId: number) {
   return state
     .setIn(['htmlTabs', htmlId, 'openOrder'], state.nextOpenOrder)
@@ -60,22 +56,6 @@ export function pushSelectorTabRecord(state: State, selectorId: number, avid: nu
   return state
     .update('selectorTabs', tabs => tabs.set(selectorId, tabRecord))
     .update('nextOpenOrder', inc)
-}
-
-export function clearSelectorTabRecord(state: State) {
-  return state.update('selectorTabs', tabs => tabs.clear())
-}
-
-export function setActiveFolderId(state: State, folderId: number) {
-  return state.set('activeFolderId', folderId)
-}
-
-export function setActiveHtmlId(state: State, htmlId: number) {
-  return state.set('activeHtmlId', htmlId)
-}
-
-export function setActiveSelectorId(state: State, selectorId: number) {
-  return state.set('activeSelectorId', selectorId)
 }
 
 export function deleteSelectorTabRecord(state: State, selectorId: number) {

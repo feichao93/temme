@@ -27,7 +27,7 @@ export async function saveSelector(selectorId: number, content: string) {
 export async function getProject(login: string, projectName: string) {
   const response = await fetch(`/api/project/${login}/${projectName}`)
   if (!response.ok) {
-    throw new Error(`${response.status} ${response.text()}`)
+    throw new Error(`${response.status} ${await response.text()}`)
   }
   const json = await response.json()
 
@@ -93,133 +93,137 @@ export async function deleteSelector(selectorId: number) {
 }
 
 export async function logout() {
-  const res = await fetch('/api/logout', { method: 'POST' })
-  if (res.ok) {
+  const response = await fetch('/api/logout', { method: 'POST' })
+  if (response.ok) {
     return true
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
 export async function getClientId() {
-  const res = await fetch('/api/client-id')
-  if (res.ok) {
-    const { clientId }: { clientId: number } = await res.json()
+  const response = await fetch('/api/client-id')
+  if (response.ok) {
+    const { clientId }: { clientId: number } = await response.json()
     return { clientId }
   } else {
-    throw new Error('无法连接到服务器')
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
 export async function getMyInfo() {
-  const res = await fetch('/api/my-info')
-  if (res.ok) {
-    const { login: username, userId }: { login: string; userId: number } = await res.json()
+  const response = await fetch('/api/my-info')
+  if (response.ok) {
+    const { login: username, userId }: { login: string; userId: number } = await response.json()
     return { username, userId }
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
+
 // 获取用户的详细信息
 export async function getDetailInfo(username: string) {
-  const res = await fetch(`/api/user-info/${username}`)
-  if (res.ok) {
-    const {
-      id,
-      location,
-      email,
-      bio,
-      name,
-      avatar_url,
-      login,
-      html_url,
-    } = (await res.json()) as UserInfo
-    return { id, location, email, bio, name, avatar_url, login, html_url }
+  const response = await fetch(`/api/user-info/${username}`)
+  if (response.ok) {
+    const json: UserInfo = await response.json()
+    return json
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
 export async function getUserProjects(username: string) {
-  const res = await fetch(`/api/user-info/${username}/projects`)
-  if (res.ok) {
-    return (await res.json()) as Project[]
+  const response = await fetch(`/api/user-info/${username}/projects`)
+  if (response.ok) {
+    return (await response.json()) as Project[]
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
+
 export async function addProject(name: string, description: string) {
-  const res = await fetch('/api/add-project', {
-    method: 'post',
-    headers: {
-      'content-type': 'application/json',
-    },
+  const response = await fetch('/api/add-project', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ name, description }),
   })
-  if (res.ok) {
+  if (response.ok) {
     return true
   } else {
-    throw new Error('创建新项目失败')
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
+
 export async function updateProject(projectId: number, name: string, description: string) {
-  const res = await fetch('/api/update-project', {
-    method: 'post',
+  const response = await fetch('/api/update-project', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ projectId, name, description }),
-    headers: { 'content-type': 'application/json' },
   })
-  if (res.ok) {
+  if (response.ok) {
     return true
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
+
 export async function deleteProject(projectId: number) {
-  const res = await fetch('/api/delete-project', {
-    method: 'post',
+  const response = await fetch('/api/delete-project', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ projectId }),
-    headers: { 'content-type': 'application/json' },
   })
-  if (res.ok) {
+  if (response.ok) {
     return true
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
-export async function renameFolder(projectId: number, folderId: number, name: string) {
-  const res = await fetch('/api/rename-folder', {
-    method: 'post',
-    body: JSON.stringify({ name, projectId, folderId }),
-    headers: {
-      'content-type': 'application/json',
-    },
+export async function renameFolder(folderId: number, name: string) {
+  const response = await fetch('/api/rename-folder', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ folderId, name }),
   })
-  if (res.ok) {
+  if (response.ok) {
     return true
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
-export async function renameSelector(selectorId: number, newName: string) {
-  const res = await fetch('/api/rename-selector', {
-    method: 'post',
-    body: JSON.stringify({ selectorId, newName }),
+export async function renameHtml(htmlId: number, name: string) {
+  const response = await fetch('/api/rename-html', {
+    method: 'POST',
     headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ htmlId, name }),
   })
-  if (res.ok) {
+  if (response.ok) {
     return true
   } else {
-    throw new Error(await res.text())
+    throw new Error(`${response.status} ${await response.text()}`)
+  }
+}
+
+export async function renameSelector(selectorId: number, name: string) {
+  const response = await fetch('/api/rename-selector', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ selectorId, name }),
+  })
+  if (response.ok) {
+    return true
+  } else {
+    throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
 export async function addHtml(folderId: number, name: string) {
   const response = await fetch('/api/add-html', {
-    method: 'post',
-    body: JSON.stringify({ folderId, name }),
+    method: 'POST',
     headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ folderId, name }),
   })
   if (response.ok) {
     const json = await response.json()
@@ -231,9 +235,9 @@ export async function addHtml(folderId: number, name: string) {
 
 export async function addSelector(folderId: number, name: string) {
   const response = await fetch('/api/add-selector', {
-    method: 'post',
-    body: JSON.stringify({ folderId, name }),
+    method: 'POST',
     headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ folderId, name }),
   })
   if (response.ok) {
     const json = await response.json()

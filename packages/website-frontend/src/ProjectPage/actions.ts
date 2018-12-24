@@ -15,7 +15,7 @@ export type Action =
   | RequestRenameSelector
   | RequestDeleteSelector
   | RequestAddFolder
-  | RequestRenameFolder
+  | RequestUpdateFolder
   | RequestDeleteFolder
 
 /** 确保参数一定是合法的 action 类型 */
@@ -115,9 +115,9 @@ export function requestAddFolder() {
   return { type: 'request-add-folder' as 'request-add-folder' }
 }
 
-export type RequestRenameFolder = ReturnType<typeof requestRenameFolder>
-export function requestRenameFolder(folderId: number) {
-  return { type: 'request-rename-folder' as 'request-rename-folder', folderId }
+export type RequestUpdateFolder = ReturnType<typeof requestUpdateFolder>
+export function requestUpdateFolder(folderId: number) {
+  return { type: 'request-update-folder' as 'request-update-folder', folderId }
 }
 
 export type RequestDeleteFolder = ReturnType<typeof requestDeleteFolder>
