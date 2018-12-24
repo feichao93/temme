@@ -86,7 +86,7 @@ export class HtmlTabRecord extends Record({
 }
 
 // 注意更新 htmlTabs/selectorTabs 的时候记得同步更新 monaco editor model
-export class EditorPageState extends Record({
+export class State extends Record({
   project: new ProjectRecord(),
   selectors: Map<number, SelectorRecord>(),
   htmls: Map<number, HtmlRecord>(),
@@ -96,4 +96,9 @@ export class EditorPageState extends Record({
   activeSelectorId: -1,
   activeHtmlId: -1,
   nextOpenOrder: 1,
+
+  // 当用户创建新的文件夹、html 或选择器时，我们会直接使用下面的 postfix 来作为新对象的名称（的一部分）
+  nextFolderPostfix: 1,
+  nextHtmlPostfix: 1,
+  nextSelectorPostfix: 1,
 }) {}

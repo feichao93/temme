@@ -9,7 +9,7 @@ import debounce from '../utils/debounce'
 import * as actions from './actions'
 import './configureTemmeLanguage'
 import EditorWrapper from './EditorWrapper'
-import { EditorPageState } from './interfaces'
+import { State } from './interfaces'
 import PageLayout from './PageLayout'
 import './ProjectPage.styl'
 import saga from './saga'
@@ -28,12 +28,23 @@ export default function ProjectPage(props: ProjectPageProps) {
   const outputEditorRef = useRef<CodeEditor>(null)
 
   const customEnv = { htmlEditorRef, selectorEditorRef, outputEditorRef, dialogs }
-  const [state, dispatch] = useSaga<EditorPageState, actions.Action>({
+  const [state, dispatch] = useSaga<State, actions.Action>({
     customEnv,
     saga,
     args: [login, projectName],
-    initialState: new EditorPageState(),
+    initialState: new State(),
   })
+
+  if (process.env.NODE_ENV === 'development') {
+    // 在开发环境下，将 state 放到 window 中以方便调试
+    useEffect(() => {
+      // @ts-ignore
+      window.projectPageState = state
+      // @ts-ignore
+      return () => delete window.projectPageState
+    })
+  }
+
   const { htmls, selectors, htmlTabs, selectorTabs, activeHtmlId, activeSelectorId } = state
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {

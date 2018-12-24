@@ -35,17 +35,21 @@ export async function getProject(login: string, projectName: string) {
     json.project.folders.map((folder: any) => [folder.folderId, new FolderRecord(folder)]),
   )
   const project = new ProjectRecord({ ...json.project, folders })
-  const htmls = Map(json.htmls.map((sel: any) => [sel.htmlId, new HtmlRecord(sel)]))
-  const selectors = Map(json.selectors.map((sel: any) => [sel.selectorId, new SelectorRecord(sel)]))
+  const htmls: Map<number, HtmlRecord> = Map(
+    json.htmls.map((sel: any) => [sel.htmlId, new HtmlRecord(sel)]),
+  )
+  const selectors: Map<number, SelectorRecord> = Map(
+    json.selectors.map((sel: any) => [sel.selectorId, new SelectorRecord(sel)]),
+  )
 
   return { project, selectors, htmls }
 }
 
-export async function addFolder(projectId: number, name: string, description: string) {
+export async function addFolder(projectId: number, name: string) {
   const response = await fetch('/api/add-folder', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ projectId, name: name, description }),
+    body: JSON.stringify({ projectId, name: name, description: '' }),
   })
   if (response.ok) {
     const json = await response.json()

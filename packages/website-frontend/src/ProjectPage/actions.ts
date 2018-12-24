@@ -1,23 +1,22 @@
-import { EditorPageState } from './interfaces'
-
 export type Action =
   | OpenSelectorTab
   | CloseSelectorTab
   | OpenHtmlTab
   | CloseHtmlTab
-  | LoadTestData
   | OpenFolder
   | UpdateHtmlAvid
   | UpdateSelectorAvid
   | RequestSaveCurrentHtml
   | RequestSaveCurrentSelector
   | RequestAddHtml
+  | RequestRenameHtml
   | RequestDeleteHtml
   | RequestAddSelector
+  | RequestRenameSelector
   | RequestDeleteSelector
   | RequestAddFolder
-  | RequestDeleteFolder
   | RequestRenameFolder
+  | RequestDeleteFolder
 
 /** 确保参数一定是合法的 action 类型 */
 export function a(actionType: Action['type']) {
@@ -56,12 +55,6 @@ export function closeHtmlTab(htmlId: number) {
   }
 }
 
-// TODO 测试用的 action
-export type LoadTestData = ReturnType<typeof loadTestData>
-export function loadTestData(data: Partial<EditorPageState>) {
-  return { type: 'load-test-data' as 'load-test-data', data }
-}
-
 export type OpenFolder = ReturnType<typeof openFolder>
 export function openFolder(folderId: number) {
   return { type: 'open-folder' as 'open-folder', folderId }
@@ -93,8 +86,13 @@ export function requestSaveCurrentSelector() {
 }
 
 export type RequestAddHtml = ReturnType<typeof requestAddHtml>
-export function requestAddHtml(name: string) {
-  return { type: 'request-add-html' as 'request-add-html', name }
+export function requestAddHtml() {
+  return { type: 'request-add-html' as 'request-add-html' }
+}
+
+export type RequestRenameHtml = ReturnType<typeof requestRenameHtml>
+export function requestRenameHtml(htmlId: number) {
+  return { type: 'request-rename-html' as 'request-rename-html', htmlId }
 }
 
 export type RequestDeleteHtml = ReturnType<typeof requestDeleteHtml>
@@ -103,21 +101,26 @@ export function requestDeleteHtml(htmlId: number) {
 }
 
 export type RequestAddSelector = ReturnType<typeof requestAddSelector>
-export function requestAddSelector(name: string) {
-  return { type: 'request-add-selector' as 'request-add-selector', name }
+export function requestAddSelector() {
+  return { type: 'request-add-selector' as 'request-add-selector' }
+}
+
+export type RequestRenameSelector = ReturnType<typeof requestRenameSelector>
+export function requestRenameSelector(selectorId: number) {
+  return { type: 'request-rename-selector' as 'request-rename-selector', selectorId }
 }
 
 export type RequestAddFolder = ReturnType<typeof requestAddFolder>
-export function requestAddFolder(name: string, description: string) {
-  return { type: 'request-add-folder' as 'request-add-folder', name, description }
+export function requestAddFolder() {
+  return { type: 'request-add-folder' as 'request-add-folder' }
+}
+
+export type RequestRenameFolder = ReturnType<typeof requestRenameFolder>
+export function requestRenameFolder(folderId: number) {
+  return { type: 'request-rename-folder' as 'request-rename-folder', folderId }
 }
 
 export type RequestDeleteFolder = ReturnType<typeof requestDeleteFolder>
 export function requestDeleteFolder(folderId: number) {
   return { type: 'request-delete-folder' as 'request-delete-folder', folderId }
-}
-
-export type RequestRenameFolder = ReturnType<typeof requestRenameFolder>
-export function requestRenameFolder(folderId: number, newName: string) {
-  return { type: 'request-rename-folder' as 'request-rename-folder', folderId, newName }
 }

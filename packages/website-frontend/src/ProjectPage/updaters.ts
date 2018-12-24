@@ -1,35 +1,24 @@
-import {
-  EditorPageState,
-  FolderRecord,
-  HtmlRecord,
-  HtmlTabRecord,
-  SelectorRecord,
-  SelectorTabRecord,
-} from './interfaces'
+import { HtmlRecord, HtmlTabRecord, SelectorRecord, SelectorTabRecord, State, } from './interfaces'
 import * as selectors from './selectors'
 import { inc } from './utils'
 
-export function updateHtmlContent(state: EditorPageState, htmlId: number, content: string) {
+export function updateHtmlContent(state: State, htmlId: number, content: string) {
   return state.setIn(['htmls', htmlId, 'content'], content)
 }
 
-export function updateSelectorContent(state: EditorPageState, selectorId: number, content: string) {
+export function updateSelectorContent(state: State, selectorId: number, content: string) {
   return state.setIn(['selectors', selectorId, 'content'], content)
 }
 
-export function updateHtmlInitAvid(state: EditorPageState, htmlId: number, initAvid: number) {
+export function updateHtmlInitAvid(state: State, htmlId: number, initAvid: number) {
   return state.setIn(['htmlTabs', htmlId, 'initAvid'], initAvid)
 }
 
-export function updateSelectorInitAvid(
-  state: EditorPageState,
-  selectorId: number,
-  initAvid: number,
-) {
+export function updateSelectorInitAvid(state: State, selectorId: number, initAvid: number) {
   return state.setIn(['selectorTabs', selectorId, 'initAvid'], initAvid)
 }
 
-export function pushHtmlTabRecord(state: EditorPageState, htmlId: number, avid: number) {
+export function pushHtmlTabRecord(state: State, htmlId: number, avid: number) {
   const openOrder = state.nextOpenOrder
   const placeOrder = selectors.nextHtmlTabPlaceOrder(state)
   const tabRecord = new HtmlTabRecord({
@@ -42,23 +31,23 @@ export function pushHtmlTabRecord(state: EditorPageState, htmlId: number, avid: 
   return state.update('htmlTabs', tabs => tabs.set(htmlId, tabRecord)).update('nextOpenOrder', inc)
 }
 
-export function clearHtmlTabRecord(state: EditorPageState) {
+export function clearHtmlTabRecord(state: State) {
   return state.update('htmlTabs', tabs => tabs.clear())
 }
 
-export function refreshHtmlTabOpenOrder(state: EditorPageState, htmlId: number) {
+export function refreshHtmlTabOpenOrder(state: State, htmlId: number) {
   return state
     .setIn(['htmlTabs', htmlId, 'openOrder'], state.nextOpenOrder)
     .update('nextOpenOrder', inc)
 }
 
-export function refreshSelectorTabOpenOrder(state: EditorPageState, selectorId: number) {
+export function refreshSelectorTabOpenOrder(state: State, selectorId: number) {
   return state
     .setIn(['selectorTabs', selectorId, 'openOrder'], state.nextOpenOrder)
     .update('nextOpenOrder', inc)
 }
 
-export function pushSelectorTabRecord(state: EditorPageState, selectorId: number, avid: number) {
+export function pushSelectorTabRecord(state: State, selectorId: number, avid: number) {
   const openOrder = state.nextOpenOrder
   const placeOrder = selectors.nextSelectorTabPlaceOrder(state)
   const tabRecord = new SelectorTabRecord({
@@ -73,38 +62,34 @@ export function pushSelectorTabRecord(state: EditorPageState, selectorId: number
     .update('nextOpenOrder', inc)
 }
 
-export function clearSelectorTabRecord(state: EditorPageState) {
+export function clearSelectorTabRecord(state: State) {
   return state.update('selectorTabs', tabs => tabs.clear())
 }
 
-export function setActiveFolderId(state: EditorPageState, folderId: number) {
+export function setActiveFolderId(state: State, folderId: number) {
   return state.set('activeFolderId', folderId)
 }
 
-export function setActiveHtmlId(state: EditorPageState, htmlId: number) {
+export function setActiveHtmlId(state: State, htmlId: number) {
   return state.set('activeHtmlId', htmlId)
 }
 
-export function setActiveSelectorId(state: EditorPageState, selectorId: number) {
+export function setActiveSelectorId(state: State, selectorId: number) {
   return state.set('activeSelectorId', selectorId)
 }
 
-export function deleteSelectorTabRecord(state: EditorPageState, selectorId: number) {
+export function deleteSelectorTabRecord(state: State, selectorId: number) {
   return state.update('selectorTabs', tabs => tabs.delete(selectorId))
 }
 
-export function deleteHtmlTabRecord(state: EditorPageState, htmlId: number) {
+export function deleteHtmlTabRecord(state: State, htmlId: number) {
   return state.update('htmlTabs', tabs => tabs.delete(htmlId))
 }
 
-export function updateFolder(state: EditorPageState, folder: FolderRecord) {
-  return state.setIn(['project', 'folders', folder.folderId], folder)
-}
-
-export function updateHtml(state: EditorPageState, html: HtmlRecord) {
+export function updateHtml(state: State, html: HtmlRecord) {
   return state.setIn(['htmls', html.htmlId], html)
 }
 
-export function updateSelector(state: EditorPageState, selector: SelectorRecord) {
+export function updateSelector(state: State, selector: SelectorRecord) {
   return state.setIn(['selectors', selector.selectorId], selector)
 }

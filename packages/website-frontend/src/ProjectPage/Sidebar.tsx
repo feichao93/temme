@@ -4,44 +4,20 @@ import React from 'react'
 import * as actions from './actions'
 import { Action } from './actions'
 import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
-import { EditorPageState, FolderRecord, ProjectRecord } from './interfaces'
+import { FolderRecord, State } from './interfaces'
 import './Sidebar.styl'
-import { noop } from './utils'
 
 export interface SidebarProps {
-  state: EditorPageState
+  state: State
   dispatch(action: Action): void
 }
 
-// TODO
-function getRandomFolderName(project: ProjectRecord) {
-  let n = 1
-  while (true) {
-    const name = `folder-${n}`
-    if (project.folders.every(p => p.name !== name)) {
-      return name
-    }
-    n++
-  }
-}
-
-function getRandomHtmlName() {
-  return `html-${Math.random().toFixed(3)}`
-}
-
-function getRandomSelectorName() {
-  return `selector-${Math.random().toFixed(3)}`
-}
-
-function Part({
-  name,
-  actions,
-  children,
-}: {
+interface PartProps {
   name: string
   actions: React.ReactNode
   children: React.ReactNode
-}) {
+}
+function Part({ name, actions, children }: PartProps) {
   return (
     <div className={classNames('part', `part-${name}`)}>
       <div className="part-title">
@@ -57,17 +33,13 @@ function SimpleList({ children }: { children: React.ReactNode }) {
   return <ul className="list htmls-list">{children}</ul>
 }
 
-function SimpleListItem({
-  text,
-  active,
-  onClick,
-  actions,
-}: {
+interface SimpleListItemProps {
   active: boolean
   onClick(): void
   text: string
   actions: React.ReactNode
-}) {
+}
+function SimpleListItem({ text, active, onClick, actions }: SimpleListItemProps) {
   return (
     <li className={classNames({ active })} onClick={onClick}>
       <span className="html-name">{text}</span>
@@ -81,26 +53,6 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
     return (...args: ARGS) => dispatch(actionCreator(...args))
-  }
-
-  // TODO 去掉 noop
-  const folderHandlers = {
-    add: wrap(actions.requestAddFolder),
-    delete: wrap(actions.requestDeleteFolder),
-    choose: wrap(actions.openFolder),
-    rename: wrap(actions.requestRenameFolder),
-  }
-  const htmlHandlers = {
-    add: wrap(actions.requestAddHtml),
-    choose: wrap(actions.openHtmlTab),
-    delete: wrap(actions.requestDeleteHtml),
-    rename: noop,
-  }
-  const selectorHandlers = {
-    add: wrap(actions.requestAddSelector),
-    choose: wrap(actions.openSelectorTab),
-    delete: wrap(actions.requestDeleteSelector),
-    rename: noop,
   }
 
   // TODO 有更好的方法判断 project 是否加载完毕
@@ -128,7 +80,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         <div className="part-title">
           <span>Folders</span>
           <div className="actions">
-            <AddFolderIcon onClick={() => folderHandlers.add(getRandomFolderName(project), '')} />
+            <AddFolderIcon onClick={wrap(actions.requestAddFolder)} />
           </div>
         </div>
         <div className="part-content">
@@ -139,12 +91,16 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                 <li
                   key={folder.folderId}
                   className={classNames({ active: folder.folderId === activeFolderId })}
-                  onClick={() => folderHandlers.choose(folder.folderId)}
+                  onClick={() => dispatch(actions.openFolder(folder.folderId))}
                 >
                   <span className="folder-name">{folder.name}</span>
                   <span className="actions">
-                    <RenameIcon onClick={() => folderHandlers.rename(folder.folderId, '')} />
-                    <DeleteIcon onClick={() => folderHandlers.delete(folder.folderId)} />
+                    <RenameIcon
+                      onClick={() => dispatch(actions.requestRenameFolder(folder.folderId))}
+                    />
+                    <DeleteIcon
+                      onClick={() => dispatch(actions.requestDeleteFolder(folder.folderId))}
+                    />
                   </span>
                 </li>
               ))
@@ -158,7 +114,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         actions={
           <AddFileIcon
             disabled={activeFolder == null}
-            onClick={() => htmlHandlers.add(getRandomHtmlName())}
+            onClick={() => dispatch(actions.requestAddHtml())}
           />
         }
       >
@@ -169,12 +125,12 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
               <SimpleListItem
                 key={html.htmlId}
                 active={html.htmlId === activeHtmlId}
-                onClick={() => htmlHandlers.choose(html.htmlId)}
+                onClick={() => dispatch(actions.openHtmlTab(html.htmlId))}
                 text={html.name}
                 actions={
                   <>
-                    <RenameIcon onClick={() => htmlHandlers.rename(html.htmlId, '')} />
-                    <DeleteIcon onClick={() => htmlHandlers.delete(html.htmlId)} />
+                    <RenameIcon onClick={() => dispatch(actions.requestRenameHtml(html.htmlId))} />
+                    <DeleteIcon onClick={() => dispatch(actions.requestDeleteHtml(html.htmlId))} />
                   </>
                 }
               />
@@ -188,7 +144,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         actions={
           <AddFileIcon
             disabled={activeFolder == null}
-            onClick={() => selectorHandlers.add(getRandomSelectorName())}
+            onClick={() => dispatch(actions.requestAddSelector())}
           />
         }
       >
@@ -199,12 +155,16 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
               <SimpleListItem
                 key={selector.selectorId}
                 active={selector.selectorId === activeSelectorId}
-                onClick={() => selectorHandlers.choose(selector.selectorId)}
+                onClick={() => dispatch(actions.openSelectorTab(selector.selectorId))}
                 text={selector.name}
                 actions={
                   <>
-                    <RenameIcon onClick={() => selectorHandlers.rename(selector.selectorId, '')} />
-                    <DeleteIcon onClick={() => selectorHandlers.delete(selector.selectorId)} />
+                    <RenameIcon
+                      onClick={() => dispatch(actions.requestRenameSelector(selector.selectorId))}
+                    />
+                    <DeleteIcon
+                      onClick={() => dispatch(actions.requestDeleteSelector(selector.selectorId))}
+                    />
                   </>
                 }
               />

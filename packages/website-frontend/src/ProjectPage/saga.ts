@@ -5,10 +5,20 @@ import { DialogContextType } from '../Dialog/dialogs'
 import * as server from '../utils/server'
 import * as actions from './actions'
 import { a } from './actions'
-import { EditorPageState, FolderRecord, HtmlRecord, SelectorRecord } from './interfaces'
+import { FolderRecord, HtmlRecord, SelectorRecord, State } from './interfaces'
 import * as selectors from './selectors'
 import * as updaters from './updaters'
-import { CodeEditor } from './utils'
+import {
+  AsyncReturnType,
+  CodeEditor,
+  getNewFolderName,
+  getNewHtmlName,
+  getNewSelectorName,
+  inc,
+  matchNewFolderPostfix,
+  matchNewHtmlPostfix,
+  matchNewSelectorPostfix,
+} from './utils'
 
 type SagaEnv = {
   htmlEditorRef: React.MutableRefObject<CodeEditor>
@@ -17,9 +27,7 @@ type SagaEnv = {
   dialogs: DialogContextType
 }
 
-function applyReducer<A extends actions.Action>(
-  reducer: (state: EditorPageState, action: A) => EditorPageState,
-) {
+function applyReducer<A extends actions.Action>(reducer: (state: State, action: A) => State) {
   return function*(action: A) {
     yield io.update(reducer, action)
   }
@@ -54,20 +62,43 @@ export default function* saga(login: string, projectName: string) {
   yield takeEvery(a('request-add-selector'), handleRequestAddSelector)
 
   yield takeEvery(a('request-save-current-html'), function*() {
-    const state: EditorPageState = yield io.select()
+    const state: State = yield io.select()
     yield saveHtml(state.activeHtmlId)
   })
   yield takeEvery(a('request-save-current-selector'), function*() {
-    const state: EditorPageState = yield io.select()
+    const state: State = yield io.select()
     yield saveSelector(state.activeSelectorId)
   })
+
+  // TODO
+  //  takeEvery(a('request-rename-folder'), ...)
+  //  takeEvery(a('request-rename-html') ...)
+  //  takeEvery(a('request-rename-selector') ...)
 }
 
 function* loadProjectData(login: string, projectName: string) {
-  const data = yield server.getProject(login, projectName)
-  const { project }: EditorPageState = yield io.update((state: EditorPageState) =>
-    state.merge(data),
-  )
+  type Data = AsyncReturnType<typeof server.getProject>
+  const data: Data = yield server.getProject(login, projectName)
+
+  const { project }: State = yield io.update((state: State) => {
+    const maxFolderPostfix = data.project.folders
+      .map(fld => matchNewFolderPostfix(fld.name))
+      .filter(Boolean)
+      .max()
+    const maxHtmlPostfix = data.htmls
+      .map(html => matchNewHtmlPostfix(html.name))
+      .filter(Boolean)
+      .max()
+    const maxSelectorPostfix = data.selectors
+      .map(selector => matchNewSelectorPostfix(selector.name))
+      .filter(Boolean)
+      .max()
+    return state
+      .merge(data)
+      .set('nextFolderPostfix', (maxFolderPostfix || 0) + 1)
+      .set('nextHtmlPostfix', (maxHtmlPostfix || 0) + 1)
+      .set('nextSelectorPostfix', (maxSelectorPostfix || 0) + 1)
+  })
 
   // 首次载入 project 之后，自动选中第一个 folder 下的 第一个 html 和第一个 selector
   if (!project.folders.isEmpty()) {
@@ -77,7 +108,7 @@ function* loadProjectData(login: string, projectName: string) {
 }
 
 function* handleOpenHtmlTab({ htmlId }: actions.OpenHtmlTab) {
-  // todo 目前我们假设 html.status 一定是 ready 的
+  // 假设在这里 html 已经加载完成
   const html: HtmlRecord = yield io.select(selectors.html, htmlId)
   const uriObject = html.getUriObject()
   let model = monaco.editor.getModel(uriObject)
@@ -92,11 +123,11 @@ function* handleOpenHtmlTab({ htmlId }: actions.OpenHtmlTab) {
   const { htmlEditorRef }: SagaEnv = yield io.getEnv()
   htmlEditorRef.current.setModel(model)
   htmlEditorRef.current.focus()
-  yield io.update((state: EditorPageState) => state.set('activeHtmlId', htmlId))
+  yield io.update((state: State) => state.set('activeHtmlId', htmlId))
 }
 
 function* handleOpenSelectorTab({ selectorId }: actions.OpenSelectorTab) {
-  // todo 目前我们假设 selector 一定是 ready 的
+  // 假设在这里 selector 已经加载完成
   const selector: SelectorRecord = yield io.select(selectors.selector, selectorId)
   const uriObject = selector.getUriObject()
 
@@ -112,12 +143,12 @@ function* handleOpenSelectorTab({ selectorId }: actions.OpenSelectorTab) {
   const { selectorEditorRef }: SagaEnv = yield io.getEnv()
   selectorEditorRef.current.setModel(model)
   selectorEditorRef.current.focus()
-  yield io.update((state: EditorPageState) => state.set('activeSelectorId', selectorId))
+  yield io.update((state: State) => state.set('activeSelectorId', selectorId))
 }
 
 function* handleCloseHtmlTab({ htmlId }: actions.CloseHtmlTab) {
   const { dialogs }: SagaEnv = yield io.getEnv()
-  const { htmlTabs, htmls, activeHtmlId }: EditorPageState = yield io.select()
+  const { htmlTabs, htmls, activeHtmlId }: State = yield io.select()
   const tab = htmlTabs.get(htmlId)
   const html = htmls.get(htmlId)
 
@@ -147,18 +178,14 @@ function* handleCloseHtmlTab({ htmlId }: actions.CloseHtmlTab) {
     if (nextHtmlToOpen != null) {
       yield io.put(actions.openHtmlTab(nextHtmlToOpen.htmlId))
     } else {
-      yield io.update((state: EditorPageState) => state.set('activeHtmlId', -1))
+      yield io.update((state: State) => state.set('activeHtmlId', -1))
     }
   }
 }
 
 function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
   const { dialogs }: SagaEnv = yield io.getEnv()
-  const {
-    selectorTabs,
-    selectors: selectorMap,
-    activeSelectorId,
-  }: EditorPageState = yield io.select()
+  const { selectorTabs, selectors: selectorMap, activeSelectorId }: State = yield io.select()
   const tab = selectorTabs.get(selectorId)
   const selector = selectorMap.get(selectorId)
 
@@ -188,7 +215,7 @@ function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
     if (nextSelectorToOpen != null) {
       yield io.put(actions.openSelectorTab(nextSelectorToOpen.selectorId))
     } else {
-      yield io.update((state: EditorPageState) => state.set('activeSelectorId', -1))
+      yield io.update((state: State) => state.set('activeSelectorId', -1))
     }
   }
 }
@@ -199,8 +226,8 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
     htmlTabs,
     htmls: htmlMap,
     selectors: selectorMap,
-  }: EditorPageState = yield io.select()
-  // TODO 这里假设 selectorAtoms, htmlAtoms, projectAtom 已经全部加载完毕
+  }: State = yield io.select()
+  // 假设在这里 project/htmlMap/selectorMap 已经全部加载完毕
   const { dialogs, htmlEditorRef, selectorEditorRef }: SagaEnv = yield io.getEnv()
   const dirtyHtmls = htmlTabs.filter(tab => tab.isDirty()).map(tab => htmlMap.get(tab.htmlId))
   const dirtySelectors = selectorTabs
@@ -227,7 +254,8 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
           .toArray()
         yield io.all(saveHtmlEffects.concat(saveSelectorEffects))
       } catch (e) {
-        dialogs.alert(e)
+        console.error(e)
+        yield dialogs.alert({ title: '保存失败', message: e.message })
         return
       }
     }
@@ -288,29 +316,36 @@ function* handleRequestDeleteSelector({ selectorId }: actions.RequestDeleteSelec
     return
   }
 
-  yield server.deleteSelector(selectorId)
-  const { activeSelectorId }: EditorPageState = yield io.update((state: EditorPageState) =>
-    state
-      .update('selectors', selectors => selectors.delete(selectorId))
-      .update('selectorTabs', tabs => tabs.delete(selectorId))
-      .set('activeSelectorId', state.activeSelectorId === selectorId ? -1 : state.activeSelectorId),
-  )
-  const model = monaco.editor.getModel(selector.getUriObject())
-  if (model) {
-    model.dispose()
-  }
-
-  // 尝试自动打开另一个 tab
-  if (activeSelectorId === -1) {
-    const nextSelectorToOpen: SelectorRecord = yield io.select(selectors.nextSelectorToOpen)
-    if (nextSelectorToOpen != null) {
-      yield io.put(actions.openSelectorTab(nextSelectorToOpen.selectorId))
-    } else {
-      const { selectorEditorRef }: SagaEnv = yield io.getEnv()
-      selectorEditorRef.current.setModel(null)
+  try {
+    yield server.deleteSelector(selectorId)
+    const { activeSelectorId }: State = yield io.update((state: State) =>
+      state
+        .update('selectors', selectors => selectors.delete(selectorId))
+        .update('selectorTabs', tabs => tabs.delete(selectorId))
+        .set(
+          'activeSelectorId',
+          state.activeSelectorId === selectorId ? -1 : state.activeSelectorId,
+        ),
+    )
+    const model = monaco.editor.getModel(selector.getUriObject())
+    if (model) {
+      model.dispose()
     }
+
+    // 尝试自动打开另一个 tab
+    if (activeSelectorId === -1) {
+      const nextSelectorToOpen: SelectorRecord = yield io.select(selectors.nextSelectorToOpen)
+      if (nextSelectorToOpen != null) {
+        yield io.put(actions.openSelectorTab(nextSelectorToOpen.selectorId))
+      } else {
+        const { selectorEditorRef }: SagaEnv = yield io.getEnv()
+        selectorEditorRef.current.setModel(null)
+      }
+    }
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '删除选择器失败', message: e.message })
   }
-  // todo 错误处理
 }
 
 /** 获取 html 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
@@ -335,11 +370,21 @@ function* saveSelector(selectorId: number) {
   yield io.update(updaters.updateSelectorContent, selectorId, content)
 }
 
-function* handleRequestAddFolder({ name, description }: actions.RequestAddFolder) {
-  const projectId: number = yield io.select(selectors.projectId)
-  const newFolder: FolderRecord = yield server.addFolder(projectId, name, description)
-  yield io.update(updaters.updateFolder, newFolder)
-  // todo 错误处理
+function* handleRequestAddFolder() {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const projectId = state.project.projectId
+  const folderName = getNewFolderName(state.nextFolderPostfix)
+  yield io.update((state: State) => state.update('nextFolderPostfix', inc))
+  try {
+    const folder: FolderRecord = yield server.addFolder(projectId, folderName)
+    yield io.update((state: State) => {
+      return state.setIn(['project', 'folders', folder.folderId], folder)
+    })
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '添加文件夹失败', message: e.message })
+  }
 }
 
 function* handleRequestDeleteFolder({ folderId }: actions.RequestDeleteFolder) {
@@ -353,43 +398,55 @@ function* handleRequestDeleteFolder({ folderId }: actions.RequestDeleteFolder) {
     return
   }
 
-  yield server.deleteFolder(folderId)
-  yield io.update((state: EditorPageState) => {
-    const selectorIdSet = state.selectors
-      .filter(sel => sel.folderId === folderId)
-      .keySeq()
-      .toSet()
-    const htmlIdSet = state.htmls
-      .filter(html => html.folderId === folderId)
-      .keySeq()
-      .toSet()
+  try {
+    yield server.deleteFolder(folderId)
+    yield io.update((state: State) => {
+      const selectorIdSet = state.selectors
+        .filter(sel => sel.folderId === folderId)
+        .keySeq()
+        .toSet()
+      const htmlIdSet = state.htmls
+        .filter(html => html.folderId === folderId)
+        .keySeq()
+        .toSet()
 
-    let nextState = state
-    nextState = nextState
-      .deleteIn(['project', 'folders', folderId])
-      .update('selectors', selectors => selectors.filterNot(sel => sel.folderId === folderId))
-      .update('htmls', htmls => htmls.filterNot(html => html.folderId === folderId))
-      .update('htmlTabs', tabs => tabs.filterNot(tab => htmlIdSet.has(tab.htmlId)))
-      .update('selectorTabs', tabs => tabs.filterNot(tab => selectorIdSet.has(tab.selectorId)))
+      let nextState = state
+      nextState = nextState
+        .deleteIn(['project', 'folders', folderId])
+        .update('selectors', selectors => selectors.filterNot(sel => sel.folderId === folderId))
+        .update('htmls', htmls => htmls.filterNot(html => html.folderId === folderId))
+        .update('htmlTabs', tabs => tabs.filterNot(tab => htmlIdSet.has(tab.htmlId)))
+        .update('selectorTabs', tabs => tabs.filterNot(tab => selectorIdSet.has(tab.selectorId)))
 
-    if (nextState.activeFolderId === folderId) {
-      nextState = nextState.merge({
-        activeSelectorId: -1,
-        activeHtmlId: -1,
-        activeFolderId: -1,
-      })
-    }
-    return nextState
-  })
-  // todo 错误处理
+      if (nextState.activeFolderId === folderId) {
+        nextState = nextState.merge({
+          activeSelectorId: -1,
+          activeHtmlId: -1,
+          activeFolderId: -1,
+        })
+      }
+      return nextState
+    })
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '删除文件夹失败', message: e.message })
+  }
 }
 
-function* handleRequestAddHtml({ name }: actions.RequestAddHtml) {
-  const folderId: number = yield io.select((s: EditorPageState) => s.activeFolderId)
-  const newHtml: HtmlRecord = yield server.addHtml(folderId, name)
-  yield io.update(updaters.updateHtml, newHtml)
-  yield io.put(actions.openHtmlTab(newHtml.htmlId))
-  // todo 错误处理
+function* handleRequestAddHtml() {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const folderId = state.activeFolderId
+  const htmlName = getNewHtmlName(state.nextHtmlPostfix)
+  yield io.update((state: State) => state.update('nextFolderPostfix', inc))
+  try {
+    const html: HtmlRecord = yield server.addHtml(folderId, htmlName)
+    yield io.update(updaters.updateHtml, html)
+    yield io.put(actions.openHtmlTab(html.htmlId))
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '添加 html 失败', message: e.message })
+  }
 }
 
 function* handleRequestDeleteHtml({ htmlId }: actions.RequestDeleteHtml) {
@@ -397,41 +454,53 @@ function* handleRequestDeleteHtml({ htmlId }: actions.RequestDeleteHtml) {
   const html: HtmlRecord = yield io.select(selectors.html, htmlId)
   const confirmed: boolean = yield dialogs.confirm({
     title: '确认删除',
-    message: `确定要删除文档 ${html.name} 吗？该操作无法撤销`,
+    message: `确定要删除 html ${html.name} 吗？该操作无法撤销`,
   })
   if (!confirmed) {
     return
   }
 
-  yield server.deleteHtml(htmlId)
-  const { activeHtmlId }: EditorPageState = yield io.update((state: EditorPageState) =>
-    state
-      .update('htmls', htmls => htmls.delete(htmlId))
-      .update('htmlTabs', tabs => tabs.delete(htmlId))
-      .set('activeHtmlId', state.activeHtmlId === htmlId ? -1 : state.activeHtmlId),
-  )
-  const model = monaco.editor.getModel(html.getUriObject())
-  if (model) {
-    model.dispose()
-  }
-
-  // 尝试自动打开另一个 tab
-  if (activeHtmlId === -1) {
-    const nextHtmlToOpen: HtmlRecord = yield io.select(selectors.nextHtmlToOpen)
-    if (nextHtmlToOpen != null) {
-      yield io.put(actions.openHtmlTab(nextHtmlToOpen.htmlId))
-    } else {
-      const { htmlEditorRef }: SagaEnv = yield io.getEnv()
-      htmlEditorRef.current.setModel(null)
+  try {
+    yield server.deleteHtml(htmlId)
+    const { activeHtmlId }: State = yield io.update((state: State) =>
+      state
+        .update('htmls', htmls => htmls.delete(htmlId))
+        .update('htmlTabs', tabs => tabs.delete(htmlId))
+        .set('activeHtmlId', state.activeHtmlId === htmlId ? -1 : state.activeHtmlId),
+    )
+    const model = monaco.editor.getModel(html.getUriObject())
+    if (model) {
+      model.dispose()
     }
+
+    // 尝试自动打开另一个 tab
+    if (activeHtmlId === -1) {
+      const nextHtmlToOpen: HtmlRecord = yield io.select(selectors.nextHtmlToOpen)
+      if (nextHtmlToOpen != null) {
+        yield io.put(actions.openHtmlTab(nextHtmlToOpen.htmlId))
+      } else {
+        const { htmlEditorRef }: SagaEnv = yield io.getEnv()
+        htmlEditorRef.current.setModel(null)
+      }
+    }
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '删除 html 失败', message: e.message })
   }
-  // todo 错误处理
 }
 
-function* handleRequestAddSelector({ name }: actions.RequestAddSelector) {
-  const folderId: number = yield io.select((s: EditorPageState) => s.activeFolderId)
-  const newSelector: SelectorRecord = yield server.addSelector(folderId, name)
-  yield io.update(updaters.updateSelector, newSelector)
-  yield io.put(actions.openSelectorTab(newSelector.selectorId))
-  // todo 错误处理
+function* handleRequestAddSelector() {
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const state: State = yield io.select()
+  const folderId = state.activeFolderId
+  const selectorName = getNewSelectorName(state.nextSelectorPostfix)
+  yield io.update((state: State) => state.update('nextFolderPostfix', inc))
+  try {
+    const selector: SelectorRecord = yield server.addSelector(folderId, selectorName)
+    yield io.update(updaters.updateSelector, selector)
+    yield io.put(actions.openSelectorTab(selector.selectorId))
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({ title: '添加选择器失败', message: e.message })
+  }
 }

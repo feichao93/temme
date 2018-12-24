@@ -1,18 +1,18 @@
-import { EditorPageState } from './interfaces'
+import { State } from './interfaces'
 
-export function folder(state: EditorPageState, folderId:number) {
+export function folder(state: State, folderId: number) {
   return state.project.folders.get(folderId)
 }
 
-export function selector(state: EditorPageState, selectorId: number) {
+export function selector(state: State, selectorId: number) {
   return state.selectors.get(selectorId)
 }
 
-export function html(state: EditorPageState, htmlId: number) {
+export function html(state: State, htmlId: number) {
   return state.htmls.get(htmlId)
 }
 
-export function nextHtmlTabPlaceOrder(state: EditorPageState) {
+export function nextHtmlTabPlaceOrder(state: State) {
   if (state.htmlTabs.isEmpty()) {
     return 1
   } else {
@@ -20,7 +20,7 @@ export function nextHtmlTabPlaceOrder(state: EditorPageState) {
   }
 }
 
-export function nextSelectorTabPlaceOrder(state: EditorPageState) {
+export function nextSelectorTabPlaceOrder(state: State) {
   if (state.selectorTabs.isEmpty()) {
     return 1
   } else {
@@ -28,14 +28,10 @@ export function nextSelectorTabPlaceOrder(state: EditorPageState) {
   }
 }
 
-export function nextSelectorToOpen(state: EditorPageState) {
+export function nextSelectorToOpen(state: State) {
   return state.selectorTabs.maxBy(tab => tab.openOrder)
 }
 
-export function nextHtmlToOpen(state: EditorPageState) {
+export function nextHtmlToOpen(state: State) {
   return state.htmlTabs.maxBy(tab => tab.openOrder)
-}
-
-export function projectId(state: EditorPageState) {
-  return state.project.projectId
 }

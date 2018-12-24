@@ -1,4 +1,4 @@
-import React, { createContext, Component, useContext, Provider, useState, useEffect } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import * as server from './server'
 
 interface SessionContext {
@@ -51,19 +51,22 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     }
   }
 
-  useEffect(() => {
-    fetchLoginInfo()
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.data.userId && event.data.username) {
-        const {username,userId}: Session = event.data
-        setSessionState({ ...sessionState, username,userId })
+  useEffect(
+    () => {
+      fetchLoginInfo() // FIXME 会导致 fetchLoginInfo 被调用两次
+      const receiveMessage = (event: MessageEvent) => {
+        if (event.data.userId && event.data.username) {
+          const { username, userId }: Session = event.data
+          setSessionState({ ...sessionState, username, userId })
+        }
       }
-    }
-    window.addEventListener('message', receiveMessage, false)
-    return () => {
-      window.removeEventListener('message', receiveMessage)
-    }
-  }, [sessionState.connected])
+      window.addEventListener('message', receiveMessage, false)
+      return () => {
+        window.removeEventListener('message', receiveMessage)
+      }
+    },
+    [sessionState.connected],
+  )
 
   return (
     <SessionContext.Provider value={{ ...sessionState, login, logout }}>

@@ -17,7 +17,11 @@ export default function Header() {
           <a href="https://github.com/shinima/temme" target="_blank" className="nav-link">
             Github
           </a>
-          <a href="https://github.com/shinima/temme#%E6%96%87%E6%A1%A3%E9%93%BE%E6%8E%A5" target="_blank" className="nav-link">
+          <a
+            href="https://github.com/shinima/temme#%E6%96%87%E6%A1%A3%E9%93%BE%E6%8E%A5"
+            target="_blank"
+            className="nav-link"
+          >
             Docs
           </a>
         </div>
