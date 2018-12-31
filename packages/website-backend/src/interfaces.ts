@@ -16,7 +16,7 @@ export interface UserInfo {
   avatar_url: string
   html_url: string
   name: string
-  // TODO 还有很多其他的用户信息，这里暂不记录
+  // 这里忽略了其他许多暂时用不到的字段
 }
 
 export interface UserProfile {

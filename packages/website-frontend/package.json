@@ -7,7 +7,7 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "@little-saga/use-saga": "little-saga/use-saga#v0.7.2",
+    "@little-saga/use-saga": "^0.7.2",
     "@types/classnames": "^2.2.6",
     "@types/history": "^4.7.2",
     "@types/react": "^16.7.13",
