@@ -85,6 +85,8 @@ export class HtmlTabRecord extends Record({
   }
 }
 
+export type SidebarView = 'folders-view' | 'files-view'
+
 // 注意更新 htmlTabs/selectorTabs 的时候记得同步更新 monaco editor model
 export class State extends Record({
   project: new ProjectRecord(),
@@ -101,4 +103,6 @@ export class State extends Record({
   nextFolderPostfix: 1,
   nextHtmlPostfix: 1,
   nextSelectorPostfix: 1,
+
+  sidebarView: 'folders-view' as SidebarView,
 }) {}

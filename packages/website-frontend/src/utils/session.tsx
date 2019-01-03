@@ -60,7 +60,7 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     function onReceiveMessage(event: MessageEvent) {
       if (event.data.userId && event.data.username) {
         const { username, userId }: Session = event.data
-        setSessionState({ ...sessionState, username, userId })
+        setSessionState(state => ({ ...state, username, userId }))
       }
     }
 

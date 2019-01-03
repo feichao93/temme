@@ -12,25 +12,114 @@ $list-item {
   color #ccc
   font-size 14px
   height 100%
+  display flex
+  flex-flow column
+  overflow hidden
 
-  .part-content {
+  > header {
+    .title {
+      display flex
+      margin 0
+      padding-left 8px
+      font-size 20px
+      line-height 35px
+      background #2d2d2d
+    }
+
+    .description {
+      padding 0 16px
+      margin-top 0
+    }
+  }
+
+  .view-container {
+    flex 1 1 auto
+    width 100%
+    display flex
+    transition transform 125ms ease-in-out
+    will-change transform
+    .view {
+      flex 0 0 100%
+      display flex
+      flex-flow column
+      ::-webkit-scrollbar {
+        width: 13px
+      }
+      ::-webkit-scrollbar-thumb {
+        background-color: rgba(121, 121, 121, 0.4)
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent
+      }
+    }
+  }
+
+  .view-title {
+    display flex
+    background #2d2d2d
+    flex-shrink 0
+    > h2 {
+      margin 0
+      font-size 16px
+      height 32px
+      line-height @height
+      padding-left 8px
+    }
+  }
+
+  .view-content {
     padding 10px 0
+    overflow-y auto
   }
 
-  .part.pages-part {
+  .folder-list {
+    margin 0
+    padding 0 8px
     user-select none
+
+    > li {
+      display flex
+      align-items center
+      cursor pointer
+      margin-top 8px
+      &.active {
+        background #234a6d
+        color white
+        .folder-description {
+          color #ccc
+        }
+      }
+      &:first-child {
+        margin-top 0
+      }
+
+      .folder-icon, .folder-open-icon {
+        margin-left 4px
+        margin-right 8px
+      }
+
+      .folder-description {
+        color #777
+      }
+
+      .text {
+        line-height 24px
+      }
+    }
   }
 
-  .part-title {
+
+  .view-content > section {
+    padding 0 8px
+  }
+
+  .section-title {
     display flex
     line-height 24px
-    background #383838
-    padding-left 8px
     text-transform uppercase
-    font-weight bold
   }
 
-  .list {
+  .simple-list {
     list-style none
     user-select none
     padding 0
@@ -39,6 +128,7 @@ $list-item {
     > li {
       @extends $list-item
       display flex
+      align-items center
       padding-left 16px
 
       &.active {

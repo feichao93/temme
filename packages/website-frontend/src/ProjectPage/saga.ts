@@ -48,6 +48,12 @@ export default function* saga(login: string, projectName: string) {
       state.setIn(['selectorTabs', action.selectorId, 'avid'], action.avid),
     ),
   )
+  yield takeEvery(
+    a('use-sidebar-view'),
+    applyReducer((state, action: actions.UseSidebarView) =>
+      state.set('sidebarView', action.sidebarView),
+    ),
+  )
 
   yield takeEvery(a('open-folder'), handleOpenFolder)
   yield takeEvery(a('open-html-tab'), handleOpenHtmlTab)
@@ -102,7 +108,7 @@ function* loadProjectData(login: string, projectName: string) {
   // 首次载入 project 之后，自动选中第一个 folder 下的 第一个 html 和第一个 selector
   if (!project.folders.isEmpty()) {
     const firstFolder = project.folders.first<null>()
-    yield io.put(actions.openFolder(firstFolder.folderId))
+    yield io.put(actions.openFolder(firstFolder.folderId, true))
   }
 }
 
@@ -219,13 +225,21 @@ function* handleCloseSelectorTab({ selectorId }: actions.CloseSelectorTab) {
   }
 }
 
-function* handleOpenFolder({ folderId }: actions.OpenFolder) {
+function* handleOpenFolder({ folderId, keepFoldersView }: actions.OpenFolder) {
   const {
     selectorTabs,
     htmlTabs,
     htmls: htmlMap,
     selectors: selectorMap,
+    activeFolderId,
   }: State = yield io.select()
+  if (folderId === activeFolderId) {
+    if (!keepFoldersView) {
+      yield io.update(updaters.useFilesView)
+    }
+    return
+  }
+
   // 假设在这里 project/htmlMap/selectorMap 已经全部加载完毕
   const { dialogs, htmlEditorRef, selectorEditorRef }: SagaEnv = yield io.getEnv()
   const dirtyHtmls = htmlTabs.filter(tab => tab.isDirty()).map(tab => htmlMap.get(tab.htmlId))
@@ -258,6 +272,11 @@ function* handleOpenFolder({ folderId }: actions.OpenFolder) {
         return
       }
     }
+  }
+
+  // 侧边栏进入文件列表
+  if (!keepFoldersView) {
+    yield io.update(updaters.useFilesView)
   }
 
   // 销毁当前 folder 下所有的 html model

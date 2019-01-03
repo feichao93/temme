@@ -20,7 +20,7 @@ export function AddFileIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
     >
@@ -76,7 +76,7 @@ export function AddFolderIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
     >
@@ -100,7 +100,7 @@ export function CloseCleanIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
       viewBox="0 0 16 16"
@@ -118,7 +118,7 @@ export function CloseDirtyIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
       viewBox="0 0 16 16"
@@ -133,7 +133,7 @@ export function SaveIcon({ disabled, onClick, size }: IconProps) {
   return (
     <svg
       className={classNames('icon interactive', { disabled })}
-      onClick={disabled ? null : onClick}
+      onClick={disabled ? null : stopPropagation(onClick)}
       width={size}
       height={size}
       viewBox="0 0 1024 1024"
@@ -146,6 +146,32 @@ export function SaveIcon({ disabled, onClick, size }: IconProps) {
   )
 }
 SaveIcon.defaultProps = { size: 16 }
+
+export const DownloadIcon = React.memo(({ disabled, onClick, size = 16 }: Partial<IconProps>) => (
+  <svg
+    className={classNames('icon interactive', { disabled })}
+    onClick={disabled ? null : stopPropagation(onClick)}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="#C5C5C5"
+  >
+    <path d="M 10 2 L 10 10 L 6 10 L 12 18 L 18 10 L 14 10 L 14 2 L 10 2 z M 2 20 L 2 22 L 22 22 L 22 20 L 2 20 z" />
+  </svg>
+))
+
+export const ContinueIcon = React.memo(({ disabled, onClick, size = 16 }: Partial<IconProps>) => (
+  <svg
+    className={classNames('icon interactive', { disabled })}
+    onClick={disabled ? null : stopPropagation(onClick)}
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill="#C5C5C5"
+  >
+    <path d="M4,1.5v13L12.667,8,4,1.5Z" fill="#c5c5c5" />
+  </svg>
+))
 
 export const FileTypeHtmlIcon = React.memo(() => (
   <svg className="icon" width={16} height={16} viewBox="0 0 32 32">
@@ -174,6 +200,24 @@ export const FileTypeTSIcon = React.memo(() => (
     <path
       fill="#497ecf"
       d="M8.4,23V11.66H5V9H15v2.66H11.6V23Zm8.6-.85.67-2.52a8.88,8.88,0,0,0,1.71.6,7.92,7.92,0,0,0,2,.25,3.11,3.11,0,0,0,1.72-.4,1.23,1.23,0,0,0,.6-1.08,1.26,1.26,0,0,0-.55-1,6.76,6.76,0,0,0-1.89-.85q-4-1.34-4-4a3.48,3.48,0,0,1,.39-1.62,3.89,3.89,0,0,1,1.09-1.3,5.21,5.21,0,0,1,1.74-.86A8.05,8.05,0,0,1,22.69,9a9.14,9.14,0,0,1,3.73.69l-.74,2.46a7.08,7.08,0,0,0-3-.65,2.76,2.76,0,0,0-1.57.38,1.11,1.11,0,0,0-.55.93,1,1,0,0,0,.11.47,1.35,1.35,0,0,0,.29.38,2.39,2.39,0,0,0,.54.35c.24.12.49.23.75.34l1,.37a7,7,0,0,1,2.85,1.65A3.39,3.39,0,0,1,27,18.78a3.87,3.87,0,0,1-.22,1.31,3.54,3.54,0,0,1-.69,1.15,4.43,4.43,0,0,1-1.15.92,6.06,6.06,0,0,1-1.65.6,9.73,9.73,0,0,1-2.15.22,10.77,10.77,0,0,1-2.32-.25A7.67,7.67,0,0,1,17,22.15Z"
+    />
+  </svg>
+))
+
+export const FolderIcon = React.memo(() => (
+  <svg className="icon folder-icon" width={32} height={32} viewBox="0 0 32 32">
+    <path
+      d="M30,5V25a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h7l2-4H29A1,1,0,0,1,30,5ZM28,8V6H16L15,8Z"
+      fill="#dcb67a"
+    />
+  </svg>
+))
+
+export const FolderOpenIcon = React.memo(() => (
+  <svg className="icon folder-open-icon" width={32} height={32} viewBox="0 0 32 32">
+    <path
+      d="M28,4a2,2,0,0,1,2,2V24a1.92,1.92,0,0,1-2,2V6H16l-2,4H6v6H22l6,10H6L0,16H4V10C4,8,6.47,8,6,8h7l2-4Z"
+      fill="#dcb67a"
     />
   </svg>
 ))

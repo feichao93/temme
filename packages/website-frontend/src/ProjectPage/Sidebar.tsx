@@ -3,34 +3,22 @@ import { Map } from 'immutable'
 import React from 'react'
 import * as actions from './actions'
 import { Action } from './actions'
-import { AddFileIcon, AddFolderIcon, DeleteIcon, RenameIcon } from './icons'
+import {
+  AddFileIcon,
+  AddFolderIcon,
+  ContinueIcon,
+  DeleteIcon,
+  DownloadIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  RenameIcon,
+} from './icons'
 import { FolderRecord, State } from './interfaces'
 import './Sidebar.styl'
 
 export interface SidebarProps {
   state: State
   dispatch(action: Action): void
-}
-
-interface PartProps {
-  name: string
-  actions: React.ReactNode
-  children: React.ReactNode
-}
-function Part({ name, actions, children }: PartProps) {
-  return (
-    <div className={classNames('part', `part-${name}`)}>
-      <div className="part-title">
-        <span>{name}</span>
-        <div className="actions">{actions}</div>
-      </div>
-      <div className="part-content">{children}</div>
-    </div>
-  )
-}
-
-function SimpleList({ children }: { children: React.ReactNode }) {
-  return <ul className="list htmls-list">{children}</ul>
 }
 
 interface SimpleListItemProps {
@@ -49,14 +37,19 @@ function SimpleListItem({ text, active, onClick, actions }: SimpleListItemProps)
 }
 
 export default function Sidebar({ state, dispatch }: SidebarProps) {
-  const { activeFolderId, project, htmls, selectors, activeHtmlId, activeSelectorId } = state
-
-  function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
-    return (...args: ARGS) => dispatch(actionCreator(...args))
-  }
+  const {
+    activeFolderId,
+    project,
+    htmls,
+    selectors,
+    activeHtmlId,
+    activeSelectorId,
+    sidebarView,
+  } = state
 
   // TODO 有更好的方法判断 project 是否加载完毕
   const folders = project.projectId > 0 ? project.folders : Map<number, FolderRecord>()
+  const name = project.projectId > 0 ? project.name : 'loading...'
   const description = project.projectId > 0 ? project.description : 'loading...'
 
   const activeFolder = folders.find(folder => folder.folderId === activeFolderId)
@@ -65,41 +58,62 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
 
   return (
     <div className="sidebar">
-      <div className="header">
-        <div className="title">PROJECT</div>
-        <button>save html</button>
-        <button>download</button>
-      </div>
-      <div className="part">
-        <div className="part-title">Info</div>
-        <div className="part-content">
-          <div className="description">{description}</div>
-        </div>
-      </div>
-      <div className="part folders-part">
-        <div className="part-title">
-          <span>Folders</span>
+      <header>
+        <h1 className="title">
+          <span>{name}</span>
           <div className="actions">
-            <AddFolderIcon onClick={wrap(actions.requestAddFolder)} />
+            <DownloadIcon size={16} onClick={() => console.log('downloading...')} />
+          </div>
+        </h1>
+        <p className="description">{description}</p>
+      </header>
+      <div
+        className="view-container"
+        style={{ transform: `translate(${sidebarView === 'folders-view' ? 0 : -100}%, 0)` }}
+      >
+        {renderFoldersView()}
+        {renderFilesView()}
+      </div>
+    </div>
+  )
+
+  function renderFoldersView() {
+    return (
+      <div className="view folders-view">
+        <div className="view-title">
+          <h2>文件夹列表</h2>
+          <div className="actions">
+            <AddFolderIcon onClick={() => dispatch(actions.requestAddFolder())} />
           </div>
         </div>
-        <div className="part-content">
-          <ul className="list folder-list">
+        <div className="view-content">
+          <ul className="folder-list">
             {folders
               .sortBy(folder => folder.folderId)
               .map(folder => (
                 <li
                   key={folder.folderId}
                   className={classNames({ active: folder.folderId === activeFolderId })}
-                  onClick={() => dispatch(actions.openFolder(folder.folderId))}
+                  onClick={() =>
+                    dispatch(
+                      actions.openFolder(folder.folderId, folder.folderId !== activeFolderId),
+                    )
+                  }
                 >
-                  <span className="folder-name">{folder.name}</span>
-                  <span className="actions">
+                  {folder.folderId === activeFolderId ? <FolderOpenIcon /> : <FolderIcon />}
+                  <div className="text">
+                    <div className="folder-name">{folder.name}</div>
+                    <div className="folder-description">{folder.description || '暂无描述'}</div>
+                  </div>
+                  <span className="actions" style={{ marginRight: 8 }}>
                     <RenameIcon
                       onClick={() => dispatch(actions.requestUpdateFolder(folder.folderId))}
                     />
                     <DeleteIcon
                       onClick={() => dispatch(actions.requestDeleteFolder(folder.folderId))}
+                    />
+                    <ContinueIcon
+                      onClick={() => dispatch(actions.openFolder(folder.folderId, false))}
                     />
                   </span>
                 </li>
@@ -108,70 +122,99 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
           </ul>
         </div>
       </div>
+    )
+  }
 
-      <Part
-        name="htmls"
-        actions={
-          <AddFileIcon
-            disabled={activeFolder == null}
-            onClick={() => dispatch(actions.requestAddHtml())}
-          />
-        }
-      >
-        <SimpleList>
-          {visibleHtmls
-            .sortBy(html => html.htmlId)
-            .map(html => (
-              <SimpleListItem
-                key={html.htmlId}
-                active={html.htmlId === activeHtmlId}
-                onClick={() => dispatch(actions.openHtmlTab(html.htmlId))}
-                text={html.name}
-                actions={
-                  <>
-                    <RenameIcon onClick={() => dispatch(actions.requestRenameHtml(html.htmlId))} />
-                    <DeleteIcon onClick={() => dispatch(actions.requestDeleteHtml(html.htmlId))} />
-                  </>
-                }
-              />
-            ))
-            .valueSeq()}
-        </SimpleList>
-      </Part>
+  function renderFilesView() {
+    return (
+      <div className="view files-view">
+        <div className="view-title">
+          <h2
+            style={{ cursor: 'pointer', flexGrow: 1 }}
+            onClick={() => dispatch(actions.useSidebarView('folders-view'))}
+          >
+            {activeFolder ? activeFolder.name : '加载中...'}
+            <span style={{ fontWeight: 'normal', fontSize: 12, color: '#999' }}>
+              （点击此处返回文件夹列表）
+            </span>
+          </h2>
+        </div>
+        <div className="view-content">
+          <section>
+            <div className="section-title">
+              <span>htmls 列表</span>
+              <div className="actions">
+                <AddFileIcon
+                  disabled={activeFolder == null}
+                  onClick={() => dispatch(actions.requestAddHtml())}
+                />
+              </div>
+            </div>
+            <div className="simple-list">
+              {visibleHtmls
+                .sortBy(html => html.htmlId)
+                .map(html => (
+                  <SimpleListItem
+                    key={html.htmlId}
+                    active={html.htmlId === activeHtmlId}
+                    onClick={() => dispatch(actions.openHtmlTab(html.htmlId))}
+                    text={html.name}
+                    actions={
+                      <>
+                        <RenameIcon
+                          onClick={() => dispatch(actions.requestRenameHtml(html.htmlId))}
+                        />
+                        <DeleteIcon
+                          onClick={() => dispatch(actions.requestDeleteHtml(html.htmlId))}
+                        />
+                      </>
+                    }
+                  />
+                ))
+                .valueSeq()}
+            </div>
+          </section>
 
-      <Part
-        name="selectors"
-        actions={
-          <AddFileIcon
-            disabled={activeFolder == null}
-            onClick={() => dispatch(actions.requestAddSelector())}
-          />
-        }
-      >
-        <SimpleList>
-          {visibleSelectors
-            .sortBy(selector => selector.selectorId)
-            .map(selector => (
-              <SimpleListItem
-                key={selector.selectorId}
-                active={selector.selectorId === activeSelectorId}
-                onClick={() => dispatch(actions.openSelectorTab(selector.selectorId))}
-                text={selector.name}
-                actions={
-                  <>
-                    <RenameIcon
-                      onClick={() => dispatch(actions.requestRenameSelector(selector.selectorId))}
-                    />
-                    <DeleteIcon
-                      onClick={() => dispatch(actions.requestDeleteSelector(selector.selectorId))}
-                    />
-                  </>
-                }
-              />
-            ))
-            .valueSeq()}
-        </SimpleList>
-      </Part>
-    </div>
-  )
+          <section style={{ marginTop: 16 }}>
+            <div className="section-title">
+              <span>选择器列表</span>
+              <div className="actions">
+                <AddFileIcon
+                  disabled={activeFolder == null}
+                  onClick={() => dispatch(actions.requestAddSelector())}
+                />
+              </div>
+            </div>
+            <div className="simple-list">
+              {visibleSelectors
+                .sortBy(selector => selector.selectorId)
+                .map(selector => (
+                  <SimpleListItem
+                    key={selector.selectorId}
+                    active={selector.selectorId === activeSelectorId}
+                    onClick={() => dispatch(actions.openSelectorTab(selector.selectorId))}
+                    text={selector.name}
+                    actions={
+                      <>
+                        <RenameIcon
+                          onClick={() =>
+                            dispatch(actions.requestRenameSelector(selector.selectorId))
+                          }
+                        />
+                        <DeleteIcon
+                          onClick={() =>
+                            dispatch(actions.requestDeleteSelector(selector.selectorId))
+                          }
+                        />
+                      </>
+                    }
+                  />
+                ))
+                .valueSeq()}
+            </div>
+          </section>
+        </div>
+      </div>
+    )
+  }
 }

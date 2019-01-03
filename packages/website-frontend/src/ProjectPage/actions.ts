@@ -1,3 +1,5 @@
+import { SidebarView } from './interfaces'
+
 export type Action =
   | OpenSelectorTab
   | CloseSelectorTab
@@ -17,6 +19,7 @@ export type Action =
   | RequestAddFolder
   | RequestUpdateFolder
   | RequestDeleteFolder
+  | UseSidebarView
 
 /** 确保参数一定是合法的 action 类型 */
 export function a(actionType: Action['type']) {
@@ -56,8 +59,8 @@ export function closeHtmlTab(htmlId: number) {
 }
 
 export type OpenFolder = ReturnType<typeof openFolder>
-export function openFolder(folderId: number) {
-  return { type: 'open-folder' as 'open-folder', folderId }
+export function openFolder(folderId: number, keepFoldersView = false) {
+  return { type: 'open-folder' as 'open-folder', folderId, keepFoldersView }
 }
 
 export type RequestDeleteSelector = ReturnType<typeof requestDeleteSelector>
@@ -123,4 +126,9 @@ export function requestUpdateFolder(folderId: number) {
 export type RequestDeleteFolder = ReturnType<typeof requestDeleteFolder>
 export function requestDeleteFolder(folderId: number) {
   return { type: 'request-delete-folder' as 'request-delete-folder', folderId }
+}
+
+export type UseSidebarView = ReturnType<typeof useSidebarView>
+export function useSidebarView(sidebarView: SidebarView) {
+  return { type: 'use-sidebar-view' as 'use-sidebar-view', sidebarView }
 }

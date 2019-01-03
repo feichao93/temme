@@ -18,6 +18,10 @@ export function updateSelectorInitAvid(state: State, selectorId: number, initAvi
   return state.setIn(['selectorTabs', selectorId, 'initAvid'], initAvid)
 }
 
+export function useFilesView(state: State) {
+  return state.set('sidebarView', 'files-view')
+}
+
 export function pushHtmlTabRecord(state: State, htmlId: number, avid: number) {
   const openOrder = state.nextOpenOrder
   const placeOrder = selectors.nextHtmlTabPlaceOrder(state)
