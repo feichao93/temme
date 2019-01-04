@@ -12,6 +12,14 @@ export function html(state: State, htmlId: number) {
   return state.htmls.get(htmlId)
 }
 
+export function dirtyHtmls({ htmlTabs, htmls }: State) {
+  return htmlTabs.filter(tab => tab.isDirty()).map(tab => htmls.get(tab.htmlId))
+}
+
+export function dirtySelectors({ selectorTabs, selectors }: State) {
+  return selectorTabs.filter(tab => tab.isDirty()).map(tab => selectors.get(tab.selectorId))
+}
+
 export function nextHtmlTabPlaceOrder(state: State) {
   if (state.htmlTabs.isEmpty()) {
     return 1

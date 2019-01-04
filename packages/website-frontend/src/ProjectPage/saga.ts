@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import { io, takeEvery } from 'little-saga'
 import * as monaco from 'monaco-editor'
 import React from 'react'
@@ -55,6 +56,7 @@ export default function* saga(login: string, projectName: string) {
     ),
   )
 
+  yield takeEvery(a('request-download-project'), handleRequestDownloadProject, login, projectName)
   yield takeEvery(a('open-folder'), handleOpenFolder)
   yield takeEvery(a('open-html-tab'), handleOpenHtmlTab)
   yield takeEvery(a('open-selector-tab'), handleOpenSelectorTab)
@@ -79,6 +81,43 @@ export default function* saga(login: string, projectName: string) {
     const state: State = yield io.select()
     yield saveSelector(state.activeSelectorId)
   })
+}
+
+function* handleRequestDownloadProject(login: string, projectName: string) {
+  // 在下载之前需要先确保当前更改都已被保存
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  const dirtyHtmls: Map<number, HtmlRecord> = yield io.select(selectors.dirtyHtmls)
+  const dirtySelectors: Map<number, SelectorRecord> = yield io.select(selectors.dirtySelectors)
+  const needSave = !(dirtyHtmls.isEmpty() && dirtySelectors.isEmpty())
+  if (needSave) {
+    const message = '在下载前需要保存当前更改，是否继续？'
+    const confirmed: boolean = yield dialogs.confirm({ message })
+    if (!confirmed) {
+      return
+    }
+    try {
+      const saveHtmlEffects = dirtyHtmls
+        .map(html => saveHtml(html.htmlId))
+        .valueSeq()
+        .toArray()
+      const saveSelectorEffects = dirtySelectors
+        .map(selector => saveSelector(selector.selectorId))
+        .valueSeq()
+        .toArray()
+      yield io.all(saveHtmlEffects.concat(saveSelectorEffects))
+    } catch (e) {
+      console.error(e)
+      yield dialogs.alert({ title: '保存失败', message: e.message })
+      return
+    }
+  }
+  const url = new URL(document.URL)
+  url.pathname = `/archive/@${login}/${projectName}`
+  // 创建一个用于下载的 anchor 标签，并点击该 anchor
+  const anchor = document.createElement('a')
+  anchor.href = url.href
+  anchor.download = ''
+  anchor.click()
 }
 
 function* loadProjectData(login: string, projectName: string) {

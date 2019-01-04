@@ -1,6 +1,7 @@
 import { SidebarView } from './interfaces'
 
 export type Action =
+  | RequestDownloadProject
   | OpenSelectorTab
   | CloseSelectorTab
   | OpenHtmlTab
@@ -116,6 +117,11 @@ export function requestRenameSelector(selectorId: number) {
 export type RequestAddFolder = ReturnType<typeof requestAddFolder>
 export function requestAddFolder() {
   return { type: 'request-add-folder' as 'request-add-folder' }
+}
+
+export type RequestDownloadProject = ReturnType<typeof requestDownloadProject>
+export function requestDownloadProject() {
+  return { type: 'request-download-project' as 'request-download-project' }
 }
 
 export type RequestUpdateFolder = ReturnType<typeof requestUpdateFolder>

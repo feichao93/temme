@@ -1,19 +1,20 @@
 import * as fs from 'fs'
 import Koa, { Context, Middleware } from 'koa'
-import conditional from 'koa-conditional-get'
-import etag from 'koa-etag'
-import serve from 'koa-static'
-import mount from 'koa-mount'
-import session from 'koa-session'
 import bodyParser from 'koa-bodyparser'
 import compress from 'koa-compress'
-import { MongoClient } from 'mongodb'
+import conditional from 'koa-conditional-get'
+import etag from 'koa-etag'
+import mount from 'koa-mount'
 import Router from 'koa-router'
-import Service from './Service'
+import session from 'koa-session'
+import serve from 'koa-static'
+import { MongoClient } from 'mongodb'
+import CONFIG from '../config'
+import archiveApp from './archiveApp'
 import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
 import privateAPIRouter from './privateAPIRouter'
 import publicAPIRouter from './publicAPIRouter'
-import CONFIG from '../config'
+import Service from './Service'
 
 const ONE_YEAR = 365 * 24 * 3600 * 1000
 
@@ -72,8 +73,9 @@ function makeApp(service: Service) {
     .use(session(app))
     .use(withService(service))
     .use(bodyParser())
-    .use(router.routes())
     .use(mount('/static', staticApp))
+    .use(mount('/archive', archiveApp))
+    .use(router.routes())
     .use(fallbackHandler)
 
   return app

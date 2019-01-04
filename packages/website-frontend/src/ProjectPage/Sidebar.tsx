@@ -62,7 +62,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         <h1 className="title">
           <span>{name}</span>
           <div className="actions">
-            <DownloadIcon size={16} onClick={() => console.log('downloading...')} />
+            <DownloadIcon size={16} onClick={() => dispatch(actions.requestDownloadProject())} />
           </div>
         </h1>
         <p className="description">{description}</p>
@@ -103,7 +103,9 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                   {folder.folderId === activeFolderId ? <FolderOpenIcon /> : <FolderIcon />}
                   <div className="text">
                     <div className="folder-name">{folder.name}</div>
-                    <div className="folder-description">{folder.description || '暂无描述'}</div>
+                    <div className="folder-description" title={folder.description}>
+                      {folder.description || '暂无描述'}
+                    </div>
                   </div>
                   <span className="actions" style={{ marginRight: 8 }}>
                     <RenameIcon
@@ -130,7 +132,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
       <div className="view files-view">
         <div className="view-title">
           <h2
-            style={{ cursor: 'pointer', flexGrow: 1 }}
+            style={{ cursor: 'pointer', flexGrow: 1, overflow: 'hidden', wordBreak: 'break-all' }}
             onClick={() => dispatch(actions.useSidebarView('folders-view'))}
           >
             {activeFolder ? activeFolder.name : '加载中...'}

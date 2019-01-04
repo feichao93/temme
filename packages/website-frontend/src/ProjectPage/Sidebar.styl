@@ -42,6 +42,7 @@ $list-item {
       flex 0 0 100%
       display flex
       flex-flow column
+      overflow-x hidden
       ::-webkit-scrollbar {
         width: 13px
       }
@@ -78,6 +79,7 @@ $list-item {
     user-select none
 
     > li {
+      flex 0 0 auto
       display flex
       align-items center
       cursor pointer
@@ -94,6 +96,7 @@ $list-item {
       }
 
       .folder-icon, .folder-open-icon {
+        flex-shrink 0
         margin-left 4px
         margin-right 8px
       }
@@ -103,7 +106,20 @@ $list-item {
       }
 
       .text {
-        line-height 24px
+        display flex
+        flex-flow column
+        overflow hidden
+        .folder-name, .folder-description {
+          line-height 24px
+          height @line-height
+          overflow hidden
+          text-overflow ellipsis
+          white-space nowrap
+        }
+      }
+
+      .actions {
+        flex 0 0
       }
     }
   }
