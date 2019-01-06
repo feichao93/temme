@@ -70,18 +70,18 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^10.12.11",
-    "js-yaml": "^3.11.0",
+    "@types/node": "^10.12.18",
+    "js-yaml": "^3.12.1",
     "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.15.3",
     "supervisor": "^0.12.0",
-    "ts-loader": "^5.3.1",
-    "typescript": "^3.2.1",
-    "vscode": "1.1.22",
-    "webpack": "^4.26.1",
-    "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "^3.1.10"
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.2",
+    "vscode": "1.1.26",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0",
+    "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
     "@types/node-fetch": "^2.1.4",
