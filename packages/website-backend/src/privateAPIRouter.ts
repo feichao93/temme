@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import { Html, Selector } from './interfaces'
+import { Page, Project } from './interfaces'
 
 function remove<T>(array: T[], item: T) {
   const index = array.indexOf(item)
@@ -25,19 +25,20 @@ async function addProject(ctx: Router.IRouterContext) {
 
   const projectId = await ctx.service.getNextProjectId()
   const now = new Date().toISOString()
-  await ctx.service.projects.insertOne({
+  const newProject: Project = {
     projectId,
     userId,
     name,
     description,
-    folders: [],
+    pageIds: [],
     createdAt: now,
     updatedAt: now,
-  })
-  ctx.body = ''
+  }
+  await ctx.service.projects.insertOne(newProject)
+  ctx.body = newProject
 }
 
-// 可以支持一下 30 天内恢复
+// 删除一个 project
 async function deleteProject(ctx: Router.IRouterContext) {
   const { projectId } = ctx.request.body
   const userId = ctx.session.userId
@@ -46,16 +47,14 @@ async function deleteProject(ctx: Router.IRouterContext) {
   ctx.assert(project, 404)
   ctx.assert(project.userId === userId, 401)
 
-  const folderIds = project.folders.map(fld => fld.folderId)
   await ctx.service.projects.deleteOne({ projectId })
-  await ctx.service.htmls.deleteMany({ folderId: { $in: folderIds } })
-  await ctx.service.selectors.deleteMany({ folderId: { $in: folderIds } })
-  ctx.body = ''
+  await ctx.service.pages.deleteMany({ pageId: { $in: project.pageIds } })
+  ctx.status = 200
 }
 
-// TODO
-async function updateProject(ctx: Router.IRouterContext) {
-  const { name, description, projectId } = ctx.request.body
+// TODO 更新一个 project 的元数据，名称、描述等
+async function updateProjectMeta(ctx: Router.IRouterContext) {
+  const { projectId, name, description } = ctx.request.body
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
 
@@ -71,8 +70,8 @@ async function updateProject(ctx: Router.IRouterContext) {
   ctx.body = ''
 }
 
-async function addFolder(ctx: Router.IRouterContext) {
-  const { projectId, name, description } = ctx.request.body
+async function addPage(ctx: Router.IRouterContext) {
+  const { projectId, name } = ctx.request.body
   ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
 
   const userId = ctx.session.userId
@@ -80,256 +79,90 @@ async function addFolder(ctx: Router.IRouterContext) {
   ctx.assert(ownership, 401, `No access to project with id ${projectId}`)
 
   const project = await ctx.service.projects.findOne({ projectId })
-  const folderId = await ctx.service.getNextFolderId()
+  const pageId = await ctx.service.getNextPageId()
   const now = new Date().toISOString()
 
-  const newFolder = {
-    folderId,
+  const newPage: Page = {
+    pageId,
+    projectId: project.projectId,
     name,
-    description,
     updatedAt: now,
     createdAt: now,
-    htmlIds: [] as number[],
-    selectorIds: [] as number[],
+    html: '',
+    selector: '',
   }
-  project.folders.push(newFolder)
+  project.pageIds.push(pageId)
+  await ctx.service.pages.insertOne(newPage)
   await ctx.service.projects.updateOne(
     { projectId },
-    { $set: { folders: project.folders, updatedAt: now } },
+    { $set: { pageIds: project.pageIds, updatedAt: now } },
   )
-  ctx.body = newFolder
+  ctx.body = newPage
 }
 
-async function renameFolder(ctx: Router.IRouterContext) {
-  const { folderId, name } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
-
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': folderId })
-  ctx.assert(project, 404)
+async function updatePage(ctx: Router.IRouterContext) {
+  const { pageId, html, selector } = ctx.request.body
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page != null, 404)
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toDateString()
-  const folder = project.folders.find(fld => fld.folderId == folderId)
-  folder.name = name
+  await ctx.service.pages.updateOne({ pageId }, { $set: { updatedAt: now, html, selector } })
   await ctx.service.projects.updateOne(
     { projectId: project.projectId },
-    { $set: { updatedAt: now, folders: project.folders } },
+    { $set: { updatedAt: now } },
   )
-
-  ctx.body = ''
+  ctx.status = 200
 }
 
-async function deleteFolder(ctx: Router.IRouterContext) {
-  const { folderId } = ctx.request.body
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': folderId })
+async function renamePage(ctx: Router.IRouterContext) {
+  const { pageId, name } = ctx.request.body
+  ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
+
+  const page = await ctx.service.pages.findOne({ pageId })
+  ctx.assert(page != null, 404)
+  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
+  const userId = ctx.session.userId
+  ctx.assert(project.userId === userId, 401)
+
+  const now = new Date().toDateString()
+  await ctx.service.pages.updateOne({ pageId }, { $set: { updatedAt: now, name } })
+  await ctx.service.projects.updateOne(
+    { projectId: project.projectId },
+    { $set: { updatedAt: now } },
+  )
+
+  ctx.status = 200
+}
+
+async function deletePage(ctx: Router.IRouterContext) {
+  const { pageId } = ctx.request.body
+  const project = await ctx.service.projects.findOne({ pageIds: pageId })
   ctx.assert(project, 404)
 
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
-  const folder = project.folders.find(fld => fld.folderId === folderId)
-  remove(project.folders, folder)
+  remove(project.pageIds, pageId)
   const now = new Date().toISOString()
   await ctx.service.projects.updateOne(
     { projectId: project.projectId },
-    { $set: { folders: project.folders, updatedAt: now } },
+    { $set: { pageIds: project.pageIds, updatedAt: now } },
   )
+  await ctx.service.pages.deleteOne({ pageId })
 
-  ctx.body = ''
-}
-
-async function addHtml(ctx: Router.IRouterContext) {
-  const { folderId, name } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid name')
-  const userId = ctx.session.userId
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': folderId })
-  ctx.assert(project, 404)
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  const htmlId = await ctx.service.getNextHtmlId()
-  const folder = project.folders.find(fld => fld.folderId === folderId)
-  folder.htmlIds.push(htmlId)
-  const html: Html = {
-    htmlId,
-    name,
-    content: '',
-    folderId,
-    createdAt: now,
-    updatedAt: now,
-  }
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now, folders: project.folders } },
-  )
-  await ctx.service.htmls.insertOne(html)
-  ctx.body = html
-}
-
-async function updateHtml(ctx: Router.IRouterContext) {
-  const { htmlId, content } = ctx.request.body
-
-  const html = await ctx.service.htmls.findOne({ htmlId })
-  ctx.assert(html, 404)
-
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': html.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  await ctx.service.htmls.updateOne({ htmlId }, { $set: { content, updatedAt: now } })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
-  ctx.body = ''
-}
-
-async function deleteHtml(ctx: Router.IRouterContext) {
-  const { htmlId } = ctx.request.body
-
-  const html = await ctx.service.htmls.findOne({ htmlId })
-  ctx.assert(html, 404)
-
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': html.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  const folder = project.folders.find(fld => fld.folderId === html.folderId)
-  remove(folder.htmlIds, htmlId)
-  await ctx.service.htmls.deleteOne({ htmlId })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now, folders: project.folders } },
-  )
-  ctx.body = ''
-}
-
-async function addSelector(ctx: Router.IRouterContext) {
-  const { folderId, name } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid name')
-  const userId = ctx.session.userId
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': folderId })
-  ctx.assert(project, 404)
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  const selectorId = await ctx.service.getNextSelectorId()
-  const folder = project.folders.find(fld => fld.folderId === folderId)
-  folder.selectorIds.push(selectorId)
-  const selector: Selector = {
-    selectorId,
-    name,
-    content: '',
-    folderId,
-    createdAt: now,
-    updatedAt: now,
-  }
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now, folders: project.folders } },
-  )
-  await ctx.service.selectors.insertOne(selector)
-  ctx.body = selector
-}
-
-async function updateSelector(ctx: Router.IRouterContext) {
-  const { selectorId, content } = ctx.request.body
-
-  const selector = await ctx.service.selectors.findOne({ selectorId })
-  ctx.assert(selector, 404)
-
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': selector.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  await ctx.service.selectors.updateOne({ selectorId }, { $set: { content, updatedAt: now } })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
-  ctx.body = ''
-}
-
-async function renameHtml(ctx: Router.IRouterContext) {
-  const { htmlId, name } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid new html name')
-
-  const html = await ctx.service.htmls.findOne({ htmlId })
-  ctx.assert(html, 404)
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': html.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
-  await ctx.service.htmls.updateOne({ htmlId }, { $set: { name, updatedAt: now } })
-  ctx.body = ''
-}
-
-async function renameSelector(ctx: Router.IRouterContext) {
-  const { selectorId, name } = ctx.request.body
-  ctx.assert(typeof name === 'string' && name.length > 0, 400, 'Invalid new selector name')
-
-  const selector = await ctx.service.selectors.findOne({ selectorId })
-  ctx.assert(selector, 404)
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': selector.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
-  await ctx.service.selectors.updateOne({ selectorId }, { $set: { name, updatedAt: now } })
-  ctx.body = ''
-}
-
-async function deleteSelector(ctx: Router.IRouterContext) {
-  const { selectorId } = ctx.request.body
-
-  const selector = await ctx.service.selectors.findOne({ selectorId })
-  ctx.assert(selector, 404)
-
-  const project = await ctx.service.projects.findOne({ 'folders.folderId': selector.folderId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
-
-  const now = new Date().toISOString()
-  const folder = project.folders.find(fld => fld.folderId === selector.folderId)
-  remove(folder.selectorIds, selectorId)
-  await ctx.service.selectors.deleteOne({ selectorId })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now, folders: project.folders } },
-  )
-  ctx.body = ''
+  ctx.status = 200
 }
 
 export default new Router({ prefix: '/api' })
   .use(requireSignedIn)
   .post('/add-project', addProject)
   .post('/delete-project', deleteProject)
-  .post('/update-project', updateProject)
-  // TODO rename project
+  .post('/update-project-meta', updateProjectMeta)
 
-  .post('/add-folder', addFolder)
-  .post('/rename-folder', renameFolder)
-  .post('/delete-folder', deleteFolder)
-
-  .post('/add-html', addHtml)
-  .post('/update-html', updateHtml)
-  .post('/delete-html', deleteHtml)
-  .post('/rename-html', renameHtml)
-
-  .post('/add-selector', addSelector)
-  .post('/update-selector', updateSelector)
-  .post('/rename-selector', renameSelector)
-  .post('/delete-selector', deleteSelector)
+  .post('/add-page', addPage)
+  .post('/update-page', updatePage)
+  .post('/rename-page', renamePage)
+  .post('/delete-page', deletePage)

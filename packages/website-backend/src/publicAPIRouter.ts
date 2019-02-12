@@ -56,43 +56,11 @@ async function getProject(ctx: Router.IRouterContext) {
   )
   ctx.assert(project, 404)
 
-  // TODO 一次性加载所有的 html/selector，后续可以优化
-  const htmls = []
-  const selectors = []
-  for (const folder of project.folders) {
-    const htmlsInFolder = await ctx.service.htmls
-      .find({ htmlId: { $in: folder.htmlIds } })
-      .project({ _id: false })
-      .toArray()
-    htmls.push(...htmlsInFolder)
-
-    const selectorsInFolder = await ctx.service.selectors
-      .find({ selectorId: { $in: folder.selectorIds } })
-      .project({ _id: false })
-      .toArray()
-    selectors.push(...selectorsInFolder)
-  }
-
-  ctx.body = { project, htmls, selectors }
-}
-
-// 查看某个选择器的内容
-async function getSelector(ctx: Router.IRouterContext) {
-  const selectorId = Number(ctx.params.selectorId)
-  const selector = await ctx.service.selectors.findOne({ selectorId })
-  ctx.assert(selector, 404)
-
-  ctx.set('content-type', 'text/plain')
-  ctx.body = selector
-}
-
-async function getHtml(ctx: Router.IRouterContext) {
-  const htmlId = Number(ctx.params.htmlId)
-  const html = await ctx.service.htmls.findOne({ htmlId })
-  ctx.assert(html, 404)
-
-  ctx.set('content-type', 'text/plain')
-  ctx.body = html
+  const pages = await ctx.service.pages
+    .find({ pageId: { $in: project.pageIds } })
+    .project({ _id: false })
+    .toArray()
+  ctx.body = { project, pages }
 }
 
 export default new Router({ prefix: '/api' })
@@ -102,5 +70,3 @@ export default new Router({ prefix: '/api' })
   .get('/user-info/:login', getUserInfo)
   .get('/user-info/:login/projects', getUserProjectList)
   .get('/project/:login/:projectName', getProject)
-  .get('/selectors/:selectorId', getSelector)
-  .get('/htmls/:htmlId', getHtml)
