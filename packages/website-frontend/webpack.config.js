@@ -27,7 +27,11 @@ const webpackConfig = (env, argv) => {
   return {
     context: __dirname,
     target: 'web',
-    entry: path.resolve(__dirname, 'src/index.tsx'),
+    entry: [
+      'normalize.css',
+      '@blueprintjs/core/lib/css/blueprint.css',
+      path.resolve(__dirname, 'src/index.tsx'),
+    ],
     output,
 
     resolve: {

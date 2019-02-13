@@ -28,12 +28,12 @@ export default function Header() {
         <div className="align-right">
           {connected &&
             (userId === -1 ? (
-              <button className="button auth" onClick={login}>
+              <button className="auth-button" onClick={login}>
                 <GithubIcon />
                 <div style={{ margin: 10 }}>登录</div>
               </button>
             ) : (
-              <Link to={`/@${username}`} className="button auth">
+              <Link to={`/@${username}`} className="auth-button">
                 <img
                   alt="icon"
                   src={`https://github.com/${username}.png?size=40`}

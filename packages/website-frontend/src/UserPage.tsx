@@ -6,7 +6,7 @@ import { Project, UserInfo } from './types'
 import Header from './Header'
 import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
 import { DeleteIcon, EditIcon, GithubIcon, LogoutIcon } from './icons'
-import ProjectDialog from './Dialog/ProjectDialog'
+import ProjectDialog from './ProjectDialog'
 import './UserPage.styl'
 
 interface Params {

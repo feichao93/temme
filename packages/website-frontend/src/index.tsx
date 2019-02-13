@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './App'
 import { Router } from 'react-router'
-import { DialogContextProvider } from './Dialog/dialogs'
+import App from './App'
+import { DialogContextProvider } from './dialogs'
 import history from './utils/history'
 import { SessionProvider } from './utils/session'
 

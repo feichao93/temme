@@ -1,7 +1,8 @@
 import { io, takeEvery } from 'little-saga'
 import * as monaco from 'monaco-editor'
 import React from 'react'
-import { DialogContextType } from '../Dialog/dialogs'
+import { DialogContextType } from '../dialogs'
+import toaster from '../toaster'
 import * as server from '../utils/server'
 import * as actions from './actions'
 import { a } from './actions'
@@ -40,7 +41,9 @@ export default function* saga(login: string, projectName: string) {
   )
 
   yield takeEvery(a('request-download-project'), handleRequestDownloadProject, login, projectName)
-  yield takeEvery(a('open-page'), handleOpenPage)
+  yield takeEvery(a('open-page'), function*({ pageId }: actions.OpenPage) {
+    yield openPage(pageId)
+  })
 
   yield takeEvery(a('request-add-page'), handleRequestAddPage)
   yield takeEvery(a('request-update-page-meta'), handleRequestUpdatePageMeta)
@@ -59,7 +62,7 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
   const modifiedPages = state.pages.filter(p => p.isModified())
   if (!modifiedPages.isEmpty()) {
     const message = '在下载前需要保存当前所有更改，是否继续？'
-    const confirmed: boolean = yield dialogs.confirm({ message })
+    const confirmed: boolean = yield dialogs.confirm({ title: '确认', message })
     if (!confirmed) {
       return
     }
@@ -106,7 +109,14 @@ function* loadProjectData(login: string, projectName: string) {
   }
 }
 
-function* handleOpenPage({ pageId }: actions.OpenPage) {
+function* closePage() {
+  const { htmlEditorRef, selectorEditorRef }: SagaEnv = yield io.getEnv()
+  htmlEditorRef.current.setModel(null)
+  selectorEditorRef.current.setModel(null)
+  yield io.update((state: State) => state.set('activePageId', -1))
+}
+
+function* openPage(pageId: number) {
   const { activePageId, pages }: State = yield io.select()
   if (pageId === activePageId) {
     return
@@ -173,6 +183,8 @@ function* handleRequestUpdatePageMeta({ pageId }: actions.RequestUpdatePageMeta)
   const page = state.pages.get(pageId)
 
   const newName: string = yield dialogs.prompt({
+    title: '重命名',
+    icon: 'edit',
     initValue: page.name,
     message: '新的页面名称',
   })
@@ -202,6 +214,8 @@ function* handleRequestAddPage() {
   try {
     const page: PageRecord = yield server.addPage(projectId, pageName)
     yield io.update((state: State) => state.update('pages', pages => pages.set(page.pageId, page)))
+    yield openPage(page.pageId)
+    toaster.show({ intent: 'success', message: `已创建 ${page.name}` })
   } catch (e) {
     console.error(e)
     yield dialogs.alert({ title: '添加文件夹失败', message: e.message })
@@ -210,10 +224,15 @@ function* handleRequestAddPage() {
 
 function* handleRequestDeletePage({ pageId }: actions.RequestDeletePage) {
   const { dialogs }: SagaEnv = yield io.getEnv()
-  const folder = yield io.select(selectors.page, pageId)
+  const page = yield io.select(selectors.page, pageId)
   const confirmed: boolean = yield dialogs.confirm({
     title: '确认删除',
-    message: `确定要删除页面 ${folder.name} 吗？该操作无法撤销`,
+    confirmIntent: 'danger',
+    message: (
+      <span>
+        确定要删除页面 <b style={{ color: '#b13b00' }}>{page.name}</b> 吗？该操作无法撤销
+      </span>
+    ),
   })
   if (!confirmed) {
     return
@@ -221,12 +240,18 @@ function* handleRequestDeletePage({ pageId }: actions.RequestDeletePage) {
 
   try {
     yield server.deletePage(pageId)
-    yield io.update((state: State) => {
-      const nextPages = state.pages.delete(pageId)
-      const nextActivePageId = state.activePageId === pageId ? -1 : state.activePageId
-      return state.set('pages', nextPages).set('activePageId', nextActivePageId)
+    const state: State = yield io.update(updaters.deletePage, pageId)
+    if (pageId === state.activePageId) {
+      if (state.pages.isEmpty()) {
+        closePage()
+      } else {
+        openPage(state.pages.map(p => p.pageId).min())
+      }
+    }
+    toaster.show({
+      intent: 'primary',
+      message: `已删除 ${page.name}`,
     })
-    // TODO toaster
   } catch (e) {
     console.error(e)
     yield dialogs.alert({ title: '删除页面失败', message: e.message })

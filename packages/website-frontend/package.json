@@ -21,6 +21,7 @@
     "invariant": "^2.2.4",
     "little-saga": "^0.6.1",
     "monaco-editor": "^0.15.6",
+    "normalize.css": "^8.0.1",
     "react": "16.8.1",
     "react-dom": "16.8.1",
     "react-router": "^4.3.1",
