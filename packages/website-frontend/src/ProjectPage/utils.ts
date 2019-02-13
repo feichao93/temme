@@ -48,32 +48,12 @@ export function disposeAllEditorModels() {
 
 export const inc = (x: number) => x + 1
 
-export function matchNewFolderPostfix(name: string) {
-  const matchResult = name.match(/^new-folder-(\d+)$/)
+export function matchNewPagePostfix(name: string) {
+  const matchResult = name.match(/^new-page-(\d+)$/)
   if (matchResult) {
     return Number(matchResult[1])
   }
 }
-export function getNewFolderName(postfix: number) {
-  return `new-folder-${postfix}`
-}
-
-export function matchNewHtmlPostfix(name: string) {
-  const matchResult = name.match(/^new-html-(\d+)$/)
-  if (matchResult) {
-    return Number(matchResult[1])
-  }
-}
-export function getNewHtmlName(postfix: number) {
-  return `new-html-${postfix}`
-}
-
-export function matchNewSelectorPostfix(name: string) {
-  const matchResult = name.match(/^new-selector-(\d+)$/)
-  if (matchResult) {
-    return Number(matchResult[1])
-  }
-}
-export function getNewSelectorName(postfix: number) {
-  return `new-selector-${postfix}`
+export function getNewPageName(postfix: number) {
+  return `new-page-${postfix}`
 }

@@ -7,12 +7,13 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "@little-saga/use-saga": "^0.7.2",
+    "@blueprintjs/core": "^3.13.0",
+    "@little-saga/use-saga": "^0.8.0",
     "@types/classnames": "^2.2.7",
     "@types/history": "^4.7.2",
-    "@types/react": "^16.7.13",
-    "@types/react-dom": "^16.0.11",
-    "@types/react-router": "^4.4.2",
+    "@types/react": "^16.8.2",
+    "@types/react-dom": "^16.8.0",
+    "@types/react-router": "^4.4.4",
     "@types/react-router-dom": "^4.3.1",
     "classnames": "^2.2.6",
     "history": "^4.7.2",
@@ -20,8 +21,8 @@
     "invariant": "^2.2.4",
     "little-saga": "^0.6.1",
     "monaco-editor": "^0.15.6",
-    "react": "16.7.0-alpha.2",
-    "react-dom": "16.7.0-alpha.2",
+    "react": "16.8.1",
+    "react-dom": "16.8.1",
     "react-router": "^4.3.1",
     "react-router-dom": "^4.3.1",
     "temme": "^0.8.3"
@@ -35,9 +36,9 @@
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2",
     "ts-loader": "^5.3.3",
-    "typescript": "^3.2.2",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.2.0",
+    "typescript": "^3.3.3",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3",
     "webpack-dev-server": "3.1.14"
   }
 }

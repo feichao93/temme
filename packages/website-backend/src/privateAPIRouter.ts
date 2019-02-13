@@ -117,7 +117,7 @@ async function updatePage(ctx: Router.IRouterContext) {
   ctx.status = 200
 }
 
-async function renamePage(ctx: Router.IRouterContext) {
+async function updatePageMeta(ctx: Router.IRouterContext) {
   const { pageId, name } = ctx.request.body
   ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
 
@@ -127,7 +127,7 @@ async function renamePage(ctx: Router.IRouterContext) {
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
-  const now = new Date().toDateString()
+  const now = new Date().toISOString()
   await ctx.service.pages.updateOne({ pageId }, { $set: { updatedAt: now, name } })
   await ctx.service.projects.updateOne(
     { projectId: project.projectId },
@@ -164,5 +164,5 @@ export default new Router({ prefix: '/api' })
 
   .post('/add-page', addPage)
   .post('/update-page', updatePage)
-  .post('/rename-page', renamePage)
+  .post('/update-page-meta', updatePageMeta)
   .post('/delete-page', deletePage)

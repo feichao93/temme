@@ -53,3 +53,33 @@
     }
   }
 }
+
+.tablist {
+  flex-shrink 0
+  height 35px
+  display flex
+  font-size 13px
+  color rgba(255, 255, 255, 0.5)
+  background #2d2d2d
+
+  .tab {
+    flex-shrink 0
+    display flex
+    align-items center
+    padding-left 12px
+    padding-right 8px
+    border-right 1px solid #252525
+    cursor pointer
+    user-select none
+
+    &.active {
+      color white
+      background #1e1e1e
+    }
+
+    .tabname {
+      padding-left 10px
+      padding-right 6px
+    }
+  }
+}

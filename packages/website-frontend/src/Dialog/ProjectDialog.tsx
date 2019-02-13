@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from 'react'
 import React from 'react'
 import { DialogContainer } from './DialogContainer'
-import { addProject, updateProject } from '../utils/server'
+import * as server from '../utils/server'
 
 interface ProjectDialogProps {
   show: boolean
@@ -29,9 +29,9 @@ export default function ProjectDialog(props: ProjectDialogProps) {
   const onConfirm = async () => {
     try {
       if (projectId === -1) {
-        await addProject(nameState, descState)
+        await server.addProject(nameState, descState)
       } else {
-        await updateProject(projectId, nameState, descState)
+        await server.updateProject(projectId, nameState, descState)
       }
       await fetchUserProjects(username)
     } catch (e) {

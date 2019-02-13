@@ -1,23 +1,13 @@
-import { Map } from 'immutable'
-import { FolderRecord, HtmlRecord, ProjectRecord, SelectorRecord } from '../ProjectPage/interfaces'
+import { List } from 'immutable'
+import { ProjectRecord, PageRecord } from '../ProjectPage/interfaces'
 import { Project, UserInfo } from '../types'
 
-export async function saveHtml(htmlId: number, content: string) {
-  const response = await fetch('/api/update-html', {
+export async function savePage(page: PageRecord) {
+  const { pageId, html, selector } = page
+  const response = await fetch('/api/update-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ htmlId, content }),
-  })
-  if (!response.ok) {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function saveSelector(selectorId: number, content: string) {
-  const response = await fetch('/api/update-selector', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ selectorId, content }),
+    body: JSON.stringify({ pageId, html, selector }),
   })
   if (!response.ok) {
     throw new Error(`${response.status} ${await response.text()}`)
@@ -31,61 +21,31 @@ export async function getProject(login: string, projectName: string) {
   }
   const json = await response.json()
 
-  const folders: Map<number, FolderRecord> = Map(
-    json.project.folders.map((folder: any) => [folder.folderId, new FolderRecord(folder)]),
-  )
-  const project = new ProjectRecord({ ...json.project, folders })
-  const htmls: Map<number, HtmlRecord> = Map(
-    json.htmls.map((sel: any) => [sel.htmlId, new HtmlRecord(sel)]),
-  )
-  const selectors: Map<number, SelectorRecord> = Map(
-    json.selectors.map((sel: any) => [sel.selectorId, new SelectorRecord(sel)]),
-  )
+  const project = new ProjectRecord(json.project)
+  const pages = List(json.pages).map((p: any) => new PageRecord(p))
 
-  return { project, selectors, htmls }
+  return { project, pages }
 }
 
-export async function addFolder(projectId: number, name: string) {
-  const response = await fetch('/api/add-folder', {
+export async function addPage(projectId: number, name: string) {
+  const response = await fetch('/api/add-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ projectId, name: name, description: '' }),
   })
   if (response.ok) {
     const json = await response.json()
-    return new FolderRecord(json)
+    return new PageRecord(json)
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
-export async function deleteFolder(folderId: number) {
-  const response = await fetch('/api/delete-folder', {
+export async function deletePage(pageId: number) {
+  const response = await fetch('/api/delete-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ folderId }),
-  })
-  if (!response.ok) {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function deleteHtml(htmlId: number) {
-  const response = await fetch('/api/delete-html', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ htmlId }),
-  })
-  if (!response.ok) {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function deleteSelector(selectorId: number) {
-  const response = await fetch('/api/delete-selector', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ selectorId }),
+    body: JSON.stringify({ pageId }),
   })
   if (!response.ok) {
     throw new Error(`${response.status} ${await response.text()}`)
@@ -180,68 +140,14 @@ export async function deleteProject(projectId: number) {
   }
 }
 
-export async function renameFolder(folderId: number, name: string) {
-  const response = await fetch('/api/rename-folder', {
+export async function updatePageMeta(pageId: number, name: string) {
+  const response = await fetch('/api/update-page-meta', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ folderId, name }),
+    body: JSON.stringify({ pageId, name }),
   })
   if (response.ok) {
     return true
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function renameHtml(htmlId: number, name: string) {
-  const response = await fetch('/api/rename-html', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ htmlId, name }),
-  })
-  if (response.ok) {
-    return true
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function renameSelector(selectorId: number, name: string) {
-  const response = await fetch('/api/rename-selector', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ selectorId, name }),
-  })
-  if (response.ok) {
-    return true
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function addHtml(folderId: number, name: string) {
-  const response = await fetch('/api/add-html', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ folderId, name }),
-  })
-  if (response.ok) {
-    const json = await response.json()
-    return new HtmlRecord(json)
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
-export async function addSelector(folderId: number, name: string) {
-  const response = await fetch('/api/add-selector', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ folderId, name }),
-  })
-  if (response.ok) {
-    const json = await response.json()
-    return new SelectorRecord(json)
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }

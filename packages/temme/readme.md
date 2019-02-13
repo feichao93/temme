@@ -1,1 +1,1 @@
-See [GitHub repo](https://github.com/shinima/temme) for more information.
+# See documentation on [GitHub](https://github.com/shinima/temme).

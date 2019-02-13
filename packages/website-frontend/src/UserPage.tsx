@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Link, match } from 'react-router-dom'
+import { fromNow } from './utils/common'
 import { useSession } from './utils/session'
 import { Project, UserInfo } from './types'
 import Header from './Header'
@@ -35,14 +36,11 @@ function UserProfile({ login }: { login: string }) {
       console.error(e)
     }
   }
-  useEffect(
-    () => {
-      if (login) {
-        fetchUserInfo(login)
-      }
-    },
-    [login],
-  )
+  useEffect(() => {
+    if (login) {
+      fetchUserInfo(login)
+    }
+  }, [login])
   return (
     userInfoState && (
       <div className="user-profile">
@@ -95,14 +93,11 @@ function UserProjects({ login }: { login: string }) {
       console.error(e)
     }
   }
-  useEffect(
-    () => {
-      if (login) {
-        fetchUserProjects(login)
-      }
-    },
-    [login],
-  )
+  useEffect(() => {
+    if (login) {
+      fetchUserProjects(login)
+    }
+  }, [login])
 
   const createProject = () => {
     setSelectedProjectState({ name: '', projectId: -1, description: '' })
@@ -127,24 +122,11 @@ function UserProjects({ login }: { login: string }) {
     onOpen()
   }
 
-  const updateTime = (lastUpdate: string) => {
-    const diffTime = (new Date().valueOf() - new Date(lastUpdate).valueOf()) / 1000
-    if (diffTime > 3600 * 24) {
-      return `${Math.floor(diffTime / 3600 / 24)}天`
-    } else if (diffTime > 3600) {
-      return `${Math.floor(diffTime / 3600)}小时`
-    } else if (diffTime > 60) {
-      return `${Math.floor(diffTime / 60)}分钟`
-    } else {
-      return '几秒'
-    }
-  }
-
   return (
     <div className="user-project">
       <div className="tab-bar">
         <div className="tab">
-          Project
+          Projects
           <span className="count">{projectsState.length}</span>
         </div>
         {username === login && (
@@ -165,7 +147,7 @@ function UserProjects({ login }: { login: string }) {
                 <div className="project-name">{project.name}</div>
               )}
               <div className="project-description">{project.description}</div>
-              <div className="project-update">{updateTime(project.updatedAt)}前更新</div>
+              <div className="project-update">{fromNow(project.updatedAt)}前更新</div>
               {username === login && (
                 <div className="manage-project">
                   <span onClick={() => handleEditProject(project)}>
@@ -183,7 +165,9 @@ function UserProjects({ login }: { login: string }) {
         key={`${show}-${selectedProjectState.projectId}`}
         show={show}
         onClose={onClose}
-        {...{ ...selectedProjectState, username: login, fetchUserProjects }}
+        username={login}
+        fetchUserProjects={fetchUserProjects}
+        {...selectedProjectState}
       />
     </div>
   )

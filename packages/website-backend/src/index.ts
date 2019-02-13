@@ -41,7 +41,6 @@ async function oauthCallbackHandler(ctx: Context) {
     const userInfo = await fetchUserInfo(access_token)
     await ctx.service.updateUserProfile(userInfo.id, access_token, userInfo)
     ctx.session.userId = userInfo.id
-    // ctx.redirect(`/@${userInfo.login}`)
     ctx.redirect(`/login-success?user_id=${userInfo.id}&username=${userInfo.login}`)
   } catch (e) {
     ctx.throw(400, e.message)
@@ -63,6 +62,7 @@ function makeApp(service: Service) {
 
   const router = new Router()
     .get(CONFIG.oauthCallbackPath, oauthCallbackHandler)
+    // TODO .use(mount('/api', apiApp))
     .use(publicAPIRouter.routes())
     .use(privateAPIRouter.routes())
 
@@ -82,10 +82,7 @@ function makeApp(service: Service) {
 }
 
 async function main() {
-  const client = await MongoClient.connect(
-    CONFIG.mongoUri,
-    { useNewUrlParser: true },
-  )
+  const client = await MongoClient.connect(CONFIG.mongoUri, { useNewUrlParser: true })
   console.log('Connected to mongodb successfully')
   const service = new Service(client.db(CONFIG.mongoDb))
 

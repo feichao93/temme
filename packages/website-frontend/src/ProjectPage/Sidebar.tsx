@@ -13,7 +13,7 @@ import {
   FolderOpenIcon,
   RenameIcon,
 } from './icons'
-import { FolderRecord, State } from './interfaces'
+import { State } from './interfaces'
 import './Sidebar.styl'
 
 export interface SidebarProps {
@@ -37,24 +37,12 @@ function SimpleListItem({ text, active, onClick, actions }: SimpleListItemProps)
 }
 
 export default function Sidebar({ state, dispatch }: SidebarProps) {
-  const {
-    activeFolderId,
-    project,
-    htmls,
-    selectors,
-    activeHtmlId,
-    activeSelectorId,
-    sidebarView,
-  } = state
+  const { project, pages, activePageId } = state
 
   // TODO 有更好的方法判断 project 是否加载完毕
-  const folders = project.projectId > 0 ? project.folders : Map<number, FolderRecord>()
+  // const folders = project.projectId > 0 ? project.folders : Map<number, FolderRecord>()
   const name = project.projectId > 0 ? project.name : 'loading...'
   const description = project.projectId > 0 ? project.description : 'loading...'
-
-  const activeFolder = folders.find(folder => folder.folderId === activeFolderId)
-  const visibleHtmls = htmls.filter(html => html.folderId === activeFolderId)
-  const visibleSelectors = selectors.filter(selector => selector.folderId === activeFolderId)
 
   return (
     <div className="sidebar">
@@ -67,156 +55,45 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
         </h1>
         <p className="description">{description}</p>
       </header>
-      <div
-        className="view-container"
-        style={{ transform: `translate(${sidebarView === 'folders-view' ? 0 : -100}%, 0)` }}
-      >
-        {renderFoldersView()}
-        {renderFilesView()}
+      <div className="view-container">
+        <div className="view folders-view">
+          <div className="view-title">
+            <h2>页面列表</h2>
+            <div className="actions">
+              <AddFolderIcon onClick={() => dispatch(actions.requestAddPage())} />
+            </div>
+          </div>
+          <div className="view-content">
+            <ul className="folder-list">
+              {pages
+                .sortBy(page => page.pageId)
+                .map(page => {
+                  const { pageId, name } = page
+                  return (
+                    <li
+                      key={pageId}
+                      className={classNames({ active: pageId === activePageId })}
+                      onClick={() => dispatch(actions.openPage(pageId))}
+                    >
+                      {pageId === activePageId ? <FolderOpenIcon /> : <FolderIcon />}
+                      <div className="text">
+                        <div className="folder-name">{name}</div>
+                        <div className="folder-description">{page.isModified() && '未保存'}</div>
+                      </div>
+                      <span className="actions" style={{ marginRight: 8 }}>
+                        <RenameIcon
+                          onClick={() => dispatch(actions.requestUpdatePageMeta(pageId))}
+                        />
+                        <DeleteIcon onClick={() => dispatch(actions.requestDeletePage(pageId))} />
+                      </span>
+                    </li>
+                  )
+                })
+                .valueSeq()}
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   )
-
-  function renderFoldersView() {
-    return (
-      <div className="view folders-view">
-        <div className="view-title">
-          <h2>文件夹列表</h2>
-          <div className="actions">
-            <AddFolderIcon onClick={() => dispatch(actions.requestAddFolder())} />
-          </div>
-        </div>
-        <div className="view-content">
-          <ul className="folder-list">
-            {folders
-              .sortBy(folder => folder.folderId)
-              .map(folder => (
-                <li
-                  key={folder.folderId}
-                  className={classNames({ active: folder.folderId === activeFolderId })}
-                  onClick={() =>
-                    dispatch(
-                      actions.openFolder(folder.folderId, folder.folderId !== activeFolderId),
-                    )
-                  }
-                >
-                  {folder.folderId === activeFolderId ? <FolderOpenIcon /> : <FolderIcon />}
-                  <div className="text">
-                    <div className="folder-name">{folder.name}</div>
-                    <div className="folder-description" title={folder.description}>
-                      {folder.description || '暂无描述'}
-                    </div>
-                  </div>
-                  <span className="actions" style={{ marginRight: 8 }}>
-                    <RenameIcon
-                      onClick={() => dispatch(actions.requestUpdateFolder(folder.folderId))}
-                    />
-                    <DeleteIcon
-                      onClick={() => dispatch(actions.requestDeleteFolder(folder.folderId))}
-                    />
-                    <ContinueIcon
-                      onClick={() => dispatch(actions.openFolder(folder.folderId, false))}
-                    />
-                  </span>
-                </li>
-              ))
-              .valueSeq()}
-          </ul>
-        </div>
-      </div>
-    )
-  }
-
-  function renderFilesView() {
-    return (
-      <div className="view files-view">
-        <div className="view-title">
-          <h2
-            style={{ cursor: 'pointer', flexGrow: 1, overflow: 'hidden', wordBreak: 'break-all' }}
-            onClick={() => dispatch(actions.useSidebarView('folders-view'))}
-          >
-            {activeFolder ? activeFolder.name : '加载中...'}
-            <span style={{ fontWeight: 'normal', fontSize: 12, color: '#999' }}>
-              （点击此处返回文件夹列表）
-            </span>
-          </h2>
-        </div>
-        <div className="view-content">
-          <section>
-            <div className="section-title">
-              <span>htmls 列表</span>
-              <div className="actions">
-                <AddFileIcon
-                  disabled={activeFolder == null}
-                  onClick={() => dispatch(actions.requestAddHtml())}
-                />
-              </div>
-            </div>
-            <div className="simple-list">
-              {visibleHtmls
-                .sortBy(html => html.htmlId)
-                .map(html => (
-                  <SimpleListItem
-                    key={html.htmlId}
-                    active={html.htmlId === activeHtmlId}
-                    onClick={() => dispatch(actions.openHtmlTab(html.htmlId))}
-                    text={html.name}
-                    actions={
-                      <>
-                        <RenameIcon
-                          onClick={() => dispatch(actions.requestRenameHtml(html.htmlId))}
-                        />
-                        <DeleteIcon
-                          onClick={() => dispatch(actions.requestDeleteHtml(html.htmlId))}
-                        />
-                      </>
-                    }
-                  />
-                ))
-                .valueSeq()}
-            </div>
-          </section>
-
-          <section style={{ marginTop: 16 }}>
-            <div className="section-title">
-              <span>选择器列表</span>
-              <div className="actions">
-                <AddFileIcon
-                  disabled={activeFolder == null}
-                  onClick={() => dispatch(actions.requestAddSelector())}
-                />
-              </div>
-            </div>
-            <div className="simple-list">
-              {visibleSelectors
-                .sortBy(selector => selector.selectorId)
-                .map(selector => (
-                  <SimpleListItem
-                    key={selector.selectorId}
-                    active={selector.selectorId === activeSelectorId}
-                    onClick={() => dispatch(actions.openSelectorTab(selector.selectorId))}
-                    text={selector.name}
-                    actions={
-                      <>
-                        <RenameIcon
-                          onClick={() =>
-                            dispatch(actions.requestRenameSelector(selector.selectorId))
-                          }
-                        />
-                        <DeleteIcon
-                          onClick={() =>
-                            dispatch(actions.requestDeleteSelector(selector.selectorId))
-                          }
-                        />
-                      </>
-                    }
-                  />
-                ))
-                .valueSeq()}
-            </div>
-          </section>
-        </div>
-      </div>
-    )
-  }
 }

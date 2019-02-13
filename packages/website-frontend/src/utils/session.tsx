@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
-import { useDidMount } from './common-hooks'
+import { useDidMount } from './common'
 import * as server from './server'
 
 interface SessionContext {

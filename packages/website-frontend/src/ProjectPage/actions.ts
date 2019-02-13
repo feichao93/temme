@@ -1,122 +1,26 @@
-import { SidebarView } from './interfaces'
-
 export type Action =
+  | UpdateActiveHtmlAvid
+  | UpdateActiveSelectorAvid
   | RequestDownloadProject
-  | OpenSelectorTab
-  | CloseSelectorTab
-  | OpenHtmlTab
-  | CloseHtmlTab
-  | OpenFolder
-  | UpdateHtmlAvid
-  | UpdateSelectorAvid
-  | RequestSaveCurrentHtml
-  | RequestSaveCurrentSelector
-  | RequestAddHtml
-  | RequestRenameHtml
-  | RequestDeleteHtml
-  | RequestAddSelector
-  | RequestRenameSelector
-  | RequestDeleteSelector
-  | RequestAddFolder
-  | RequestUpdateFolder
-  | RequestDeleteFolder
-  | UseSidebarView
+  | OpenPage
+  | RequestSaveCurrentPage
+  | RequestAddPage
+  | RequestUpdatePageMeta
+  | RequestDeletePage
 
 /** 确保参数一定是合法的 action 类型 */
 export function a(actionType: Action['type']) {
   return actionType
 }
 
-export type OpenSelectorTab = ReturnType<typeof openSelectorTab>
-export function openSelectorTab(selectorId: number) {
-  return {
-    type: 'open-selector-tab' as 'open-selector-tab',
-    selectorId,
-  }
+export type UpdateActiveHtmlAvid = ReturnType<typeof updateActiveHtmlAvid>
+export function updateActiveHtmlAvid(avid: number) {
+  return { type: 'update-active-html-avid' as 'update-active-html-avid', avid }
 }
 
-export type CloseSelectorTab = ReturnType<typeof closeSelectorTab>
-export function closeSelectorTab(selectorId: number) {
-  return {
-    type: 'close-selector-tab' as 'close-selector-tab',
-    selectorId,
-  }
-}
-
-export type OpenHtmlTab = ReturnType<typeof openHtmlTab>
-export function openHtmlTab(htmlId: number) {
-  return {
-    type: 'open-html-tab' as 'open-html-tab',
-    htmlId,
-  }
-}
-
-export type CloseHtmlTab = ReturnType<typeof closeHtmlTab>
-export function closeHtmlTab(htmlId: number) {
-  return {
-    type: 'close-html-tab' as 'close-html-tab',
-    htmlId,
-  }
-}
-
-export type OpenFolder = ReturnType<typeof openFolder>
-export function openFolder(folderId: number, keepFoldersView = false) {
-  return { type: 'open-folder' as 'open-folder', folderId, keepFoldersView }
-}
-
-export type RequestDeleteSelector = ReturnType<typeof requestDeleteSelector>
-export function requestDeleteSelector(selectorId: number) {
-  return { type: 'request-delete-selector' as 'request-delete-selector', selectorId }
-}
-
-export type UpdateHtmlAvid = ReturnType<typeof updateHtmlAvid>
-export function updateHtmlAvid(htmlId: number, avid: number) {
-  return { type: 'update-html-avid' as 'update-html-avid', htmlId, avid }
-}
-
-export type UpdateSelectorAvid = ReturnType<typeof updateSelectorAvid>
-export function updateSelectorAvid(selectorId: number, avid: number) {
-  return { type: 'update-selector-avid' as 'update-selector-avid', selectorId, avid }
-}
-
-export type RequestSaveCurrentHtml = ReturnType<typeof requestSaveCurrentHtml>
-export function requestSaveCurrentHtml() {
-  return { type: 'request-save-current-html' as 'request-save-current-html' }
-}
-
-export type RequestSaveCurrentSelector = ReturnType<typeof requestSaveCurrentSelector>
-export function requestSaveCurrentSelector() {
-  return { type: 'request-save-current-selector' as 'request-save-current-selector' }
-}
-
-export type RequestAddHtml = ReturnType<typeof requestAddHtml>
-export function requestAddHtml() {
-  return { type: 'request-add-html' as 'request-add-html' }
-}
-
-export type RequestRenameHtml = ReturnType<typeof requestRenameHtml>
-export function requestRenameHtml(htmlId: number) {
-  return { type: 'request-rename-html' as 'request-rename-html', htmlId }
-}
-
-export type RequestDeleteHtml = ReturnType<typeof requestDeleteHtml>
-export function requestDeleteHtml(htmlId: number) {
-  return { type: 'request-delete-html' as 'request-delete-html', htmlId }
-}
-
-export type RequestAddSelector = ReturnType<typeof requestAddSelector>
-export function requestAddSelector() {
-  return { type: 'request-add-selector' as 'request-add-selector' }
-}
-
-export type RequestRenameSelector = ReturnType<typeof requestRenameSelector>
-export function requestRenameSelector(selectorId: number) {
-  return { type: 'request-rename-selector' as 'request-rename-selector', selectorId }
-}
-
-export type RequestAddFolder = ReturnType<typeof requestAddFolder>
-export function requestAddFolder() {
-  return { type: 'request-add-folder' as 'request-add-folder' }
+export type UpdateActiveSelectorAvid = ReturnType<typeof updateActiveSelectorAvid>
+export function updateActiveSelectorAvid(avid: number) {
+  return { type: 'update-active-selector-avid' as 'update-active-selector-avid', avid }
 }
 
 export type RequestDownloadProject = ReturnType<typeof requestDownloadProject>
@@ -124,17 +28,27 @@ export function requestDownloadProject() {
   return { type: 'request-download-project' as 'request-download-project' }
 }
 
-export type RequestUpdateFolder = ReturnType<typeof requestUpdateFolder>
-export function requestUpdateFolder(folderId: number) {
-  return { type: 'request-update-folder' as 'request-update-folder', folderId }
+export type OpenPage = ReturnType<typeof openPage>
+export function openPage(pageId: number) {
+  return { type: 'open-page' as 'open-page', pageId }
 }
 
-export type RequestDeleteFolder = ReturnType<typeof requestDeleteFolder>
-export function requestDeleteFolder(folderId: number) {
-  return { type: 'request-delete-folder' as 'request-delete-folder', folderId }
+export type RequestSaveCurrentPage = ReturnType<typeof requestSaveCurrentPage>
+export function requestSaveCurrentPage() {
+  return { type: 'request-save-current-page' as 'request-save-current-page' }
 }
 
-export type UseSidebarView = ReturnType<typeof useSidebarView>
-export function useSidebarView(sidebarView: SidebarView) {
-  return { type: 'use-sidebar-view' as 'use-sidebar-view', sidebarView }
+export type RequestAddPage = ReturnType<typeof requestAddPage>
+export function requestAddPage() {
+  return { type: 'request-add-page' as 'request-add-page' }
+}
+
+export type RequestUpdatePageMeta = ReturnType<typeof requestUpdatePageMeta>
+export function requestUpdatePageMeta(pageId: number) {
+  return { type: 'request-update-page-meta' as 'request-update-page-meta', pageId }
+}
+
+export type RequestDeletePage = ReturnType<typeof requestDeletePage>
+export function requestDeletePage(pageId: number) {
+  return { type: 'request-delete-page' as 'request-delete-page', pageId }
 }

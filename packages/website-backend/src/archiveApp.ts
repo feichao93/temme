@@ -22,22 +22,10 @@ const archiveApp = new Koa()
         ctx.set('content-disposition', `attachment; filename="${projectName}.zip"`)
         ctx.body = archive
 
-        for (const folder of project.folders) {
-          for (const selectorId of folder.selectorIds) {
-            const selector = await ctx.service.selectors.findOne({ selectorId })
-            const selectorName = selector.name.endsWith('.temme')
-              ? selector.name
-              : selector.name + '.temme'
-            const zipPath = { prefix: folder.name, name: selectorName }
-            archive.append(Buffer.from(selector.content, 'utf8'), zipPath)
-          }
-
-          for (const htmlId of folder.htmlIds) {
-            const html = await ctx.service.htmls.findOne({ htmlId })
-            const htmlName = html.name.endsWith('.html') ? html.name : html.name + '.html'
-            const zipPath = { prefix: folder.name, name: htmlName }
-            archive.append(Buffer.from(html.content, 'utf8'), zipPath)
-          }
+        for (const pageId of project.pageIds) {
+          const page = await ctx.service.pages.findOne({ pageId })
+          archive.append(Buffer.from(page.html, 'utf8'), { name: page.name + '.html' })
+          archive.append(Buffer.from(page.selector, 'utf8'), { name: page.name + '.temme' })
         }
         archive.finalize()
       })
