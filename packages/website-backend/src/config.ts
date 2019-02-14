@@ -10,6 +10,6 @@ export interface Config {
   mongoDb: string
 }
 
-const CONFIG: Config = JSON.parse(fs.readFileSync('CONFIG.json', 'utf8'))
+const CONFIG: Config = JSON.parse(fs.readFileSync('config.json', 'utf8'))
 
 export default CONFIG
