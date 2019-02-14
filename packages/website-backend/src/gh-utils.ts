@@ -1,5 +1,5 @@
 import axios from 'axios'
-import CONFIG from '../config'
+import CONFIG from './config'
 import { OAuthData, OAuthError, UserInfo } from './interfaces'
 
 export async function exchangeOAuthData(code: string) {

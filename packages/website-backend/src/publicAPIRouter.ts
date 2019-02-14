@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import CONFIG from '../config'
+import CONFIG from './config'
 
 // 查看当前登陆用户的信息
 async function getMyInfo(ctx: Router.IRouterContext) {
