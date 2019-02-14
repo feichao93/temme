@@ -55,7 +55,7 @@ export default function Header() {
               <Menu>
                 <Menu.Item
                   icon="cube"
-                  text="我的集合"
+                  text="我的项目"
                   onClick={(e: React.MouseEvent) => {
                     e.preventDefault()
                     history.push(`/@${username}`)

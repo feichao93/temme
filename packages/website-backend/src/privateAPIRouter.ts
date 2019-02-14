@@ -52,15 +52,14 @@ async function deleteProject(ctx: Router.IRouterContext) {
   ctx.status = 200
 }
 
-// TODO 更新一个 project 的元数据，名称、描述等
 async function updateProjectMeta(ctx: Router.IRouterContext) {
   const { projectId, name, description } = ctx.request.body
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
 
   const userId = ctx.session.userId
-  const existedProject = await ctx.service.projects.findOne({ projectId, userId })
-  ctx.assert(existedProject.name == name, 400, 'Project name already exists')
+  const existedProject = await ctx.service.projects.findOne({ name, userId })
+  ctx.assert(existedProject == null, 400, 'Project name already used')
 
   const now = new Date().toISOString()
   await ctx.service.projects.updateOne(
@@ -156,7 +155,7 @@ async function deletePage(ctx: Router.IRouterContext) {
   ctx.status = 200
 }
 
-export default new Router({ prefix: '/api' })
+export default new Router()
   .use(requireSignedIn)
   .post('/add-project', addProject)
   .post('/delete-project', deleteProject)

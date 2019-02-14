@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
+import toaster from '../toaster'
 import { useDidMount } from './common'
 import * as server from './server'
 
@@ -39,7 +40,9 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
       userId: -1,
       username: null,
     })
-    server.logout()
+    server.logout().then(() => {
+      toaster.show({ message: '已登出' })
+    })
   }
 
   const fetchLoginInfo = async () => {

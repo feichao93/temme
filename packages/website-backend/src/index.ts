@@ -60,12 +60,6 @@ function makeApp(service: Service) {
   const app = new Koa()
   app.keys = CONFIG.appKeys
 
-  const router = new Router()
-    .get(CONFIG.oauthCallbackPath, oauthCallbackHandler)
-    // TODO .use(mount('/api', apiApp))
-    .use(publicAPIRouter.routes())
-    .use(privateAPIRouter.routes())
-
   app
     .use(compress({ threshold: 2048 }))
     .use(conditional())
@@ -75,7 +69,16 @@ function makeApp(service: Service) {
     .use(bodyParser())
     .use(mount('/static', staticApp))
     .use(mount('/archive', archiveApp))
-    .use(router.routes())
+    .use(new Router().get(CONFIG.oauthCallbackPath, oauthCallbackHandler).routes())
+    .use(
+      mount(
+        '/api',
+        new Koa()
+          .use(publicAPIRouter.routes())
+          .use(privateAPIRouter.routes())
+          .use(ctx => ctx.throw(404)),
+      ),
+    )
     .use(fallbackHandler)
 
   return app

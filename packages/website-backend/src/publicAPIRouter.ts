@@ -63,7 +63,7 @@ async function getProject(ctx: Router.IRouterContext) {
   ctx.body = { project, pages }
 }
 
-export default new Router({ prefix: '/api' })
+export default new Router()
   .get('/my-info', getMyInfo)
   .post('/logout', logout)
   .get('/client-id', getClientId)

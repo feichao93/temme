@@ -82,11 +82,10 @@ export async function getMyInfo() {
 }
 
 // 获取用户的详细信息
-export async function getDetailInfo(username: string) {
+export async function getUserInfo(username: string): Promise<UserInfo> {
   const response = await fetch(`/api/user-info/${username}`)
   if (response.ok) {
-    const json: UserInfo = await response.json()
-    return json
+    return response.json()
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }
@@ -101,21 +100,21 @@ export async function getUserProjects(username: string) {
   }
 }
 
-export async function addProject(name: string, description: string) {
+export async function addProject(name: string, description: string): Promise<Project> {
   const response = await fetch('/api/add-project', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ name, description }),
   })
   if (response.ok) {
-    return true
+    return response.json()
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }
 }
 
-export async function updateProject(projectId: number, name: string, description: string) {
-  const response = await fetch('/api/update-project', {
+export async function updateProjectMeta(projectId: number, name: string, description: string) {
+  const response = await fetch('/api/update-project-meta', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ projectId, name, description }),

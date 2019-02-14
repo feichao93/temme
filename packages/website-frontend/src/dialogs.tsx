@@ -39,7 +39,7 @@ export function DialogContextProvider({ children }: { children: JSX.Element }) {
     <DialogContext.Provider value={{ confirm, prompt, alert }}>
       {children}
       <Dialog
-        icon={state.type !== 'empty' ? state.icon || 'info-sign' : null}
+        icon={state.type !== 'empty' ? state.icon : null}
         title={state.type !== 'empty' && state.title}
         isOpen={state.type !== 'empty'}
         style={{ width: 600, alignSelf: 'flex-start' }}
@@ -73,7 +73,7 @@ export function DialogContextProvider({ children }: { children: JSX.Element }) {
   )
 
   function prompt({
-    icon,
+    icon = 'manually-entered-data',
     title,
     message,
     confirmIntent = 'success',
@@ -89,7 +89,12 @@ export function DialogContextProvider({ children }: { children: JSX.Element }) {
     })
   }
 
-  function confirm({ icon, title, message, confirmIntent }: DialogProps): Promise<boolean> {
+  function confirm({
+    icon = 'help',
+    title,
+    message,
+    confirmIntent,
+  }: DialogProps): Promise<boolean> {
     setState({ type: 'confirm', icon, title, message, confirmIntent })
     return new Promise(resolve => {
       callback.current = (result: boolean) => {
@@ -100,7 +105,12 @@ export function DialogContextProvider({ children }: { children: JSX.Element }) {
     })
   }
 
-  function alert({ icon, title, message, confirmIntent }: DialogProps): Promise<void> {
+  function alert({
+    icon = 'info-sign',
+    title,
+    message,
+    confirmIntent,
+  }: DialogProps): Promise<void> {
     setState({ type: 'alert', icon, title, message, confirmIntent })
     return new Promise(resolve => {
       callback.current = () => {
