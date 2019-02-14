@@ -4,20 +4,20 @@ import './MainPage.styl'
 
 export default function MainPage() {
   return (
-    <>
+    <div className="main-page">
       <Header />
-      <div className="main-page">
+      <main>
         <div className="intro-text">
           <h1>Temme</h1>
-          <p>Temme is a concise selector to extract JSON from HTML.</p>
+          <p>concise selector to extract JSON from HTML.</p>
         </div>
-        <div className="example">
-          Code with ❤️ by{' '}
-          <a href="https://github.com/shinima" target="_blank" style={{ color: 'white' }}>
-            @shinima
-          </a>
-        </div>
-      </div>
-    </>
+      </main>
+      <footer>
+        Code with ❤️ by{' '}
+        <a href="https://github.com/shinima" target="_blank">
+          @shinima
+        </a>
+      </footer>
+    </div>
   )
 }
