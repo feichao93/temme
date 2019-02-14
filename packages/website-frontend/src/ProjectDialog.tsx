@@ -33,29 +33,30 @@ export default function ProjectDialog(props: ProjectDialogProps) {
     onClose()
   }
 
+  // TODO 需要完善文本，文本需要考虑 更新工程的情况
   return (
     <Dialog
       isOpen={show}
       onClose={onClose}
-      title="Create Project"
+      title="创建新的集合"
       icon="cube-add"
       style={{ width: 600 }}
       canOutsideClickClose={false}
     >
       <div className={Classes.DIALOG_BODY}>
-        <FormGroup label="Project Name" labelFor="project-name-input" labelInfo="(required)">
+        <FormGroup label="集合名称" labelFor="project-name-input" labelInfo="(必填项)">
           <InputGroup id="project-name-input" {...nameInput.props} />
         </FormGroup>
-        <FormGroup label="Project Description" labelFor="project-description-input">
+        <FormGroup label="集合描述" labelFor="project-description-input">
           <TextArea fill {...descInput.props} />
         </FormGroup>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button intent="success" onClick={onConfirm}>
-            Confirm
+            创建
           </Button>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button onClick={onClose}>取消</Button>
         </div>
       </div>
     </Dialog>

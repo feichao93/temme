@@ -1,4 +1,4 @@
-import { Button, Classes, Dialog, IconName, Intent } from '@blueprintjs/core'
+import { Button, Classes, Dialog, FormGroup, IconName, InputGroup, Intent } from '@blueprintjs/core'
 import { noop } from 'little-saga'
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
 import useInput from './utils/common'
@@ -134,7 +134,7 @@ function ConfirmDialogContent({ message, onConfirm, onCancel, confirmIntent }: D
 
 function PromptDialogContent({ message, onSubmit, confirmIntent, initValue }: DialogProps) {
   const promptInput = useInput(initValue)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const inputRef: any = useRef(null)
   useEffect(() => {
     if (inputRef.current != null) {
       inputRef.current.select()
@@ -143,8 +143,9 @@ function PromptDialogContent({ message, onSubmit, confirmIntent, initValue }: Di
 
   return (
     <div className={Classes.DIALOG_BODY}>
-      {message}
-      <input ref={inputRef} className={Classes.INPUT} type="text" {...promptInput.props} />
+      <FormGroup label={message}>
+        <InputGroup inputRef={inputRef} {...promptInput.props} />
+      </FormGroup>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button intent={confirmIntent} onClick={() => onSubmit(promptInput.value)} text="确认" />

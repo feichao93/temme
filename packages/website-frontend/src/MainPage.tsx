@@ -1,5 +1,6 @@
 import React from 'react'
 import Header from './Header'
+import './MainPage.styl'
 
 export default function MainPage() {
   return (

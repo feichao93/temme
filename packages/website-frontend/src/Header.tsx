@@ -1,50 +1,77 @@
-import { useSession } from './utils/session'
-import { Link } from 'react-router-dom'
-import { GithubIcon } from './icons'
+import {
+  AnchorButton,
+  Button,
+  Menu,
+  Navbar,
+  NavbarDivider,
+  NavbarGroup,
+  NavbarHeading,
+  Popover,
+} from '@blueprintjs/core'
 import React from 'react'
-import './Header.styl'
+import history from './utils/history'
+import { useSession } from './utils/session'
 
 export default function Header() {
-  const { login, connected, username, userId } = useSession()
+  const { login, connected, username, userId, logout } = useSession()
 
   return (
-    <div className="nav-bar">
-      <div className="container">
-        <div className="align-left">
-          <div className="logo">
-            <Link to="/">Temme</Link>
-          </div>
-          <a href="https://github.com/shinima/temme" target="_blank" className="nav-link">
-            GitHub
-          </a>
-          <a
-            href="https://github.com/shinima/temme#%E6%96%87%E6%A1%A3%E9%93%BE%E6%8E%A5"
-            target="_blank"
-            className="nav-link"
-          >
-            Docs
-          </a>
-        </div>
-        <div className="align-right">
-          {connected &&
-            (userId === -1 ? (
-              <button className="auth-button" onClick={login}>
-                <GithubIcon />
-                <div style={{ margin: 10 }}>登录</div>
-              </button>
-            ) : (
-              <Link to={`/@${username}`} className="auth-button">
-                <img
-                  alt="icon"
-                  src={`https://github.com/${username}.png?size=40`}
-                  width={20}
-                  height={20}
+    <Navbar fixedToTop>
+      <NavbarGroup>
+        <NavbarHeading>Temme</NavbarHeading>
+        <NavbarDivider />
+        <AnchorButton
+          minimal
+          icon="home"
+          text="主页"
+          href="/"
+          onClick={(e: React.MouseEvent) => {
+            e.preventDefault()
+            history.push('/')
+          }}
+        />
+        <AnchorButton
+          minimal
+          icon="git-repo"
+          text="GitHub"
+          href="https://github.com/shinima/temme"
+          target="_blank"
+        />
+        <AnchorButton
+          minimal
+          icon="manual"
+          text="文档"
+          href="https://github.com/shinima/temme#%E6%96%87%E6%A1%A3%E9%93%BE%E6%8E%A5"
+          target="_blank"
+        />
+      </NavbarGroup>
+      <NavbarGroup align="right">
+        {connected && userId === -1 && (
+          <Button minimal icon="log-in" intent="primary" text="使用 GitHub 登录" onClick={login} />
+        )}
+        {connected && userId != -1 && (
+          <Popover
+            content={
+              <Menu>
+                <Menu.Item
+                  icon="cube"
+                  text="我的集合"
+                  onClick={(e: React.MouseEvent) => {
+                    e.preventDefault()
+                    history.push(`/@${username}`)
+                  }}
+                  href={`/@${username}`}
                 />
-                <div style={{ margin: 10 }}>{username}</div>
-              </Link>
-            ))}
-        </div>
-      </div>
-    </div>
+                <Menu.Item icon="log-out" text="登出" onClick={logout} />
+              </Menu>
+            }
+            position="bottom-right"
+            minimal
+          >
+            <Button minimal icon="user" text={username} rightIcon="caret-down" />
+          </Popover>
+        )}
+      </NavbarGroup>
+    </Navbar>
   )
 }

@@ -1,13 +1,14 @@
+import { Button, ButtonGroup } from '@blueprintjs/core'
 import React, { useEffect, useState } from 'react'
 import { Link, match } from 'react-router-dom'
-import { fromNow } from './utils/common'
-import { useSession } from './utils/session'
-import { Project, UserInfo } from './types'
 import Header from './Header'
-import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
-import { DeleteIcon, EditIcon, GithubIcon, LogoutIcon } from './icons'
+import { GithubIcon, LocationIcon } from './icons'
 import ProjectDialog from './ProjectDialog'
+import { Project, UserInfo } from './types'
 import './UserPage.styl'
+import { fromNow } from './utils/common'
+import { deleteProject, getDetailInfo, getUserProjects } from './utils/server'
+import { useSession } from './utils/session'
 
 interface Params {
   login: string
@@ -15,18 +16,17 @@ interface Params {
 
 export default function UserPage({ match }: { match: match<Params> }) {
   return (
-    <>
+    <div className="user-page">
       <Header />
-      <div className="user-page">
+      <main>
         <UserProfile login={match.params.login} />
         <UserProjects login={match.params.login} />
-      </div>
-    </>
+      </main>
+    </div>
   )
 }
 
 function UserProfile({ login }: { login: string }) {
-  const { username, logout } = useSession()
   const [userInfoState, setUserInfoState] = useState(null as UserInfo)
   const fetchUserInfo = async (username: string) => {
     try {
@@ -36,38 +36,37 @@ function UserProfile({ login }: { login: string }) {
       console.error(e)
     }
   }
+
   useEffect(() => {
     if (login) {
       fetchUserInfo(login)
     }
   }, [login])
+
   return (
     userInfoState && (
       <div className="user-profile">
-        <img src={userInfoState.avatar_url} alt="avatar-icon" />
+        <img className="avatar mb16" src={userInfoState.avatar_url} alt="avatar-icon" />
         <div className="fullname">{userInfoState.name}</div>
-        <div className="username">{login}</div>
-        <div className="bio">{userInfoState.bio}</div>
+        <div className="username mb16">{login}</div>
+        <div className="bio mb16">{userInfoState.bio}</div>
+        <div className="location">
+          <LocationIcon />
+          {userInfoState.location}
+        </div>
         <a className="email" href={`mailto:${userInfoState.email}`}>
+          <svg viewBox="0 0 14 16" width="22" height="16">
+            <path
+              d="M0 4v8c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H1c-.55 0-1 .45-1 1zm13 0L7 9 1 4h12zM1 5.5l4 3-4 3v-6zM2 12l3.5-3L7 10.5 8.5 9l3.5 3H2zm11-.5l-4-3 4-3v6z"
+              fill="#6a737d"
+            />
+          </svg>
           {userInfoState.email}
         </a>
-        <div className="location">{userInfoState.location}</div>
         <div className="divider" />
         <a href={userInfoState.html_url} target="_blank">
           <GithubIcon size={30} />
         </a>
-        {username === login && (
-          <div
-            onClick={() => {
-              logout()
-            }}
-            style={{ cursor: 'pointer' }}
-            className="logout"
-          >
-            <LogoutIcon size={15} />
-            <span>Sign out</span>
-          </div>
-        )}
       </div>
     )
   )
@@ -126,36 +125,43 @@ function UserProjects({ login }: { login: string }) {
     <div className="user-project">
       <div className="tab-bar">
         <div className="tab">
-          Projects
+          集合
           <span className="count">{projectsState.length}</span>
         </div>
         {username === login && (
-          <button onClick={createProject} className="create-project-button align-right">
-            New Project
-          </button>
+          <Button
+            icon="cube-add"
+            text="新建"
+            onClick={createProject}
+            style={{ marginLeft: 'auto', alignSelf: 'center' }}
+          />
         )}
       </div>
       <div className="project-list">
         {projectsState &&
-          projectsState.map((project, index) => (
-            <div className="project-item" key={`project-${index}`}>
-              {username === login ? (
-                <Link className="project-name" to={`/@${login}/${project.name}`}>
-                  {project.name}
-                </Link>
-              ) : (
-                <div className="project-name">{project.name}</div>
-              )}
+          projectsState.map(project => (
+            <div key={project.projectId} className="project-item">
+              <Link className="project-name" to={`/@${login}/${project.name}`}>
+                {project.name}
+              </Link>
               <div className="project-description">{project.description}</div>
               <div className="project-update">{fromNow(project.updatedAt)}前更新</div>
               {username === login && (
                 <div className="manage-project">
-                  <span onClick={() => handleEditProject(project)}>
-                    <EditIcon />
-                  </span>
-                  <span onClick={() => handleDeleteProject(project.projectId, project.name)}>
-                    <DeleteIcon />
-                  </span>
+                  <ButtonGroup>
+                    <Button
+                      minimal
+                      intent="primary"
+                      icon="edit"
+                      onClick={() => handleEditProject(project)}
+                    />
+                    <Button
+                      minimal
+                      intent="danger"
+                      icon="trash"
+                      onClick={() => handleDeleteProject(project.projectId, project.name)}
+                    />
+                  </ButtonGroup>
                 </div>
               )}
             </div>
