@@ -3,6 +3,7 @@ import * as monaco from 'monaco-editor'
 import React from 'react'
 import { DialogContextType } from '../dialogs'
 import toaster from '../toaster'
+import { CreateProjectData } from '../utils/server'
 import * as server from '../utils/server'
 import * as actions from './actions'
 import { a } from './actions'
@@ -10,6 +11,7 @@ import { PageRecord, State } from './interfaces'
 import * as selectors from './selectors'
 import * as updaters from './updaters'
 import { AsyncReturnType, CodeEditor, getNewPageName, inc, matchNewPagePostfix } from './utils'
+import history from '../utils/history'
 
 type SagaEnv = {
   htmlEditorRef: React.MutableRefObject<CodeEditor>
@@ -48,6 +50,7 @@ export default function* saga(login: string, projectName: string) {
   yield takeEvery(a('request-add-page'), handleRequestAddPage)
   yield takeEvery(a('request-update-page-meta'), handleRequestUpdatePageMeta)
   yield takeEvery(a('request-delete-page'), handleRequestDeletePage)
+  yield takeEvery(a('request-import-project'), handleRequestImportProject)
 
   yield takeEvery(a('request-save-current-page'), function*() {
     const state: State = yield io.select()
@@ -271,5 +274,43 @@ function* handleRequestDeletePage({ pageId }: actions.RequestDeletePage) {
   } catch (e) {
     console.error(e)
     yield dialogs.alert({ title: '删除页面失败', message: e.message })
+  }
+}
+
+function* handleRequestImportProject() {
+  const state: State = yield io.select()
+
+  const data: CreateProjectData = {
+    name: state.project.name,
+    description: state.project.description,
+    pages: [],
+  }
+  for (const page of state.pages.values()) {
+    const htmlModel = monaco.editor.getModel(page.getHtmlUriObject())
+    const html = htmlModel != null ? htmlModel.getValue() : page.html
+    const selectorModel = monaco.editor.getModel(page.getSelectorUriObject())
+    const selector = selectorModel != null ? selectorModel.getValue() : page.selector
+    data.pages.push({
+      name: page.name,
+      html,
+      selector,
+    })
+  }
+
+  try {
+    const { login, projectName } = yield server.createProject(data)
+    toaster.show({
+      intent: 'success',
+      message: `已创建 @${login}/${projectName}`,
+      action: {
+        onClick() {
+          history.push(`/@${login}/${projectName}`)
+        },
+        text: '打开',
+      },
+    })
+  } catch (e) {
+    console.error(e)
+    toaster.show({ intent: 'danger', message: `导入项目失败. ${yield e.response.text()}` })
   }
 }

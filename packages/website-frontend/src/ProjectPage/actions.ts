@@ -7,6 +7,7 @@ export type Action =
   | RequestAddPage
   | RequestUpdatePageMeta
   | RequestDeletePage
+  | RequestImportProject
 
 /** 确保参数一定是合法的 action 类型 */
 export function a(actionType: Action['type']) {
@@ -51,4 +52,10 @@ export function requestUpdatePageMeta(pageId: number) {
 export type RequestDeletePage = ReturnType<typeof requestDeletePage>
 export function requestDeletePage(pageId: number) {
   return { type: 'request-delete-page' as 'request-delete-page', pageId }
+}
+
+// 将当前浏览的 project 导入至自己的项目列表
+export type RequestImportProject = ReturnType<typeof requestImportProject>
+export function requestImportProject() {
+  return { type: 'request-import-project' as 'request-import-project' }
 }

@@ -158,3 +158,27 @@ export async function updatePageMeta(pageId: number, name: string) {
     throw new Error(`${response.status} ${await response.text()}`)
   }
 }
+
+export interface CreateProjectData {
+  name: string
+  description: string
+  pages: Array<{
+    name: string
+    html: string
+    selector: string
+  }>
+}
+export async function createProject(
+  data: CreateProjectData,
+): Promise<{ login: string; projectName: string }> {
+  const response = await fetch('/api/create-project', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+  if (response.ok) {
+    return response.json()
+  } else {
+    throw new FetchError(response)
+  }
+}

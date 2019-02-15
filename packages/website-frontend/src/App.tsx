@@ -10,7 +10,10 @@ export default function App() {
   return (
     <Switch>
       <Route path="/login-success" component={LoginSuccessPage} />
-      <Route path="/@:login/:projectName" component={ProjectPage} />
+      <Route
+        path="/@:login/:projectName"
+        render={({ match: { params, url } }) => <ProjectPage key={url} {...params} />}
+      />
       <Route path="/@:login" component={UserPage} />
       <Route path="/" component={MainPage} />
     </Switch>

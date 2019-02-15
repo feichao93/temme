@@ -70,6 +70,14 @@ $list-item {
     overflow-y auto
   }
 
+  .modify-hint {
+    font-weight normal
+    color #32adff
+    margin-left 16px
+    border-radius 3px
+    font-size 12px
+  }
+
   .folder-list {
     margin 0
     padding 0 8px
@@ -96,17 +104,13 @@ $list-item {
         margin-right 8px
       }
 
-      .text {
+      .page-name-wrapper {
         display flex
-        flex-flow column
+        align-items center
+        line-height 24px
+        height @line-height
         overflow hidden
-        .folder-name {
-          line-height 24px
-          height @line-height
-          overflow hidden
-          text-overflow ellipsis
-          white-space nowrap
-        }
+        white-space nowrap
       }
 
       .actions {

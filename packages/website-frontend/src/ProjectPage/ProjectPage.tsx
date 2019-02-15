@@ -1,13 +1,14 @@
 import useSaga from '@little-saga/use-saga'
 import classNames from 'classnames'
 import React, { useEffect, useRef } from 'react'
-import { RouteComponentProps } from 'react-router'
 import { Link } from 'react-router-dom'
 import temme from 'temme'
 import { useDialogs } from '../dialogs'
 import { FileIcon } from '../icons'
+import toaster from '../toaster'
 import { useBodyOverflowHidden, useDidMount, useWillUnmount } from '../utils/common'
 import debounce from '../utils/debounce'
+import { useSession } from '../utils/session'
 import * as actions from './actions'
 import './configureTemmeLanguage'
 import EditorWrapper from './EditorWrapper'
@@ -19,10 +20,12 @@ import saga from './saga'
 import Sidebar from './Sidebar'
 import { CodeEditor, CTRL_S, disposeAllEditorModels, INIT_EDITOR_OPTIONS } from './utils'
 
-type ProjectPageProps = RouteComponentProps<{ login: string; projectName: string }>
+export interface ProjectPageProps {
+  login: string
+  projectName: string
+}
 
-export default function ProjectPage(props: ProjectPageProps) {
-  const { login, projectName } = props.match.params
+export default function ProjectPage({ login, projectName }: ProjectPageProps) {
   const dialogs = useDialogs()
 
   const htmlEditorRef = useRef<CodeEditor>(null)
@@ -39,6 +42,8 @@ export default function ProjectPage(props: ProjectPageProps) {
 
   const { project, pages, activePageId } = state
   const activePage = pages.get(activePageId)
+  const session = useSession()
+  const readonly = session.username !== login
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
     return (...args: ARGS) => dispatch(actionCreator(...args))
@@ -113,8 +118,19 @@ export default function ProjectPage(props: ProjectPageProps) {
 
   // 给编辑器绑定 ctrl+S 快捷键
   useDidMount(() => {
-    htmlEditorRef.current.addCommand(CTRL_S, wrap(actions.requestSaveCurrentPage), '')
-    selectorEditorRef.current.addCommand(CTRL_S, wrap(actions.requestSaveCurrentPage), '')
+    const warnReadonly = () =>
+      toaster.show({
+        icon: 'info-sign',
+        intent: 'primary',
+        message: '无法保存对只读项目的修改。',
+        action: {
+          onClick: wrap(actions.requestImportProject),
+          text: '导入该项目',
+        },
+      })
+    const handler = readonly ? warnReadonly : wrap(actions.requestSaveCurrentPage)
+    htmlEditorRef.current.addCommand(CTRL_S, handler, '')
+    selectorEditorRef.current.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
 
@@ -142,7 +158,7 @@ export default function ProjectPage(props: ProjectPageProps) {
       </nav>
       <PageLayout
         layout={layout}
-        sidebar={<Sidebar state={state} dispatch={dispatch} />}
+        sidebar={<Sidebar state={state} dispatch={dispatch} readonly={readonly} />}
         left={
           <>
             {activePage != null && (

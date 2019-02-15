@@ -15,10 +15,11 @@ import './Sidebar.styl'
 
 export interface SidebarProps {
   state: State
+  readonly: boolean
   dispatch(action: Action): void
 }
 
-export default function Sidebar({ state, dispatch }: SidebarProps) {
+export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
   const { project, pages, activePageId } = state
 
   // TODO 有更好的方法判断 project 是否加载完毕
@@ -41,10 +42,15 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
       <div className="view-container">
         <div className="view folders-view">
           <div className="view-title">
-            <h2>页面列表</h2>
-            <div className="actions">
-              <AddFolderIcon onClick={() => dispatch(actions.requestAddPage())} />
-            </div>
+            <h2 style={{ display: 'flex', alignItems: 'baseline' }}>
+              页面列表
+              {pages.some(p => p.isModified()) && <div className="modify-hint">部分页面未保存</div>}
+            </h2>
+            {!readonly && (
+              <div className="actions">
+                <AddFolderIcon onClick={() => dispatch(actions.requestAddPage())} />
+              </div>
+            )}
           </div>
           <div className="view-content">
             <ul className="folder-list">
@@ -59,16 +65,18 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
                       onClick={() => dispatch(actions.openPage(pageId))}
                     >
                       {pageId === activePageId ? <FolderOpenIcon /> : <FolderIcon />}
-                      <div className="text">
-                        <div className="folder-name">{name}</div>
-                        <div className="folder-description">{page.isModified() && '未保存'}</div>
+                      <div className="page-name-wrapper">
+                        <div className="page-name">{name}</div>
+                        <div className="modify-hint">{page.isModified() && '未保存'}</div>
                       </div>
-                      <span className="actions" style={{ marginRight: 8 }}>
-                        <RenameIcon
-                          onClick={() => dispatch(actions.requestUpdatePageMeta(pageId))}
-                        />
-                        <DeleteIcon onClick={() => dispatch(actions.requestDeletePage(pageId))} />
-                      </span>
+                      {!readonly && (
+                        <span className="actions" style={{ marginRight: 8 }}>
+                          <RenameIcon
+                            onClick={() => dispatch(actions.requestUpdatePageMeta(pageId))}
+                          />
+                          <DeleteIcon onClick={() => dispatch(actions.requestDeletePage(pageId))} />
+                        </span>
+                      )}
                     </li>
                   )
                 })

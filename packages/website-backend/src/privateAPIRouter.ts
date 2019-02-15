@@ -1,6 +1,12 @@
 import Router from 'koa-router'
 import { Page, Project } from './interfaces'
 
+function randomString(len = 5) {
+  return Math.random()
+    .toString(36)
+    .substring(2, 2 + len)
+}
+
 function remove<T>(array: T[], item: T) {
   const index = array.indexOf(item)
   array.splice(index, 1)
@@ -10,6 +16,50 @@ function requireSignedIn(ctx: Router.IRouterContext, next: any) {
   const userId = ctx.session.userId
   ctx.assert(userId && userId !== -1, 401, 'Require signed in')
   return next()
+}
+
+interface CreateProjectData {
+  name: string
+  description: string
+  pages: Array<{
+    name: string
+    html: string
+    selector: string
+  }>
+}
+async function createProject(ctx: Router.IRouterContext) {
+  const data: CreateProjectData = ctx.request.body
+  const name = `${data.name}-${randomString()}`
+  const now = new Date().toISOString()
+  const projectId = await ctx.service.getNextProjectId()
+  const pageIds: number[] = []
+  for (const page of data.pages) {
+    const pageId = await ctx.service.getNextPageId()
+    await ctx.service.pages.insertOne({
+      pageId,
+      projectId,
+      name: page.name,
+      html: page.html,
+      selector: page.selector,
+      updatedAt: now,
+      createdAt: now,
+    })
+    pageIds.push(pageId)
+  }
+
+  const userId = ctx.session.userId
+  await ctx.service.projects.insertOne({
+    projectId,
+    userId,
+    name,
+    description: data.description,
+    updatedAt: now,
+    createdAt: now,
+    pageIds,
+  })
+
+  const user = await ctx.service.users.findOne({ userId })
+  ctx.body = { login: user.login, projectName: name }
 }
 
 // 创建新的 project
@@ -161,6 +211,7 @@ async function deletePage(ctx: Router.IRouterContext) {
 
 export default new Router()
   .use(requireSignedIn)
+  .post('/create-project', createProject)
   .post('/add-project', addProject)
   .post('/delete-project', deleteProject)
   .post('/update-project-meta', updateProjectMeta)
