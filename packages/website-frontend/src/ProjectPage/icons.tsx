@@ -160,19 +160,6 @@ export const DownloadIcon = React.memo(({ disabled, onClick, size = 16 }: Partia
   </svg>
 ))
 
-export const ContinueIcon = React.memo(({ disabled, onClick, size = 16 }: Partial<IconProps>) => (
-  <svg
-    className={classNames('icon interactive', { disabled })}
-    onClick={disabled ? null : stopPropagation(onClick)}
-    width={size}
-    height={size}
-    viewBox="0 0 16 16"
-    fill="#C5C5C5"
-  >
-    <path d="M4,1.5v13L12.667,8,4,1.5Z" fill="#c5c5c5" />
-  </svg>
-))
-
 export const FileTypeHtmlIcon = React.memo(() => (
   <svg className="icon" width={16} height={16} viewBox="0 0 32 32">
     <polygon fill="#dcdbdd" points="9 11 10.5 12.5 7 16 10.5 19.5 9 21 4 16 9 11" />
@@ -205,7 +192,7 @@ export const FileTypeTSIcon = React.memo(() => (
 ))
 
 export const FolderIcon = React.memo(() => (
-  <svg className="icon folder-icon" width={32} height={32} viewBox="0 0 32 32">
+  <svg className="icon folder-icon" width={16} height={16} viewBox="0 0 32 32">
     <path
       d="M30,5V25a1,1,0,0,1-1,1H5a1,1,0,0,1-1-1V9A1,1,0,0,1,5,8h7l2-4H29A1,1,0,0,1,30,5ZM28,8V6H16L15,8Z"
       fill="#dcb67a"
@@ -214,7 +201,7 @@ export const FolderIcon = React.memo(() => (
 ))
 
 export const FolderOpenIcon = React.memo(() => (
-  <svg className="icon folder-open-icon" width={32} height={32} viewBox="0 0 32 32">
+  <svg className="icon folder-open-icon" width={16} height={16} viewBox="0 0 32 32">
     <path
       d="M28,4a2,2,0,0,1,2,2V24a1.92,1.92,0,0,1-2,2V6H16l-2,4H6v6H22l6,10H6L0,16H4V10C4,8,6.47,8,6,8h7l2-4Z"
       fill="#dcb67a"

@@ -58,7 +58,11 @@ async function updateProjectMeta(ctx: Router.IRouterContext) {
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
 
   const userId = ctx.session.userId
-  const existedProject = await ctx.service.projects.findOne({ name, userId })
+  const existedProject = await ctx.service.projects.findOne({
+    name,
+    userId,
+    projectId: { $not: { $eq: projectId } },
+  })
   ctx.assert(existedProject == null, 400, 'Project name already used')
 
   const now = new Date().toISOString()

@@ -90,22 +90,38 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
 
 function* loadProjectData(login: string, projectName: string) {
   type Data = AsyncReturnType<typeof server.getProject>
-  const data: Data = yield server.getProject(login, projectName)
+  const { dialogs }: SagaEnv = yield io.getEnv()
+  try {
+    const data: Data = yield server.getProject(login, projectName)
 
-  const { pages }: State = yield io.update((state: State) => {
-    const maxPagePostfix = data.pages
-      .map(fld => matchNewPagePostfix(fld.name))
-      .filter(Boolean)
-      .max()
-    return state
-      .set('project', data.project)
-      .set('pages', data.pages.toMap().mapKeys((_, p) => p.pageId))
-      .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
-  })
+    const { pages }: State = yield io.update((state: State) => {
+      const maxPagePostfix = data.pages
+        .map(fld => matchNewPagePostfix(fld.name))
+        .filter(Boolean)
+        .max()
+      return state
+        .set('project', data.project)
+        .set('pages', data.pages.toMap().mapKeys((_, p) => p.pageId))
+        .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
+    })
 
-  // 首次载入 project 时自动选中第一个 page
-  if (!pages.isEmpty()) {
-    yield io.put(actions.openPage(pages.first<null>().pageId))
+    // 首次载入 project 时自动选中第一个 page
+    if (!pages.isEmpty()) {
+      yield io.put(actions.openPage(pages.first<null>().pageId))
+    }
+  } catch (e) {
+    console.error(e)
+    yield dialogs.alert({
+      title: '加载失败',
+      message: (
+        <span>
+          <b style={{ color: '#b13b00' }}>
+            @{login}/{projectName}
+          </b>{' '}
+          加载失败，请确保该项目存在。刷新页面以尝试重试加载。
+        </span>
+      ),
+    })
   }
 }
 

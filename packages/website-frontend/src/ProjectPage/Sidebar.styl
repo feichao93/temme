@@ -27,8 +27,7 @@ $list-item {
     }
 
     .description {
-      padding 0 16px
-      margin-top 0
+      margin 8px 16px
     }
   }
 
@@ -81,13 +80,11 @@ $list-item {
       display flex
       align-items center
       cursor pointer
-      margin-top 8px
+      padding 2px 0
+
       &.active {
         background #234a6d
         color white
-        .folder-description {
-          color #ccc
-        }
       }
       &:first-child {
         margin-top 0
@@ -99,15 +96,11 @@ $list-item {
         margin-right 8px
       }
 
-      .folder-description {
-        color #777
-      }
-
       .text {
         display flex
         flex-flow column
         overflow hidden
-        .folder-name, .folder-description {
+        .folder-name {
           line-height 24px
           height @line-height
           overflow hidden

@@ -35,7 +35,7 @@ export default function Sidebar({ state, dispatch }: SidebarProps) {
           </div>
         </h1>
         <p className="description">
-          {description || <span style={{ color: '#777' }}>暂无描述</span>}
+          {description || <span style={{ color: '#777' }}>(暂无描述)</span>}
         </p>
       </header>
       <div className="view-container">

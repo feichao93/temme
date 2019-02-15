@@ -16,6 +16,10 @@ import privateAPIRouter from './privateAPIRouter'
 import publicAPIRouter from './publicAPIRouter'
 import Service from './Service'
 
+function wait(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms))
+}
+
 const ONE_YEAR = 365 * 24 * 3600 * 1000
 
 // extends koa context
@@ -85,8 +89,22 @@ function makeApp(service: Service) {
 }
 
 async function main() {
-  const client = await MongoClient.connect(CONFIG.mongoUri, { useNewUrlParser: true })
-  console.log('Connected to mongodb successfully')
+  let client: MongoClient
+  let retryCount = 0
+  while (true) {
+    try {
+      client = await MongoClient.connect(CONFIG.mongoUri, { useNewUrlParser: true })
+      console.log('Connected to mongodb successfully')
+      break
+    } catch (e) {
+      retryCount++
+      if (retryCount === 10) {
+        throw e
+      }
+      console.error(`Connect to mongo fail. Retrying ${retryCount}/10`)
+      await wait(300)
+    }
+  }
   const service = new Service(client.db(CONFIG.mongoDb))
 
   const app = makeApp(service)

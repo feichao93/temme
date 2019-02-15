@@ -29,6 +29,8 @@ export default function UserPage({ match }: { match: match<Params> }) {
 
   const [userInfo, setUserInfo] = useState<UserInfo>(null)
   const [projectList, setProjectList] = useState<Project[]>(null)
+  const [is404, set404] = useState(false)
+  useEffect(() => set404(false), [login])
 
   const [dialogState, setDialogState] = useState<DialogState>({
     isOpen: false,
@@ -44,9 +46,19 @@ export default function UserPage({ match }: { match: match<Params> }) {
   useEffect(() => {
     if (login) {
       fetchUserInfo(login)
-      fetchUserProjects(login)
     }
   }, [login])
+
+  if (is404) {
+    return (
+      <div className="user-page">
+        <Header />
+        <main>
+          <img src="https://pic3.zhimg.com/daa3c5b52b93b069bf118b43244f1552_r.jpg" alt="404" />
+        </main>
+      </div>
+    )
+  }
 
   if (userInfo == null || projectList == null) {
     return (
@@ -150,22 +162,18 @@ export default function UserPage({ match }: { match: match<Params> }) {
   function fetchUserInfo(username: string) {
     server
       .getUserInfo(username)
-      .then(userInfo => {
-        setUserInfo({ ...userInfo, ...userInfo })
+      .then(({ userInfo, projectList }) => {
+        setUserInfo(userInfo)
+        setProjectList(projectList)
       })
       .catch(e => {
         console.error(e)
+        if (e.status === 404) {
+          set404(true)
+          return
+        }
+        toaster.show({ intent: 'warning', message: '加载用户信息失败' })
       })
-  }
-
-  async function fetchUserProjects(username: string) {
-    try {
-      const projects = await server.getUserProjects(username)
-      setProjectList(projects)
-    } catch (e) {
-      toaster.show({ intent: 'warning', message: '加载用户项目列表失败' })
-      console.error(e)
-    }
   }
 
   async function handleDeleteProject(projectId: number) {

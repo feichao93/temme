@@ -2,6 +2,15 @@ import { List } from 'immutable'
 import { ProjectRecord, PageRecord } from '../ProjectPage/interfaces'
 import { Project, UserInfo } from '../types'
 
+export class FetchError extends Error {
+  readonly status: number
+
+  constructor(readonly response: Response) {
+    super()
+    this.status = response.status
+  }
+}
+
 export async function savePage(page: PageRecord) {
   const { pageId, html, selector } = page
   const response = await fetch('/api/update-page', {
@@ -81,23 +90,21 @@ export async function getMyInfo() {
   }
 }
 
-// 获取用户的详细信息
-export async function getUserInfo(username: string): Promise<UserInfo> {
-  const response = await fetch(`/api/user-info/${username}`)
-  if (response.ok) {
-    return response.json()
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
+// 获取用户的详细信息与用户工程列表
+export async function getUserInfo(username: string) {
+  const [res1, res2] = await Promise.all([
+    fetch(`/api/user-info/${username}`),
+    fetch(`/api/user-info/${username}/projects`),
+  ])
+  if (!res1.ok) {
+    throw new FetchError(res1)
   }
-}
-
-export async function getUserProjects(username: string) {
-  const response = await fetch(`/api/user-info/${username}/projects`)
-  if (response.ok) {
-    return (await response.json()) as Project[]
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
+  if (!res2.ok) {
+    throw new FetchError(res2)
   }
+  const userInfo: UserInfo = await res1.json()
+  const projectList: Project[] = await res2.json()
+  return { userInfo, projectList }
 }
 
 export async function addProject(name: string, description: string): Promise<Project> {

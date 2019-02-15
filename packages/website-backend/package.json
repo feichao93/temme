@@ -3,7 +3,7 @@
   "name": "website-backend",
   "version": "0.8.3",
   "scripts": {
-    "run-server": "ts-node -T src/index.ts -i ad71c16dbbbef129c52b -s 411cab46384d36bde761da970ebd5830c98dd4d4"
+    "run-server": "ts-node -T src/index.ts -i ad71c16dbbbef129c52b -s 411cab46384d36bde761da970ebd5830c98dd4d4 --mongo-uri mongodb://localhost:27017"
   },
   "devDependencies": {
     "supervisor": "^0.12.0",
