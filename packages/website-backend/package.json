@@ -3,7 +3,7 @@
   "name": "website-backend",
   "version": "0.8.3",
   "scripts": {
-    "run-server": "ts-node -T src/index.ts"
+    "run-server": "ts-node -T src/index.ts -i ad71c16dbbbef129c52b -s 411cab46384d36bde761da970ebd5830c98dd4d4"
   },
   "devDependencies": {
     "supervisor": "^0.12.0",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/archiver": "^2.1.2",
+    "@types/commander": "^2.12.2",
     "@types/koa": "^2.0.47",
     "@types/koa-bodyparser": "^4.2.1",
     "@types/koa-compress": "^2.0.8",
@@ -24,6 +25,7 @@
     "@types/mongodb": "^3.1.15",
     "archiver": "^3.0.0",
     "axios": "^0.18.0",
+    "commander": "^2.19.0",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "koa-compress": "^3.0.0",
