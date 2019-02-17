@@ -69,16 +69,6 @@ export async function logout() {
   }
 }
 
-export async function getClientId() {
-  const response = await fetch('/api/client-id')
-  if (response.ok) {
-    const { clientId }: { clientId: number } = await response.json()
-    return { clientId }
-  } else {
-    throw new Error(`${response.status} ${await response.text()}`)
-  }
-}
-
 export async function getMyInfo() {
   const response = await fetch('/api/my-info')
   if (response.ok) {

@@ -20,12 +20,6 @@ async function logout(ctx: Router.IRouterContext) {
   ctx.status = 200
 }
 
-async function getClientId(ctx: Router.IRouterContext) {
-  ctx.body = {
-    clientId: CONFIG.oauthClientId,
-  }
-}
-
 // 查看某个用户的个人信息
 async function getUserInfo(ctx: Router.IRouterContext) {
   const login = ctx.params.login
@@ -66,7 +60,6 @@ async function getProject(ctx: Router.IRouterContext) {
 export default new Router()
   .get('/my-info', getMyInfo)
   .post('/logout', logout)
-  .get('/client-id', getClientId)
   .get('/user-info/:login', getUserInfo)
   .get('/user-info/:login/projects', getUserProjectList)
   .get('/project/:login/:projectName', getProject)

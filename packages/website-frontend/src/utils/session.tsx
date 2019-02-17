@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react'
+import { useDialogs } from '../dialogs'
 import toaster from '../toaster'
 import { useDidMount } from './common'
 import * as server from './server'
@@ -24,14 +25,10 @@ const SessionContext = createContext(null as SessionContext)
 
 export function SessionProvider({ children }: { children: JSX.Element }) {
   const [sessionState, setSessionState] = useState(defaultSession)
+  const dialogs = useDialogs()
 
-  async function login() {
-    const { clientId } = await server.getClientId()
-    window.open(
-      `https://github.com/login/oauth/authorize?client_id=${clientId}`,
-      '_blank',
-      'width=965,height=560,top=250,left=150',
-    )
+  function login() {
+    window.open(`/oauth-request`, '_blank', 'width=965,height=560,top=250,left=150')
   }
 
   function logout() {
@@ -45,13 +42,16 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     })
   }
 
-  const fetchLoginInfo = async () => {
+  async function fetchLoginInfo() {
     try {
       const { username, userId } = await server.getMyInfo()
       setSessionState({ ...sessionState, username, userId, connected: true })
     } catch (e) {
-      console.log('无法连接服务器')
       console.error(e)
+      dialogs.alert({
+        title: '请求失败',
+        message: '获取当前登录信息失败，请刷新后重试。',
+      })
     }
   }
 

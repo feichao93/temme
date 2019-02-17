@@ -1,3 +1,4 @@
+import { Spinner } from '@blueprintjs/core'
 import React from 'react'
 import { Route, Switch } from 'react-router'
 import './App.styl'
@@ -7,6 +8,15 @@ import UserPage from './UserPage'
 
 const ProjectPage = React.lazy(() => import('./ProjectPage/ProjectPage'))
 
+function LoadingEditor() {
+  return (
+    <div style={{ margin: 'auto', marginTop: 50 }}>
+      <Spinner />
+      <p style={{ textAlign: 'center', fontSize: 20, marginTop: 16 }}>编辑器载入中，请稍后</p>
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <Switch>
@@ -14,8 +24,8 @@ export default function App() {
       <Route
         path="/@:login/:projectName"
         render={({ match: { params, url } }) => (
-          <React.Suspense fallback="loading...">
-            <ProjectPage key={url} {...params} />
+          <React.Suspense fallback={<LoadingEditor />}>
+            <ProjectPage key={url} login={params.login} projectName={params.projectName} />
           </React.Suspense>
         )}
       />

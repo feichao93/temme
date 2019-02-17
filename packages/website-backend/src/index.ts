@@ -73,7 +73,14 @@ function makeApp(service: Service) {
     .use(bodyParser())
     .use(mount('/static', staticApp))
     .use(mount('/archive', archiveApp))
-    .use(new Router().get(CONFIG.oauthCallbackPath, oauthCallbackHandler).routes())
+    .use(
+      new Router()
+        .get(CONFIG.oauthCallbackPath, oauthCallbackHandler)
+        .get('/oauth-request', ctx => {
+          ctx.redirect(`https://github.com/login/oauth/authorize?client_id=${CONFIG.oauthClientId}`)
+        })
+        .routes(),
+    )
     .use(
       mount(
         '/api',
