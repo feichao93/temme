@@ -1,10 +1,11 @@
 import React from 'react'
 import { Route, Switch } from 'react-router'
-import UserPage from './UserPage'
-import ProjectPage from './ProjectPage/ProjectPage'
+import './App.styl'
 import LoginSuccessPage from './LoginSuccessPage'
 import MainPage from './MainPage'
-import './App.styl'
+import UserPage from './UserPage'
+
+const ProjectPage = React.lazy(() => import('./ProjectPage/ProjectPage'))
 
 export default function App() {
   return (
@@ -12,7 +13,11 @@ export default function App() {
       <Route path="/login-success" component={LoginSuccessPage} />
       <Route
         path="/@:login/:projectName"
-        render={({ match: { params, url } }) => <ProjectPage key={url} {...params} />}
+        render={({ match: { params, url } }) => (
+          <React.Suspense fallback="loading...">
+            <ProjectPage key={url} {...params} />
+          </React.Suspense>
+        )}
       />
       <Route path="/@:login" component={UserPage} />
       <Route path="/" component={MainPage} />

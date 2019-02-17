@@ -1,6 +1,5 @@
 import { List } from 'immutable'
-import { ProjectRecord, PageRecord } from '../ProjectPage/interfaces'
-import { Project, UserInfo } from '../types'
+import { PageRecord, Project, ProjectRecord, UserInfo } from '../types'
 
 export class FetchError extends Error {
   readonly status: number

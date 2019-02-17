@@ -12,7 +12,7 @@ const program = require('commander')
 
 program
   .option('--app-key <key>', 'Application key used by koa session', 'key')
-  .option('-p, --port <port>', 'Port to bind', parseInt, 3000)
+  .option('-p, --port <port>', 'Port to bind', Number, 3000)
   .option('--mongo-uri <uri>', 'Uri of mongodb', 'mongodb://mongo:27017')
   .option('--mongo-db <name>', 'Database name of mongodb', 'temme-website')
   .option('-i, --oauth-client-id <id>', 'GitHub oauth2 client id')

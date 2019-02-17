@@ -3,15 +3,24 @@ import * as monaco from 'monaco-editor'
 import React from 'react'
 import { DialogContextType } from '../dialogs'
 import toaster from '../toaster'
-import { CreateProjectData } from '../utils/server'
+import { PageRecord } from '../types'
+import history from '../utils/history'
 import * as server from '../utils/server'
+import { CreateProjectData } from '../utils/server'
 import * as actions from './actions'
 import { a } from './actions'
-import { PageRecord, State } from './interfaces'
+import { State } from './interfaces'
 import * as selectors from './selectors'
 import * as updaters from './updaters'
-import { AsyncReturnType, CodeEditor, getNewPageName, inc, matchNewPagePostfix } from './utils'
-import history from '../utils/history'
+import {
+  AsyncReturnType,
+  CodeEditor,
+  getHtmlUriObject,
+  getNewPageName,
+  getSelectorUriObject,
+  inc,
+  matchNewPagePostfix,
+} from './utils'
 
 type SagaEnv = {
   htmlEditorRef: React.MutableRefObject<CodeEditor>
@@ -146,14 +155,14 @@ function* openPage(pageId: number) {
   // 假设在这里 page 已经加载完成
   const page = pages.get(pageId)
 
-  const htmlUriObject = page.getHtmlUriObject()
+  const htmlUriObject = getHtmlUriObject(page)
   let htmlModel = monaco.editor.getModel(htmlUriObject)
   if (htmlModel == null) {
     htmlModel = monaco.editor.createModel(page.html, 'html', htmlUriObject)
   }
   const htmlAvid = htmlModel.getAlternativeVersionId()
 
-  const selectorUriObject = page.getSelectorUriObject()
+  const selectorUriObject = getSelectorUriObject(page)
   let selectorModel = monaco.editor.getModel(selectorUriObject)
   if (selectorModel == null) {
     selectorModel = monaco.editor.createModel(page.selector, 'temme', selectorUriObject)
@@ -180,10 +189,10 @@ function* openPage(pageId: number) {
 /** 获取 page 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
 function* savePage(pageId: number) {
   const page: PageRecord = yield io.select(selectors.page, pageId)
-  const htmlModel = monaco.editor.getModel(page.getHtmlUriObject())
+  const htmlModel = monaco.editor.getModel(getHtmlUriObject(page))
   const html = htmlModel.getValue()
   const nextHtmlInitAvid = htmlModel.getAlternativeVersionId()
-  const selectorModel = monaco.editor.getModel(page.getSelectorUriObject())
+  const selectorModel = monaco.editor.getModel(getSelectorUriObject(page))
   const selector = selectorModel.getValue()
   const nextSelectorInitAvid = selectorModel.getAlternativeVersionId()
   const nextPage = page.merge({
@@ -286,9 +295,9 @@ function* handleRequestImportProject() {
     pages: [],
   }
   for (const page of state.pages.values()) {
-    const htmlModel = monaco.editor.getModel(page.getHtmlUriObject())
+    const htmlModel = monaco.editor.getModel(getHtmlUriObject(page))
     const html = htmlModel != null ? htmlModel.getValue() : page.html
-    const selectorModel = monaco.editor.getModel(page.getSelectorUriObject())
+    const selectorModel = monaco.editor.getModel(getSelectorUriObject(page))
     const selector = selectorModel != null ? selectorModel.getValue() : page.selector
     data.pages.push({
       name: page.name,

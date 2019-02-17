@@ -1,4 +1,5 @@
 import * as monaco from 'monaco-editor'
+import { PageRecord } from '../types'
 
 export type CodeEditor = monaco.editor.IStandaloneCodeEditor
 export type EditorConstructionOptions = monaco.editor.IEditorConstructionOptions
@@ -56,4 +57,12 @@ export function matchNewPagePostfix(name: string) {
 }
 export function getNewPageName(postfix: number) {
   return `new-page-${postfix}`
+}
+
+export function getHtmlUriObject(page: PageRecord) {
+  return monaco.Uri.parse(`inmemory://htmls/${page.pageId}`)
+}
+
+export function getSelectorUriObject(page: PageRecord) {
+  return monaco.Uri.parse(`inmemory://selectors/${page.pageId}`)
 }

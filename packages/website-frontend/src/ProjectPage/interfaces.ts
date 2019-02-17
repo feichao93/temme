@@ -1,39 +1,5 @@
 import { Map, Record } from 'immutable'
-import * as monaco from 'monaco-editor'
-
-const PageRecordBase = Record({
-  pageId: 0,
-  name: '',
-  html: '',
-  selector: '',
-  createdAt: '',
-  updatedAt: '',
-  htmlAvid: 0,
-  htmlInitAvid: 0,
-  selectorAvid: 0,
-  selectorInitAvid: 0,
-})
-export class PageRecord extends PageRecordBase {
-  getHtmlUriObject() {
-    return monaco.Uri.parse(`inmemory://htmls/${this.pageId}`)
-  }
-  getSelectorUriObject() {
-    return monaco.Uri.parse(`inmemory://selectors/${this.pageId}`)
-  }
-  isModified() {
-    return this.htmlAvid !== this.htmlInitAvid || this.selectorAvid !== this.selectorInitAvid
-  }
-}
-
-const ProjectRecordBase = Record({
-  projectId: 0,
-  userId: 0,
-  name: '',
-  description: '',
-  createdAt: '',
-  updatedAt: '',
-})
-export class ProjectRecord extends ProjectRecordBase {}
+import { PageRecord, ProjectRecord } from '../types'
 
 export class State extends Record({
   project: new ProjectRecord(),

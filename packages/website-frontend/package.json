@@ -4,7 +4,8 @@
   "version": "0.8.3",
   "scripts": {
     "start": "webpack-dev-server --mode development",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "analyze": "webpack --profile --json --mode production > stats.json"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.13.0",
