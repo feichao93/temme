@@ -11,7 +11,7 @@
     "start:website": "npm run --prefix=packages/website start",
     "start:temme": "npm run --prefix=packages/temme start",
     "start:vscode-temme": "npm run --prefix=packages/vscode-temme start",
-    "package-website": "ncc build --out dist packages/website-backend/src/index.ts && copyfiles --soft --up=2 packages/website-backend/config.json dist && npm run --prefix=packages/website-frontend build && copyfiles --up=3 \"packages/website-frontend/dist/**/*\" dist/public"
+    "package-website": "ncc build --out dist packages/website-backend/src/index.ts && npm run --prefix=packages/website-frontend build && copyfiles --up=3 \"packages/website-frontend/dist/**/*\" dist/public"
   },
   "devDependencies": {
     "@zeit/ncc": "^0.15.0",

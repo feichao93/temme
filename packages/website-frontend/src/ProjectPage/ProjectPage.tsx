@@ -193,11 +193,6 @@ export default function ProjectPage({ login, projectName }: ProjectPageProps) {
                 <span className="tabname">output</span>
                 <span style={{ width: 16 }} />
               </div>
-              <div className="tab">
-                <FileTypeTSIcon />
-                <span className="tabname">typings(wip)</span>
-                <span style={{ width: 16 }} />
-              </div>
             </div>
             <EditorWrapper editorRef={outputEditorRef} options={INIT_EDITOR_OPTIONS.output} />
           </>
