@@ -46,7 +46,7 @@ async function getProject(ctx: Router.IRouterContext) {
   const project = await ctx.service.projects.findOne({ userId: user.userId, name: projectName })
   ctx.assert(project, 404)
 
-  const pages = await ctx.service.pages.find({ pageId: { $in: project.pageIds } }).toArray()
+  const pages = await ctx.service.pages.find({ _id: { $in: project.pageIds } }).toArray()
   ctx.body = { project, pages }
 }
 
