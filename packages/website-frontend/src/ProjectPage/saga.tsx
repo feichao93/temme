@@ -80,7 +80,7 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
     }
     try {
       const saveHtmlEffects = modifiedPages
-        .map(page => savePage(page.pageId))
+        .map(page => savePage(page._id))
         .valueSeq()
         .toArray()
       yield io.all(saveHtmlEffects)
@@ -113,14 +113,14 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
         .max()
       return state
         .set('project', data.project)
-        .set('pages', data.pages.toMap().mapKeys((_, p) => p.pageId))
+        .set('pages', data.pages.toMap().mapKeys((_, p) => p._id))
         .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
     })
 
     // 首次载入 project 时选中指定 page
     if (!pages.isEmpty()) {
       const pageToOpen = pages.find(p => p.name === initPageName, null, pages.first())
-      yield io.put(actions.openPage(pageToOpen.pageId))
+      yield io.put(actions.openPage(pageToOpen._id))
     }
   } catch (e) {
     console.error(e)
@@ -142,10 +142,10 @@ function* closePage() {
   const { htmlEditorRef, selectorEditorRef }: SagaEnv = yield io.getEnv()
   htmlEditorRef.current.setModel(null)
   selectorEditorRef.current.setModel(null)
-  yield io.update((state: State) => state.set('activePageId', -1))
+  yield io.update((state: State) => state.set('activePageId', ''))
 }
 
-function* openPage(pageId: number) {
+function* openPage(pageId: string) {
   const { activePageId, pages }: State = yield io.select()
   if (pageId === activePageId) {
     return
@@ -176,7 +176,7 @@ function* openPage(pageId: number) {
 
   yield io.update(
     updaters.updatePage,
-    page.pageId,
+    page._id,
     page.merge({
       htmlAvid,
       htmlInitAvid: htmlAvid,
@@ -188,7 +188,7 @@ function* openPage(pageId: number) {
 }
 
 /** 获取 page 在编辑器中的 model 的值，将其保存到服务器，然后更新相关前端状态 */
-function* savePage(pageId: number) {
+function* savePage(pageId: string) {
   const page: PageRecord = yield io.select(selectors.page, pageId)
   const htmlModel = monaco.editor.getModel(getHtmlUriObject(page))
   const html = htmlModel.getValue()
@@ -203,7 +203,7 @@ function* savePage(pageId: number) {
     selectorInitAvid: nextSelectorInitAvid,
   })
   yield server.savePage(nextPage)
-  yield io.update(updaters.updatePage, page.pageId, nextPage)
+  yield io.update(updaters.updatePage, page._id, nextPage)
 }
 
 function* handleRequestUpdatePageMeta({ pageId }: actions.RequestUpdatePageMeta) {
@@ -237,13 +237,13 @@ function* handleRequestUpdatePageMeta({ pageId }: actions.RequestUpdatePageMeta)
 function* handleRequestAddPage() {
   const { dialogs }: SagaEnv = yield io.getEnv()
   const state: State = yield io.select()
-  const projectId = state.project.projectId
+  const projectId = state.project._id
   const pageName = getNewPageName(state.nextPagePostfix)
   yield io.update((state: State) => state.update('nextPagePostfix', inc))
   try {
     const page: PageRecord = yield server.addPage(projectId, pageName)
-    yield io.update((state: State) => state.update('pages', pages => pages.set(page.pageId, page)))
-    yield openPage(page.pageId)
+    yield io.update((state: State) => state.update('pages', pages => pages.set(page._id, page)))
+    yield openPage(page._id)
     toaster.show({ intent: 'success', message: `已创建 ${page.name}` })
   } catch (e) {
     console.error(e)
@@ -274,7 +274,7 @@ function* handleRequestDeletePage({ pageId }: actions.RequestDeletePage) {
       if (state.pages.isEmpty()) {
         closePage()
       } else {
-        openPage(state.pages.map(p => p.pageId).min())
+        openPage(state.pages.map(p => p._id).min())
       }
     }
     toaster.show({

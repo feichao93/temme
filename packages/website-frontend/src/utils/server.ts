@@ -11,7 +11,7 @@ export class FetchError extends Error {
 }
 
 export async function savePage(page: PageRecord) {
-  const { pageId, html, selector } = page
+  const { _id: pageId, html, selector } = page
   const response = await fetch('/api/update-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -35,7 +35,7 @@ export async function getProject(login: string, projectName: string) {
   return { project, pages }
 }
 
-export async function addPage(projectId: number, name: string) {
+export async function addPage(projectId: string, name: string) {
   const response = await fetch('/api/add-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -49,7 +49,7 @@ export async function addPage(projectId: number, name: string) {
   }
 }
 
-export async function deletePage(pageId: number) {
+export async function deletePage(pageId: string) {
   const response = await fetch('/api/delete-page', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -109,7 +109,7 @@ export async function addProject(name: string, description: string): Promise<Pro
   }
 }
 
-export async function updateProjectMeta(projectId: number, name: string, description: string) {
+export async function updateProjectMeta(projectId: string, name: string, description: string) {
   const response = await fetch('/api/update-project-meta', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -122,7 +122,7 @@ export async function updateProjectMeta(projectId: number, name: string, descrip
   }
 }
 
-export async function deleteProject(projectId: number) {
+export async function deleteProject(projectId: string) {
   const response = await fetch('/api/delete-project', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -135,7 +135,7 @@ export async function deleteProject(projectId: number) {
   }
 }
 
-export async function updatePageMeta(pageId: number, name: string) {
+export async function updatePageMeta(pageId: string, name: string) {
   const response = await fetch('/api/update-page-meta', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },

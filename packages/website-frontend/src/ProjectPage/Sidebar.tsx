@@ -23,8 +23,8 @@ export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
   const { project, pages, activePageId } = state
 
   // TODO 有更好的方法判断 project 是否加载完毕
-  const name = project.projectId > 0 ? project.name : 'loading...'
-  const description = project.projectId > 0 ? project.description : 'loading...'
+  const name = project._id ? project.name : 'loading...'
+  const description = project._id ? project.description : 'loading...'
 
   return (
     <div className="sidebar">
@@ -55,9 +55,9 @@ export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
           <div className="view-content">
             <ul className="folder-list">
               {pages
-                .sortBy(page => page.pageId)
+                .sortBy(page => page._id)
                 .map(page => {
-                  const { pageId, name } = page
+                  const { _id: pageId, name } = page
                   return (
                     <li
                       key={pageId}

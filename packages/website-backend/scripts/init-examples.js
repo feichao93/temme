@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb')
+const uuid = require('uuid/v1')
 const fs = require('fs')
 const path = require('path')
 const program = require('commander')
@@ -25,23 +26,22 @@ async function main() {
 
   const existed = await projects.findOne({ userId: program.userId, name: program.name })
   if (existed) {
-    console.log('示例工程已存在')
+    console.log(`示例工程 ${program.name} 已存在`)
     process.exit(0)
   }
 
   const now = new Date().toISOString()
   const pageIds = []
-  // TODO
-  const projectId = 123456
-  let pageId = 100
+  const projectId = uuid()
 
   for (const { name, html, htmlFile, selector } of examples) {
     console.log('processing', name)
     const htmlContent = htmlFile
       ? fs.readFileSync(path.resolve(__dirname, 'resources/html', htmlFile), 'utf8')
       : html
+    const pageId = uuid()
     await pages.insertOne({
-      pageId,
+      _id: pageId,
       projectId,
       name,
       html: htmlContent.trim(),
@@ -51,11 +51,10 @@ async function main() {
     })
 
     pageIds.push(pageId)
-    pageId++
   }
 
   await projects.insertOne({
-    projectId: 123456,
+    _id: projectId,
     userId: program.userId,
     name: program.name,
     description: '',

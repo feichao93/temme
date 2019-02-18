@@ -23,6 +23,7 @@
     "@types/koa-session": "^5.7.4",
     "@types/koa-static": "^4.0.0",
     "@types/mongodb": "^3.1.15",
+    "@types/uuid": "^3.4.4",
     "archiver": "^3.0.0",
     "axios": "^0.18.0",
     "commander": "^2.19.0",
@@ -35,6 +36,7 @@
     "koa-router": "^7.4.0",
     "koa-session": "^5.10.0",
     "koa-static": "^5.0.0",
-    "mongodb": "^3.1.10"
+    "mongodb": "^3.1.10",
+    "uuid": "^3.3.2"
   }
 }

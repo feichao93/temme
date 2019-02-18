@@ -1,4 +1,5 @@
 import Router from 'koa-router'
+import uuid from 'uuid/v1'
 import { Page, Project } from './interfaces'
 
 function randomString(len = 5) {
@@ -31,12 +32,12 @@ async function createProject(ctx: Router.IRouterContext) {
   const data: CreateProjectData = ctx.request.body
   const name = `${data.name}-${randomString()}`
   const now = new Date().toISOString()
-  const projectId = await ctx.service.getNextProjectId()
-  const pageIds: number[] = []
+  const projectId = uuid()
+  const pageIds: string[] = []
   for (const page of data.pages) {
-    const pageId = await ctx.service.getNextPageId()
+    const pageId = uuid()
     await ctx.service.pages.insertOne({
-      pageId,
+      _id: pageId,
       projectId,
       name: page.name,
       html: page.html,
@@ -49,7 +50,7 @@ async function createProject(ctx: Router.IRouterContext) {
 
   const userId = ctx.session.userId
   await ctx.service.projects.insertOne({
-    projectId,
+    _id: projectId,
     userId,
     name,
     description: data.description,
@@ -73,10 +74,9 @@ async function addProject(ctx: Router.IRouterContext) {
   const existedProject = await ctx.service.projects.findOne({ name, userId })
   ctx.assert(existedProject == null, 400, 'Project name already exists')
 
-  const projectId = await ctx.service.getNextProjectId()
   const now = new Date().toISOString()
   const newProject: Project = {
-    projectId,
+    _id: uuid(),
     userId,
     name,
     description,
@@ -93,11 +93,11 @@ async function deleteProject(ctx: Router.IRouterContext) {
   const { projectId } = ctx.request.body
   const userId = ctx.session.userId
 
-  const project = await ctx.service.projects.findOne({ projectId })
+  const project = await ctx.service.projects.findOne({ _id: projectId })
   ctx.assert(project, 404)
   ctx.assert(project.userId === userId, 401)
 
-  await ctx.service.projects.deleteOne({ projectId })
+  await ctx.service.projects.deleteOne({ _id: projectId })
   await ctx.service.pages.deleteMany({ pageId: { $in: project.pageIds } })
   ctx.status = 200
 }
@@ -111,16 +111,16 @@ async function updateProjectMeta(ctx: Router.IRouterContext) {
   const existedProject = await ctx.service.projects.findOne({
     name,
     userId,
-    projectId: { $not: { $eq: projectId } },
+    _id: { $not: { $eq: projectId } },
   })
   ctx.assert(existedProject == null, 400, 'Project name already used')
 
   const now = new Date().toISOString()
   await ctx.service.projects.updateOne(
-    { projectId },
+    { _id: projectId },
     { $set: { name, description, updatedAt: now } },
   )
-  ctx.body = ''
+  ctx.status = 200
 }
 
 async function addPage(ctx: Router.IRouterContext) {
@@ -128,16 +128,16 @@ async function addPage(ctx: Router.IRouterContext) {
   ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
 
   const userId = ctx.session.userId
-  const ownership = await ctx.service.checkProjectOwnership(userId, projectId)
-  ctx.assert(ownership, 401, `No access to project with id ${projectId}`)
+  const project = await ctx.service.projects.findOne({ _id: projectId })
+  ctx.assert(project != null, 404)
+  ctx.assert(project.userId === userId, 401, `No access to project with id ${projectId}`)
 
-  const project = await ctx.service.projects.findOne({ projectId })
-  const pageId = await ctx.service.getNextPageId()
+  const pageId = uuid()
   const now = new Date().toISOString()
 
   const newPage: Page = {
-    pageId,
-    projectId: project.projectId,
+    _id: pageId,
+    projectId: project._id,
     name,
     updatedAt: now,
     createdAt: now,
@@ -147,7 +147,7 @@ async function addPage(ctx: Router.IRouterContext) {
   project.pageIds.push(pageId)
   await ctx.service.pages.insertOne(newPage)
   await ctx.service.projects.updateOne(
-    { projectId },
+    { _id: projectId },
     { $set: { pageIds: project.pageIds, updatedAt: now } },
   )
   ctx.body = newPage
@@ -155,18 +155,15 @@ async function addPage(ctx: Router.IRouterContext) {
 
 async function updatePage(ctx: Router.IRouterContext) {
   const { pageId, html, selector } = ctx.request.body
-  const page = await ctx.service.pages.findOne({ pageId })
+  const page = await ctx.service.pages.findOne({ _id: pageId })
   ctx.assert(page != null, 404)
-  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
+  const project = await ctx.service.projects.findOne({ _id: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toDateString()
-  await ctx.service.pages.updateOne({ pageId }, { $set: { updatedAt: now, html, selector } })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
+  await ctx.service.pages.updateOne({ _id: pageId }, { $set: { updatedAt: now, html, selector } })
+  await ctx.service.projects.updateOne({ _id: project._id }, { $set: { updatedAt: now } })
   ctx.status = 200
 }
 
@@ -174,18 +171,15 @@ async function updatePageMeta(ctx: Router.IRouterContext) {
   const { pageId, name } = ctx.request.body
   ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
 
-  const page = await ctx.service.pages.findOne({ pageId })
+  const page = await ctx.service.pages.findOne({ _id: pageId })
   ctx.assert(page != null, 404)
-  const project = await ctx.service.projects.findOne({ projectId: page.projectId })
+  const project = await ctx.service.projects.findOne({ _id: page.projectId })
   const userId = ctx.session.userId
   ctx.assert(project.userId === userId, 401)
 
   const now = new Date().toISOString()
-  await ctx.service.pages.updateOne({ pageId }, { $set: { updatedAt: now, name } })
-  await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
-    { $set: { updatedAt: now } },
-  )
+  await ctx.service.pages.updateOne({ _id: pageId }, { $set: { updatedAt: now, name } })
+  await ctx.service.projects.updateOne({ _id: project._id }, { $set: { updatedAt: now } })
 
   ctx.status = 200
 }
@@ -201,10 +195,10 @@ async function deletePage(ctx: Router.IRouterContext) {
   remove(project.pageIds, pageId)
   const now = new Date().toISOString()
   await ctx.service.projects.updateOne(
-    { projectId: project.projectId },
+    { _id: project._id },
     { $set: { pageIds: project.pageIds, updatedAt: now } },
   )
-  await ctx.service.pages.deleteOne({ pageId })
+  await ctx.service.pages.deleteOne({ _id: pageId })
 
   ctx.status = 200
 }

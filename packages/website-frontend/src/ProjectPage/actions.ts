@@ -30,7 +30,7 @@ export function requestDownloadProject() {
 }
 
 export type OpenPage = ReturnType<typeof openPage>
-export function openPage(pageId: number) {
+export function openPage(pageId: string) {
   return { type: 'open-page' as 'open-page', pageId }
 }
 
@@ -45,12 +45,12 @@ export function requestAddPage() {
 }
 
 export type RequestUpdatePageMeta = ReturnType<typeof requestUpdatePageMeta>
-export function requestUpdatePageMeta(pageId: number) {
+export function requestUpdatePageMeta(pageId: string) {
   return { type: 'request-update-page-meta' as 'request-update-page-meta', pageId }
 }
 
 export type RequestDeletePage = ReturnType<typeof requestDeletePage>
-export function requestDeletePage(pageId: number) {
+export function requestDeletePage(pageId: string) {
   return { type: 'request-delete-page' as 'request-delete-page', pageId }
 }
 

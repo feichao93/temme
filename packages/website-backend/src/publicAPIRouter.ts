@@ -1,5 +1,4 @@
 import Router from 'koa-router'
-import CONFIG from './config'
 
 // 查看当前登陆用户的信息
 async function getMyInfo(ctx: Router.IRouterContext) {
@@ -44,16 +43,10 @@ async function getProject(ctx: Router.IRouterContext) {
   const { login, projectName } = ctx.params
   const user = await ctx.service.users.findOne({ login })
   ctx.assert(user != null, 404)
-  const project = await ctx.service.projects.findOne(
-    { userId: user.userId, name: projectName },
-    { projection: { _id: false } },
-  )
+  const project = await ctx.service.projects.findOne({ userId: user.userId, name: projectName })
   ctx.assert(project, 404)
 
-  const pages = await ctx.service.pages
-    .find({ pageId: { $in: project.pageIds } })
-    .project({ _id: false })
-    .toArray()
+  const pages = await ctx.service.pages.find({ pageId: { $in: project.pageIds } }).toArray()
   ctx.body = { project, pages }
 }
 

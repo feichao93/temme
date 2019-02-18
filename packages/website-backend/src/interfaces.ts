@@ -27,18 +27,18 @@ export interface UserProfile {
 }
 
 export interface Project {
-  projectId: number
+  _id: string
   userId: number
   name: string
   description: string
-  pageIds: number[]
+  pageIds: string[]
   createdAt: string
   updatedAt: string
 }
 
 export interface Page {
-  pageId: number
-  projectId: number
+  _id: string
+  projectId: string
   name: string
   html: string
   selector: string

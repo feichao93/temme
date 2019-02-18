@@ -12,7 +12,7 @@ export interface UserInfo {
 }
 
 export interface Project {
-  projectId: number
+  _id: string
   userId: number
   name: string
   description: string
@@ -22,7 +22,7 @@ export interface Project {
 }
 
 const PageRecordBase = Record({
-  pageId: 0,
+  _id: '',
   name: '',
   html: '',
   selector: '',
@@ -40,7 +40,7 @@ export class PageRecord extends PageRecordBase {
 }
 
 const ProjectRecordBase = Record({
-  projectId: 0,
+  _id: '',
   userId: 0,
   name: '',
   description: '',

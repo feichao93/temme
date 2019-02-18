@@ -19,32 +19,4 @@ export default class Service {
       { upsert: true },
     )
   }
-
-  /**  判断一个用户是否具有一个 project 的权限 */
-  async checkProjectOwnership(userId: number, projectId: number) {
-    const project = await this.projects.findOne({ userId, projectId })
-    return project != null
-  }
-
-  /** 获取下一个 project 的 id */
-  async getNextProjectId() {
-    const [projectWithMaxId] = await this.projects
-      .find()
-      .project({ projectId: true })
-      .sort({ projectId: -1 })
-      .limit(1)
-      .toArray()
-    return projectWithMaxId == null ? 1 : projectWithMaxId.projectId + 1
-  }
-
-  /** 获取下一个 page 的 id */
-  async getNextPageId() {
-    const [withMaxPageId] = await this.pages
-      .find()
-      .project({ pageId: true })
-      .sort({ pageId: -1 })
-      .limit(1)
-      .toArray()
-    return withMaxPageId == null ? 1 : withMaxPageId.pageId + 1
-  }
 }

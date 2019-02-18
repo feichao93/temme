@@ -60,9 +60,9 @@ export function getNewPageName(postfix: number) {
 }
 
 export function getHtmlUriObject(page: PageRecord) {
-  return monaco.Uri.parse(`inmemory://htmls/${page.pageId}`)
+  return monaco.Uri.parse(`inmemory://htmls/${page._id}`)
 }
 
 export function getSelectorUriObject(page: PageRecord) {
-  return monaco.Uri.parse(`inmemory://selectors/${page.pageId}`)
+  return monaco.Uri.parse(`inmemory://selectors/${page._id}`)
 }

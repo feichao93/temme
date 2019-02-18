@@ -19,7 +19,7 @@ interface Params {
 interface DialogState {
   isOpen: boolean
   isNewProject?: boolean
-  projectId?: number
+  projectId?: string
 }
 
 export default function UserPage({ match }: { match: match<Params> }) {
@@ -35,12 +35,12 @@ export default function UserPage({ match }: { match: match<Params> }) {
   const [dialogState, setDialogState] = useState<DialogState>({
     isOpen: false,
     isNewProject: false,
-    projectId: -1,
+    projectId: null,
   })
 
   const editingProject =
     dialogState.isOpen && !dialogState.isNewProject
-      ? projectList.find(p => p.projectId === dialogState.projectId)
+      ? projectList.find(p => p._id === dialogState.projectId)
       : null
 
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
           <div className="project-list">
             {projectList &&
               projectList.map(project => (
-                <div key={project.projectId} className="project-item">
+                <div key={project._id} className="project-item">
                   <Link className="project-name" to={`/@${login}/${project.name}`}>
                     {project.name}
                   </Link>
@@ -138,7 +138,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
                             setDialogState({
                               isOpen: true,
                               isNewProject: false,
-                              projectId: project.projectId,
+                              projectId: project._id,
                             })
                           }
                         />
@@ -146,7 +146,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
                           minimal
                           intent="danger"
                           icon="trash"
-                          onClick={() => handleDeleteProject(project.projectId)}
+                          onClick={() => handleDeleteProject(project._id)}
                         />
                       </ButtonGroup>
                     </div>
@@ -176,8 +176,8 @@ export default function UserPage({ match }: { match: match<Params> }) {
       })
   }
 
-  async function handleDeleteProject(projectId: number) {
-    const project = projectList.find(p => p.projectId === projectId)
+  async function handleDeleteProject(projectId: string) {
+    const project = projectList.find(p => p._id === projectId)
     const confirmed = await dialogs.confirm({
       title: '确认删除',
       message: (
@@ -196,11 +196,11 @@ export default function UserPage({ match }: { match: match<Params> }) {
         intent: 'primary',
         message: (
           <span>
-            已删除 <b style={{ color: '#b13b00' }}>{project.name}</b>
+            已删除 <b>{project.name}</b>
           </span>
         ),
       })
-      const nextProjectList = projectList.filter(p => p.projectId !== projectId)
+      const nextProjectList = projectList.filter(p => p._id !== projectId)
       setProjectList(nextProjectList)
     } catch (e) {
       console.error(e)
@@ -225,7 +225,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
       await server.updateProjectMeta(dialogState.projectId, name, description)
       setDialogState({ isOpen: false })
       const nextProjectList = projectList.map(p =>
-        p.projectId === dialogState.projectId ? { ...p, name, description } : p,
+        p._id === dialogState.projectId ? { ...p, name, description } : p,
       )
       setProjectList(nextProjectList)
       toaster.show({ message: `修改成功` })
