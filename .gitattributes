@@ -1,2 +1,2 @@
 packages/temme/__tests__/realworld/html/* linguist-vendored
-packages/website/public/resources/**/* linguist-vendored
+packages/website-backend/scripts/resources/**/* linguist-vendored
