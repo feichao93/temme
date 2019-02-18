@@ -23,7 +23,7 @@ const archiveApp = new Koa()
         ctx.body = archive
 
         for (const pageId of project.pageIds) {
-          const page = await ctx.service.pages.findOne({ pageId })
+          const page = await ctx.service.pages.findOne({ _id: pageId })
           archive.append(Buffer.from(page.html, 'utf8'), { name: page.name + '.html' })
           archive.append(Buffer.from(page.selector, 'utf8'), { name: page.name + '.temme' })
         }
