@@ -35,8 +35,8 @@ function applyReducer<A extends actions.Action>(reducer: (state: State, action: 
   }
 }
 
-export default function* saga(login: string, projectName: string) {
-  yield io.fork(loadProjectData, login, projectName)
+export default function* saga(login: string, projectName: string, initPageName?: string) {
+  yield io.fork(loadProjectData, login, projectName, initPageName)
 
   yield takeEvery(
     a('update-active-html-avid'),
@@ -100,7 +100,7 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
   anchor.click()
 }
 
-function* loadProjectData(login: string, projectName: string) {
+function* loadProjectData(login: string, projectName: string, initPageName?: string) {
   type Data = AsyncReturnType<typeof server.getProject>
   const { dialogs }: SagaEnv = yield io.getEnv()
   try {
@@ -117,9 +117,10 @@ function* loadProjectData(login: string, projectName: string) {
         .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
     })
 
-    // 首次载入 project 时自动选中第一个 page
+    // 首次载入 project 时选中指定 page
     if (!pages.isEmpty()) {
-      yield io.put(actions.openPage(pages.first<null>().pageId))
+      const pageToOpen = pages.find(p => p.name === initPageName, null, pages.first())
+      yield io.put(actions.openPage(pageToOpen.pageId))
     }
   } catch (e) {
     console.error(e)

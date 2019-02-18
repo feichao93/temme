@@ -23,9 +23,14 @@ export default function App() {
       <Route path="/login-success" component={LoginSuccessPage} />
       <Route
         path="/@:login/:projectName"
-        render={({ match: { params, url } }) => (
+        render={({ match: { params, url }, location }) => (
           <React.Suspense fallback={<LoadingEditor />}>
-            <ProjectPage key={url} login={params.login} projectName={params.projectName} />
+            <ProjectPage
+              key={url}
+              login={params.login}
+              projectName={params.projectName}
+              initPageName={new URLSearchParams(location.search).get('page')}
+            />
           </React.Suspense>
         )}
       />

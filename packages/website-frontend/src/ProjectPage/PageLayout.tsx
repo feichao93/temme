@@ -38,16 +38,13 @@ export default function PageLayout({
   const rightRatio = 1 - sidebarRatio - leftRatio
 
   const isMount = useRef(true)
-  useLayoutEffect(
-    () => {
-      if (isMount.current) {
-        isMount.current = false
-        return
-      }
-      return layout()
-    },
-    [sidebarRatio, leftRatio, topRatio],
-  )
+  useLayoutEffect(() => {
+    if (isMount.current) {
+      isMount.current = false
+      return
+    }
+    return layout()
+  }, [sidebarRatio, leftRatio, topRatio])
   useLayoutEffect(() => {
     window.addEventListener('resize', layout)
     return () => window.removeEventListener('resize', layout)
@@ -145,6 +142,7 @@ export default function PageLayout({
       <div
         className="left-part"
         style={{
+          willChange: 'width',
           width: percentify(leftRatio),
           position: 'relative',
           display: leftRatio === 0 ? 'none' : undefined,
@@ -159,8 +157,10 @@ export default function PageLayout({
       >
         <div className="line" />
       </div>
-      <div className="right-part" style={{ width: percentify(rightRatio) }}>
-        <div style={{ height: percentify(topRatio), position: 'relative' }}>{rightTop}</div>
+      <div className="right-part" style={{ willChange: 'width', width: percentify(rightRatio) }}>
+        <div style={{ willChange: 'height', height: percentify(topRatio), position: 'relative' }}>
+          {rightTop}
+        </div>
         <div
           className="resizer horizontal"
           style={{ top: percentify(topRatio) }}
@@ -168,7 +168,11 @@ export default function PageLayout({
         >
           <div className="line" />
         </div>
-        <div style={{ height: percentify(1 - topRatio), position: 'relative' }}>{rightBottom}</div>
+        <div
+          style={{ willChange: 'height', height: percentify(1 - topRatio), position: 'relative' }}
+        >
+          {rightBottom}
+        </div>
       </div>
       <div
         className="resizer orthogonal"

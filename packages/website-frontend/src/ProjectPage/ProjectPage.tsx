@@ -12,7 +12,8 @@ import { useSession } from '../utils/session'
 import * as actions from './actions'
 import './configureTemmeLanguage'
 import EditorWrapper from './EditorWrapper'
-import { FileTypeHtmlIcon, FileTypeJsonIcon, FileTypeTSIcon } from './icons'
+import { FileTypeHtmlIcon, FileTypeJsonIcon } from './icons'
+import history from '../utils/history'
 import { State } from './interfaces'
 import PageLayout from './PageLayout'
 import './ProjectPage.styl'
@@ -23,9 +24,10 @@ import { CodeEditor, CTRL_S, disposeAllEditorModels, INIT_EDITOR_OPTIONS } from 
 export interface ProjectPageProps {
   login: string
   projectName: string
+  initPageName?: string
 }
 
-export default function ProjectPage({ login, projectName }: ProjectPageProps) {
+export default function ProjectPage({ login, projectName, initPageName }: ProjectPageProps) {
   const dialogs = useDialogs()
 
   const htmlEditorRef = useRef<CodeEditor>(null)
@@ -36,11 +38,11 @@ export default function ProjectPage({ login, projectName }: ProjectPageProps) {
   const [state, dispatch] = useSaga<State, actions.Action>({
     customEnv,
     saga,
-    args: [login, projectName],
+    args: [login, projectName, initPageName],
     initialState: new State(),
   })
 
-  const { project, pages, activePageId } = state
+  const { readyState, project, pages, activePageId } = state
   const activePage = pages.get(activePageId)
   const session = useSession()
   const readonly = session.username !== login
@@ -133,6 +135,15 @@ export default function ProjectPage({ login, projectName }: ProjectPageProps) {
     selectorEditorRef.current.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
   })
+
+  // 当 activePage.name 发生变化时，同步更新地址栏
+  useEffect(() => {
+    if (activePage) {
+      const url = new URL(document.URL)
+      url.searchParams.set('page', activePage.name)
+      history.replace(url.pathname + url.search)
+    }
+  }, [activePage && activePage.name])
 
   // 在退出页面时，销毁所有的 model
   useWillUnmount(disposeAllEditorModels)
