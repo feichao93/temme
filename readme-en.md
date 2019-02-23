@@ -50,7 +50,7 @@ temme(html, selector)
 // }
 ```
 
-If you are very familiar with temme, you could start with this [stackoverflow example](/examples/stackoverflow/readme.md). There are some short examples in the online playground. [This example](https://temme.js.org?example=github-commits) extracts commits information from GitHub commits page, including time, author, commit message and links. [This example](https://temme.js.org?example=github-issues) extract issues information from GitHub issues page, including title, assignee and number of comments.
+If you are not familiar with temme, you could start with this [stackoverflow example](/examples/stackoverflow/readme.md). There are some short examples in the online playground. [This example](https://temme.js.org?example=github-commits) extracts commits information from GitHub commits page, including time, author, commit message and links. [This example](https://temme.js.org?example=github-issues) extract issues information from GitHub issues page, including title, assignee and number of comments.
 
 ## Documentation
 
