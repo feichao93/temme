@@ -1,6 +1,6 @@
 ## Multiple Selectors
 
-Temme supports multiple selectors at top-level and in children selectors. Every selector should end with a semicolon. But if the selector ends with curly brace, then the semicolon is optional.
+Temme supports multiple selectors at top-level and in children selectors (sub-selectors of an array-capture). Every selector should end with a semicolon. However when the selector ends with a closing curly brace, the semicolon is optional.
 
 ### Examples
 

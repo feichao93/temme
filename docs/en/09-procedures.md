@@ -1,16 +1,16 @@
 ## Procedures
 
-Procedure is a JavaScript function that will be called against the node that matches our selector. In temme, the procedure part is placed after the normal CSS selector within a pair of curly brace. Actually, in the previous docs, we have met procedures: text-capture and conditional-assignment are two special forms of procedures.
+Procedure is a JavaScript function that will be called against the node that matches our selector. In temme, the procedure part is placed after the normal CSS selector within a pair of curly brace `{ }`. Actually, in the previous docs, we have met procedures: text-capture and conditional-assignment are two special forms of procedures.
 
 ### Syntax
 
-- `div{ proc(arg1, arg2) }` When a node matches the matching rules, `proc` will be executed. Every argument is either a capture (e.g. `$foo`) or a JavaScript literal.
-- `div{ $arg }` This is a special form and is equivalent to `div{ text($arg) }`
-- `div{ $foo = bar }`: This is a special form and is equivalent to `div{ assign($foo, bar) }`
+- `div{ proc(arg1, arg2) }` When a node matches the matching rules, `proc` will be executed. Every argument is either a capture (e.g. `$foo`) or a simple JavaScript literal.
+- `div{ $arg }` This is a special form and it is equivalent to `div{ text($arg) }`
+- `div{ $foo = bar }` This is a special form and it is equivalent to `div{ assign($foo, bar) }`
 
 ### Text-Capture
 
-Since text-capture is the most used capture form, temme uses `text` as the default procedure. When we only provide a single value-capture, the default capture `text` will be executed, in another word, `div{ $foo }` and `div{ text($foo) }` are equivalent.
+Since text-capture is the most used capture form, temme uses `text` as the default procedure. When we only provide a single value-capture, the default capture `text` will be executed. In another word, `div{ $foo }` and `div{ text($foo) }` are equivalent.
 
 ### Conditional-Assignment
 
@@ -27,7 +27,10 @@ Examples:
 
 ```html
 <!-- html used below -->
-<div class="outer"><p>TEXT-1</p> <div class="inner">TEXT-2</div></div>
+<div class="outer">
+  <p>TEXT-1</p>
+  <div class="inner">TEXT-2</div>
+</div>
 ```
 
 ```JavaScript
@@ -80,11 +83,11 @@ temme(html, `a { find('Fork Me on ', $website) }`)
 
 ### Customized Procedures
 
-Like filters, temme supports several different ways to define customized procedures. When customized procedures get called, the arguments are as follows: the capture result, the node matching the CSS selector, the arguments passed in the selector.
+Like in filters, temme supports several different ways to define customized procedures. When customized procedures get called, the arguments are as follows: the capture result, the node matching the CSS selector, the arguments passed in the selector.
 
-Procedures are supported to be powerful and complex. In most situations, we do not need to used it. Temme supports pseudo-class selector (powered by [css-select](https://github.com/fb55/css-select#supported-selectors)). Especially `:contains`, `:not` and `:has`, pseudo-class selectors improve expression ability greatly. Before using customized procedures, try using these pseudo-class selectors.
+Procedures are supported to be powerful and complex. In most situations, we do not need to use it. Temme supports pseudo-class selector (powered by [css-select](https://github.com/fb55/css-select#supported-selectors)) which improve the expression ability greatly (especially `:contains`, `:not` and `:has`). Before defining customized procedures, try to have a luck with these pseudo-class selectors.
 
-Before implementing customized procedures, you can use [procedures.ts](/packages/temme/src/procedures.ts) as a reference.
+When implementing customized procedures, you can use [procedures.ts](/packages/temme/src/procedures.ts) as a reference.
 
 ### Global Procedures Definition
 
@@ -107,12 +110,18 @@ const extraProcedures = {
   },
   // ...
 }
-temme(html, 'div{ mark($foo) }', null, null, extraProcedures)
+temme(
+  html,
+  'div{ mark($foo) }',
+  /* extraFilters */ null,
+  /* extraModifiers */ null,
+  extraProcedures,
+)
 ```
 
 ### Inline Procedures Definition
 
-Define procedures in selector string. Inline procedure definition has the same syntax as JavaScript-style function definition. The difference is that temme uses _procedure_ as the keyword instead of _function_.
+Define procedures in selector string. Inline procedure definition has the same syntax as JavaScript-style function definition. The difference is that temme uses `procedure` as the keyword instead of `function`.
 
 ```javascript
 procedure mark(result, node, arg) {
@@ -121,6 +130,6 @@ procedure mark(result, node, arg) {
   /* Note that the curly braces must be balanced here due to the parser limitations */
 }
 
-// We can use `mark` like this
+// We can use `mark` as follows
 div{ mark($foo) };
 ```

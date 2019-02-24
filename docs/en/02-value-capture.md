@@ -9,7 +9,7 @@ Value-capture is the most basic and most used capture form. Value-capture can be
 
 #### Running semantics
 
-Normal attribute qualifier is in form `[foo=bar]`. Attribute-capture is in form `[foo=$bar]`, which means putting the value of attribute `foo` into `.bar` of the capture result. Content capture `{$buzz}` means capturing text of a node into `.buzz` of the capture result.
+Attribute-capture is in form `[foo=$bar]`, which means putting the value of attribute `foo` into `.bar` of the capture result. Content capture `{$buzz}` means capturing text of a node into `.buzz` of the capture result.
 
 #### Examples
 
@@ -34,7 +34,7 @@ temme(html, 'div[class=$cls]{$content};')
 
 ## Default-Capture
 
-The output of `temme()` is an object called capture-result. Capture-result contains captured items at specific fields. We can use a single `$` to make a default-value-capture, and the capture result will be a single value.
+The output of `temme()` is an object called capture-result. Capture-result contains captured data at specific fields. We can use a single `$` to make a default-value-capture, and the capture result will be a single value.
 
 #### Syntax
 

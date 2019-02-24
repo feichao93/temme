@@ -11,7 +11,7 @@ Snippet-define is allowed at top level only. Snippet-expand can be place at top 
 
 ### Running Semantics
 
-The running semantics of snippet is simple: when temme meets a snippet-expand, temme will replace the `@xxx` with its content.
+The running semantics of snippet is straightforward: when temme meets a snippet-expand, temme will replace the `@xxx` with its content.
 
 ### Example-1
 

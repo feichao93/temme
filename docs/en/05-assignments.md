@@ -10,7 +10,7 @@ The running semantics differs when assignments appear in different places:
 
 - At top level: `$foo = 'bar';` means that string `'bar'` will be in `.foo` of the final result;
 - In content-capture: `div.foo{ $a = null }` is like a conditional capture: if there is such a div that satisfies `.foo` qualifier, then the assignment is executed;
-- In children selector, `li@list { $x = 123 }` means that every object in `list` will have `123` as the `.x` field.
+- In children selector, `li@list { $x = 123; }` means that every object in `list` will have `123` as the `.x` field.
 
 ### Examples
 
