@@ -8,12 +8,12 @@ export default function MainPage() {
       <Header />
       <main>
         <div className="intro-text">
-          <h1>Temme</h1>
-          <p>concise selector to extract JSON from HTML.</p>
+          <h1>创建、运行、分享 temme 选择器</h1>
+          <p>temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中提取所需的 JSON 数据。</p>
         </div>
       </main>
       <footer>
-        Code with ❤️ by{' '}
+        Code with ❤️by{' '}
         <a href="https://github.com/shinima" target="_blank">
           @shinima
         </a>

@@ -171,3 +171,18 @@ export async function createProject(
     throw new FetchError(response)
   }
 }
+
+type CreateProjectByZipResponse = { project: Project; warnings: string[] }
+export async function createProjectByZip(zipFile: File): Promise<CreateProjectByZipResponse> {
+  const formData = new FormData()
+  formData.append('zipFile', zipFile)
+  const response = await fetch('/api/create-project-by-zip', {
+    method: 'POST',
+    body: formData,
+  })
+  if (response.ok) {
+    return response.json()
+  } else {
+    throw new FetchError(response)
+  }
+}

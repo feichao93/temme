@@ -42,7 +42,7 @@ export function DialogContextProvider({ children }: { children: JSX.Element }) {
         icon={state.type !== 'empty' ? state.icon : null}
         title={state.type !== 'empty' && state.title}
         isOpen={state.type !== 'empty'}
-        style={{ width: 600, alignSelf: 'flex-start' }}
+        style={{ width: 600 }}
         isCloseButtonShown={false}
       >
         {state.type === 'confirm' && (

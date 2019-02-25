@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import Koa, { Context, Middleware } from 'koa'
-import bodyParser from 'koa-bodyparser'
+import koaBody from 'koa-body'
 import compress from 'koa-compress'
 import conditional from 'koa-conditional-get'
 import etag from 'koa-etag'
@@ -70,7 +70,7 @@ function makeApp(service: Service) {
     .use(etag())
     .use(session(app))
     .use(withService(service))
-    .use(bodyParser())
+    .use(koaBody({ multipart: true }))
     .use(mount('/static', staticApp))
     .use(mount('/archive', archiveApp))
     .use(

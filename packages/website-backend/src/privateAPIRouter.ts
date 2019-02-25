@@ -1,17 +1,7 @@
 import Router from 'koa-router'
 import uuid from 'uuid/v1'
-import { Page, Project } from './interfaces'
-
-function randomString(len = 5) {
-  return Math.random()
-    .toString(36)
-    .substring(2, 2 + len)
-}
-
-function remove<T>(array: T[], item: T) {
-  const index = array.indexOf(item)
-  array.splice(index, 1)
-}
+import { getProjectDataFromZip, randomString, remove } from './common'
+import { CreateProjectData, Page, Project } from './interfaces'
 
 function requireSignedIn(ctx: Router.IRouterContext, next: any) {
   const userId = ctx.session.userId
@@ -19,48 +9,22 @@ function requireSignedIn(ctx: Router.IRouterContext, next: any) {
   return next()
 }
 
-interface CreateProjectData {
-  name: string
-  description: string
-  pages: Array<{
-    name: string
-    html: string
-    selector: string
-  }>
-}
 async function createProject(ctx: Router.IRouterContext) {
   const data: CreateProjectData = ctx.request.body
-  const name = `${data.name}-${randomString()}`
-  const now = new Date().toISOString()
-  const projectId = uuid()
-  const pageIds: string[] = []
-  for (const page of data.pages) {
-    const pageId = uuid()
-    await ctx.service.pages.insertOne({
-      _id: pageId,
-      projectId,
-      name: page.name,
-      html: page.html,
-      selector: page.selector,
-      updatedAt: now,
-      createdAt: now,
-    })
-    pageIds.push(pageId)
-  }
-
   const userId = ctx.session.userId
-  await ctx.service.projects.insertOne({
-    _id: projectId,
-    userId,
-    name,
-    description: data.description,
-    updatedAt: now,
-    createdAt: now,
-    pageIds,
-  })
-
+  data.name += `-${randomString()}` // 添加一个随机后缀，避免名称冲突
+  await ctx.service.createProject(userId, data)
   const user = await ctx.service.users.findOne({ userId })
-  ctx.body = { login: user.login, projectName: name }
+  ctx.body = { login: user.login, projectName: data.name }
+}
+
+async function createProjectByZip(ctx: Router.IRouterContext) {
+  const uploadedFile = ctx.request.files.zipFile
+  const { data, warnings } = await getProjectDataFromZip(uploadedFile)
+  const userId = ctx.session.userId
+  data.name += `-${randomString()}` // 添加一个随机后缀，避免名称冲突
+  const project = await ctx.service.createProject(userId, data)
+  ctx.body = { project, warnings }
 }
 
 // 创建新的 project
@@ -206,6 +170,7 @@ async function deletePage(ctx: Router.IRouterContext) {
 export default new Router()
   .use(requireSignedIn)
   .post('/create-project', createProject)
+  .post('/create-project-by-zip', createProjectByZip)
   .post('/add-project', addProject)
   .post('/delete-project', deleteProject)
   .post('/update-project-meta', updateProjectMeta)

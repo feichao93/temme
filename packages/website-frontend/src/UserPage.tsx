@@ -1,4 +1,4 @@
-import { Button, ButtonGroup } from '@blueprintjs/core'
+import { Button, ButtonGroup, Tooltip } from '@blueprintjs/core'
 import React, { useEffect, useState } from 'react'
 import { Link, match } from 'react-router-dom'
 import { useDialogs } from './dialogs'
@@ -110,12 +110,16 @@ export default function UserPage({ match }: { match: match<Params> }) {
               <span className="count">{projectList.length}</span>
             </div>
             {username === login && (
-              <Button
-                icon="cube-add"
-                text="新建"
-                onClick={() => setDialogState({ isOpen: true, isNewProject: true })}
-                style={{ marginLeft: 'auto', alignSelf: 'center' }}
-              />
+              <ButtonGroup style={{ marginLeft: 'auto', alignSelf: 'center' }}>
+                <Tooltip content="从 zip 文件中导入项目">
+                  <Button icon="import" text="导入" onClick={onRequestImportProject} />
+                </Tooltip>
+                <Button
+                  icon="cube-add"
+                  text="新建"
+                  onClick={() => setDialogState({ isOpen: true, isNewProject: true })}
+                />
+              </ButtonGroup>
             )}
           </div>
           <div className="project-list">
@@ -205,6 +209,39 @@ export default function UserPage({ match }: { match: match<Params> }) {
     } catch (e) {
       console.error(e)
       toaster.show({ intent: 'danger', message: '删除失败' })
+    }
+  }
+
+  function onRequestImportProject() {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.click()
+    input.onchange = () => {
+      const file = input.files[0]
+      if (file.type !== 'application/x-zip-compressed') {
+        toaster.show({ intent: 'warning', message: '请上传 .zip 文件' })
+        return
+      }
+      const zipFile = input.files[0]
+      server
+        .createProjectByZip(zipFile)
+        .then(({ project, warnings }) => {
+          setProjectList(list => list.concat(project))
+
+          const message = (
+            <>
+              <span style={{ fontSize: 18, lineHeight: '24px' }}>已导入 {project.name}</span>
+              <span style={{ whiteSpace: 'pre-wrap' }}>{warnings.map(w => `\n${w}`)}</span>
+            </>
+          )
+          toaster.show({ intent: 'primary', message })
+        })
+        .catch(async err => {
+          toaster.show({
+            intent: 'danger',
+            message: `${err.response.status} ${err.response.text()}`,
+          })
+        })
     }
   }
 

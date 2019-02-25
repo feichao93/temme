@@ -45,3 +45,15 @@ export interface Page {
   createdAt: string
   updatedAt: string
 }
+
+export interface CreateProjectData {
+  name: string
+  description: string
+  pages: Array<PageData>
+}
+
+export interface PageData {
+  name: string
+  html: string
+  selector: string
+}
