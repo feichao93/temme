@@ -70,7 +70,7 @@ export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
                         <div className="modify-hint">{page.isModified() && '未保存'}</div>
                       </div>
                       {!readonly && (
-                        <span className="actions" style={{ marginRight: 8 }}>
+                        <span className="actions">
                           <RenameIcon
                             onClick={() => dispatch(actions.requestUpdatePageMeta(pageId))}
                           />
