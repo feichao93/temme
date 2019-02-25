@@ -56,6 +56,13 @@ const webpackConfig = (env, argv) => {
           test: /\.styl$/,
           loaders: ['style-loader', 'css-loader', 'stylus-loader'],
         },
+        {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'file-loader',
+          options: {
+            name: prod ? '[hash].[ext]' : '[path][name].[ext]',
+          },
+        },
       ],
     },
 

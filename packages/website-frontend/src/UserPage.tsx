@@ -54,7 +54,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
       <div className="user-page">
         <Header />
         <main>
-          <img src="https://pic3.zhimg.com/daa3c5b52b93b069bf118b43244f1552_r.jpg" alt="404" />
+          <img src={require('../imgs/404.jpg')} alt="404" />
         </main>
       </div>
     )
