@@ -231,7 +231,9 @@ export default function UserPage({ match }: { match: match<Params> }) {
           const message = (
             <>
               <span>已导入 {project.name}</span>
-              <span style={{ whiteSpace: 'pre-wrap' }}>{warnings.map(w => `\n${w}`)}</span>
+              <span style={{ whiteSpace: 'pre-wrap' }}>
+                {'\n' + warnings.map(w => `\n${w}`).join('')}
+              </span>
             </>
           )
           toaster.show({ intent: 'primary', message })

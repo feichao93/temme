@@ -22,11 +22,18 @@ const archiveApp = new Koa()
         ctx.set('content-disposition', `attachment; filename="${projectName}.zip"`)
         ctx.body = archive
 
+        const meta = {
+          name: project.name,
+          description: project.description,
+          pages: [] as string[],
+        }
         for (const pageId of project.pageIds) {
           const page = await ctx.service.pages.findOne({ _id: pageId })
           archive.append(Buffer.from(page.html, 'utf8'), { name: page.name + '.html' })
           archive.append(Buffer.from(page.selector, 'utf8'), { name: page.name + '.temme' })
+          meta.pages.push(page.name)
         }
+        archive.append(Buffer.from(JSON.stringify(meta, null, 2), 'utf8'), { name: 'meta.json' })
         archive.finalize()
       })
       .routes(),

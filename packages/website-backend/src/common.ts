@@ -19,9 +19,10 @@ export function getProjectDataFromZip(uploadedFile: UploadedFile) {
     const warnings: string[] = []
     const data: CreateProjectData = {
       name: uploadedFile.name.replace(/\.zip$/, ''),
-      description: '', // TODO store description in a file inside the zip
+      description: '',
       pages: [],
     }
+    let meta: { name: string; description: string; pages: string[] } = null
 
     const pageDataByName = new Map<string, PageData>()
     const ensurePage = (pageName: string) => {
@@ -47,11 +48,32 @@ export function getProjectDataFromZip(uploadedFile: UploadedFile) {
           zip.readEntry()
         } else {
           // file entry
+          if (entry.fileName === 'meta.json') {
+            zip.openReadStream(entry, (err, readStream) => {
+              if (err) {
+                reject(err)
+                return
+              }
+
+              const chunks: string[] = []
+              readStream.setEncoding('utf8')
+              readStream.on('data', (chuck: string) => {
+                chunks.push(chuck)
+              })
+              readStream.on('end', () => {
+                const content = chunks.join('')
+                meta = JSON.parse(content) // TODO 需要验证 content 是否正确
+                zip.readEntry()
+              })
+            })
+            return
+          }
+
           const isHtmlFile = entry.fileName.endsWith('.html')
           const isTemmeFile = entry.fileName.endsWith('.temme')
           if (!isHtmlFile && !isTemmeFile) {
             shouldWarnInvalidFile = true
-            warnings.push(`Encounter an invalid file ${entry.fileName} in zip file.`)
+            warnings.push(`已跳过无法识别支持的文件 ${entry.fileName}`)
             zip.readEntry()
             return // skip this entry
           }
@@ -84,16 +106,40 @@ export function getProjectDataFromZip(uploadedFile: UploadedFile) {
         }
       })
 
-      zip.on('end', () => {
+      function truncateWarnings() {
         const maxWarningCount = 5
         if (warnings.length > maxWarningCount) {
           const extraWarningCount = warnings.length - maxWarningCount
           warnings.length = maxWarningCount
-          warnings.push(`and ${extraWarningCount} more ...`)
+          warnings.push(`以及 ${extraWarningCount} 条其他信息...`)
         }
         if (shouldWarnInvalidFile) {
-          warnings.push('\nNote that only html/temme files are valid, other files will be skipped.')
+          warnings.push(
+            '注意：压缩文件应仅包含 .html/.temme 数据文件以及 meta.json 文件。其他文件将被跳过。',
+          )
         }
+      }
+
+      zip.on('end', () => {
+        truncateWarnings()
+
+        if (meta == null) {
+          warnings.push(
+            '注意：压缩文件没有包含 meta.json 文件，工程的描述信息将被置为空，页面将按照字典序进行排序。',
+          )
+        } else {
+          data.name = meta.name
+          data.description = meta.description
+          data.pages = []
+          for (const pageName of meta.pages) {
+            if (!pageDataByName.has(pageName)) {
+              warnings.push(`压缩文件中缺少 ${pageName} 页面的数据。`)
+            } else {
+              data.pages.push(pageDataByName.get(pageName))
+            }
+          }
+        }
+
         resolve({ data, warnings })
       })
     })
