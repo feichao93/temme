@@ -21,9 +21,16 @@ $list-item {
       display flex
       margin 0
       padding-left 8px
-      font-size 20px
-      line-height 35px
+      height 35px
+      line-height @height
       background #2d2d2d
+
+      > span {
+        font-size 18px
+        white-space pre
+        overflow hidden
+        text-overflow ellipsis
+      }
     }
 
     .description {
@@ -90,13 +97,23 @@ $list-item {
       cursor pointer
       padding 2px 0
 
+      &:first-child {
+        margin-top 0
+      }
+
+      &:hover {
+        background #2a2e35
+        .actions {
+          display flex
+          padding-left 8px
+        }
+      }
+
       &.active {
         background #234a6d
         color white
       }
-      &:first-child {
-        margin-top 0
-      }
+
 
       .folder-icon, .folder-open-icon {
         flex-shrink 0
@@ -114,51 +131,14 @@ $list-item {
       }
 
       .actions {
-        visibility hidden
+        display none
         flex 0 0
         margin-right 8px
       }
-
-      &:hover .actions {
-        visibility visible
-      }
     }
   }
-
 
   .view-content > section {
     padding 0 8px
-  }
-
-  .section-title {
-    display flex
-    line-height 24px
-    text-transform uppercase
-  }
-
-  .simple-list {
-    list-style none
-    user-select none
-    padding 0
-    margin 0
-
-    > li {
-      @extends $list-item
-      display flex
-      align-items center
-      padding-left 16px
-
-      &.active {
-        background #1a496f
-      }
-
-      .actions {
-        visibility hidden
-      }
-
-      &:hover .actions {
-        visibility visible
-      }
-    }
   }
 }

@@ -1,10 +1,10 @@
 import { Map, Record } from 'immutable'
 import { PageRecord, ProjectRecord } from '../types'
 
-export type ReadyState = 'idle' | 'loading' | 'ready'
+export type ReadyState = 'idle' | 'loading' | 'ready' | 'aborted'
 
 export class State extends Record({
-  readyState: 'idle',
+  readyState: 'idle' as ReadyState,
   project: new ProjectRecord(),
   pages: Map<string, PageRecord>(),
   activePageId: '',

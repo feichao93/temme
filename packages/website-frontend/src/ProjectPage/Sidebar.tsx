@@ -1,3 +1,4 @@
+import { Spinner } from '@blueprintjs/core'
 import classNames from 'classnames'
 import React from 'react'
 import * as actions from './actions'
@@ -22,27 +23,40 @@ export interface SidebarProps {
 export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
   const { project, pages, activePageId } = state
 
-  // TODO 有更好的方法判断 project 是否加载完毕
-  const name = project._id ? project.name : 'loading...'
-  const description = project._id ? project.description : 'loading...'
+  function renderDescriptionContent() {
+    if (state.readyState === 'ready') {
+      if (project.description) {
+        return project.description
+      } else {
+        return <span style={{ color: '#777' }}>(暂无描述)</span>
+      }
+    } else {
+      return <Spinner size={30} />
+    }
+  }
 
   return (
     <div className="sidebar">
       <header>
         <h1 className="title">
-          <span>{name}</span>
+          <span>{project.name}</span>
           <div className="actions">
             <DownloadIcon size={16} onClick={() => dispatch(actions.requestDownloadProject())} />
           </div>
         </h1>
-        <p className="description">
-          {description || <span style={{ color: '#777' }}>(暂无描述)</span>}
-        </p>
+        <div className="description">{renderDescriptionContent()}</div>
       </header>
       <div className="view-container">
         <div className="view folders-view">
           <div className="view-title">
-            <h2 style={{ display: 'flex', alignItems: 'baseline' }}>
+            <h2
+              style={{
+                display: 'flex',
+                alignItems: 'baseline',
+                whiteSpace: 'pre',
+                overflow: 'hidden',
+              }}
+            >
               页面列表
               {pages.some(p => p.isModified()) && <div className="modify-hint">部分页面未保存</div>}
             </h2>

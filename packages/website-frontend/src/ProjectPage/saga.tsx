@@ -104,6 +104,7 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
   type Data = AsyncReturnType<typeof server.getProject>
   const { dialogs }: SagaEnv = yield io.getEnv()
   try {
+    yield io.update((s: State) => s.set('readyState', 'loading'))
     const data: Data = yield server.getProject(login, projectName)
 
     const { pages }: State = yield io.update((state: State) => {
@@ -115,6 +116,7 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
         .set('project', data.project)
         .set('pages', data.pages.toMap().mapKeys((_, p) => p._id))
         .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
+        .set('readyState', 'ready')
     })
 
     // 首次载入 project 时选中指定 page
@@ -124,6 +126,7 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
     }
   } catch (e) {
     console.error(e)
+    yield io.update((s: State) => s.set('readyState', 'aborted'))
     yield dialogs.alert({
       title: '加载失败',
       message: (

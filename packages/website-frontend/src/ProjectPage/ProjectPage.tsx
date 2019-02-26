@@ -42,7 +42,7 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
     initialState: new State(),
   })
 
-  const { readyState, project, pages, activePageId } = state
+  const { pages, activePageId } = state
   const activePage = pages.get(activePageId)
   const session = useSession()
   const readonly = session.username !== login

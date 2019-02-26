@@ -128,8 +128,8 @@ export function useDialogs() {
 
 function ConfirmDialogContent({ message, onConfirm, onCancel, confirmIntent }: DialogProps) {
   return (
-    <div className={Classes.DIALOG_BODY}>
-      {message}
+    <>
+      <div className={Classes.DIALOG_BODY}>{message}</div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button intent={confirmIntent} onClick={onConfirm}>
@@ -138,7 +138,7 @@ function ConfirmDialogContent({ message, onConfirm, onCancel, confirmIntent }: D
           <Button onClick={onCancel}>取消</Button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -152,24 +152,26 @@ function PromptDialogContent({ message, onSubmit, confirmIntent, initValue }: Di
   }, [])
 
   return (
-    <div className={Classes.DIALOG_BODY}>
-      <FormGroup label={message}>
-        <InputGroup inputRef={inputRef} {...promptInput.props} />
-      </FormGroup>
+    <>
+      <div className={Classes.DIALOG_BODY}>
+        <FormGroup label={message}>
+          <InputGroup inputRef={inputRef} {...promptInput.props} />
+        </FormGroup>
+      </div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button intent={confirmIntent} onClick={() => onSubmit(promptInput.value)} text="确认" />
           <Button onClick={() => onSubmit(null)}>取消</Button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 
 function AlertDialogContent({ message, confirmIntent, onConfirm }: DialogProps) {
   return (
-    <div className={Classes.DIALOG_BODY}>
-      {message}
+    <>
+      <div className={Classes.DIALOG_BODY}>{message}</div>
       <div className={Classes.DIALOG_FOOTER}>
         <div className={Classes.DIALOG_FOOTER_ACTIONS}>
           <Button intent={confirmIntent} onClick={onConfirm}>
@@ -177,6 +179,6 @@ function AlertDialogContent({ message, confirmIntent, onConfirm }: DialogProps) 
           </Button>
         </div>
       </div>
-    </div>
+    </>
   )
 }
