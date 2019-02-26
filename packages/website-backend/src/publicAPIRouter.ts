@@ -1,4 +1,5 @@
 import Router from 'koa-router'
+import { Page } from './interfaces'
 
 // 查看当前登陆用户的信息
 async function getMyInfo(ctx: Router.IRouterContext) {
@@ -47,7 +48,11 @@ async function getProject(ctx: Router.IRouterContext) {
   ctx.assert(project, 404)
 
   const pages = await ctx.service.pages.find({ _id: { $in: project.pageIds } }).toArray()
-  ctx.body = { project, pages }
+  const pageById = new Map(pages.map(p => [p._id, p] as [string, Page]))
+  ctx.body = {
+    project,
+    pages: project.pageIds.map(pageId => pageById.get(pageId)),
+  }
 }
 
 export default new Router()

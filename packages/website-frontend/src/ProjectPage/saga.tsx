@@ -114,7 +114,7 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
         .max()
       return state
         .set('project', data.project)
-        .set('pages', data.pages.toMap().mapKeys((_, p) => p._id))
+        .set('pages', data.pages.toOrderedMap().mapKeys((_, p) => p._id))
         .set('nextPagePostfix', (maxPagePostfix || 0) + 1)
         .set('readyState', 'ready')
     })
@@ -177,16 +177,7 @@ function* openPage(pageId: string) {
   selectorEditorRef.current.setModel(selectorModel)
   selectorEditorRef.current.focus()
 
-  yield io.update(
-    updaters.updatePage,
-    page._id,
-    page.merge({
-      htmlAvid,
-      htmlInitAvid: htmlAvid,
-      selectorAvid,
-      selectorInitAvid: selectorAvid,
-    }),
-  )
+  yield io.update(updaters.updatePage, page._id, page.merge({ htmlAvid, selectorAvid }))
   yield io.update((state: State) => state.set('activePageId', pageId))
 }
 

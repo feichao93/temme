@@ -28,10 +28,12 @@ const PageRecordBase = Record({
   selector: '',
   createdAt: '',
   updatedAt: '',
-  htmlAvid: 0,
-  htmlInitAvid: 0,
-  selectorAvid: 0,
-  selectorInitAvid: 0,
+  // 第一次打开一个 model 的时候 avid (alternativeVersionId) 默认为 1
+  // 我们在这里将下面这些字段的默认值设置为 1，这样在首次打开 model 时就不需要更新这些字段了
+  htmlAvid: 1,
+  htmlInitAvid: 1,
+  selectorAvid: 1,
+  selectorInitAvid: 1,
 })
 export class PageRecord extends PageRecordBase {
   isModified() {

@@ -69,7 +69,6 @@ export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
           <div className="view-content">
             <ul className="folder-list">
               {pages
-                .sortBy(page => page._id)
                 .map(page => {
                   const { _id: pageId, name } = page
                   return (
