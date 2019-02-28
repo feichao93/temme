@@ -8,18 +8,26 @@ import { FileIcon } from '../icons'
 import toaster from '../toaster'
 import { useBodyOverflowHidden, useDidMount, useWillUnmount } from '../utils/common'
 import debounce from '../utils/debounce'
+import history from '../utils/history'
 import { useSession } from '../utils/session'
 import * as actions from './actions'
 import './configureTemmeLanguage'
 import EditorWrapper from './EditorWrapper'
 import { FileTypeHtmlIcon, FileTypeJsonIcon } from './icons'
-import history from '../utils/history'
 import { State } from './interfaces'
 import PageLayout from './PageLayout'
 import './ProjectPage.styl'
 import saga from './saga'
 import Sidebar from './Sidebar'
-import { CodeEditor, CTRL_S, disposeAllEditorModels, INIT_EDITOR_OPTIONS } from './utils'
+import {
+  addTemmeError,
+  clearModelMarkers,
+  CodeEditor,
+  CTRL_S,
+  disposeAllEditorModels,
+  INIT_EDITOR_OPTIONS,
+  setModelMarkersByError,
+} from './utils'
 
 export interface ProjectPageProps {
   login: string
@@ -62,19 +70,25 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
     const outputEditor = outputEditorRef.current
 
     function compute() {
-      try {
-        const html = htmlEditor.getValue()
-        const selector = selectorEditor.getValue()
+      const htmlModel = htmlEditor.getModel()
+      const selectorModel = selectorEditor.getModel()
+      if (htmlModel == null || selectorModel == null) {
+        return
+      }
+      const html = htmlModel.getValue()
+      const selector = selectorModel.getValue()
 
-        // TODO should use try-catch to catch parse/execution exceptions
+      try {
         const result = temme(html, selector)
         const oldValue = outputEditor.getValue()
         const newValue = JSON.stringify(result, null, 2)
+        clearModelMarkers(selectorModel)
         if (oldValue !== newValue) {
           outputEditor.setValue(newValue)
         }
       } catch (e) {
-        console.error(e)
+        setModelMarkersByError(selectorModel, e)
+        addTemmeError(e)
       }
     }
 
@@ -148,7 +162,7 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   // 在退出页面时，销毁所有的 model
   useWillUnmount(disposeAllEditorModels)
 
-  /** 让各个编辑器重新根据父元素的大小进行布局 */
+  // 让各个编辑器重新根据父元素的大小进行布局
   function layout() {
     // 用户可能在各个编辑器尚未加载时 调整了浏览器窗口大小
     htmlEditorRef.current && htmlEditorRef.current.layout()
