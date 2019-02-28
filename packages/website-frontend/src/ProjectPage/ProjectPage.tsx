@@ -1,6 +1,6 @@
 import useSaga from '@little-saga/use-saga'
 import classNames from 'classnames'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import temme from 'temme'
 import { useDialogs } from '../dialogs'
@@ -42,6 +42,8 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   const selectorEditorRef = useRef<CodeEditor>(null)
   const outputEditorRef = useRef<CodeEditor>(null)
 
+  const [execInfo, setExecInfo] = useState('')
+
   const customEnv = { htmlEditorRef, selectorEditorRef, outputEditorRef, dialogs }
   const [state, dispatch] = useSaga<State, actions.Action>({
     customEnv,
@@ -77,6 +79,7 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
       }
       const html = htmlModel.getValue()
       const selector = selectorModel.getValue()
+      const startTime = performance.now()
 
       try {
         const result = temme(html, selector)
@@ -86,9 +89,12 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
         if (oldValue !== newValue) {
           outputEditor.setValue(newValue)
         }
+        const endTime = performance.now()
+        setExecInfo((endTime - startTime).toFixed(1) + 'ms')
       } catch (e) {
         setModelMarkersByError(selectorModel, e)
         addTemmeError(e)
+        setExecInfo('')
       }
     }
 
@@ -218,6 +224,7 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
                 <span className="tabname">output</span>
                 <span style={{ width: 16 }} />
               </div>
+              <span className="exec-info">{execInfo}</span>
             </div>
             <EditorWrapper editorRef={outputEditorRef} options={INIT_EDITOR_OPTIONS.output} />
           </>
