@@ -1,11 +1,14 @@
 {
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "name": "temme",
   "description": "Temme monorepo",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
   "scripts": {
-    "postinstall": "lerna bootstrap",
+    "postinstall": "lerna run --scope temme build && lerna run --scope vscode-temme postinstall",
     "test": "lerna run --parallel test",
     "build": "lerna run --parallel build",
     "start:website": "npm run --prefix=packages/website start",
