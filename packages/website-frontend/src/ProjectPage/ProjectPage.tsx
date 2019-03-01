@@ -42,7 +42,7 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   const selectorEditorRef = useRef<CodeEditor>(null)
   const outputEditorRef = useRef<CodeEditor>(null)
 
-  const [execInfo, setExecInfo] = useState('')
+  const [execInfo, setExecInfo] = useState({ isErr: false, message: '' })
 
   const customEnv = { htmlEditorRef, selectorEditorRef, outputEditorRef, dialogs }
   const [state, dispatch] = useSaga<State, actions.Action>({
@@ -90,11 +90,11 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
           outputEditor.setValue(newValue)
         }
         const endTime = performance.now()
-        setExecInfo((endTime - startTime).toFixed(1) + 'ms')
+        setExecInfo({ isErr: false, message: (endTime - startTime).toFixed(1) + 'ms' })
       } catch (e) {
         setModelMarkersByError(selectorModel, e)
         addTemmeError(e)
-        setExecInfo('')
+        setExecInfo({ isErr: true, message: e.message })
       }
     }
 
@@ -224,7 +224,9 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
                 <span className="tabname">output</span>
                 <span style={{ width: 16 }} />
               </div>
-              <span className="exec-info">{execInfo}</span>
+              <span className={classNames('exec-info', { error: execInfo.isErr })}>
+                {execInfo.message}
+              </span>
             </div>
             <EditorWrapper editorRef={outputEditorRef} options={INIT_EDITOR_OPTIONS.output} />
           </>

@@ -93,7 +93,14 @@
 
   .exec-info {
     align-self center
-    margin-left 16px
+    margin 0 16px
     color #56d272
+    white-space nowrap
+    overflow hidden
+    text-overflow ellipsis
+
+    &.error {
+      color #d0393d
+    }
   }
 }
