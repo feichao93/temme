@@ -49,40 +49,47 @@ export function NavPartContent() {
 
 export function UserPartContent() {
   const session = useSession()
+  const { loggingIn, connected, userId } = session
+
+  if (!connected) {
+    return null
+  }
+  if (loggingIn) {
+    return <Button minimal loading style={{ width: 120 }} />
+  }
+  if (userId === -1) {
+    return (
+      <Button
+        minimal
+        icon="log-in"
+        intent="primary"
+        text="使用 GitHub 登录"
+        onClick={session.login}
+      />
+    )
+  }
+
   return (
-    <>
-      {session.connected && session.userId === -1 && (
-        <Button
-          minimal
-          icon="log-in"
-          intent="primary"
-          text="使用 GitHub 登录"
-          onClick={session.login}
-        />
-      )}
-      {session.connected && session.userId != -1 && (
-        <Popover
-          content={
-            <Menu>
-              <Menu.Item
-                icon="cube"
-                text="个人页面"
-                onClick={(e: React.MouseEvent) => {
-                  e.preventDefault()
-                  history.push(`/@${session.username}`)
-                }}
-                href={`/@${session.username}`}
-              />
-              <Menu.Item icon="log-out" text="登出" onClick={session.logout} />
-            </Menu>
-          }
-          position="bottom-right"
-          minimal
-        >
-          <Button minimal icon="user" text={session.username} rightIcon="caret-down" />
-        </Popover>
-      )}
-    </>
+    <Popover
+      content={
+        <Menu>
+          <Menu.Item
+            icon="cube"
+            text="个人页面"
+            onClick={(e: React.MouseEvent) => {
+              e.preventDefault()
+              history.push(`/@${session.username}`)
+            }}
+            href={`/@${session.username}`}
+          />
+          <Menu.Item icon="log-out" text="登出" onClick={session.logout} />
+        </Menu>
+      }
+      position="bottom-right"
+      minimal
+    >
+      <Button minimal icon="user" text={session.username} rightIcon="caret-down" />
+    </Popover>
   )
 }
 

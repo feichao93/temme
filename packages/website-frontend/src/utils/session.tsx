@@ -1,33 +1,38 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useDialogs } from '../dialogs'
 import toaster from '../toaster'
 import * as server from './server'
 
-interface SessionContext {
+interface SessionState {
+  /** 当前登录用户的用户名；未登录状态下该字段为 `null` */
   username: string
+  /** 当前登录用户的 id；未登录状态下该字段为 `-1` */
   userId: number
+  /** 是否获取到 getMyInfo 接口返回的信息 */
   connected: boolean
+  /** 是否正在进行登录 */
+  loggingIn: boolean
+}
+
+type SessionContextType = SessionState & {
   login: () => void
   logout: () => void
 }
-interface Session {
-  username: string
-  userId: number
-  connected: boolean
-}
-const defaultSession: Session = {
+
+const defaultSession: SessionState = {
   username: null,
   userId: -1,
   connected: false,
+  loggingIn: false,
 }
-const SessionContext = createContext(null as SessionContext)
+const SessionContext = createContext(null as SessionContextType)
 
 export function SessionProvider({ children }: { children: JSX.Element }) {
   const [sessionState, setSessionState] = useState(defaultSession)
-  const dialogs = useDialogs()
 
   function login() {
+    setSessionState({ ...sessionState, loggingIn: true })
     window.open(`/oauth-request`, '_blank', 'width=965,height=560,top=250,left=150')
+    // TODO 设置超时时间
   }
 
   function logout() {
@@ -41,36 +46,37 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     })
   }
 
-  async function fetchLoginInfo() {
-    try {
-      const { username, userId } = await server.getMyInfo()
-      setSessionState({ ...sessionState, username, userId, connected: true })
-    } catch (e) {
-      console.error(e)
-      dialogs.alert({
-        title: '请求失败',
-        message: '获取当前登录信息失败，请刷新后重试。',
-      })
-    }
-  }
-
   useEffect(() => {
-    fetchLoginInfo()
+    server
+      .getMyInfo()
+      .then(({ username, userId }) =>
+        setSessionState({ ...sessionState, username, userId, connected: true }),
+      )
+      .catch(e => {
+        console.error(e)
+        toaster.show({
+          icon: 'error',
+          intent: 'danger',
+          message: '获取当前登录信息失败，请刷新后重试。',
+        })
+      })
   }, [])
 
   useEffect(() => {
-    function onReceiveMessage(event: MessageEvent) {
-      if (event.data.userId && event.data.username) {
-        const { username, userId }: Session = event.data
-        setSessionState(state => ({ ...state, username, userId }))
+    if (sessionState.loggingIn) {
+      function onReceiveMessage(event: MessageEvent) {
+        if (event.data && event.data.userId && event.data.username) {
+          const { username, userId } = event.data
+          setSessionState(state => ({ ...state, username, userId, loggingIn: false }))
+        }
+      }
+
+      window.addEventListener('message', onReceiveMessage, false)
+      return () => {
+        window.removeEventListener('message', onReceiveMessage)
       }
     }
-
-    window.addEventListener('message', onReceiveMessage, false)
-    return () => {
-      window.removeEventListener('message', onReceiveMessage)
-    }
-  }, [])
+  }, [sessionState.loggingIn])
 
   return (
     <SessionContext.Provider value={{ ...sessionState, login, logout }}>
