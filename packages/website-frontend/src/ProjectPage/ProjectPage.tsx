@@ -4,9 +4,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import temme from 'temme'
 import { useDialogs } from '../dialogs'
+import { UserPartContent } from '../Header'
 import { FileIcon } from '../icons'
 import toaster from '../toaster'
-import { useBodyOverflowHidden, useDidMount, useWillUnmount } from '../utils/common'
+import { useBodyOverflowHidden, useWillUnmount } from '../utils/common'
 import debounce from '../utils/debounce'
 import history from '../utils/history'
 import { useSession } from '../utils/session'
@@ -29,13 +30,29 @@ import {
   setModelMarkersByError,
 } from './utils'
 
+enum AccessMode {
+  readWrite = 'readWrite',
+  readOnly = 'readOnly',
+  needLogin = 'needLogin',
+}
+
+function getAccessMode(username: string, projectOwner: string) {
+  if (username == null) {
+    return AccessMode.needLogin
+  } else if (username === projectOwner) {
+    return AccessMode.readWrite
+  } else {
+    return AccessMode.readOnly
+  }
+}
+
 export interface ProjectPageProps {
-  login: string
+  projectOwner: string
   projectName: string
   initPageName?: string
 }
 
-export default function ProjectPage({ login, projectName, initPageName }: ProjectPageProps) {
+export default function ProjectPage({ projectOwner, projectName, initPageName }: ProjectPageProps) {
   const dialogs = useDialogs()
 
   const htmlEditorRef = useRef<CodeEditor>(null)
@@ -48,14 +65,14 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   const [state, dispatch] = useSaga<State, actions.Action>({
     customEnv,
     saga,
-    args: [login, projectName, initPageName],
+    args: [projectOwner, projectName, initPageName],
     initialState: new State(),
   })
 
   const { pages, activePageId } = state
   const activePage = pages.get(activePageId)
   const session = useSession()
-  const readonly = session.username !== login
+  const accessMode = getAccessMode(session.username, projectOwner)
 
   function wrap<ARGS extends any[]>(actionCreator: (...args: ARGS) => actions.Action) {
     return (...args: ARGS) => dispatch(actionCreator(...args))
@@ -139,22 +156,39 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   }, [activePageId])
 
   // 给编辑器绑定 ctrl+S 快捷键
-  useDidMount(() => {
-    const warnReadonly = () =>
-      toaster.show({
-        icon: 'info-sign',
-        intent: 'primary',
-        message: '无法保存对只读项目的修改。',
-        action: {
-          onClick: wrap(actions.requestImportProject),
-          text: '导入该项目',
-        },
-      })
-    const handler = readonly ? warnReadonly : wrap(actions.requestSaveCurrentPage)
+  useEffect(() => {
+    let handler
+    if (accessMode === AccessMode.readWrite) {
+      handler = wrap(actions.requestSaveCurrentPage)
+    } else if (accessMode === AccessMode.readOnly) {
+      handler = () =>
+        toaster.show({
+          icon: 'info-sign',
+          intent: 'primary',
+          message: '无法保存对只读项目的修改。',
+          action: {
+            onClick: wrap(actions.requestImportProject),
+            text: '导入该项目',
+          },
+        })
+    } else {
+      handler = () => {
+        toaster.show({
+          icon: 'info-sign',
+          intent: 'primary',
+          message: '请先登录。',
+          action: {
+            onClick: session.login,
+            text: '登录',
+          },
+        })
+      }
+    }
+
     htmlEditorRef.current.addCommand(CTRL_S, handler, '')
     selectorEditorRef.current.addCommand(CTRL_S, handler, '')
     // monaco editor 不提供 removeCommand 方法，故这里不需要（也没办法）返回一个清理函数
-  })
+  }, [accessMode])
 
   // 当 activePage.name 发生变化时，同步更新地址栏
   useEffect(() => {
@@ -179,17 +213,28 @@ export default function ProjectPage({ login, projectName, initPageName }: Projec
   return (
     <div className="project-page">
       <nav>
-        <h1>
-          <Link to="/">T</Link>
-        </h1>
-        <Link style={{ color: 'white' }} to={`/@${login}`}>
-          @{login}
-        </Link>
-        <span>&nbsp;/&nbsp;{projectName}</span>
+        <div className="nav-group">
+          <h1 className="logo">
+            <Link to="/">T</Link>
+          </h1>
+          <Link className="username" to={`/@${projectOwner}`}>
+            @{projectOwner}
+          </Link>
+          <span>&nbsp;/&nbsp;{projectName}</span>
+        </div>
+        <div className="nav-group align-right bp3-dark">
+          <UserPartContent />
+        </div>
       </nav>
       <PageLayout
         layout={layout}
-        sidebar={<Sidebar state={state} dispatch={dispatch} readonly={readonly} />}
+        sidebar={
+          <Sidebar
+            state={state}
+            dispatch={dispatch}
+            readonly={accessMode !== AccessMode.readWrite}
+          />
+        }
         left={
           <>
             {activePage != null && (

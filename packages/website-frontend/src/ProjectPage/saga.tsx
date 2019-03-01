@@ -64,6 +64,11 @@ export default function* saga(login: string, projectName: string, initPageName?:
   yield takeEvery(a('request-save-current-page'), function*() {
     const state: State = yield io.select()
     yield savePage(state.activePageId)
+    toaster.show({
+      intent: 'success',
+      icon: 'saved',
+      message: '保存成功',
+    })
   })
 }
 
@@ -294,12 +299,9 @@ function* handleRequestImportProject() {
     const html = htmlModel != null ? htmlModel.getValue() : page.html
     const selectorModel = monaco.editor.getModel(getSelectorUriObject(page))
     const selector = selectorModel != null ? selectorModel.getValue() : page.selector
-    data.pages.push({
-      name: page.name,
-      html,
-      selector,
-    })
+    data.pages.push({ name: page.name, html, selector })
   }
+  const activePage = state.pages.get(state.activePageId)
 
   try {
     const { login, projectName } = yield server.createProject(data)
@@ -308,7 +310,7 @@ function* handleRequestImportProject() {
       message: `已创建 @${login}/${projectName}`,
       action: {
         onClick() {
-          history.push(`/@${login}/${projectName}`)
+          history.push(`/@${login}/${projectName}?page=${activePage.name}`)
         },
         text: '打开',
       },

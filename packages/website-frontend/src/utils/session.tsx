@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useDialogs } from '../dialogs'
 import toaster from '../toaster'
-import { useDidMount } from './common'
 import * as server from './server'
 
 interface SessionContext {
@@ -38,7 +37,7 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
       username: null,
     })
     server.logout().then(() => {
-      toaster.show({ message: '已登出' })
+      toaster.show({ icon: 'log-out', message: '已登出' })
     })
   }
 
@@ -55,11 +54,11 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     }
   }
 
-  useDidMount(() => {
+  useEffect(() => {
     fetchLoginInfo()
-  })
+  }, [])
 
-  useDidMount(() => {
+  useEffect(() => {
     function onReceiveMessage(event: MessageEvent) {
       if (event.data.userId && event.data.username) {
         const { username, userId }: Session = event.data
@@ -71,7 +70,7 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     return () => {
       window.removeEventListener('message', onReceiveMessage)
     }
-  })
+  }, [])
 
   return (
     <SessionContext.Provider value={{ ...sessionState, login, logout }}>

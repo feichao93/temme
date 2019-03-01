@@ -22,12 +22,12 @@ export default function App() {
     <Switch>
       <Route path="/login-success" component={LoginSuccessPage} />
       <Route
-        path="/@:login/:projectName"
+        path="/@:projectOwner/:projectName"
         render={({ match: { params, url }, location }) => (
           <React.Suspense fallback={<LoadingEditor />}>
             <ProjectPage
               key={url}
-              login={params.login}
+              projectOwner={params.projectOwner}
               projectName={params.projectName}
               initPageName={new URLSearchParams(location.search).get('page')}
             />

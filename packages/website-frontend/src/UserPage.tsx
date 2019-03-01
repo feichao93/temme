@@ -219,7 +219,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
     input.onchange = () => {
       const file = input.files[0]
       if (file.type !== 'application/x-zip-compressed') {
-        toaster.show({ intent: 'warning', message: '请上传 .zip 文件' })
+        toaster.show({ icon: 'error', intent: 'warning', message: '请上传 .zip 文件' })
         return
       }
       const zipFile = input.files[0]
@@ -267,7 +267,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
         p._id === dialogState.projectId ? { ...p, name, description } : p,
       )
       setProjectList(nextProjectList)
-      toaster.show({ message: `修改成功` })
+      toaster.show({ intent: 'success', message: '已修改' })
     } catch (e) {
       console.error(e)
       toaster.show({ intent: 'danger', message: '修改失败' })

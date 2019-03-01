@@ -10,22 +10,34 @@
 
   > nav {
     display flex
-    align-items center
     flex 0 0 40px
     color #cccccc
     background #3c3c3c
 
-    > a:hover {
-      text-decoration underline
-    }
+    .nav-group {
+      display flex
+      align-items center
 
-    > h1 {
-      margin 0
-      font-size 32px
+      &.align-right {
+        margin-left auto
+        margin-right 16px
+      }
 
-      > a {
-        padding 0 16px
-        color #ccc
+      > a.username {
+        color white
+        &:hover {
+          text-decoration underline
+        }
+      }
+
+      .logo {
+        margin 0
+        font-size 32px
+
+        > a {
+          padding 0 16px
+          color #ccc
+        }
       }
     }
   }

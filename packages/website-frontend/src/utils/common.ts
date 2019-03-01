@@ -1,5 +1,5 @@
 import { identity } from 'little-saga'
-import React, { EffectCallback, useCallback, useEffect, useLayoutEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 
 export default function useInput(initValue: string, normalize = identity) {
   const [value, setValue] = useState(initValue)
@@ -15,10 +15,6 @@ export default function useInput(initValue: string, normalize = identity) {
     setValue,
     props: { value, onChange },
   }
-}
-
-export function useDidMount(effect: EffectCallback) {
-  return useEffect(effect, [])
 }
 
 export function useWillUnmount(teardownLogic: () => void) {
