@@ -31,8 +31,12 @@ export function NewProjectDialog({ isOpen, onClose, onRequestAddProject }: NewPr
         <FormGroup label="项目名称" labelFor="project-name-input" labelInfo="(必填项)">
           <InputGroup id="project-name-input" {...nameInput.props} />
         </FormGroup>
-        <FormGroup label="项目描述" labelFor="project-description-input">
-          <TextArea fill {...descInput.props} />
+        <FormGroup
+          label="项目描述"
+          labelInfo="(markdown 已启用)"
+          labelFor="project-description-input"
+        >
+          <TextArea style={{ resize: 'none', height: 150 }} fill {...descInput.props} />
         </FormGroup>
       </div>
       <div className={Classes.DIALOG_FOOTER}>
@@ -87,8 +91,12 @@ export function EditProjectDialog({
         <FormGroup label="项目名称" labelFor="project-name-input" labelInfo="(必填项)">
           <InputGroup id="project-name-input" {...nameInput.props} />
         </FormGroup>
-        <FormGroup label="项目描述" labelFor="project-description-input">
-          <TextArea fill {...descInput.props} />
+        <FormGroup
+          label="项目描述"
+          labelInfo="(markdown 已启用)"
+          labelFor="project-description-input"
+        >
+          <TextArea fill style={{ resize: 'none', height: 150 }} {...descInput.props} />
         </FormGroup>
       </div>
       <div className={Classes.DIALOG_FOOTER}>

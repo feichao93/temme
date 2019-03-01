@@ -1,6 +1,7 @@
 import { Spinner } from '@blueprintjs/core'
 import classNames from 'classnames'
 import React from 'react'
+import ReactMarkdown from 'react-markdown'
 import * as actions from './actions'
 import { Action } from './actions'
 import {
@@ -26,7 +27,7 @@ export default function Sidebar({ state, dispatch, readonly }: SidebarProps) {
   function renderDescriptionContent() {
     if (state.readyState === 'ready') {
       if (project.description) {
-        return project.description
+        return <ReactMarkdown source={project.description} />
       } else {
         return <span style={{ color: '#777' }}>(暂无描述)</span>
       }

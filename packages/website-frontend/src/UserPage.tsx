@@ -1,5 +1,6 @@
 import { Button, ButtonGroup, Tooltip } from '@blueprintjs/core'
 import React, { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { Link, match } from 'react-router-dom'
 import { useDialogs } from './dialogs'
 import Header from './Header'
@@ -89,14 +90,18 @@ export default function UserPage({ match }: { match: match<Params> }) {
           <div className="fullname">{userInfo.name}</div>
           <div className="username mb16">{login}</div>
           <div className="bio mb16">{userInfo.bio}</div>
-          <div className="location">
-            <LocationIcon />
-            {userInfo.location}
-          </div>
-          <a className="email" href={`mailto:${userInfo.email}`}>
-            <EmailIcon />
-            {userInfo.email}
-          </a>
+          {userInfo.location && (
+            <div className="location">
+              <LocationIcon />
+              {userInfo.location}
+            </div>
+          )}
+          {userInfo.email && (
+            <a className="email" href={`mailto:${userInfo.email}`}>
+              <EmailIcon />
+              {userInfo.email}
+            </a>
+          )}
           <div className="divider" />
           <a href={userInfo.html_url} target="_blank">
             <GithubIcon size={30} />
@@ -129,7 +134,9 @@ export default function UserPage({ match }: { match: match<Params> }) {
                   <Link className="project-name" to={`/@${login}/${project.name}`}>
                     {project.name}
                   </Link>
-                  <div className="project-description">{project.description}</div>
+                  <div className="project-description">
+                    <ReactMarkdown source={project.description} />
+                  </div>
                   <div className="project-update">{fromNow(project.updatedAt)}前更新</div>
                   {username === login && (
                     <div className="manage-project">
