@@ -70,10 +70,12 @@ export async function logout() {
 }
 
 export async function getMyInfo() {
+  type ResponseJson = { login: string; userId: number; isAdmin: boolean }
+
   const response = await fetch('/api/my-info')
   if (response.ok) {
-    const { login: username, userId }: { login: string; userId: number } = await response.json()
-    return { username, userId }
+    const { login: username, userId, isAdmin }: ResponseJson = await response.json()
+    return { username, userId, isAdmin }
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }

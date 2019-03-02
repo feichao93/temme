@@ -2,6 +2,7 @@ import { Spinner } from '@blueprintjs/core'
 import React from 'react'
 import { Route, Switch } from 'react-router'
 import './App.styl'
+import AdminPage from "./AdminPage";
 import LoginSuccessPage from './LoginSuccessPage'
 import MainPage from './MainPage'
 import UserPage from './UserPage'
@@ -21,6 +22,7 @@ export default function App() {
   return (
     <Switch>
       <Route path="/login-success" component={LoginSuccessPage} />
+      <Route path="/admin" component={AdminPage} />
       <Route
         path="/@:projectOwner/:projectName"
         render={({ match: { params, url }, location }) => (

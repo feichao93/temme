@@ -11,6 +11,8 @@ interface SessionState {
   connected: boolean
   /** 是否正在进行登录 */
   loggingIn: boolean
+  /** 当前用户是否为管理员 */
+  isAdmin: boolean
 }
 
 type SessionContextType = SessionState & {
@@ -23,6 +25,7 @@ const defaultSession: SessionState = {
   userId: -1,
   connected: false,
   loggingIn: false,
+  isAdmin: false,
 }
 const SessionContext = createContext(null as SessionContextType)
 
@@ -49,9 +52,7 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
   useEffect(() => {
     server
       .getMyInfo()
-      .then(({ username, userId }) =>
-        setSessionState({ ...sessionState, username, userId, connected: true }),
-      )
+      .then(myInfo => setSessionState({ ...sessionState, ...myInfo, connected: true }))
       .catch(e => {
         console.error(e)
         toaster.show({
@@ -66,8 +67,7 @@ export function SessionProvider({ children }: { children: JSX.Element }) {
     if (sessionState.loggingIn) {
       function onReceiveMessage(event: MessageEvent) {
         if (event.data && event.data.userId && event.data.username) {
-          const { username, userId } = event.data
-          setSessionState(state => ({ ...state, username, userId, loggingIn: false }))
+          setSessionState(state => ({ ...state, ...event.data, loggingIn: false }))
         }
       }
 

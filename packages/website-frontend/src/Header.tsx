@@ -82,6 +82,17 @@ export function UserPartContent() {
             }}
             href={`/@${session.username}`}
           />
+          {session.isAdmin && (
+            <Menu.Item
+              icon="helper-management"
+              text="管理员页面"
+              onClick={(e: React.MouseEvent) => {
+                e.preventDefault()
+                history.push('/admin')
+              }}
+              href="/admin"
+            />
+          )}
           <Menu.Item icon="log-out" text="登出" onClick={session.logout} />
         </Menu>
       }

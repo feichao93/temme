@@ -1,4 +1,5 @@
 import Router from 'koa-router'
+import CONFIG from './config'
 import { Page } from './interfaces'
 
 // 查看当前登陆用户的信息
@@ -6,12 +7,14 @@ async function getMyInfo(ctx: Router.IRouterContext) {
   const userId = ctx.session.userId
   if (userId) {
     const user = await ctx.service.users.findOne({ userId })
+    const login = user.userInfo.login
     ctx.body = {
+      login,
       userId: user.userId,
-      login: user.userInfo.login,
+      isAdmin: login === CONFIG.admin,
     }
   } else {
-    ctx.body = { userId: -1, login: null }
+    ctx.body = { userId: -1, login: null, isAdmin: false }
   }
 }
 

@@ -45,7 +45,9 @@ async function oauthCallbackHandler(ctx: Context) {
     const userInfo = await fetchUserInfo(access_token)
     await ctx.service.updateUserProfile(userInfo.id, access_token, userInfo)
     ctx.session.userId = userInfo.id
-    ctx.redirect(`/login-success?user_id=${userInfo.id}&username=${userInfo.login}`)
+
+    const adminPart = userInfo.login === CONFIG.admin ? '&isAdmin' : ''
+    ctx.redirect(`/login-success?userId=${userInfo.id}&username=${userInfo.login}${adminPart}`)
   } catch (e) {
     ctx.throw(400, e.message)
   }
