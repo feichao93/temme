@@ -9,6 +9,7 @@ import Router from 'koa-router'
 import session from 'koa-session'
 import serve from 'koa-static'
 import { MongoClient } from 'mongodb'
+import adminAPIRouter from "./adminAPIRouter";
 import archiveApp from './archiveApp'
 import CONFIG from './config'
 import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
@@ -89,6 +90,7 @@ function makeApp(service: Service) {
         new Koa()
           .use(publicAPIRouter.routes())
           .use(privateAPIRouter.routes())
+          .use(adminAPIRouter.routes())
           .use(ctx => ctx.throw(404)),
       ),
     )

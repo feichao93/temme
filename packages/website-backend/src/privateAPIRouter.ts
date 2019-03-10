@@ -4,7 +4,7 @@ import { getProjectDataFromZip, randomString, remove } from './common'
 import { CreateProjectData, Page, Project } from './interfaces'
 
 function requireSignedIn(ctx: Router.IRouterContext, next: any) {
-  const userId = ctx.session.userId
+  const userId: number = ctx.session.userId
   ctx.assert(userId && userId !== -1, 401, 'Require signed in')
   return next()
 }
