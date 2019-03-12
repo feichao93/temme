@@ -1,6 +1,10 @@
 import { Collection, Db } from 'mongodb'
 import uuid from 'uuid/v1'
-import { CreateProjectData, Page, Project, UserInfo, UserProfile } from './interfaces'
+import { AdminConfig, CreateProjectData, Page, Project, UserInfo, UserProfile } from './interfaces'
+
+const DEFAULT_ADMIN_CONFIG: AdminConfig = {
+  recommendedProjects: [],
+}
 
 export default class Service {
   users: Collection<UserProfile>
@@ -13,15 +17,23 @@ export default class Service {
     this.pages = this.db.collection('pages')
   }
 
+  async getAdminConfig(): Promise<AdminConfig> {
+    return (await this.db.collection('config').findOne({})) || DEFAULT_ADMIN_CONFIG
+  }
+
+  async setAdminConfig(config: AdminConfig) {
+    return this.db.collection('config').updateOne({}, { $set: config })
+  }
+
   updateUserProfile(userId: number, access_token: string, userInfo: UserInfo) {
     return this.users.updateOne(
       { userId },
-      { $set: { userId, login: userInfo.login, access_token, userInfo } },
+      { $set: { userId, username: userInfo.login, access_token, userInfo } },
       { upsert: true },
     )
   }
 
-  async createProject(userId: number, data: CreateProjectData) {
+  async createProject(username: string, data: CreateProjectData) {
     const now = new Date().toISOString()
     const projectId = uuid()
     const pageIds: string[] = []
@@ -41,7 +53,7 @@ export default class Service {
 
     const project: Project = {
       _id: projectId,
-      userId,
+      username,
       name: data.name,
       description: data.description,
       updatedAt: now,

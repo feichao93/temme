@@ -5,14 +5,14 @@ import Router from 'koa-router'
 const archiveApp = new Koa()
   .use(
     new Router()
-      .get('/@:login/:rawProjectName', async ctx => {
-        const { login, rawProjectName } = ctx.params
+      .get('/@:username/:rawProjectName', async ctx => {
+        const { username, rawProjectName } = ctx.params
         const projectName = rawProjectName.replace(/\.zip$/, '')
 
-        const user = await ctx.service.users.findOne({ login })
+        const user = await ctx.service.users.findOne({ username })
         ctx.assert(user, 404)
         const project = await ctx.service.projects.findOne({
-          userId: user.userId,
+          username: user.username,
           name: projectName,
         })
         ctx.assert(project, 404)

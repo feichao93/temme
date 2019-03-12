@@ -13,10 +13,10 @@ export interface UserInfo {
 
 export interface Project {
   _id: string
-  userId: number
+  username?: string
   name: string
   description: string
-  pageIds: number[]
+  pageIds?: number[]
   createdAt: string
   updatedAt: string
 }

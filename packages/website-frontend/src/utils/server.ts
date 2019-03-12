@@ -22,8 +22,8 @@ export async function savePage(page: PageRecord) {
   }
 }
 
-export async function getProject(login: string, projectName: string) {
-  const response = await fetch(`/api/project/${login}/${projectName}`)
+export async function getProject(username: string, projectName: string) {
+  const response = await fetch(`/api/project/${username}/${projectName}`)
   if (!response.ok) {
     throw new Error(`${response.status} ${await response.text()}`)
   }
@@ -69,13 +69,15 @@ export async function logout() {
   }
 }
 
-export async function getMyInfo() {
-  type ResponseJson = { login: string; userId: number; isAdmin: boolean }
-
+interface GetMyInfoResponse {
+  username: string
+  userId: number
+  isAdmin: boolean
+}
+export async function getMyInfo(): Promise<GetMyInfoResponse> {
   const response = await fetch('/api/my-info')
   if (response.ok) {
-    const { login: username, userId, isAdmin }: ResponseJson = await response.json()
-    return { username, userId, isAdmin }
+    return await response.json()
   } else {
     throw new Error(`${response.status} ${await response.text()}`)
   }
@@ -161,7 +163,7 @@ export interface CreateProjectData {
 }
 export async function createProject(
   data: CreateProjectData,
-): Promise<{ login: string; projectName: string }> {
+): Promise<{ username: string; projectName: string }> {
   const response = await fetch('/api/create-project', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -182,6 +184,15 @@ export async function createProjectByZip(zipFile: File): Promise<CreateProjectBy
     method: 'POST',
     body: formData,
   })
+  if (response.ok) {
+    return response.json()
+  } else {
+    throw new FetchError(response)
+  }
+}
+
+export async function getRecommendedProjects(): Promise<Project[]> {
+  const response = await fetch('/api/recommended-projects')
   if (response.ok) {
     return response.json()
   } else {

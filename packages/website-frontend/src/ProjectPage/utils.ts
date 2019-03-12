@@ -18,7 +18,7 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
     language: 'html',
     theme: 'vs-dark',
     minimap: {
-      renderCharacters: false,
+      enabled: false,
     },
   },
   selector: {
@@ -26,7 +26,7 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
     language: null as string,
     theme: 'vs-dark',
     minimap: {
-      renderCharacters: false,
+      enabled: false,
     },
   },
   output: {
@@ -35,7 +35,7 @@ export const INIT_EDITOR_OPTIONS: InitEditorOptions = {
     theme: 'vs-dark',
     readOnly: true,
     minimap: {
-      renderCharacters: false,
+      enabled: false,
     },
   },
 }

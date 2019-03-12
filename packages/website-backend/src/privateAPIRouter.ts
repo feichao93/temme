@@ -4,26 +4,26 @@ import { getProjectDataFromZip, randomString, remove } from './common'
 import { CreateProjectData, Page, Project } from './interfaces'
 
 function requireSignedIn(ctx: Router.IRouterContext, next: any) {
-  const userId: number = ctx.session.userId
-  ctx.assert(userId && userId !== -1, 401, 'Require signed in')
+  const username: string = ctx.session.username
+  ctx.assert(username, 401, 'Require signed in')
   return next()
 }
 
 async function createProject(ctx: Router.IRouterContext) {
   const data: CreateProjectData = ctx.request.body
-  const userId = ctx.session.userId
+  const username: string = ctx.session.username
   data.name += `-${randomString()}` // 添加一个随机后缀，避免名称冲突
-  await ctx.service.createProject(userId, data)
-  const user = await ctx.service.users.findOne({ userId })
-  ctx.body = { login: user.login, projectName: data.name }
+  await ctx.service.createProject(username, data)
+  const user = await ctx.service.users.findOne({ username })
+  ctx.body = { username: user.username, projectName: data.name }
 }
 
 async function createProjectByZip(ctx: Router.IRouterContext) {
   const uploadedFile = ctx.request.files.zipFile
   const { data, warnings } = await getProjectDataFromZip(uploadedFile)
-  const userId = ctx.session.userId
+  const username: string = ctx.session.username
   data.name += `-${randomString()}` // 添加一个随机后缀，避免名称冲突
-  const project = await ctx.service.createProject(userId, data)
+  const project = await ctx.service.createProject(username, data)
   ctx.body = { project, warnings }
 }
 
@@ -34,14 +34,14 @@ async function addProject(ctx: Router.IRouterContext) {
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
 
-  const userId = ctx.session.userId
-  const existedProject = await ctx.service.projects.findOne({ name, userId })
+  const username: string = ctx.session.username
+  const existedProject = await ctx.service.projects.findOne({ name, username })
   ctx.assert(existedProject == null, 400, 'Project name already exists')
 
   const now = new Date().toISOString()
   const newProject: Project = {
     _id: uuid(),
-    userId,
+    username,
     name,
     description,
     pageIds: [],
@@ -55,11 +55,11 @@ async function addProject(ctx: Router.IRouterContext) {
 // 删除一个 project
 async function deleteProject(ctx: Router.IRouterContext) {
   const { projectId } = ctx.request.body
-  const userId = ctx.session.userId
+  const username: string = ctx.session.username
 
   const project = await ctx.service.projects.findOne({ _id: projectId })
   ctx.assert(project, 404)
-  ctx.assert(project.userId === userId, 401)
+  ctx.assert(project.username === username, 401)
 
   await ctx.service.projects.deleteOne({ _id: projectId })
   await ctx.service.pages.deleteMany({ pageId: { $in: project.pageIds } })
@@ -71,10 +71,10 @@ async function updateProjectMeta(ctx: Router.IRouterContext) {
   const isNameValid = typeof name === 'string' && name.length > 0
   ctx.assert(isNameValid, 400, 'Invalid new project name.')
 
-  const userId = ctx.session.userId
+  const username: string = ctx.session.username
   const existedProject = await ctx.service.projects.findOne({
     name,
-    userId,
+    username,
     _id: { $not: { $eq: projectId } },
   })
   ctx.assert(existedProject == null, 400, 'Project name already used')
@@ -91,10 +91,10 @@ async function addPage(ctx: Router.IRouterContext) {
   const { projectId, name } = ctx.request.body
   ctx.assert(typeof name === 'string' && name.length > 0, 400, `Invalid name - ${name}`)
 
-  const userId = ctx.session.userId
+  const username: string = ctx.session.username
   const project = await ctx.service.projects.findOne({ _id: projectId })
   ctx.assert(project != null, 404)
-  ctx.assert(project.userId === userId, 401, `No access to project with id ${projectId}`)
+  ctx.assert(project.username === username, 401, `No access to project with id ${projectId}`)
 
   const pageId = uuid()
   const now = new Date().toISOString()
@@ -122,8 +122,8 @@ async function updatePage(ctx: Router.IRouterContext) {
   const page = await ctx.service.pages.findOne({ _id: pageId })
   ctx.assert(page != null, 404)
   const project = await ctx.service.projects.findOne({ _id: page.projectId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
+  const username: string = ctx.session.username
+  ctx.assert(project.username === username, 401)
 
   const now = new Date().toDateString()
   await ctx.service.pages.updateOne({ _id: pageId }, { $set: { updatedAt: now, html, selector } })
@@ -138,8 +138,8 @@ async function updatePageMeta(ctx: Router.IRouterContext) {
   const page = await ctx.service.pages.findOne({ _id: pageId })
   ctx.assert(page != null, 404)
   const project = await ctx.service.projects.findOne({ _id: page.projectId })
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
+  const username: string = ctx.session.username
+  ctx.assert(project.username === username, 401)
 
   const now = new Date().toISOString()
   await ctx.service.pages.updateOne({ _id: pageId }, { $set: { updatedAt: now, name } })
@@ -153,8 +153,8 @@ async function deletePage(ctx: Router.IRouterContext) {
   const project = await ctx.service.projects.findOne({ pageIds: pageId })
   ctx.assert(project, 404)
 
-  const userId = ctx.session.userId
-  ctx.assert(project.userId === userId, 401)
+  const username: string = ctx.session.username
+  ctx.assert(project.username === username, 401)
 
   remove(project.pageIds, pageId)
   const now = new Date().toISOString()

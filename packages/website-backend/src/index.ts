@@ -9,7 +9,7 @@ import Router from 'koa-router'
 import session from 'koa-session'
 import serve from 'koa-static'
 import { MongoClient } from 'mongodb'
-import adminAPIRouter from "./adminAPIRouter";
+import adminAPIRouter from './adminAPIRouter'
 import archiveApp from './archiveApp'
 import CONFIG from './config'
 import { exchangeOAuthData, fetchUserInfo } from './gh-utils'
@@ -45,10 +45,16 @@ async function oauthCallbackHandler(ctx: Context) {
     const { access_token } = await exchangeOAuthData(code)
     const userInfo = await fetchUserInfo(access_token)
     await ctx.service.updateUserProfile(userInfo.id, access_token, userInfo)
-    ctx.session.userId = userInfo.id
+    ctx.session.username = userInfo.login
 
-    const adminPart = userInfo.login === CONFIG.admin ? '&isAdmin' : ''
-    ctx.redirect(`/login-success?userId=${userInfo.id}&username=${userInfo.login}${adminPart}`)
+    const searchParams = new URLSearchParams()
+    searchParams.set('userId', String(userInfo.id))
+    searchParams.set('username', userInfo.login)
+    if (userInfo.login === CONFIG.admin) {
+      searchParams.set('isAdmin', '')
+    }
+
+    ctx.redirect(`/login-success?${searchParams}`)
   } catch (e) {
     ctx.throw(400, e.message)
   }

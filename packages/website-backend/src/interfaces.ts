@@ -11,24 +11,28 @@ export interface OAuthError {
 }
 
 export interface UserInfo {
+  /** 用户名，例如「shinima」 */
   login: string
+  /** 用户的数字 ID */
   id: number
+  /** 用户头像的图片地址 */
   avatar_url: string
-  html_url: string
+  /** 用户的名字，例如 「肥超」 */
   name: string
+
   // 这里忽略了其他许多暂时用不到的字段
 }
 
 export interface UserProfile {
   userId: number
-  login: string
+  username: string
   access_token: string
   userInfo: UserInfo
 }
 
 export interface Project {
   _id: string
-  userId: number
+  username: string
   name: string
   description: string
   pageIds: string[]
@@ -56,4 +60,12 @@ export interface PageData {
   name: string
   html: string
   selector: string
+}
+
+/** 管理员在 admin-page 中的配置 */
+export interface AdminConfig {
+  recommendedProjects: Array<{
+    username: string
+    projectName: string
+  }>
 }

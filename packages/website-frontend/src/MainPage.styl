@@ -5,11 +5,13 @@
   flex-flow column
 
   > main {
+    flex 0 0 auto
     display flex
     flex-flow column
 
     .intro-text {
-      text-align center
+      width 800px
+      margin auto
       > h1 {
         font-size 30px
       }
@@ -20,9 +22,16 @@
       }
     }
 
-    .examples {
-      //width 1000px
+    .recommendations {
       margin auto
+      width 800px
+      margin-top 24px
+
+      .project-list {
+        .project-item:first-child {
+          padding-top 0
+        }
+      }
     }
   }
 

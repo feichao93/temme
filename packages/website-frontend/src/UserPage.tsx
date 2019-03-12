@@ -1,10 +1,10 @@
 import { Button, ButtonGroup, Tooltip } from '@blueprintjs/core'
 import React, { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Link, match } from 'react-router-dom'
 import { useDialogs } from './dialogs'
 import Header from './Header'
 import { EmailIcon, GithubIcon, LocationIcon } from './icons'
+import ProjectDescription from './ProjectDescription'
 import { EditProjectDialog, NewProjectDialog } from './ProjectDialog'
 import toaster from './toaster'
 import { Project, UserInfo } from './types'
@@ -14,7 +14,7 @@ import * as server from './utils/server'
 import { useSession } from './utils/session'
 
 interface Params {
-  login: string
+  username: string
 }
 
 interface DialogState {
@@ -24,14 +24,14 @@ interface DialogState {
 }
 
 export default function UserPage({ match }: { match: match<Params> }) {
-  const login = match.params.login
+  const username = match.params.username
   const dialogs = useDialogs()
-  const { username } = useSession()
+  const session = useSession()
 
   const [userInfo, setUserInfo] = useState<UserInfo>(null)
   const [projectList, setProjectList] = useState<Project[]>(null)
   const [is404, set404] = useState(false)
-  useEffect(() => set404(false), [login])
+  useEffect(() => set404(false), [username])
 
   const [dialogState, setDialogState] = useState<DialogState>({
     isOpen: false,
@@ -45,10 +45,10 @@ export default function UserPage({ match }: { match: match<Params> }) {
       : null
 
   useEffect(() => {
-    if (login) {
-      fetchUserInfo(login)
+    if (username) {
+      fetchUserInfo(username)
     }
-  }, [login])
+  }, [username])
 
   if (is404) {
     return (
@@ -88,7 +88,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
         <div className="user-profile">
           <img className="avatar mb16" src={userInfo.avatar_url} alt="avatar-icon" />
           <div className="fullname">{userInfo.name}</div>
-          <div className="username mb16">{login}</div>
+          <div className="username mb16">{username}</div>
           <div className="bio mb16">{userInfo.bio}</div>
           {userInfo.location && (
             <div className="location">
@@ -114,7 +114,7 @@ export default function UserPage({ match }: { match: match<Params> }) {
               项目
               <span className="count">{projectList.length}</span>
             </div>
-            {username === login && (
+            {session.username === username && (
               <ButtonGroup style={{ marginLeft: 'auto', alignSelf: 'center' }}>
                 <Tooltip content="从 zip 文件中导入项目">
                   <Button icon="import" text="导入" onClick={onRequestImportProject} />
@@ -131,14 +131,12 @@ export default function UserPage({ match }: { match: match<Params> }) {
             {projectList &&
               projectList.map(project => (
                 <div key={project._id} className="project-item">
-                  <Link className="project-name" to={`/@${login}/${project.name}`}>
+                  <Link className="project-name" to={`/@${username}/${project.name}`}>
                     {project.name}
                   </Link>
-                  <div className="project-description">
-                    <ReactMarkdown source={project.description} />
-                  </div>
+                  <ProjectDescription project={project} />
                   <div className="project-update">{fromNow(project.updatedAt)}前更新</div>
-                  {username === login && (
+                  {session.username === username && (
                     <div className="manage-project">
                       <ButtonGroup>
                         <Button

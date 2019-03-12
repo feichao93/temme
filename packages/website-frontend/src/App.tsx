@@ -36,7 +36,7 @@ export default function App() {
           </React.Suspense>
         )}
       />
-      <Route path="/@:login" component={UserPage} />
+      <Route path="/@:username" component={UserPage} />
       <Route path="/" component={MainPage} />
     </Switch>
   )

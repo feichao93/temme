@@ -35,8 +35,8 @@ function applyReducer<A extends actions.Action>(reducer: (state: State, action: 
   }
 }
 
-export default function* saga(login: string, projectName: string, initPageName?: string) {
-  yield io.fork(loadProjectData, login, projectName, initPageName)
+export default function* saga(username: string, projectName: string, initPageName?: string) {
+  yield io.fork(loadProjectData, username, projectName, initPageName)
 
   yield takeEvery(
     a('update-active-html-avid'),
@@ -51,7 +51,12 @@ export default function* saga(login: string, projectName: string, initPageName?:
     ),
   )
 
-  yield takeEvery(a('request-download-project'), handleRequestDownloadProject, login, projectName)
+  yield takeEvery(
+    a('request-download-project'),
+    handleRequestDownloadProject,
+    username,
+    projectName,
+  )
   yield takeEvery(a('open-page'), function*({ pageId }: actions.OpenPage) {
     yield openPage(pageId)
   })
@@ -72,7 +77,7 @@ export default function* saga(login: string, projectName: string, initPageName?:
   })
 }
 
-function* handleRequestDownloadProject(login: string, projectName: string) {
+function* handleRequestDownloadProject(username: string, projectName: string) {
   // 在下载之前需要先确保当前更改都已被保存
   const { dialogs }: SagaEnv = yield io.getEnv()
   const state: State = yield io.select()
@@ -97,7 +102,7 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
   }
 
   const url = new URL(document.URL)
-  url.pathname = `/archive/@${login}/${projectName}`
+  url.pathname = `/archive/@${username}/${projectName}`
   // 创建一个用于下载的 anchor 标签，并点击该 anchor
   const anchor = document.createElement('a')
   anchor.href = url.href
@@ -105,12 +110,12 @@ function* handleRequestDownloadProject(login: string, projectName: string) {
   anchor.click()
 }
 
-function* loadProjectData(login: string, projectName: string, initPageName?: string) {
+function* loadProjectData(username: string, projectName: string, initPageName?: string) {
   type Data = AsyncReturnType<typeof server.getProject>
   const { dialogs }: SagaEnv = yield io.getEnv()
   try {
     yield io.update((s: State) => s.set('readyState', 'loading'))
-    const data: Data = yield server.getProject(login, projectName)
+    const data: Data = yield server.getProject(username, projectName)
 
     const { pages }: State = yield io.update((state: State) => {
       const maxPagePostfix = data.pages
@@ -137,7 +142,7 @@ function* loadProjectData(login: string, projectName: string, initPageName?: str
       message: (
         <span>
           <b style={{ color: '#b13b00' }}>
-            @{login}/{projectName}
+            @{username}/{projectName}
           </b>{' '}
           加载失败，请确保该项目存在。刷新页面以尝试重试加载。
         </span>
@@ -271,9 +276,9 @@ function* handleRequestDeletePage({ pageId }: actions.RequestDeletePage) {
     const state: State = yield io.update(updaters.deletePage, pageId)
     if (pageId === state.activePageId) {
       if (state.pages.isEmpty()) {
-        closePage()
+        yield closePage()
       } else {
-        openPage(state.pages.map(p => p._id).min())
+        yield openPage(state.pages.map(p => p._id).min())
       }
     }
     toaster.show({
@@ -304,13 +309,13 @@ function* handleRequestImportProject() {
   const activePage = state.pages.get(state.activePageId)
 
   try {
-    const { login, projectName } = yield server.createProject(data)
+    const { username, projectName } = yield server.createProject(data)
     toaster.show({
       intent: 'success',
-      message: `已创建 @${login}/${projectName}`,
+      message: `已创建 @${username}/${projectName}`,
       action: {
         onClick() {
-          history.push(`/@${login}/${projectName}?page=${activePage.name}`)
+          history.push(`/@${username}/${projectName}?page=${activePage.name}`)
         },
         text: '打开',
       },

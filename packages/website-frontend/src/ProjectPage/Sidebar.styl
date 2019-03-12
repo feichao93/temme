@@ -17,7 +17,13 @@ $list-item {
   overflow hidden
 
   > header {
+    display flex
+    flex-flow column
+    flex 0 0 auto
+    max-height 50%
+
     .title {
+      flex 0 0 auto
       display flex
       margin 0
       padding-left 8px
@@ -34,7 +40,9 @@ $list-item {
     }
 
     .description {
-      margin 8px 16px
+      margin 8px
+      overflow-y auto
+      overflow-x hidden
     }
   }
 
@@ -47,15 +55,6 @@ $list-item {
       display flex
       flex-flow column
       overflow-x hidden
-      ::-webkit-scrollbar {
-        width: 13px
-      }
-      ::-webkit-scrollbar-thumb {
-        background-color: rgba(121, 121, 121, 0.4)
-      }
-      ::-webkit-scrollbar-track {
-        background: transparent
-      }
     }
   }
 

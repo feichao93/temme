@@ -1,11 +1,11 @@
-import { Button, Code, Icon, Tab, Tabs, Tag } from '@blueprintjs/core'
+import { Button, Code, Tab, Tabs } from '@blueprintjs/core'
 import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
+import './AdminPage.styl'
 import Header from './Header'
 import { ProjectRecord } from './types'
 import { useSession } from './utils/session'
-import './AdminPage.styl'
 
 enum TabId {
   dataManagement,
@@ -13,8 +13,12 @@ enum TabId {
   hotProjects,
 }
 
+function getPageCount(project: any) {
+  return project.pageIds.length
+}
+
 function DataManagementTab() {
-  const [users, setUsers] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([]) // TODO 完善类型信息
 
   useEffect(() => {
     const url = new URL('/api/admin/list-users', document.URL)
@@ -32,18 +36,20 @@ function DataManagementTab() {
   return (
     <ul className="user-list">
       {users.map(user => (
-        <li key={user.userId}>
+        <li key={user.username}>
           <div className="user-info">
-            <img className="avatar" src={user.userInfo.avatar_url} alt="avatar-icon" />
-            <span className="username">{user.login}</span>
+            <Link to={`/@${user.username}`}>
+              <img className="avatar" src={user.userInfo.avatar_url} alt="avatar-icon" />
+            </Link>
+            <span className="username">{user.username}</span>
           </div>
           <div className="project-list-wrapper">
             <div style={{ fontWeight: 'bold' }}>项目列表({user.projects.length})：</div>
             <ul className="project-list">
               {user.projects.map((project: ProjectRecord, index: number) => (
                 <li key={project._id}>
-                  {index + 1}. <Code>{project.pageIds.length}</Code> {project.name}
-                  <Link to={`/@${user.login}/${project.name}`}>
+                  {index + 1}. <Code>{getPageCount(project)}</Code> {project.name}
+                  <Link to={`/@${user.username}/${project.name}`}>
                     <Button style={{ marginLeft: 4 }} minimal small icon="eye-open" />
                   </Link>
                 </li>
