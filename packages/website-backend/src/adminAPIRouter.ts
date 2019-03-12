@@ -30,7 +30,9 @@ async function banUser(ctx: Router.IRouterContext) {
 }
 
 async function setRecommendedProjects(ctx: Router.IRouterContext) {
-  ctx.throw(400, '仍在实现中')
+  const recommendedProjects = ctx.request.body
+  await ctx.service.setAdminConfig({ recommendedProjects })
+  ctx.status = 200
 }
 
 export default new Router({ prefix: '/admin' })

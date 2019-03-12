@@ -11,6 +11,7 @@ import {
 } from '@blueprintjs/core'
 import classNames from 'classnames'
 import React from 'react'
+import LinkButton from './LinkButton'
 import history from './utils/history'
 import { useSession } from './utils/session'
 
@@ -19,16 +20,7 @@ export function NavPartContent() {
     <>
       <NavbarHeading>Temme</NavbarHeading>
       <NavbarDivider />
-      <AnchorButton
-        minimal
-        icon="home"
-        text="主页"
-        href="/"
-        onClick={(e: React.MouseEvent) => {
-          e.preventDefault()
-          history.push('/')
-        }}
-      />
+      <LinkButton minimal icon="home" text="主页" href="/" />
       <AnchorButton
         minimal
         icon="git-repo"

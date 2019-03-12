@@ -199,3 +199,20 @@ export async function getRecommendedProjects(): Promise<Project[]> {
     throw new FetchError(response)
   }
 }
+
+export async function setRecommendedProjects(
+  recs: Array<{ username: string; projectName: string }>,
+) {
+  const response = await fetch('/api/admin/set-recommended-projects', {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(recs),
+  })
+  if (response.ok) {
+    return true
+  } else {
+    throw new FetchError(response)
+  }
+}

@@ -39,6 +39,7 @@ export default function MainPage() {
                   <div className="project-update">{fromNow(project.updatedAt)}前更新</div>
                 </div>
               ))}
+              {projects.length === 0 && <p style={{ fontSize: '20px' }}>暂无推荐项目</p>}
             </div>
           </div>
         )}

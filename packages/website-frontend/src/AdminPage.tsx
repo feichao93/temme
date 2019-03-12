@@ -1,10 +1,13 @@
-import { Button, Code, Tab, Tabs } from '@blueprintjs/core'
+import { Button, Classes, Code, Tab, Tabs } from '@blueprintjs/core'
+import { List, Record } from 'immutable'
 import React, { useEffect, useState } from 'react'
 import { Redirect } from 'react-router'
 import { Link } from 'react-router-dom'
 import './AdminPage.styl'
 import Header from './Header'
 import { ProjectRecord } from './types'
+import useInput from './utils/common'
+import * as server from './utils/server'
 import { useSession } from './utils/session'
 
 enum TabId {
@@ -62,10 +65,76 @@ function DataManagementTab() {
   )
 }
 
+class RecRecord extends Record({ username: '', projectName: '' }) {}
+
+function RecommendationTab() {
+  const [recs, setRecs] = useState(List<RecRecord>())
+  const usernameInput = useInput('')
+  const projectNameInput = useInput('')
+
+  useEffect(() => {
+    server.getRecommendedProjects().then(projects => {
+      const nextRecs = List(
+        projects.map(({ username, name }) => new RecRecord({ username, projectName: name })),
+      )
+      setRecs(nextRecs)
+    })
+  }, [])
+
+  async function onAddRec() {
+    const rec = new RecRecord({
+      username: usernameInput.value,
+      projectName: projectNameInput.value,
+    })
+    const nextRecs = recs.push(rec)
+    await server.setRecommendedProjects(nextRecs.toJS())
+    setRecs(nextRecs)
+    usernameInput.setValue('')
+    projectNameInput.setValue('')
+  }
+
+  async function onDeleteRec(index: number) {
+    const nextRecs = recs.delete(index)
+    await server.setRecommendedProjects(nextRecs.toJS())
+    setRecs(nextRecs)
+  }
+
+  return (
+    <div>
+      <h2>推荐项目列表</h2>
+      <ul style={{ paddingLeft: 16 }}>
+        {recs.map(({ username, projectName }, index) => (
+          <li key={index} style={{ display: 'flex', alignItems: 'center' }}>
+            <Button icon="trash" small minimal intent="danger" onClick={() => onDeleteRec(index)} />
+            <Link to={`/@${username}/${projectName}`}>
+              @{username}/{projectName}
+            </Link>
+          </li>
+        ))}
+        <li style={{ display: 'flex', alignItems: 'center' }}>
+          <input
+            type="text"
+            className={Classes.INPUT}
+            placeholder="username"
+            {...usernameInput.props}
+          />
+          <input
+            type="text"
+            className={Classes.INPUT}
+            placeholder="projectName"
+            {...projectNameInput.props}
+          />
+          <Button icon="add" intent="success" onClick={onAddRec} />
+        </li>
+      </ul>
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const session = useSession()
 
-  const [selectedTabId, setSelectTabId] = useState(TabId.dataManagement)
+  const [selectedTabId, setSelectTabId] = useState(TabId.hotProjects)
 
   if (!session.connected) {
     return null
@@ -91,7 +160,7 @@ export default function AdminPage() {
             panel={<DataManagementTab />}
           />
           <Tab id={TabId.trafficStat} title="查看最近流量" panel={<h1>仍在开发中...</h1>} />
-          <Tab id={TabId.hotProjects} title="推荐项目配置" panel={<h1>仍在开发中...</h1>} />
+          <Tab id={TabId.hotProjects} title="推荐项目配置" panel={<RecommendationTab />} />
         </Tabs>
       </main>
     </div>
