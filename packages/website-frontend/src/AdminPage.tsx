@@ -134,7 +134,7 @@ function RecommendationTab() {
 export default function AdminPage() {
   const session = useSession()
 
-  const [selectedTabId, setSelectTabId] = useState(TabId.hotProjects)
+  const [selectedTabId, setSelectTabId] = useState(TabId.dataManagement)
 
   if (!session.connected) {
     return null

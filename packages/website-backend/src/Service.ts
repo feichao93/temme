@@ -22,7 +22,7 @@ export default class Service {
   }
 
   async setAdminConfig(config: AdminConfig) {
-    return this.db.collection('config').updateOne({}, { $set: config })
+    return this.db.collection('config').updateOne({}, { $set: config }, { upsert: true })
   }
 
   updateUserProfile(userId: number, access_token: string, userInfo: UserInfo) {
