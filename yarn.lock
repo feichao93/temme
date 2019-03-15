@@ -680,10 +680,10 @@
   resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.29.tgz#aa845204cd0a289f65d47e0de63a6a815e30cc66"
   integrity sha512-lRVw09gOvgviOfeUrKc/pmTiRZ7g7oDOU6OAutyuSHpm1/o2RaBQvRhgK8QEdu+FFuw/wnWb29A/iuxv9i8OpQ==
 
-"@zeit/ncc@^0.15.2":
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/@zeit/ncc/-/ncc-0.15.2.tgz#14b232c2ecdb3a9c5923c34e83ef16e71c96387f"
-  integrity sha512-O5olWTrJ/b/gI1pxHgolV8Gwx0aA5BUCYIaAGcIHzIe55CMU+J1CgpRCRGzOLyqal7bV/l0quFgl8vcT8G3DTg==
+"@zeit/ncc@^0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@zeit/ncc/-/ncc-0.16.0.tgz#e40b70c277786a014bad04830ac968f946973173"
+  integrity sha512-C6to1HjG0nLHNq4nDVHW4SmO37Ya+pyxbWh7eutcxzmVcD00VHJeGAQLS0P81BNSyH96ysK/WjD6iHRYQIY70Q==
 
 JSONStream@^1.0.4, JSONStream@^1.3.4:
   version "1.3.5"
