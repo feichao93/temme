@@ -742,10 +742,10 @@
   resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.29.tgz#aa845204cd0a289f65d47e0de63a6a815e30cc66"
   integrity sha512-lRVw09gOvgviOfeUrKc/pmTiRZ7g7oDOU6OAutyuSHpm1/o2RaBQvRhgK8QEdu+FFuw/wnWb29A/iuxv9i8OpQ==
 
-"@zeit/ncc@^0.18.5":
-  version "0.18.5"
-  resolved "https://registry.npm.taobao.org/@zeit/ncc/download/@zeit/ncc-0.18.5.tgz#5687df6c32f1a2e2486aa110b3454ccebda4fb9c"
-  integrity sha1-VoffbDLxouJIaqEQs0VMzr2k+5w=
+"@zeit/ncc@^0.19.0":
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/@zeit/ncc/-/ncc-0.19.0.tgz#1aa89d71eecdcf55fec1c824e7b9bfc1dcb7dde3"
+  integrity sha512-SV/90XT+TTNAcdJDGXJU4Jh14ygQXTJFvg/qIa99m/ev3RrBk2KGrWoi0ENS8iP2mePoHW0jsapDS76X+O46Ag==
 
 JSONStream@^1.0.4, JSONStream@^1.3.4:
   version "1.3.5"
