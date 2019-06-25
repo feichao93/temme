@@ -59,6 +59,7 @@ export default function temme(
     return null
   }
 
+  /* istanbul ignore else */
   if (process.env.NODE_ENV !== 'production') {
     rootSelectorArray.forEach(checkRootSelector)
   }
