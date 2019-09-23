@@ -1,9 +1,9 @@
-// https://stackoverflow.com/questions/47772015/toggle-between-two-stylesheets
+// <test> https://stackoverflow.com/questions/47772015/toggle-between-two-stylesheets
 
 #question-header a[href=$link]{$title};
 
 .question .vote-count-post{$upvoteCount|Number};
-.question .post-text{$postText|html|trim};
+.question .post-text{html($postText|trim)};
 .question .post-tag@tagList{ &{$} };
 .question .post-signature:last-child .user-details a{$askedBy};
 
@@ -13,7 +13,7 @@
   &.accepted-answer{$accepted = true};
   .vote-count-post{$upvoteCount|Number};
 
-  .post-text{$postText|html|trim};
+  .post-text{html($postText|trim)};
   .post-signature:last-child .user-details a{$answeredBy};
   .user-action-time{$action|trim}
 

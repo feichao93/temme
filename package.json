@@ -4,14 +4,19 @@
   "description": "Temme monorepo",
   "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
   "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "postinstall": "lerna bootstrap",
+    "postinstall": "yarn install-typings",
+    "install-typings": "node ./node_modules/vscode/bin/install",
     "test": "lerna run --parallel test",
     "build": "lerna run --parallel build",
-    "start:website": "npm run --prefix=packages/website start",
-    "start:temme": "npm run --prefix=packages/temme start",
-    "start:vscode-temme": "npm run --prefix=packages/vscode-temme start",
-    "package-website": "ncc build --out dist packages/website-backend/src/index.ts && npm run --prefix=packages/website-frontend build && copyfiles --up=3 \"packages/website-frontend/dist/**/*\" dist/public"
+    "start:temme": "yarn workspace temme start",
+    "start:vscode-temme": "yarn workspace vscode-temme start"
+  },
+  "engines": {
+    "vscode": "^1.22.0"
   },
   "devDependencies": {
     "@zeit/ncc": "^0.20.1",

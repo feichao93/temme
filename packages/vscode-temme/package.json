@@ -9,8 +9,6 @@
   "repository": "https://github.com/shinima/temme.git",
   "main": "dist/index.js",
   "scripts": {
-    "postinstall": "npm run install-typings",
-    "install-typings": "node ./node_modules/vscode/bin/install",
     "start": "npm-run-all --parallel start:*",
     "start:grammar": "supervisor --no-restart-on exit --watch temme.tmLanguage.yaml -e yaml -- compile.js",
     "start:ext": "webpack --watch --mode=development",
