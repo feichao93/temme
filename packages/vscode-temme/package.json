@@ -76,7 +76,7 @@
     "supervisor": "^0.12.0",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.2",
-    "vscode": "1.1.34",
+    "vscode": "1.1.36",
     "webpack": "^4.35.0",
     "webpack-cli": "^3.3.5",
     "webpack-dev-server": "^3.7.2"
