@@ -21,11 +21,11 @@ function config(output) {
 export default [
   config({
     format: 'es',
-    file: 'dist/temme.mjs',
+    file: pkg.module,
   }),
   config({
     format: 'cjs',
     exports: 'named',
-    file: 'dist/temme.js',
+    file: pkg.main,
   }),
 ]

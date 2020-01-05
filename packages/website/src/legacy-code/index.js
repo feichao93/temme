@@ -9,6 +9,11 @@ import {
   saveContentToLocalStorage,
 } from './localStorageUtils'
 
+import * as Temme from 'temme'
+window.Temme = Temme
+console.log('window.Temme =', Temme)
+console.log('Temme.version =', Temme.version)
+
 /* static elements */
 const versionSpan = document.querySelector('#version')
 const browseExampleLink = document.querySelector('#browse-example-link')

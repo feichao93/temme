@@ -3,7 +3,7 @@
   "version": "0.8.3",
   "description": "Concise selector to extract JSON from HTML.",
   "main": "dist/temme.js",
-  "module": "dist/temme.mjs",
+  "module": "dist/temme.esm.js",
   "unpkg": "dist/temme.umd.js",
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/shinima/temme.git",

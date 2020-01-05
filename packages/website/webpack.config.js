@@ -11,16 +11,13 @@ const config = (_env, argv) => {
     'lz-string': 'LZString',
   }
 
-  if (prod) {
-    externals.temme = 'Temme'
-  }
-
   return {
     context: __dirname,
     target: 'web',
+    entry: path.resolve(__dirname, 'src/main.tsx'),
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: 'bundle.[chunkhash:6].js',
+      filename: prod ? 'bundle.[chunkhash:6].js' : 'bundle.js',
     },
 
     resolve: {
@@ -44,16 +41,17 @@ const config = (_env, argv) => {
     externals,
 
     plugins: [
+      !prod && new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         TEMME_VERSION: JSON.stringify(pkg.version),
       }),
       new HtmlWebpackPlugin({
         template: 'index.html',
-        temmeVersion: prod ? pkg.version : null,
       }),
     ],
 
     devServer: {
+      hot: true,
       contentBase: [path.resolve(__dirname, 'public')],
     },
   }

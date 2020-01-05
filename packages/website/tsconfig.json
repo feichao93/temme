@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "es2015",
+    "target": "es2019",
+    "jsx": "react",
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "strictNullChecks": false,
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
