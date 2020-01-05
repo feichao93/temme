@@ -13,7 +13,8 @@
     "test": "lerna run --parallel test",
     "build": "lerna run --parallel build",
     "start:temme": "yarn workspace temme start",
-    "start:vscode-temme": "yarn workspace vscode-temme start"
+    "start:vscode-temme": "yarn workspace vscode-temme start",
+    "start:website": "yarn workspace website start"
   },
   "engines": {
     "vscode": "^1.22.0"
