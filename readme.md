@@ -6,14 +6,8 @@
 
 temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中提取所需的 JSON 数据。
 
-## NEWS
-
-✨ 新版网站处于 beta 阶段，欢迎大家试用。 https://temmejs.org ✨
-
-## 相关链接
-
 - [中文文档](/docs/zh-cn/)
-- [在线版本（旧版网站）](https://temme.js.org)
+- [在线版本](https://temme.js.org)
 - [VSCode 插件](https://marketplace.visualstudio.com/items?itemName=shinima.vscode-temme)
 - [反馈 / 疑问](https://github.com/shinima/temme/issues)
 - [升级指南](/docs/zh-cn/upgrade-guide-0.7-to-0.8.md)
