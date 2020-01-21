@@ -33,6 +33,8 @@ temme 是一个类 jQuery 的选择器，用于简洁优雅地从 HTML 文档中
 
 ```javascript
 import temme from 'temme'
+// 使用 commonjs 导入时需要加上 .default
+// const temme = require('temme').default
 
 const selector = `li@fruits {
   span[data-color=$color]{$name};

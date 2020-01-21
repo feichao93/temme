@@ -35,6 +35,8 @@ We could the following temme selector to extract _an array of fruit color and na
 
 ```javascript
 import temme from 'temme'
+// Note the `.default` if you are using commonjs
+// const temme = require('temme').default
 
 const selector = `li@fruits {
   span[data-color=$color]{$name};
