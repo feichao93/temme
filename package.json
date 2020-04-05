@@ -20,7 +20,7 @@
     "vscode": "^1.22.0"
   },
   "devDependencies": {
-    "@zeit/ncc": "^0.22.0",
+    "@zeit/ncc": "^0.22.1",
     "copyfiles": "^2.1.1",
     "lerna": "^3.20.2",
     "mixin-deep": "^2.0.1",
