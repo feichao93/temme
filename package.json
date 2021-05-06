@@ -2,7 +2,7 @@
   "private": true,
   "name": "temme",
   "description": "Temme monorepo",
-  "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
+  "author": "Shi Feichao <842351815@qq.com>",
   "license": "MIT",
   "workspaces": [
     "packages/*"

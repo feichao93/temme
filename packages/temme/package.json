@@ -8,7 +8,7 @@
   "typings": "dist/index.d.ts",
   "repository": "https://github.com/shinima/temme.git",
   "homepage": "https://temme.js.org",
-  "author": "Shi Feichao <842351815@qq.com> (shinima.pw)",
+  "author": "Shi Feichao <842351815@qq.com>",
   "license": "MIT",
   "bin": "./bin/temme.js",
   "engines": {
