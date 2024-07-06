@@ -214,10 +214,10 @@ ChildrenSelectors
   }
 
 Filter
-  = '||' name:IdentifierName args:LiteralArgs? {
+  = __? '||' __ name:IdentifierName args:LiteralArgs? {
     return { isArrayFilter: true, name, args: args || [] }
   }
-  / '|' name:IdentifierName args:LiteralArgs? {
+  / __? '|' __ name:IdentifierName args:LiteralArgs? {
     return { isArrayFilter: false, name, args: args || [] }
   }
 
